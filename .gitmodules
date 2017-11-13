@@ -1,0 +1,4 @@
+[submodule "External/Glyph"]
+	path = External/Glyph
+	url = https://github.com/ReMinoer/Glyph.git
+	branch = master
