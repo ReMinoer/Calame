@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F44FCC70-3106-4F78-BC8B-BA3CE8AD41FD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Calame.CompositionGraph</RootNamespace>
+    <AssemblyName>Calame.CompositionGraph</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Commands\CompositionGraphCommand.cs" />
+    <Compile Include="MenuDefinitions.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\CompositionGraphViewModel.cs" />
+    <Compile Include="Views\CompositionGraphView.xaml.cs">
+      <DependentUpon>CompositionGraphView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\CompositionGraphView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Caliburn.Micro">
+      <Version>2.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="GeminiWpf">
+      <Version>0.6.2</Version>
+    </PackageReference>
+    <PackageReference Include="MahApps.Metro">
+      <Version>1.2.4</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Calame\Calame.csproj">
+      <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
+      <Name>Calame</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
+      <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
+      <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
+      <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
+      <Name>Glyph.Composition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj">
+      <Project>{25400349-233E-404D-BB4E-A0CB4AF893EA}</Project>
+      <Name>Glyph.Engine</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

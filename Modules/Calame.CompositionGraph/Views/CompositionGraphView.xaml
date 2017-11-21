@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Calame.CompositionGraph.Views.CompositionGraphView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:composition="clr-namespace:Glyph.Composition;assembly=Glyph.Composition"
+             xmlns:viewModels="clr-namespace:Calame.CompositionGraph.ViewModels"
+             xmlns:utils="clr-namespace:Calame.Utils;assembly=Calame"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:CompositionGraphViewModel, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300"
+             d:DesignWidth="300">
+    <Grid>
+        <TreeView MinWidth="200" ItemsSource="{Binding Engine.Root.Components}">
+            <i:Interaction.Behaviors>
+                <utils:BindableSelectedItemBehavior SelectedItem="{Binding Selection, Mode=TwoWay}" />
+            </i:Interaction.Behaviors>
+            <TreeView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <utils:VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </TreeView.ItemsPanel>
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Components}" DataType="composition:IGlyphComponent">
+                    <TextBlock Text="{Binding Name}" />
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </Grid>
+</UserControl>

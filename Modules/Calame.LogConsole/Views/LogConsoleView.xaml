@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="Calame.LogConsole.Views.LogConsoleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:nlogviewer="clr-namespace:NlogViewer;assembly=NlogViewer"
+             xmlns:viewModels="clr-namespace:Calame.LogConsole.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:LogConsoleViewModel, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300"
+             d:DesignWidth="300">
+    <Grid>
+        <nlogviewer:NlogViewer TimeWidth="auto" LoggerNameWidth="0" LevelWidth="auto" ExceptionWidth="auto" MessageWidth="auto" />
+    </Grid>
+</UserControl>
