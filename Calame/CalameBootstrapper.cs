@@ -1,8 +1,11 @@
 ﻿using System;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Gemini;
+using MonoGame.Framework.WpfInterop;
 
 namespace Calame
 {
@@ -25,13 +28,18 @@ namespace Calame
             Window mainWindow = Application.MainWindow;
             if (mainWindow == null)
                 return;
-
+            
             mainWindow.Title = "Calame";
             mainWindow.WindowState = WindowState.Maximized;
-
             mainWindow.Icon = _icon;
         }
-        
+
+        protected override void BindServices(CompositionBatch batch)
+        {
+            base.BindServices(batch);
+            batch.AddExportedValue(new ContentManagerProvider(D3D11Client.GraphicsDevice));
+        }
+
 #if DEBUG
         protected override void Configure()
         {
