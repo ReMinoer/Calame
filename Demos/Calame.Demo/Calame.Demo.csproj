@@ -36,10 +36,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -55,6 +57,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\DemoGameData\GameData\RectangleData.cs" />
+    <Compile Include="Modules\DemoGameData\GameData\CircleData.cs" />
+    <Compile Include="Modules\DemoGameData\Module.cs" />
+    <Compile Include="Modules\DemoGameData\Editors\RectangleEditor.cs" />
+    <Compile Include="Modules\DemoGameData\Editors\CircleEditor.cs" />
+    <Compile Include="Modules\DemoGameData\Session\MovingSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -85,9 +93,65 @@
       <Project>{8cc36da5-321d-49ba-9ee2-56015ef5081f}</Project>
       <Name>Calame</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Collections\Diese.Collections.csproj">
+      <Project>{8E354191-E8E5-498B-9C24-A6765DA86417}</Project>
+      <Name>Diese.Collections</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Injection\Diese.Injection.csproj">
+      <Project>{6ADD41DC-F168-43C4-AD4E-F6B8218D8F7C}</Project>
+      <Name>Diese.Injection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Modelization\Diese.Modelization.csproj">
+      <Project>{0781ad0f-eb0f-442e-9a1c-34c2aa9319fd}</Project>
+      <Name>Diese.Modelization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Scheduling\Diese.Scheduling.csproj">
+      <Project>{ED3283B6-9691-4418-96D0-6E83AEE37540}</Project>
+      <Name>Diese.Scheduling</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese\Diese.csproj">
+      <Project>{f2f3feb2-8453-409e-b00c-96dc64ac8020}</Project>
+      <Name>Diese</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
+      <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
+      <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj">
+      <Project>{9EEF1863-44BE-423E-A29D-088C23AAC45E}</Project>
+      <Name>Fingear.MonoGame</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj">
+      <Project>{7EE0B116-6B49-4073-99D8-827DD68B8AE0}</Project>
+      <Name>Fingear</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
+      <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
+      <Name>Glyph.Composition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Core\Glyph.Core.csproj">
+      <Project>{bc40e833-0eaa-4bbc-97d8-1541276bba54}</Project>
+      <Name>Glyph.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj">
+      <Project>{25400349-233E-404D-BB4E-A0CB4AF893EA}</Project>
+      <Name>Glyph.Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Graphics\Glyph.Graphics.csproj">
+      <Project>{CC4D895F-646F-43C8-B25E-81CF5803ED7A}</Project>
+      <Name>Glyph.Graphics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj">
+      <Project>{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}</Project>
+      <Name>Glyph</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Modules\Calame.CompositionGraph\Calame.CompositionGraph.csproj">
       <Project>{f44fcc70-3106-4f78-bc8b-ba3ce8ad41fd}</Project>
       <Name>Calame.CompositionGraph</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Modules\Calame.DataModelViewer\Calame.DataModelViewer.csproj">
+      <Project>{a88c8133-f38b-4374-9022-ef27ae25141e}</Project>
+      <Name>Calame.DataModelViewer</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Modules\Calame.LogConsole\Calame.LogConsole.csproj">
       <Project>{ba726253-52ba-4543-be12-0cce2556e3da}</Project>
@@ -100,6 +164,10 @@
     <ProjectReference Include="..\..\Modules\Calame.SceneGraph\Calame.SceneGraph.csproj">
       <Project>{4a808252-5bb0-45e4-b814-4c732f12eb40}</Project>
       <Name>Calame.SceneGraph</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Modules\Calame.SceneViewer\Calame.SceneViewer.csproj">
+      <Project>{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}</Project>
+      <Name>Calame.SceneViewer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
