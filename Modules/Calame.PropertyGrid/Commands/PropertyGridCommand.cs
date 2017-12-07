@@ -13,7 +13,7 @@ namespace Calame.PropertyGrid.Commands
         [CommandDefinition]
         public class Definition : CommandDefinition
         {
-            public const string CommandName = "Demos.PropertyGrid";
+            public const string CommandName = "PropertyGrid.Open";
             public override string Name => CommandName;
             public override string Text => "_Property Grid";
             public override string ToolTip => "_Property Grid";

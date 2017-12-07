@@ -13,7 +13,7 @@ namespace Calame.SceneGraph.Commands
         [CommandDefinition]
         public class Definition : CommandDefinition
         {
-            public const string CommandName = "Demos.SceneGraph";
+            public const string CommandName = "SceneGraph.Open";
             public override string Name => CommandName;
             public override string Text => "Scene _Graph";
             public override string ToolTip => "Scene _Graph";

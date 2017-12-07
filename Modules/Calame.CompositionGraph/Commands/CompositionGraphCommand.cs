@@ -13,7 +13,7 @@ namespace Calame.CompositionGraph.Commands
         [CommandDefinition]
         public class Definition : CommandDefinition
         {
-            public const string CommandName = "Demos.CompositionGraph";
+            public const string CommandName = "CompositionGraph.Open";
             public override string Name => CommandName;
             public override string Text => "_Composition Graph";
             public override string ToolTip => "_Composition Graph";

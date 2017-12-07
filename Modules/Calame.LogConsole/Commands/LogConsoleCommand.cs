@@ -13,7 +13,7 @@ namespace Calame.LogConsole.Commands
         [CommandDefinition]
         public class Definition : CommandDefinition
         {
-            public const string CommandName = "Demos.LogConsole";
+            public const string CommandName = "LogConsole.Open";
             public override string Name => CommandName;
             public override string Text => "_Log Console";
             public override string ToolTip => "_Log Console";
