@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}"
 EndProject
@@ -84,6 +84,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{0FAE2ED9-DF3B-4E4D-8AF4-895D375ABD16}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Demo", "Demos\Calame.Demo\Calame.Demo.csproj", "{EA4D5021-5355-46AA-8C50-9637C03BB08E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.DataModelViewer", "Modules\Calame.DataModelViewer\Calame.DataModelViewer.csproj", "{A88C8133-F38B-4374-9022-EF27AE25141E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.SceneViewer", "Modules\Calame.SceneViewer\Calame.SceneViewer.csproj", "{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -243,6 +247,14 @@ Global
 		{EA4D5021-5355-46AA-8C50-9637C03BB08E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA4D5021-5355-46AA-8C50-9637C03BB08E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA4D5021-5355-46AA-8C50-9637C03BB08E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A88C8133-F38B-4374-9022-EF27AE25141E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A88C8133-F38B-4374-9022-EF27AE25141E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A88C8133-F38B-4374-9022-EF27AE25141E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A88C8133-F38B-4374-9022-EF27AE25141E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -284,6 +296,8 @@ Global
 		{4A808252-5BB0-45E4-B814-4C732F12EB40} = {95AFED7A-6211-441D-9643-10354F05477E}
 		{BA726253-52BA-4543-BE12-0CCE2556E3DA} = {95AFED7A-6211-441D-9643-10354F05477E}
 		{EA4D5021-5355-46AA-8C50-9637C03BB08E} = {0FAE2ED9-DF3B-4E4D-8AF4-895D375ABD16}
+		{A88C8133-F38B-4374-9022-EF27AE25141E} = {95AFED7A-6211-441D-9643-10354F05477E}
+		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5} = {95AFED7A-6211-441D-9643-10354F05477E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51117004-2C3A-426A-86DF-7881F4FEF766}
