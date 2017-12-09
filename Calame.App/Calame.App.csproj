@@ -80,14 +80,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GeminiWpf">
-      <Version>0.6.2</Version>
-    </PackageReference>
-    <PackageReference Include="MahApps.Metro">
-      <Version>1.2.4</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Calame\Calame.csproj">
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>

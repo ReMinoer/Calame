@@ -41,7 +41,6 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -169,14 +168,6 @@
       <Project>{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}</Project>
       <Name>Calame.SceneViewer</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GeminiWpf">
-      <Version>0.6.2</Version>
-    </PackageReference>
-    <PackageReference Include="MahApps.Metro">
-      <Version>1.2.4</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

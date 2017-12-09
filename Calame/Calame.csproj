@@ -69,6 +69,9 @@
     <PackageReference Include="GeminiWpf">
       <Version>0.6.2</Version>
     </PackageReference>
+    <PackageReference Include="MahApps.Metro">
+      <Version>1.2.4</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
