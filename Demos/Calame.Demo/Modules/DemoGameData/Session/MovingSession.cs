@@ -21,6 +21,7 @@ namespace Calame.Demo.Modules.DemoGameData.Session
     [Export(typeof(ISession))]
     public class MovingSession : ISession
     {
+        private Viewport _viewport;
         public string DisplayName => "Moving Demo";
         public string ContentPath => "Content/";
         
@@ -56,22 +57,23 @@ namespace Calame.Demo.Modules.DemoGameData.Session
             engine.Root.Schedulers.Draw.Plan(drawer =>
             {
                 drawer.GraphicsDevice.SetRenderTarget(drawer.DefaultRenderTarget);
+                _viewport = drawer.GraphicsDevice.Viewport;
 
                 float targetAspectRatio = VirtualResolution.AspectRatio;
 
-                int width = drawer.DefaultRenderTarget.Width;
+                int width = _viewport.Width;
                 int height = (int)(width / targetAspectRatio + .5f);
 
-                if (height > drawer.DefaultRenderTarget.Height)
+                if (height > _viewport.Height)
                 {
-                    height = drawer.DefaultRenderTarget.Height;
+                    height = _viewport.Height;
                     width = (int)(height * targetAspectRatio + .5f);
                 }
 
                 var viewport = new Viewport
                 {
-                    X = drawer.DefaultRenderTarget.Width / 2 - width / 2,
-                    Y = drawer.DefaultRenderTarget.Height / 2 - height / 2,
+                    X = _viewport.Width / 2 - width / 2,
+                    Y = _viewport.Height / 2 - height / 2,
                     Width = width,
                     Height = height,
                     MinDepth = 0,
@@ -94,7 +96,11 @@ namespace Calame.Demo.Modules.DemoGameData.Session
 
             }).AtStart();
 
-            engine.Root.Schedulers.Draw.Plan(drawer => drawer.SpriteBatchStack.Pop()).AtEnd();
+            engine.Root.Schedulers.Draw.Plan(drawer =>
+            {
+                drawer.SpriteBatchStack.Pop();
+                drawer.GraphicsDevice.Viewport = _viewport;
+            }).AtEnd();
         }
     }
 }
