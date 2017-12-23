@@ -7,34 +7,46 @@ using Calame.SceneViewer.Views;
 using Caliburn.Micro;
 using Diese.Collections;
 using Fingear;
+using Fingear.Controls;
+using Fingear.Controls.Containers;
+using Fingear.MonoGame;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph;
+using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Inputs;
 using Glyph.Engine;
+using Glyph.Graphics;
 using Glyph.Math.Shapes;
 using Glyph.Tools;
+using Glyph.Tools.ShapeRendering;
 using Glyph.WpfInterop;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : Document, IDisposable
+    public sealed class SceneViewerViewModel : Document, IDocumentContext<GlyphEngine>, IDisposable
     {
         private readonly IShell _shell;
         private readonly ContentManagerProvider _contentManagerProvider;
-        
+        private readonly IEventAggregator _eventAggregator;
+
         private SceneViewerView _view;
         private Cursor _viewerCursor;
         private GlyphWpfRunner _runner;
+        private ShapedObjectSelector _shapedObjectSelector;
+        private AreaComponentRenderer _selectionRenderer;
         public ISession Session { get; set; }
         public FreeCamera EditorCamera { get; private set; }
         public Glyph.Graphics.View EditorView { get; private set; }
         public GlyphWpfViewer Viewer { get; private set; }
         public IEnumerable<IView> RunnerViews => ViewManager.Main.Views.Where(x => !(x.Camera.Parent is FreeCamera));
+        GlyphEngine IDocumentContext<GlyphEngine>.Context => Runner?.Engine;
 
         public GlyphWpfRunner Runner
         {
@@ -51,19 +63,31 @@ namespace Calame.SceneViewer.ViewModels
 
                 if (_runner != null)
                 {
-                    EditorCamera = _runner.Engine.Root.Add<FreeCamera>();
                     EditorView = _runner.Engine.Injector.Resolve<Glyph.Graphics.View>();
                     EditorView.Name = "Editor View";
                     EditorView.BoundingBox = new TopLeftRectangle(Vector2.Zero, VirtualResolution.Size);
                     EditorView.DrawClientFilter = new ExcludingFilter<IDrawClient>();
 
+                    EditorCamera = _runner.Engine.Root.Add<FreeCamera>();
                     EditorCamera.View = EditorView;
                     ViewManager.Main.RegisterView(EditorView);
+
+                    _shapedObjectSelector = _runner.Engine.Root.Add<ShapedObjectSelector>();
+                    _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
+                    {
+                        TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
+                        ValueControl = _runner.Engine.InputClientManager.CursorControls.ScenePosition
+                    };
+                    _shapedObjectSelector.HandleInputs = true;
+                    _shapedObjectSelector.SelectionChanged += ShapedObjectSelectorOnSelectionChanged;
 
                     _runner.Engine.Root.Schedulers.Update.Plan(EditorCamera).AtStart();
                 }
                 
                 ConnectView();
+                
+                if (IsActive)
+                    OnActivated();
             }
         }
 
@@ -93,10 +117,11 @@ namespace Calame.SceneViewer.ViewModels
         public ICommand CursorInputsCommand { get; }
         public ICommand DefaultInputsCommand { get; }
         
-        public SceneViewerViewModel(IShell shell, ContentManagerProvider contentManagerProvider)
+        public SceneViewerViewModel(IShell shell, ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
         {
             _shell = shell;
             _contentManagerProvider = contentManagerProvider;
+            _eventAggregator = eventAggregator;
 
             DisplayName = "Scene Viewer";
 
@@ -135,6 +160,7 @@ namespace Calame.SceneViewer.ViewModels
             ConnectView();
 
             Activated += OnActivated;
+            Deactivated += OnDeactivated;
         }
 
         private void ConnectView()
@@ -155,6 +181,28 @@ namespace Calame.SceneViewer.ViewModels
                 _view.ViewsComboBox.SelectedItems.Add(runnerView);
 
             FreeCameraAction(null);
+        }
+
+        private void ShapedObjectSelectorOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
+        {
+            if (_selectionRenderer != null)
+            {
+                Runner.Engine.Root.Remove(_selectionRenderer);
+                _selectionRenderer.Dispose();
+            }
+
+            if (boxedComponent != null)
+            {
+                _selectionRenderer = new AreaComponentRenderer(boxedComponent, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>())
+                {
+                    Name = "Selection Renderer",
+                    Color = Color.Purple * 0.5f,
+                    DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera
+                };
+                Runner.Engine.Root.Add(_selectionRenderer);
+            }
+
+            _eventAggregator.PublishOnUIThread(boxedComponent != null ? new Selection<IGlyphComponent>(boxedComponent) : Selection<IGlyphComponent>.Empty);
         }
 
         private void FreeCameraAction(object obj)
@@ -191,7 +239,7 @@ namespace Calame.SceneViewer.ViewModels
 
         private void NewViewerAction(object obj)
         {
-            _shell.OpenDocument(new SceneViewerViewModel(_shell, _contentManagerProvider) { Runner = Runner });
+            _shell.OpenDocument(new SceneViewerViewModel(_shell, _contentManagerProvider, _eventAggregator) { Runner = Runner });
         }
 
         private void CursorInputsAction(object obj)
@@ -213,15 +261,26 @@ namespace Calame.SceneViewer.ViewModels
         public void Dispose()
         {
             Activated -= OnActivated;
-            
+            Deactivated -= OnDeactivated;
+
             Runner?.Dispose();
             Runner = null;
         }
 
-        private void OnActivated(object sender, ActivationEventArgs activationEventArgs)
+        private void OnActivated()
         {
             if (Runner?.Engine != null)
                 Runner.Engine.FocusedClient = Viewer;
+            
+            _eventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
+        }
+
+        private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();
+
+        private void OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)
+        {
+            if (Runner?.Engine != null && Runner.Engine.FocusedClient == Viewer)
+                Runner.Engine.FocusedClient = null;
         }
     }
 }

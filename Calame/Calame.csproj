@@ -44,8 +44,9 @@
   <ItemGroup>
     <Compile Include="CalameBootstrapper.cs" />
     <Compile Include="ContentManagerProvider.cs" />
+    <Compile Include="DocumentContext.cs" />
     <Compile Include="HandleTool.cs" />
-    <Compile Include="ISelector.cs" />
+    <Compile Include="IDocumentContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\BindableSelectedItemBehavior.cs" />
     <Compile Include="ISelection.cs" />

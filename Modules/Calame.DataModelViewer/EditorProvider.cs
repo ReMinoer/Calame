@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Calame.DataModelViewer.ViewModels;
+using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 
@@ -13,13 +14,15 @@ namespace Calame.DataModelViewer
     public class EditorProvider : IEditorProvider
     {
         private readonly ContentManagerProvider _contentManagerProvider;
+        private readonly IEventAggregator _eventAggregator;
         public List<IEditor> Editors { get; } = new List<IEditor>();
         public IEnumerable<EditorFileType> FileTypes => Editors.SelectMany(x => x.FileExtensions.Select(e => new EditorFileType(x.DisplayName, e)));
 
         [ImportingConstructor]
-        public EditorProvider(ContentManagerProvider contentManagerProvider, [ImportMany] IEnumerable<IEditor> editors = null)
+        public EditorProvider(ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IEditor> editors = null)
         {
             _contentManagerProvider = contentManagerProvider;
+            _eventAggregator = eventAggregator;
             if (editors != null)
                 Editors.AddRange(editors);
         }
@@ -31,7 +34,7 @@ namespace Calame.DataModelViewer
 
         public IDocument Create()
         {
-            return new DataModelViewerViewModel(_contentManagerProvider);
+            return new DataModelViewerViewModel(_contentManagerProvider, _eventAggregator);
         }
 
         public async Task New(IDocument document, string name)

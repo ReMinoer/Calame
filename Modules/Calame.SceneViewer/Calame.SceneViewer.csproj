@@ -128,6 +128,10 @@
       <Project>{CC4D895F-646F-43C8-B25E-81CF5803ED7A}</Project>
       <Name>Glyph.Graphics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj">
+      <Project>{26405F4B-4532-4F48-A96F-594A70C12B3E}</Project>
+      <Name>Glyph.Messaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph.Tools\Glyph.Tools.csproj">
       <Project>{6692F3F4-E1EA-4D53-B0A1-2DBA67414FC2}</Project>
       <Name>Glyph.Tools</Name>

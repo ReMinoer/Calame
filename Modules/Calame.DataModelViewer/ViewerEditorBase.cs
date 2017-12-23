@@ -4,16 +4,16 @@ using System.IO;
 using System.Threading.Tasks;
 using Glyph;
 using Glyph.Composition;
-using Glyph.Composition.Modelization;
 using Glyph.Engine;
 using Glyph.IO;
+using Glyph.Modelization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame.DataModelViewer
 {
     public abstract class ViewerEditorBase<T> : IEditor
-        where T : IGlyphCreator<IGlyphComponent>
+        where T : IBindedGlyphCreator<IGlyphComponent>
     {
         private Viewport _viewport;
         public string DisplayName => SaveLoadFormat.FileType.DisplayName;
@@ -21,7 +21,7 @@ namespace Calame.DataModelViewer
         public abstract string ContentPath { get; }
 
         protected abstract ISaveLoadFormat<T> SaveLoadFormat { get; }
-        public abstract Task<IGlyphCreator<IGlyphComponent>> NewDataAsync();
+        public abstract Task<IBindedGlyphCreator<IGlyphComponent>> NewDataAsync();
 
         public virtual IGlyphComposite<IGlyphComponent> PrepareEditor(GlyphEngine engine)
         {
@@ -79,7 +79,7 @@ namespace Calame.DataModelViewer
             return engine.Root;
         }
 
-        public async Task<IGlyphCreator<IGlyphComponent>> LoadDataAsync(Stream stream)
+        public async Task<IBindedGlyphCreator<IGlyphComponent>> LoadDataAsync(Stream stream)
         {
             return SaveLoadFormat.Load(stream);
         }

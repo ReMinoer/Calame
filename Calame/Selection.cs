@@ -7,13 +7,29 @@ namespace Calame
     static public class Selection
     {
         static public Selection<T> New<T>(T item)
+            where T : class
         {
             return new Selection<T>(item);
+        }
+        
+        static public Selection<T> New<T>(params T[] items)
+            where T : class
+        {
+            return new Selection<T>(items);
+        }
+
+        static public Selection<T> New<T>(IEnumerable<T> items)
+            where T : class
+        {
+            return new Selection<T>(items);
         }
     }
     
     public class Selection<T> : ISelection<T>
+        where T : class
     {
+        static public Selection<T> Empty => new Selection<T>();
+        
         private T _item;
         private T[] _others;
 
@@ -48,6 +64,11 @@ namespace Calame
                     _others = enumerator.AsEnumerable().ToArray();
                 }
             }
+        }
+
+        private Selection()
+        {
+            _item = null;
         }
 
         public Selection(T item)

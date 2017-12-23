@@ -8,7 +8,7 @@ using Glyph.Engine;
 namespace Calame.SceneGraph.ViewModels
 {
     [Export(typeof(SceneGraphViewModel))]
-    public sealed class SceneGraphViewModel : HandleTool, IHandle<ISelection<GlyphEngine>>, IHandle<ISelection<IGlyphComponent>>
+    public sealed class SceneGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelection<IGlyphComponent>>
     {
         private GlyphEngine _engine;
         private IGlyphComponent _selection;
@@ -29,7 +29,7 @@ namespace Calame.SceneGraph.ViewModels
                 if (!SetValue(ref _selection, value))
                     return;
 
-                _selectionNode = _selection.GetSceneNode();
+                _selectionNode = _selection?.GetSceneNode();
                 NotifyOfPropertyChange(nameof(SelectionNode));
                     
                 EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
@@ -44,7 +44,7 @@ namespace Calame.SceneGraph.ViewModels
                 if (!SetValue(ref _selectionNode, value))
                     return;
 
-                _selection = _selectionNode.Parent;
+                _selection = _selectionNode?.Parent;
                 NotifyOfPropertyChange(nameof(Selection));
 
                 EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
@@ -62,6 +62,6 @@ namespace Calame.SceneGraph.ViewModels
         }
 
         void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => Selection = message.Item;
-        void IHandle<ISelection<GlyphEngine>>.Handle(ISelection<GlyphEngine> message) => Engine = message.Item;
+        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
     }
 }

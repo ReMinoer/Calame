@@ -56,6 +56,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\DemoGameData\GameData\IShapeData.cs" />
     <Compile Include="Modules\DemoGameData\GameData\RectangleData.cs" />
     <Compile Include="Modules\DemoGameData\GameData\CircleData.cs" />
     <Compile Include="Modules\DemoGameData\Module.cs" />
@@ -140,6 +141,10 @@
       <Project>{CC4D895F-646F-43C8-B25E-81CF5803ED7A}</Project>
       <Name>Glyph.Graphics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj">
+      <Project>{26405f4b-4532-4f48-a96f-594a70c12b3e}</Project>
+      <Name>Glyph.Messaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj">
       <Project>{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}</Project>
       <Name>Glyph</Name>
@@ -168,6 +173,17 @@
       <Project>{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}</Project>
       <Name>Calame.SceneViewer</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fody">
+      <Version>2.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="PropertyChanged.Fody">
+      <Version>2.1.4</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

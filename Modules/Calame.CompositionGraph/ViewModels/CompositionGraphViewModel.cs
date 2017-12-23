@@ -7,7 +7,7 @@ using Glyph.Engine;
 namespace Calame.CompositionGraph.ViewModels
 {
     [Export(typeof(CompositionGraphViewModel))]
-    public sealed class CompositionGraphViewModel : HandleTool, IHandle<ISelection<IGlyphComponent>>, IHandle<ISelection<GlyphEngine>>
+    public sealed class CompositionGraphViewModel : HandleTool, IHandle<ISelection<IGlyphComponent>>, IHandle<IDocumentContext<GlyphEngine>>
     {
         private GlyphEngine _engine;
         private IGlyphComponent _selection;
@@ -40,6 +40,6 @@ namespace Calame.CompositionGraph.ViewModels
         }
         
         void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => Selection = message.Item;
-        void IHandle<ISelection<GlyphEngine>>.Handle(ISelection<GlyphEngine> message) => Engine = message.Item;
+        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
     }
 }
