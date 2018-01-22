@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.DataModelViewer.Views;
@@ -14,6 +15,7 @@ using Gemini.Framework;
 using Glyph;
 using Glyph.Composition;
 using Glyph.Core;
+using Glyph.Core.Inputs;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.Math.Shapes;
@@ -23,6 +25,7 @@ using Glyph.Tools.ShapeRendering;
 using Glyph.WpfInterop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Stave;
 using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.DataModelViewer.ViewModels
@@ -53,7 +56,7 @@ namespace Calame.DataModelViewer.ViewModels
             {
                 if (_runner != null)
                 {
-                    ViewManager.Main.UnregisterView(EditorView);
+                    _runner.Engine.ViewManager.UnregisterView(EditorView);
                     _runner.Engine.Root.RemoveAndDispose(EditorCamera);
                 }
                 
@@ -61,6 +64,15 @@ namespace Calame.DataModelViewer.ViewModels
 
                 if (_runner != null)
                 {
+                    _shapedObjectSelector = _runner.Engine.Root.Add<ShapedObjectSelector>();
+                    _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
+                    {
+                        TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
+                        ValueControl = new SceneCursorControl("Scene cursor", InputSystem.Instance.Mouse.Cursor, _runner.Engine.InputClientManager, _runner.Engine.ViewManager)
+                    };
+                    _shapedObjectSelector.HandleInputs = true;
+                    _shapedObjectSelector.SelectionChanged += ShapedObjectSelectorOnSelectionChanged;
+
                     EditorView = _runner.Engine.Injector.Resolve<Glyph.Graphics.View>();
                     EditorView.Name = "Editor View";
                     EditorView.BoundingBox = new TopLeftRectangle(Vector2.Zero, VirtualResolution.Size);
@@ -68,16 +80,7 @@ namespace Calame.DataModelViewer.ViewModels
 
                     EditorCamera = _runner.Engine.Root.Add<FreeCamera>();
                     EditorCamera.View = EditorView;
-                    ViewManager.Main.RegisterView(EditorView);
-
-                    _shapedObjectSelector = _runner.Engine.Root.Add<ShapedObjectSelector>();
-                    _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
-                    {
-                        TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
-                        ValueControl = _runner.Engine.InputClientManager.CursorControls.ScenePosition
-                    };
-                    _shapedObjectSelector.HandleInputs = true;
-                    _shapedObjectSelector.SelectionChanged += ShapedObjectSelectorOnSelectionChanged;
+                    _runner.Engine.ViewManager.RegisterView(EditorView);
 
                     _runner.Engine.Root.Schedulers.Update.Plan(EditorCamera).AtStart();
                 }
@@ -186,10 +189,24 @@ namespace Calame.DataModelViewer.ViewModels
                 Runner.Engine.Root.Add(_selectionRenderer);
             }
 
-            if (boxedComponent != null && _dataBindings.TryGetValue(boxedComponent, out IGlyphCreator<IGlyphComponent> data))
+            if (boxedComponent == null)
+            {
+                _eventAggregator.PublishOnUIThread(Selection<IGlyphCreator<IGlyphComponent>>.Empty);
+                return;
+            }
+
+            if (_dataBindings.TryGetValue(boxedComponent, out IGlyphCreator<IGlyphComponent> data))
                 _eventAggregator.PublishOnUIThread(new Selection<IGlyphCreator<IGlyphComponent>>(data));
             else
-                _eventAggregator.PublishOnUIThread(Selection<IGlyphCreator<IGlyphComponent>>.Empty);
+            {
+                if (boxedComponent.ParentQueue().Any(x => _dataBindings.ContainsKey(x), out IGlyphContainer parent))
+                {
+                    data = _dataBindings[parent];
+                    _eventAggregator.PublishOnUIThread(new Selection<IGlyphCreator<IGlyphComponent>>(data));
+                }
+                else
+                    _eventAggregator.PublishOnUIThread(Selection<IGlyphCreator<IGlyphComponent>>.Empty);
+            }
         }
 
         public void Dispose()

@@ -45,7 +45,7 @@ namespace Calame.SceneViewer.ViewModels
         public FreeCamera EditorCamera { get; private set; }
         public Glyph.Graphics.View EditorView { get; private set; }
         public GlyphWpfViewer Viewer { get; private set; }
-        public IEnumerable<IView> RunnerViews => ViewManager.Main.Views.Where(x => !(x.Camera.Parent is FreeCamera));
+        public IEnumerable<IView> RunnerViews => _runner.Engine.ViewManager.Views.Where(x => !(x.Camera.Parent is FreeCamera));
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Runner?.Engine;
 
         public GlyphWpfRunner Runner
@@ -55,7 +55,7 @@ namespace Calame.SceneViewer.ViewModels
             {
                 if (_runner != null)
                 {
-                    ViewManager.Main.UnregisterView(EditorView);
+                    _runner.Engine.ViewManager.UnregisterView(EditorView);
                     _runner.Engine.Root.RemoveAndDispose(EditorCamera);
                 }
                 
@@ -63,6 +63,15 @@ namespace Calame.SceneViewer.ViewModels
 
                 if (_runner != null)
                 {
+                    _shapedObjectSelector = _runner.Engine.Root.Add<ShapedObjectSelector>();
+                    _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
+                    {
+                        TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
+                        ValueControl = new SceneCursorControl("Scene cursor", InputSystem.Instance.Mouse.Cursor, _runner.Engine.InputClientManager, _runner.Engine.ViewManager)
+                    };
+                    _shapedObjectSelector.HandleInputs = true;
+                    _shapedObjectSelector.SelectionChanged += ShapedObjectSelectorOnSelectionChanged;
+
                     EditorView = _runner.Engine.Injector.Resolve<Glyph.Graphics.View>();
                     EditorView.Name = "Editor View";
                     EditorView.BoundingBox = new TopLeftRectangle(Vector2.Zero, VirtualResolution.Size);
@@ -70,16 +79,7 @@ namespace Calame.SceneViewer.ViewModels
 
                     EditorCamera = _runner.Engine.Root.Add<FreeCamera>();
                     EditorCamera.View = EditorView;
-                    ViewManager.Main.RegisterView(EditorView);
-
-                    _shapedObjectSelector = _runner.Engine.Root.Add<ShapedObjectSelector>();
-                    _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
-                    {
-                        TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
-                        ValueControl = _runner.Engine.InputClientManager.CursorControls.ScenePosition
-                    };
-                    _shapedObjectSelector.HandleInputs = true;
-                    _shapedObjectSelector.SelectionChanged += ShapedObjectSelectorOnSelectionChanged;
+                    _runner.Engine.ViewManager.RegisterView(EditorView);
 
                     _runner.Engine.Root.Schedulers.Update.Plan(EditorCamera).AtStart();
                 }
@@ -207,13 +207,13 @@ namespace Calame.SceneViewer.ViewModels
 
         private void FreeCameraAction(object obj)
         {
-            foreach (IView runnerView in ViewManager.Main.Views)
+            foreach (IView runnerView in _runner.Engine.ViewManager.Views)
                 SelectView(runnerView, runnerView == EditorView);
         }
 
         private void DefaultViewsAction(object obj)
         {
-            foreach (IView runnerView in ViewManager.Main.Views)
+            foreach (IView runnerView in _runner.Engine.ViewManager.Views)
                 SelectView(runnerView, _view.ViewsComboBox.SelectedItems.Contains(runnerView));
         }
 

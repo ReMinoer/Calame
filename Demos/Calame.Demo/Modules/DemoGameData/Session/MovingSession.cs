@@ -29,7 +29,7 @@ namespace Calame.Demo.Modules.DemoGameData.Session
         {
             var view = engine.Injector.Resolve<View>();
             view.BoundingBox = new TopLeftRectangle(Vector2.Zero, VirtualResolution.Size);
-            ViewManager.Main.RegisterView(view);
+            engine.ViewManager.RegisterView(view);
             
             engine.Root.Add<SceneNode>();
             
