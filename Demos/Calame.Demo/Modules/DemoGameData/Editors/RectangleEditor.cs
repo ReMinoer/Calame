@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Calame.DataModelViewer;
-using Calame.Demo.Modules.DemoGameData.GameData;
-using Glyph.Composition;
+using Calame.Demo.Data;
+using Glyph.Composition.Modelization;
 using Glyph.IO;
-using Glyph.Modelization;
 
 namespace Calame.Demo.Modules.DemoGameData.Editors
 {
@@ -13,6 +12,6 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
     {
         public override string ContentPath => "Content/";
         protected override ISaveLoadFormat<RectangleData> SaveLoadFormat => new XmlSerializationFormat<RectangleData>("Rectangle", ".rectangle");
-        public override async Task<IBindedGlyphCreator<IGlyphComponent>> NewDataAsync() => new RectangleData();
+        public override async Task<IGlyphCreator> NewDataAsync() => new RectangleData();
     }
 }

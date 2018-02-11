@@ -2,8 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Engine;
-using Glyph.Modelization;
 
 namespace Calame.DataModelViewer
 {
@@ -13,8 +13,8 @@ namespace Calame.DataModelViewer
         IEnumerable<string> FileExtensions { get; }
         string ContentPath { get; }
         IGlyphComposite<IGlyphComponent> PrepareEditor(GlyphEngine engine);
-        Task<IBindedGlyphCreator<IGlyphComponent>> NewDataAsync();
-        Task<IBindedGlyphCreator<IGlyphComponent>> LoadDataAsync(Stream stream);
+        Task<IGlyphCreator> NewDataAsync();
+        Task<IGlyphCreator> LoadDataAsync(Stream stream);
         Task SaveDataAsync(object obj, Stream stream);
     }
 }

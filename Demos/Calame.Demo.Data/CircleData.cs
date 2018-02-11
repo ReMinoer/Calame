@@ -1,13 +1,13 @@
 ﻿using Diese.Collections;
 using Glyph.Binding;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Graphics;
 using Glyph.Graphics.Renderer;
 using Glyph.Graphics.Shapes;
-using Glyph.Modelization;
 using Microsoft.Xna.Framework;
 
-namespace Calame.Demo.Modules.DemoGameData.GameData
+namespace Calame.Demo.Data
 {
     public class CircleData : BindedData<CircleData, GlyphObject>, IShapeData
     {
@@ -22,8 +22,7 @@ namespace Calame.Demo.Modules.DemoGameData.GameData
             Bindings.Add(
                 x => x.Radius,
                 x => x.Components.First<SpriteTransformer>().Scale,
-                (radius, m, v) => radius / v.Components.First<FilledCircleSprite>().Radius * Vector2.One,
-                (scale, m, v) => scale.X * v.Components.First<FilledCircleSprite>().Radius);
+                (radius, m, v) => radius / v.Components.First<FilledCircleSprite>().Radius * Vector2.One);
         }
 
         protected override GlyphObject New()

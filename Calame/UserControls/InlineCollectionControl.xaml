@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Calame.UserControls.InlineCollectionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:Calame.Converters"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="150">
+    <DockPanel>
+        <Button Width="25" DockPanel.Dock="Right" Click="Button_OnClick">...</Button>
+        <ItemsControl Margin="3" VerticalAlignment="Center" ItemsSource="{Binding Value}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Canvas Height="12" Width="12" Margin="1">
+                        <Ellipse Width="12" Height="12" Fill="DarkGray" ToolTip="{Binding}" />
+                    </Canvas>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </DockPanel>
+</UserControl>

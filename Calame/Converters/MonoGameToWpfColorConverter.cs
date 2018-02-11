@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Calame.PropertyGrid.Converters
+namespace Calame.Converters
 {
     public class MonoGameToWpfColorConverter : IValueConverter
     {

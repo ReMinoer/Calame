@@ -15,6 +15,7 @@ namespace Calame.DataModelViewer
     {
         private readonly ContentManagerProvider _contentManagerProvider;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IShell _shell;
         public List<IEditor> Editors { get; } = new List<IEditor>();
         public IEnumerable<EditorFileType> FileTypes => Editors.SelectMany(x => x.FileExtensions.Select(e => new EditorFileType(x.DisplayName, e)));
 
@@ -23,6 +24,7 @@ namespace Calame.DataModelViewer
         {
             _contentManagerProvider = contentManagerProvider;
             _eventAggregator = eventAggregator;
+
             if (editors != null)
                 Editors.AddRange(editors);
         }

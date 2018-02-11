@@ -30,23 +30,47 @@ namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : Document, IDocumentContext<GlyphEngine>, IDisposable
+    public sealed class SceneViewerViewModel : HandleDocument, IDocumentContext<GlyphEngine>, IHandle<ISelection<IGlyphComponent>>, IDisposable
     {
         private readonly IShell _shell;
         private readonly ContentManagerProvider _contentManagerProvider;
-        private readonly IEventAggregator _eventAggregator;
 
         private SceneViewerView _view;
         private Cursor _viewerCursor;
         private GlyphWpfRunner _runner;
+        private IBoxedComponent _boxedSelection;
         private ShapedObjectSelector _shapedObjectSelector;
         private AreaComponentRenderer _selectionRenderer;
         public ISession Session { get; set; }
         public FreeCamera EditorCamera { get; private set; }
         public Glyph.Graphics.View EditorView { get; private set; }
         public GlyphWpfViewer Viewer { get; private set; }
-        public IEnumerable<IView> RunnerViews => _runner.Engine.ViewManager.Views.Where(x => !(x.Camera.Parent is FreeCamera));
+        public IEnumerable<IView> RunnerViews => _runner?.Engine.ViewManager.Views.Where(x => !(x.Camera.Parent is FreeCamera));
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Runner?.Engine;
+
+        public IBoxedComponent BoxedSelection
+        {
+            get => _boxedSelection;
+            private set
+            {
+                if (SetValue(ref _boxedSelection, value))
+                {
+                    if (_selectionRenderer != null)
+                    {
+                        Runner.Engine.Root.Remove(_selectionRenderer);
+                        _selectionRenderer.Dispose();
+                    }
+
+                    _boxedSelection = value;
+
+                    if (_boxedSelection != null)
+                    {
+                        _selectionRenderer = new AreaComponentRenderer(_boxedSelection, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>()) { Name = "Selection Renderer", Color = Color.Purple * 0.5f, DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera };
+                        Runner.Engine.Root.Add(_selectionRenderer);
+                    }
+                }
+            }
+        }
 
         public GlyphWpfRunner Runner
         {
@@ -94,14 +118,7 @@ namespace Calame.SceneViewer.ViewModels
         public Cursor ViewerCursor
         {
             get => _viewerCursor;
-            set
-            {
-                if (_viewerCursor == value)
-                    return;
-
-                _viewerCursor = value;
-                NotifyOfPropertyChange();
-            }
+            set => SetValue(ref _viewerCursor, value);
         }
 
         public ICommand PlayCommand { get; }
@@ -118,10 +135,10 @@ namespace Calame.SceneViewer.ViewModels
         public ICommand DefaultInputsCommand { get; }
         
         public SceneViewerViewModel(IShell shell, ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
+            : base(eventAggregator)
         {
             _shell = shell;
             _contentManagerProvider = contentManagerProvider;
-            _eventAggregator = eventAggregator;
 
             DisplayName = "Scene Viewer";
 
@@ -183,26 +200,19 @@ namespace Calame.SceneViewer.ViewModels
             FreeCameraAction(null);
         }
 
+        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
+        {
+            if (Runner.Engine.FocusedClient == Viewer && message.Item is IBoxedComponent boxedComponent)
+                BoxedSelection = boxedComponent;
+        }
+
         private void ShapedObjectSelectorOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
         {
-            if (_selectionRenderer != null)
+            if (Runner.Engine.FocusedClient == Viewer)
             {
-                Runner.Engine.Root.Remove(_selectionRenderer);
-                _selectionRenderer.Dispose();
+                BoxedSelection = boxedComponent;
+                EventAggregator.PublishOnUIThread(Selection.New(_boxedSelection));
             }
-
-            if (boxedComponent != null)
-            {
-                _selectionRenderer = new AreaComponentRenderer(boxedComponent, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>())
-                {
-                    Name = "Selection Renderer",
-                    Color = Color.Purple * 0.5f,
-                    DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera
-                };
-                Runner.Engine.Root.Add(_selectionRenderer);
-            }
-
-            _eventAggregator.PublishOnUIThread(boxedComponent != null ? new Selection<IGlyphComponent>(boxedComponent) : Selection<IGlyphComponent>.Empty);
         }
 
         private void FreeCameraAction(object obj)
@@ -239,7 +249,7 @@ namespace Calame.SceneViewer.ViewModels
 
         private void NewViewerAction(object obj)
         {
-            _shell.OpenDocument(new SceneViewerViewModel(_shell, _contentManagerProvider, _eventAggregator) { Runner = Runner });
+            _shell.OpenDocument(new SceneViewerViewModel(_shell, _contentManagerProvider, EventAggregator) { Runner = Runner });
         }
 
         private void CursorInputsAction(object obj)
@@ -271,8 +281,8 @@ namespace Calame.SceneViewer.ViewModels
         {
             if (Runner?.Engine != null)
                 Runner.Engine.FocusedClient = Viewer;
-            
-            _eventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
+
+            EventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
         }
 
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();

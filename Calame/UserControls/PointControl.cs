@@ -1,9 +1,9 @@
 ﻿using System;
-using Calame.PropertyGrid.UserControls.Base;
+using Calame.UserControls.Base;
 using Microsoft.Xna.Framework;
 using Xceed.Wpf.Toolkit;
 
-namespace Calame.PropertyGrid.UserControls
+namespace Calame.UserControls
 {
     public class PointControl : VectorControlBase<IntegerUpDown, Point?, int?>
     {

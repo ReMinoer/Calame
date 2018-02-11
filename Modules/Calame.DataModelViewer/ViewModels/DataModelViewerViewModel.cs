@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.DataModelViewer.Views;
@@ -12,42 +10,66 @@ using Fingear.Controls;
 using Fingear.Controls.Containers;
 using Fingear.MonoGame;
 using Gemini.Framework;
+using Gemini.Framework.Services;
 using Glyph;
 using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Core.Inputs;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.Math.Shapes;
-using Glyph.Modelization;
 using Glyph.Tools;
 using Glyph.Tools.ShapeRendering;
 using Glyph.WpfInterop;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Stave;
 using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : PersistedDocument, IDocumentContext<GlyphEngine>, IDisposable
+    public class DataModelViewerViewModel : HandlePersistedDocument, IDocumentContext<GlyphEngine>, IDocumentContext<IGlyphCreator>, IHandle<ISelection<IGlyphComponent>>, IDisposable
     {
         private readonly ContentManagerProvider _contentManagerProvider;
-        private readonly IEventAggregator _eventAggregator;
         private DataModelViewerView _view;
         private Cursor _viewerCursor;
         private GlyphWpfRunner _runner;
+        private IBoxedComponent _boxedSelection;
         private ShapedObjectSelector _shapedObjectSelector;
         private AreaComponentRenderer _selectionRenderer;
-        private readonly Dictionary<IGlyphComponent, IGlyphCreator<IGlyphComponent>> _dataBindings = new Dictionary<IGlyphComponent, IGlyphCreator<IGlyphComponent>>();
         public IEditor Editor { get; set; }
-        public IBindedGlyphCreator<IGlyphComponent> Data { get; private set; }
+        public IGlyphCreator Data { get; private set; }
         public FreeCamera EditorCamera { get; private set; }
         public Glyph.Graphics.View EditorView { get; private set; }
         public GlyphWpfViewer Viewer { get; private set; }
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Runner?.Engine;
+        IGlyphCreator IDocumentContext<IGlyphCreator>.Context => Data;
+
+        public IBoxedComponent BoxedSelection
+        {
+            get => _boxedSelection;
+            private set
+            {
+                if (SetValue(ref _boxedSelection, value))
+                {
+                    if (_selectionRenderer != null)
+                    {
+                        Runner.Engine.Root.Remove(_selectionRenderer);
+                        _selectionRenderer.Dispose();
+                    }
+
+                    _boxedSelection = value;
+
+                    if (_boxedSelection != null)
+                    {
+                        _selectionRenderer = new AreaComponentRenderer(_boxedSelection, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>()) { Name = "Selection Renderer", Color = Color.Purple * 0.5f, DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera };
+                        Runner.Engine.Root.Add(_selectionRenderer);
+                    }
+                }
+            }
+        }
 
         public GlyphWpfRunner Runner
         {
@@ -59,7 +81,7 @@ namespace Calame.DataModelViewer.ViewModels
                     _runner.Engine.ViewManager.UnregisterView(EditorView);
                     _runner.Engine.Root.RemoveAndDispose(EditorCamera);
                 }
-                
+
                 _runner = value;
 
                 if (_runner != null)
@@ -84,10 +106,10 @@ namespace Calame.DataModelViewer.ViewModels
 
                     _runner.Engine.Root.Schedulers.Update.Plan(EditorCamera).AtStart();
                 }
-                
+
                 ConnectView();
 
-                if (IsActive)
+                if (IsActive && Data.IsInstantiated)
                     OnActivated();
             }
         }
@@ -95,20 +117,13 @@ namespace Calame.DataModelViewer.ViewModels
         public Cursor ViewerCursor
         {
             get => _viewerCursor;
-            set
-            {
-                if (_viewerCursor == value)
-                    return;
-
-                _viewerCursor = value;
-                NotifyOfPropertyChange();
-            }
+            set => SetValue(ref _viewerCursor, value);
         }
 
         public DataModelViewerViewModel(ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
+            : base(eventAggregator)
         {
             _contentManagerProvider = contentManagerProvider;
-            _eventAggregator = eventAggregator;
         }
 
         protected override async Task DoNew()
@@ -126,21 +141,18 @@ namespace Calame.DataModelViewer.ViewModels
 
         private void InitializeEngine()
         {
-            Runner = new GlyphWpfRunner
-            {
-                Engine = new GlyphEngine(_contentManagerProvider.Get(Editor.ContentPath))
-            };
+            Runner = new GlyphWpfRunner { Engine = new GlyphEngine(_contentManagerProvider.Get(Editor.ContentPath)) };
 
             Data.Injector = Runner.Engine.Injector;
             Data.Instantiate();
-            _dataBindings[Data.BindedObject] = Data;
-            
+
             Editor.PrepareEditor(Runner.Engine).Add(Data.BindedObject);
+            OnActivated();
         }
 
         protected override async Task DoSave(string filePath)
         {
-            using (FileStream fileStream = File.OpenWrite(filePath))
+            using (FileStream fileStream = File.Create(filePath))
                 await Editor.SaveDataAsync(Data, fileStream);
         }
 
@@ -161,51 +173,28 @@ namespace Calame.DataModelViewer.ViewModels
         {
             if (_view == null)
                 return;
-            
+
             if (Runner == null)
                 return;
-            
+
             Viewer.Runner = Runner;
             EditorCamera.Client = Viewer;
             Runner.Engine.FocusedClient = Viewer;
         }
 
+        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
+        {
+            if (Runner.Engine.FocusedClient == Viewer && message.Item is IBoxedComponent boxedComponent)
+                BoxedSelection = boxedComponent;
+        }
+
         private void ShapedObjectSelectorOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
         {
-            if (_selectionRenderer != null)
+            if (Runner.Engine.FocusedClient == Viewer)
             {
-                Runner.Engine.Root.Remove(_selectionRenderer);
-                _selectionRenderer.Dispose();
-            }
-
-            if (boxedComponent != null)
-            {
-                _selectionRenderer = new AreaComponentRenderer(boxedComponent, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>())
-                {
-                    Name = "Selection Renderer",
-                    Color = Color.Purple * 0.5f,
-                    DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera
-                };
-                Runner.Engine.Root.Add(_selectionRenderer);
-            }
-
-            if (boxedComponent == null)
-            {
-                _eventAggregator.PublishOnUIThread(Selection<IGlyphCreator<IGlyphComponent>>.Empty);
-                return;
-            }
-
-            if (_dataBindings.TryGetValue(boxedComponent, out IGlyphCreator<IGlyphComponent> data))
-                _eventAggregator.PublishOnUIThread(new Selection<IGlyphCreator<IGlyphComponent>>(data));
-            else
-            {
-                if (boxedComponent.ParentQueue().Any(x => _dataBindings.ContainsKey(x), out IGlyphContainer parent))
-                {
-                    data = _dataBindings[parent];
-                    _eventAggregator.PublishOnUIThread(new Selection<IGlyphCreator<IGlyphComponent>>(data));
-                }
-                else
-                    _eventAggregator.PublishOnUIThread(Selection<IGlyphCreator<IGlyphComponent>>.Empty);
+                BoxedSelection = boxedComponent;
+                EventAggregator.PublishOnUIThread(Selection.New(_boxedSelection));
+                EventAggregator.PublishOnUIThread(Selection.New(Data.GetData(_boxedSelection)));
             }
         }
 
@@ -214,7 +203,7 @@ namespace Calame.DataModelViewer.ViewModels
             Activated -= OnActivated;
             Deactivated -= OnDeactivated;
 
-            (Data as IDisposable)?.Dispose();
+            Data.Dispose();
 
             Runner?.Dispose();
             Runner = null;
@@ -225,7 +214,8 @@ namespace Calame.DataModelViewer.ViewModels
             if (Runner?.Engine != null)
                 Runner.Engine.FocusedClient = Viewer;
 
-            _eventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
+            EventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
+            EventAggregator.PublishOnUIThread(new DocumentContext<IGlyphCreator>(Data));
         }
 
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();

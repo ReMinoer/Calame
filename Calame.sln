@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2010
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}"
 EndProject
@@ -88,6 +88,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.DataModelViewer", "Modules\Calame.DataModelViewer\Calame.DataModelViewer.csproj", "{A88C8133-F38B-4374-9022-EF27AE25141E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.SceneViewer", "Modules\Calame.SceneViewer\Calame.SceneViewer.csproj", "{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.DataModelTree", "Modules\Calame.DataModelTree\Calame.DataModelTree.csproj", "{ED371A46-D089-452E-850B-8D8FBA310152}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Demo.Data", "Demos\Calame.Demo.Data\Calame.Demo.Data.csproj", "{F5FDE43A-FA06-442E-8447-3A889FCCAE6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -255,6 +259,14 @@ Global
 		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED371A46-D089-452E-850B-8D8FBA310152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED371A46-D089-452E-850B-8D8FBA310152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED371A46-D089-452E-850B-8D8FBA310152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED371A46-D089-452E-850B-8D8FBA310152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5FDE43A-FA06-442E-8447-3A889FCCAE6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5FDE43A-FA06-442E-8447-3A889FCCAE6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5FDE43A-FA06-442E-8447-3A889FCCAE6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5FDE43A-FA06-442E-8447-3A889FCCAE6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -298,6 +310,8 @@ Global
 		{EA4D5021-5355-46AA-8C50-9637C03BB08E} = {0FAE2ED9-DF3B-4E4D-8AF4-895D375ABD16}
 		{A88C8133-F38B-4374-9022-EF27AE25141E} = {95AFED7A-6211-441D-9643-10354F05477E}
 		{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5} = {95AFED7A-6211-441D-9643-10354F05477E}
+		{ED371A46-D089-452E-850B-8D8FBA310152} = {95AFED7A-6211-441D-9643-10354F05477E}
+		{F5FDE43A-FA06-442E-8447-3A889FCCAE6A} = {0FAE2ED9-DF3B-4E4D-8AF4-895D375ABD16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51117004-2C3A-426A-86DF-7881F4FEF766}

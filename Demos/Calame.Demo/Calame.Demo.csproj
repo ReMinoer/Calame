@@ -56,9 +56,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Modules\DemoGameData\GameData\IShapeData.cs" />
-    <Compile Include="Modules\DemoGameData\GameData\RectangleData.cs" />
-    <Compile Include="Modules\DemoGameData\GameData\CircleData.cs" />
+    <Compile Include="Modules\DemoGameData\Editors\SceneEditor.cs" />
     <Compile Include="Modules\DemoGameData\Module.cs" />
     <Compile Include="Modules\DemoGameData\Editors\RectangleEditor.cs" />
     <Compile Include="Modules\DemoGameData\Editors\CircleEditor.cs" />
@@ -153,6 +151,10 @@
       <Project>{f44fcc70-3106-4f78-bc8b-ba3ce8ad41fd}</Project>
       <Name>Calame.CompositionGraph</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Modules\Calame.DataModelTree\Calame.DataModelTree.csproj">
+      <Project>{ed371a46-d089-452e-850b-8d8fba310152}</Project>
+      <Name>Calame.DataModelTree</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Modules\Calame.DataModelViewer\Calame.DataModelViewer.csproj">
       <Project>{a88c8133-f38b-4374-9022-ef27ae25141e}</Project>
       <Name>Calame.DataModelViewer</Name>
@@ -172,6 +174,10 @@
     <ProjectReference Include="..\..\Modules\Calame.SceneViewer\Calame.SceneViewer.csproj">
       <Project>{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}</Project>
       <Name>Calame.SceneViewer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Calame.Demo.Data\Calame.Demo.Data.csproj">
+      <Project>{f5fde43a-fa06-442e-8447-3a889fccae6a}</Project>
+      <Name>Calame.Demo.Data</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

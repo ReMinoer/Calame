@@ -1,14 +1,14 @@
 ﻿using Diese.Collections;
 using Glyph;
 using Glyph.Binding;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Graphics;
 using Glyph.Graphics.Renderer;
 using Glyph.Graphics.Shapes;
-using Glyph.Modelization;
 using Microsoft.Xna.Framework;
 
-namespace Calame.Demo.Modules.DemoGameData.GameData
+namespace Calame.Demo.Data
 {
     public class RectangleData : BindedData<RectangleData, GlyphObject>, IShapeData
     {
@@ -24,13 +24,11 @@ namespace Calame.Demo.Modules.DemoGameData.GameData
             Bindings.Add(
                 x => x.Width,
                 x => x.Components.First<SpriteTransformer>().Scale,
-                (width, m, v) => v.Components.First<SpriteTransformer>().Scale.SetX(width / v.Components.First<FilledRectangleSprite>().Width),
-                (scale, m, v) => scale.X * v.Components.First<FilledRectangleSprite>().Width);
+                (width, m, v) => v.Components.First<SpriteTransformer>().Scale.SetX(width / v.Components.First<FilledRectangleSprite>().Width));
             Bindings.Add(
                 x => x.Height,
                 x => x.Components.First<SpriteTransformer>().Scale,
-                (height, m, v) => v.Components.First<SpriteTransformer>().Scale.SetY(height / v.Components.First<FilledRectangleSprite>().Height),
-                (scale, m, v) => scale.Y * v.Components.First<FilledRectangleSprite>().Height);
+                (height, m, v) => v.Components.First<SpriteTransformer>().Scale.SetY(height / v.Components.First<FilledRectangleSprite>().Height));
         }
 
         protected override GlyphObject New()

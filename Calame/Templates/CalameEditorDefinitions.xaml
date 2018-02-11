@@ -1,0 +1,65 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                    xmlns:monogame="clr-namespace:Microsoft.Xna.Framework;assembly=MonoGame.Framework"
+                    xmlns:userControls="clr-namespace:Calame.UserControls"
+                    xmlns:converters="clr-namespace:Calame.Converters"
+                    xmlns:utils="clr-namespace:Calame.Utils"
+                    xmlns:modelization="clr-namespace:Glyph.Composition.Modelization;assembly=Glyph.Composition"
+                    xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib">
+    <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
+    <xctk:EditorDefinitionCollection x:Key="CalameEditorDefinitions">
+        <xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition.TargetProperties>
+                <collections:ArrayList>
+                    <utils:EnumerableType>
+                        <x:Type Type="modelization:IGlyphCreator"/>
+                    </utils:EnumerableType>
+                </collections:ArrayList>
+            </xctk:EditorTemplateDefinition.TargetProperties>
+            <xctk:EditorTemplateDefinition.EditingTemplate>
+                <DataTemplate>
+                    <userControls:InlineCollectionControl
+                        ItemsSource="{Binding Value, Mode=TwoWay}" />
+                </DataTemplate>
+            </xctk:EditorTemplateDefinition.EditingTemplate>
+        </xctk:EditorTemplateDefinition>
+        <xctk:EditorTemplateDefinition TargetProperties="{x:Type monogame:Vector2}">
+            <xctk:EditorTemplateDefinition.EditingTemplate>
+                <DataTemplate>
+                    <userControls:Vector2Control Value="{Binding Value, Mode=TwoWay}"/>
+                </DataTemplate>
+            </xctk:EditorTemplateDefinition.EditingTemplate>
+        </xctk:EditorTemplateDefinition>
+        <xctk:EditorTemplateDefinition TargetProperties="{x:Type monogame:Vector3}">
+            <xctk:EditorTemplateDefinition.EditingTemplate>
+                <DataTemplate>
+                    <userControls:Vector3Control Value="{Binding Value, Mode=TwoWay}"/>
+                </DataTemplate>
+            </xctk:EditorTemplateDefinition.EditingTemplate>
+        </xctk:EditorTemplateDefinition>
+        <xctk:EditorTemplateDefinition TargetProperties="{x:Type monogame:Vector4}">
+            <xctk:EditorTemplateDefinition.EditingTemplate>
+                <DataTemplate>
+                    <userControls:Vector4Control Value="{Binding Value, Mode=TwoWay}"/>
+                </DataTemplate>
+            </xctk:EditorTemplateDefinition.EditingTemplate>
+        </xctk:EditorTemplateDefinition>
+        <xctk:EditorTemplateDefinition TargetProperties="{x:Type monogame:Point}">
+            <xctk:EditorTemplateDefinition.EditingTemplate>
+                <DataTemplate>
+                    <userControls:PointControl Value="{Binding Value, Mode=TwoWay}"/>
+                </DataTemplate>
+            </xctk:EditorTemplateDefinition.EditingTemplate>
+        </xctk:EditorTemplateDefinition>
+        <xctk:EditorTemplateDefinition TargetProperties="{x:Type monogame:Color}">
+            <xctk:EditorTemplateDefinition.EditingTemplate>
+                <DataTemplate>
+                    <xctk:ColorPicker SelectedColor="{Binding Value, Converter={StaticResource MonoGameToWpfColorConverter}}"
+                                      ColorMode="ColorCanvas"
+                                      />
+                </DataTemplate>
+            </xctk:EditorTemplateDefinition.EditingTemplate>
+        </xctk:EditorTemplateDefinition>
+    </xctk:EditorDefinitionCollection>
+</ResourceDictionary>

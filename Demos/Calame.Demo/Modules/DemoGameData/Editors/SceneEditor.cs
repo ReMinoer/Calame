@@ -8,10 +8,10 @@ using Glyph.IO;
 namespace Calame.Demo.Modules.DemoGameData.Editors
 {
     [Export(typeof(IEditor))]
-    public class CircleEditor : ViewerEditorBase<CircleData>
+    public class SceneEditor : ViewerEditorBase<SceneData>
     {
         public override string ContentPath => "Content/";
-        protected override ISaveLoadFormat<CircleData> SaveLoadFormat => new XmlSerializationFormat<CircleData>("Circle", ".circle");
-        public override async Task<IGlyphCreator> NewDataAsync() => new CircleData();
+        protected override ISaveLoadFormat<SceneData> SaveLoadFormat => new XmlSerializationFormat<SceneData>("Scene", ".scene");
+        public override async Task<IGlyphCreator> NewDataAsync() => new SceneData();
     }
 }

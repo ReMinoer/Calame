@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using Xceed.Wpf.Toolkit.Primitives;
 
-namespace Calame.PropertyGrid.UserControls.Base
+namespace Calame.UserControls.Base
 {
     public abstract class VectorControlBase<TControl, TVector, TComponent> : UserControl
         where TControl : UpDownBase<TComponent>, new()
