@@ -6,6 +6,12 @@ namespace Calame
 {
     static public class Selection
     {
+        static public Selection<T> Empty<T>()
+            where T : class
+        {
+            return Selection<T>.Empty;
+        }
+
         static public Selection<T> New<T>(T item)
             where T : class
         {

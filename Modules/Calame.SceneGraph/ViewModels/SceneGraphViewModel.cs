@@ -26,12 +26,12 @@ namespace Calame.SceneGraph.ViewModels
             get => _selection;
             set
             {
-                if (!SetValue(ref _selection, value))
-                    return;
-
-                _selectionNode = _selection?.GetSceneNode();
-                NotifyOfPropertyChange(nameof(SelectionNode));
-                    
+                if (SetValue(ref _selection, value))
+                {
+                    _selectionNode = _selection?.GetSceneNode();
+                    NotifyOfPropertyChange(nameof(SelectionNode));
+                }
+ 
                 EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
             }
         }
@@ -41,11 +41,11 @@ namespace Calame.SceneGraph.ViewModels
             get => _selectionNode;
             set
             {
-                if (!SetValue(ref _selectionNode, value))
-                    return;
-
-                _selection = _selectionNode?.Parent;
-                NotifyOfPropertyChange(nameof(Selection));
+                if (SetValue(ref _selectionNode, value))
+                {
+                    _selection = _selectionNode?.Parent;
+                    NotifyOfPropertyChange(nameof(Selection));
+                }
 
                 EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
             }
@@ -61,7 +61,12 @@ namespace Calame.SceneGraph.ViewModels
                 Engine = documentContext.Context;
         }
 
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => Selection = message.Item;
+        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
+        {
+            SetValue(ref _selection, message.Item, nameof(Selection));
+            SetValue(ref _selectionNode, message.Item?.GetSceneNode(), nameof(SelectionNode));
+        }
+
         void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
     }
 }

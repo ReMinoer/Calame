@@ -24,8 +24,8 @@ namespace Calame.CompositionGraph.ViewModels
             get => _selection;
             set
             {
-                if (SetValue(ref _selection, value))
-                    EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
+                SetValue(ref _selection, value);
+                EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
             }
         }
 
@@ -39,7 +39,7 @@ namespace Calame.CompositionGraph.ViewModels
                 Engine = documentContext.Context;
         }
         
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => Selection = message.Item;
+        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => SetValue(ref _selection, message.Item, nameof(Selection));
         void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
     }
 }

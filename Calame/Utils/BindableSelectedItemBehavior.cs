@@ -14,14 +14,20 @@ namespace Calame.Utils
         }
 
         static public readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register("SelectedItem", typeof(object), typeof(BindableSelectedItemBehavior), new UIPropertyMetadata(null, OnSelectedItemChanged));
+            DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(BindableSelectedItemBehavior), new UIPropertyMetadata(null, OnSelectedItemChanged));
 
         static private void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             TreeView treeView = (sender as BindableSelectedItemBehavior)?.AssociatedObject;
+            
             TreeViewItem item = GetTreeViewItem(treeView, e.NewValue);
             if (item == null)
+            {
+                TreeViewItem oldItem = GetTreeViewItem(treeView, e.OldValue);
+                if (oldItem != null)
+                    oldItem.IsSelected = false;
                 return;
+            }
 
             item.IsSelected = true;
         }
