@@ -13,17 +13,19 @@ namespace Calame.DataModelViewer
     [Export(typeof(IEditorProvider))]
     public class EditorProvider : IEditorProvider
     {
-        private readonly ContentManagerProvider _contentManagerProvider;
+        private readonly IContentManagerProvider _contentManagerProvider;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IImportedTypeProvider _importedTypeProvider;
         private readonly IShell _shell;
         public List<IEditor> Editors { get; } = new List<IEditor>();
         public IEnumerable<EditorFileType> FileTypes => Editors.SelectMany(x => x.FileExtensions.Select(e => new EditorFileType(x.DisplayName, e)));
 
         [ImportingConstructor]
-        public EditorProvider(ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IEditor> editors = null)
+        public EditorProvider(IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, [ImportMany] IEnumerable<IEditor> editors = null)
         {
             _contentManagerProvider = contentManagerProvider;
             _eventAggregator = eventAggregator;
+            _importedTypeProvider = importedTypeProvider;
 
             if (editors != null)
                 Editors.AddRange(editors);
@@ -36,7 +38,7 @@ namespace Calame.DataModelViewer
 
         public IDocument Create()
         {
-            return new DataModelViewerViewModel(_contentManagerProvider, _eventAggregator);
+            return new DataModelViewerViewModel(_contentManagerProvider, _eventAggregator, _importedTypeProvider);
         }
 
         public async Task New(IDocument document, string name)

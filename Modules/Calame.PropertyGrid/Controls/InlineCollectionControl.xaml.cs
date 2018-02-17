@@ -8,16 +8,18 @@ using Diese.Collections;
 using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
-namespace Calame.UserControls
+namespace Calame.PropertyGrid.Controls
 {
     public partial class InlineCollectionControl : UserControl
     {
         static public readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(object), typeof(InlineCollectionControl), new PropertyMetadata(null));
-        static public readonly DependencyProperty NewItemTypesProperty =
-            DependencyProperty.Register("NewItemTypes", typeof(IList<Type>), typeof(InlineCollectionControl), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(ItemsSource), typeof(object), typeof(InlineCollectionControl), new PropertyMetadata(null));
+        static public readonly DependencyProperty NewItemTypeRegistryProperty =
+            DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(InlineCollectionControl), new PropertyMetadata(null));
         static public readonly DependencyProperty IsReadOnlyProperty =
-            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(InlineCollectionControl), new PropertyMetadata(false));
+            DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(InlineCollectionControl), new PropertyMetadata(false));
+        static public readonly DependencyProperty EditorDefinitionsProperty =
+            DependencyProperty.Register(nameof(EditorDefinitions), typeof(EditorDefinitionCollection), typeof(InlineCollectionControl), new PropertyMetadata(null));
 
         public object ItemsSource
         {
@@ -25,10 +27,10 @@ namespace Calame.UserControls
             set => SetValue(ItemsSourceProperty, value);
         }
 
-        public IList<Type> NewItemTypes
+        public IList<Type> NewItemTypeRegistry
         {
-            get => (IList<Type>)GetValue(NewItemTypesProperty);
-            set => SetValue(NewItemTypesProperty, value);
+            get => (IList<Type>)GetValue(NewItemTypeRegistryProperty);
+            set => SetValue(NewItemTypeRegistryProperty, value);
         }
         
         public bool IsReadOnly
@@ -36,7 +38,13 @@ namespace Calame.UserControls
             get => (bool)GetValue(IsReadOnlyProperty);
             set => SetValue(IsReadOnlyProperty, value);
         }
-        
+
+        public EditorDefinitionCollection EditorDefinitions
+        {
+            get => (EditorDefinitionCollection)GetValue(EditorDefinitionsProperty);
+            set => SetValue(EditorDefinitionsProperty, value);
+        }
+
         public InlineCollectionControl()
         {
             InitializeComponent();
@@ -46,14 +54,13 @@ namespace Calame.UserControls
         {
             var collectionControl = new CollectionControl
             {
-                Margin = new Thickness(10),
-                NewItemTypes = new List<Type>()
+                Margin = new Thickness(10)
             };
 
             if (ItemsSource.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICollection<>), out Type type))
             {
                 Type itemType = type.GenericTypeArguments[0];
-                collectionControl.NewItemTypes = NewItemTypes?.Where(x => itemType.IsAssignableFrom(x)).ToList();
+                collectionControl.NewItemTypes = NewItemTypeRegistry?.Where(x => itemType.IsAssignableFrom(x)).ToList();
             }
 
             collectionControl.ItemAdded += CollectionControlOnItemAdded;
@@ -79,12 +86,8 @@ namespace Calame.UserControls
                 Height = 500,
                 Content = collectionControl
             };
-
-            var resourceDictionary = new ResourceDictionary { Source = new Uri("pack://application:,,,/Calame;component/Templates/CalameEditorDefinitions.xaml") };
-            collectionControl.PropertyGrid.Resources.MergedDictionaries.Add(resourceDictionary);
-
-            if (collectionControl.PropertyGrid.TryFindResource("CalameEditorDefinitions") is EditorDefinitionCollection editorDefinitions)
-                collectionControl.PropertyGrid.EditorDefinitions = editorDefinitions;
+            
+            collectionControl.PropertyGrid.EditorDefinitions = EditorDefinitions;
 
             window.ShowDialog();
 

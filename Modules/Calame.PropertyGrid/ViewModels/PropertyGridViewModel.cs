@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 using Caliburn.Micro;
 using Gemini.Framework.Services;
 
@@ -16,11 +19,15 @@ namespace Calame.PropertyGrid.ViewModels
             set => SetValue(ref _selectedObject, value);
         }
 
+        public IList<Type> NewItemTypeRegistry { get; }
+
         [ImportingConstructor]
-        public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator)
+        public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider)
             : base(eventAggregator)
         {
             DisplayName = "Property Grid";
+
+            NewItemTypeRegistry = importedTypeProvider.Types.Where(t => t.GetConstructor(Type.EmptyTypes) != null).ToList();
         }
 
         public void Handle(ISelection<object> message) => SelectedObject = message.Item;

@@ -1,0 +1,102 @@
+﻿<UserControl x:Class="Calame.PropertyGrid.Controls.CalamePropertyGrid"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                   xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
+                   xmlns:utils="clr-namespace:Calame.Utils;assembly=Calame"
+                   xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+                   xmlns:monogame="clr-namespace:Microsoft.Xna.Framework;assembly=MonoGame.Framework"
+                   xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
+                   xmlns:modelization="clr-namespace:Glyph.Composition.Modelization;assembly=Glyph.Composition"
+                   xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
+                   mc:Ignorable="d"
+                   d:DataContext="{d:DesignInstance controls:CalamePropertyGrid, IsDesignTimeCreatable=True}"
+                   d:DesignHeight="300"
+                   d:DesignWidth="300">
+    <UserControl.Resources>
+        <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
+    </UserControl.Resources>
+    <xctk:PropertyGrid Name="PropertyGrid" SelectedObject="{Binding SelectedObject}">
+        <xctk:PropertyGrid.EditorDefinitions>
+            <xctk:EditorDefinitionCollection>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <utils:EnumerableType>
+                                <x:Type Type="modelization:IGlyphCreator"/>
+                            </utils:EnumerableType>
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="monogame:Vector2" />
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <userControls:Vector2Control Value="{Binding Value, Mode=TwoWay}"/>
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="monogame:Vector3" />
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <userControls:Vector3Control Value="{Binding Value, Mode=TwoWay}"/>
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="monogame:Vector4" />
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <userControls:Vector4Control Value="{Binding Value, Mode=TwoWay}"/>
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="monogame:Point" />
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <userControls:PointControl Value="{Binding Value, Mode=TwoWay}"/>
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="monogame:Color" />
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <xctk:ColorPicker SelectedColor="{Binding Value, Converter={StaticResource MonoGameToWpfColorConverter}}"
+                                              ColorMode="ColorCanvas" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+            </xctk:EditorDefinitionCollection>
+        </xctk:PropertyGrid.EditorDefinitions>
+    </xctk:PropertyGrid>
+</UserControl>

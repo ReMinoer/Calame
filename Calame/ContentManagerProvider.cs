@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame
 {
-    public class ContentManagerProvider
+    public class ContentManagerProvider : IContentManagerProvider
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly Dictionary<string, ContentManager> _contentManagers = new Dictionary<string, ContentManager>();

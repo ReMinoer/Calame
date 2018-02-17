@@ -3,22 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:viewModels="clr-namespace:Calame.PropertyGrid.ViewModels"
-             xmlns:monogame="clr-namespace:Microsoft.Xna.Framework;assembly=MonoGame.Framework"
-             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+             xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:PropertyGridViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="500"
              d:DesignWidth="300">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Calame;component/Templates/CalameEditorDefinitions.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
     <Grid>
-        <xctk:PropertyGrid SelectedObject="{Binding SelectedObject}" EditorDefinitions="{StaticResource CalameEditorDefinitions}"/>
+        <controls:CalamePropertyGrid SelectedObject="{Binding SelectedObject}" NewItemTypeRegistry="{Binding NewItemTypeRegistry}" />
     </Grid>
 </UserControl>

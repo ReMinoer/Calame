@@ -15,14 +15,14 @@ namespace Calame.SceneViewer
     public class SessionProvider : IEditorProvider
     {
         private readonly IShell _shell;
-        private readonly ContentManagerProvider _contentManagerProvider;
+        private readonly IContentManagerProvider _contentManagerProvider;
         private readonly IEventAggregator _eventAggregator;
         
         public List<ISession> Sessions { get; } = new List<ISession>();
         public IEnumerable<EditorFileType> FileTypes => Sessions.Select(x => new EditorFileType(x.DisplayName, null));
 
         [ImportingConstructor]
-        public SessionProvider(IShell shell, ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<ISession> gameDataEnumerable = null)
+        public SessionProvider(IShell shell, IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<ISession> gameDataEnumerable = null)
         {
             _shell = shell;
             _contentManagerProvider = contentManagerProvider;

@@ -52,13 +52,13 @@
     <Compile Include="HandleDocument.cs" />
     <Compile Include="HandlePersistedDocument.cs" />
     <Compile Include="HandleTool.cs" />
+    <Compile Include="IContentManagerProvider.cs" />
     <Compile Include="IDocumentContext.cs" />
+    <Compile Include="IImportedTypeProvider.cs" />
+    <Compile Include="ImportedTypeProvider.cs" />
     <Compile Include="InterfaceTemplateSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserControls\Base\VectorControlBase.cs" />
-    <Compile Include="UserControls\InlineCollectionControl.xaml.cs">
-      <DependentUpon>InlineCollectionControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UserControls\PointControl.cs" />
     <Compile Include="UserControls\Vector2Control.cs" />
     <Compile Include="UserControls\Vector3Control.cs" />
@@ -66,6 +66,7 @@
     <Compile Include="Utils\BindableSelectedItemBehavior.cs" />
     <Compile Include="ISelection.cs" />
     <Compile Include="Selection.cs" />
+    <Compile Include="Utils\DependencyObjectExtension.cs" />
     <Compile Include="Utils\EnumerableTypeExtension.cs" />
     <Compile Include="Utils\VirtualizingStackPanel.cs" />
   </ItemGroup>
@@ -108,16 +109,6 @@
     <PackageReference Include="MahApps.Metro">
       <Version>1.2.4</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Templates\CalameEditorDefinitions.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\InlineCollectionControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

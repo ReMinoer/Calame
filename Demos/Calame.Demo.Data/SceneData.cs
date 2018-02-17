@@ -5,11 +5,11 @@ namespace Calame.Demo.Data
 {
     public class SceneData : BindedData<SceneData, GlyphObject>
     {
-        public FactoryConfigurator<RectangleData, GlyphObject> Rectangles { get; set; }
+        public FactoryConfigurator<IShapeData, GlyphObject> Rectangles { get; }
 
         public SceneData()
         {
-            SubConfigurators.Add(Rectangles = new FactoryConfigurator<RectangleData, GlyphObject>(this));
+            SubConfigurators.Add(Rectangles = new FactoryConfigurator<IShapeData, GlyphObject>(this));
         }
 
         protected override GlyphObject New()

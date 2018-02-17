@@ -32,7 +32,8 @@ namespace Calame.DataModelViewer.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DataModelViewerViewModel : HandlePersistedDocument, IDocumentContext<GlyphEngine>, IDocumentContext<IGlyphCreator>, IHandle<ISelection<IGlyphComponent>>, IDisposable
     {
-        private readonly ContentManagerProvider _contentManagerProvider;
+        private readonly IContentManagerProvider _contentManagerProvider;
+        private readonly IImportedTypeProvider _importedTypeProvider;
         private DataModelViewerView _view;
         private Cursor _viewerCursor;
         private GlyphWpfRunner _runner;
@@ -120,10 +121,11 @@ namespace Calame.DataModelViewer.ViewModels
             set => SetValue(ref _viewerCursor, value);
         }
 
-        public DataModelViewerViewModel(ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
+        public DataModelViewerViewModel(IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider)
             : base(eventAggregator)
         {
             _contentManagerProvider = contentManagerProvider;
+            _importedTypeProvider = importedTypeProvider;
         }
 
         protected override async Task DoNew()

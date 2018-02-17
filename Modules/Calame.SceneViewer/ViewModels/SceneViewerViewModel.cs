@@ -33,7 +33,7 @@ namespace Calame.SceneViewer.ViewModels
     public sealed class SceneViewerViewModel : HandleDocument, IDocumentContext<GlyphEngine>, IHandle<ISelection<IGlyphComponent>>, IDisposable
     {
         private readonly IShell _shell;
-        private readonly ContentManagerProvider _contentManagerProvider;
+        private readonly IContentManagerProvider _contentManagerProvider;
 
         private SceneViewerView _view;
         private Cursor _viewerCursor;
@@ -134,7 +134,7 @@ namespace Calame.SceneViewer.ViewModels
         public ICommand CursorInputsCommand { get; }
         public ICommand DefaultInputsCommand { get; }
         
-        public SceneViewerViewModel(IShell shell, ContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
+        public SceneViewerViewModel(IShell shell, IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
             : base(eventAggregator)
         {
             _shell = shell;

@@ -1,17 +1,20 @@
 ﻿using System.ComponentModel.Composition;
-using System.Threading.Tasks;
 using Calame.DataModelViewer;
 using Calame.Demo.Data;
-using Glyph.Composition.Modelization;
 using Glyph.IO;
 
 namespace Calame.Demo.Modules.DemoGameData.Editors
 {
     [Export(typeof(IEditor))]
-    public class CircleEditor : ViewerEditorBase<CircleData>
+    public class CircleEditor : SerializingViewerEditorBase<CircleData>
     {
         public override string ContentPath => "Content/";
-        protected override ISaveLoadFormat<CircleData> SaveLoadFormat => new XmlSerializationFormat<CircleData>("Circle", ".circle");
-        public override async Task<IGlyphCreator> NewDataAsync() => new CircleData();
+        protected override ISerializationFormat<CircleData> SerializationFormat => new DataContractSerializationFormat<CircleData>("Circle", ".circle");
+
+        [ImportingConstructor]
+        public CircleEditor(IImportedTypeProvider importedTypeProvider)
+            : base(importedTypeProvider)
+        {
+        }
     }
 }

@@ -79,14 +79,14 @@ namespace Calame.DataModelViewer
             return engine.Root;
         }
 
-        public async Task<IGlyphCreator> LoadDataAsync(Stream stream)
+        public virtual Task<IGlyphCreator> LoadDataAsync(Stream stream)
         {
-            return SaveLoadFormat.Load(stream);
+            return Task.Run<IGlyphCreator>(() => SaveLoadFormat.Load(stream));
         }
         
-        public async Task SaveDataAsync(object obj, Stream stream)
+        public virtual Task SaveDataAsync(object obj, Stream stream)
         {
-            SaveLoadFormat.Save((T)obj, stream);
+            return Task.Run(() => SaveLoadFormat.Save((T)obj, stream));
         }
     }
 }

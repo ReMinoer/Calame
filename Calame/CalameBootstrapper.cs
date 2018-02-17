@@ -37,7 +37,8 @@ namespace Calame
         protected override void BindServices(CompositionBatch batch)
         {
             base.BindServices(batch);
-            batch.AddExportedValue(new ContentManagerProvider(D3D11Client.GraphicsDevice));
+            batch.AddExportedValue<IContentManagerProvider>(new ContentManagerProvider(D3D11Client.GraphicsDevice));
+            batch.AddExportedValue<IImportedTypeProvider>(new ImportedTypeProvider());
         }
 
 #if DEBUG
