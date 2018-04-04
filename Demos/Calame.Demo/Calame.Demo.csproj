@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Niddle">
+      <HintPath>..\..\External\Glyph\External\Niddle\Niddle\bin\Debug\netstandard1.0\Niddle.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -94,10 +97,6 @@
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Collections\Diese.Collections.csproj">
       <Project>{8E354191-E8E5-498B-9C24-A6765DA86417}</Project>
       <Name>Diese.Collections</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Injection\Diese.Injection.csproj">
-      <Project>{6ADD41DC-F168-43C4-AD4E-F6B8218D8F7C}</Project>
-      <Name>Diese.Injection</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Modelization\Diese.Modelization.csproj">
       <Project>{0781ad0f-eb0f-442e-9a1c-34c2aa9319fd}</Project>

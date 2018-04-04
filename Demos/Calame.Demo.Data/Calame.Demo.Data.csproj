@@ -49,10 +49,6 @@
       <Project>{8e354191-e8e5-498b-9c24-a6765da86417}</Project>
       <Name>Diese.Collections</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Injection\Diese.Injection.csproj">
-      <Project>{6add41dc-f168-43c4-ad4e-f6b8218d8f7c}</Project>
-      <Name>Diese.Injection</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Modelization\Diese.Modelization.csproj">
       <Project>{0781AD0F-EB0F-442E-9A1C-34C2AA9319FD}</Project>
       <Name>Diese.Modelization</Name>
