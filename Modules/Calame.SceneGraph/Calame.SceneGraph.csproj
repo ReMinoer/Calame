@@ -72,14 +72,6 @@
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Collections\Diese.Collections.csproj">
-      <Project>{8e354191-e8e5-498b-9c24-a6765da86417}</Project>
-      <Name>Diese.Collections</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese\Diese.csproj">
-      <Project>{F2F3FEB2-8453-409E-B00C-96DC64AC8020}</Project>
-      <Name>Diese</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
       <Name>Stave</Name>

@@ -94,25 +94,13 @@
       <Project>{8cc36da5-321d-49ba-9ee2-56015ef5081f}</Project>
       <Name>Calame</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Collections\Diese.Collections.csproj">
-      <Project>{8E354191-E8E5-498B-9C24-A6765DA86417}</Project>
-      <Name>Diese.Collections</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Modelization\Diese.Modelization.csproj">
-      <Project>{0781ad0f-eb0f-442e-9a1c-34c2aa9319fd}</Project>
-      <Name>Diese.Modelization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Scheduling\Diese.Scheduling.csproj">
-      <Project>{ED3283B6-9691-4418-96D0-6E83AEE37540}</Project>
-      <Name>Diese.Scheduling</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese\Diese.csproj">
-      <Project>{f2f3feb2-8453-409e-b00c-96dc64ac8020}</Project>
-      <Name>Diese</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
       <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Taskete\Taskete.csproj">
+      <Project>{88c50d55-d13c-46fb-afb2-0b6fb4fd4d3b}</Project>
+      <Name>Taskete</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj">
       <Project>{9EEF1863-44BE-423E-A29D-088C23AAC45E}</Project>
@@ -121,6 +109,10 @@
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj">
       <Project>{7EE0B116-6B49-4073-99D8-827DD68B8AE0}</Project>
       <Name>Fingear</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
+      <Project>{91b676a6-3501-4a25-b2bd-4c8519d43faf}</Project>
+      <Name>Simulacra</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
       <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>

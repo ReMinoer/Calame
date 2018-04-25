@@ -71,14 +71,6 @@
     <Compile Include="Utils\VirtualizingStackPanel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Collections\Diese.Collections.csproj">
-      <Project>{8e354191-e8e5-498b-9c24-a6765da86417}</Project>
-      <Name>Diese.Collections</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Modelization\Diese.Modelization.csproj">
-      <Project>{0781ad0f-eb0f-442e-9a1c-34c2aa9319fd}</Project>
-      <Name>Diese.Modelization</Name>
-    </ProjectReference>
     <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
       <Name>Stave</Name>

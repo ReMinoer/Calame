@@ -78,25 +78,13 @@
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Collections\Diese.Collections.csproj">
-      <Project>{8E354191-E8E5-498B-9C24-A6765DA86417}</Project>
-      <Name>Diese.Collections</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Modelization\Diese.Modelization.csproj">
-      <Project>{0781AD0F-EB0F-442E-9A1C-34C2AA9319FD}</Project>
-      <Name>Diese.Modelization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese.Scheduling\Diese.Scheduling.csproj">
-      <Project>{ED3283B6-9691-4418-96D0-6E83AEE37540}</Project>
-      <Name>Diese.Scheduling</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\External\Diese\Diese\Diese.csproj">
-      <Project>{F2F3FEB2-8453-409E-B00C-96DC64AC8020}</Project>
-      <Name>Diese</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
       <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Taskete\Taskete.csproj">
+      <Project>{88c50d55-d13c-46fb-afb2-0b6fb4fd4d3b}</Project>
+      <Name>Taskete</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj">
       <Project>{9eef1863-44be-423e-a29d-088c23aac45e}</Project>
@@ -109,6 +97,10 @@
     <ProjectReference Include="..\..\External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj">
       <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
       <Name>MonoGame.Framework.WpfInterop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
+      <Project>{91b676a6-3501-4a25-b2bd-4c8519d43faf}</Project>
+      <Name>Simulacra</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
       <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
