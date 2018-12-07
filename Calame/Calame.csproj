@@ -49,14 +49,13 @@
     <Compile Include="Converters\EnumerableToString.cs" />
     <Compile Include="Converters\MonoGameToWpfColorConverter.cs" />
     <Compile Include="DocumentContext.cs" />
-    <Compile Include="HandleDocument.cs" />
-    <Compile Include="HandlePersistedDocument.cs" />
     <Compile Include="HandleTool.cs" />
     <Compile Include="IContentManagerProvider.cs" />
     <Compile Include="IDocumentContext.cs" />
     <Compile Include="IImportedTypeProvider.cs" />
     <Compile Include="ImportedTypeProvider.cs" />
     <Compile Include="InterfaceTemplateSelector.cs" />
+    <Compile Include="NotifyPropertyChangedExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserControls\Base\VectorControlBase.cs" />
     <Compile Include="UserControls\PointControl.cs" />
@@ -76,7 +75,7 @@
       <Name>Stave</Name>
     </ProjectReference>
     <ProjectReference Include="..\External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj">
-      <Project>{809f0d79-aedc-4754-a213-fdbe97ccd6d6}</Project>
+      <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
       <Name>MonoGame.Framework.WpfInterop</Name>
     </ProjectReference>
     <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
@@ -102,5 +101,6 @@
       <Version>1.2.4</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

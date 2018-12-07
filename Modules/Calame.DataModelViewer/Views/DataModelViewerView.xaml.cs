@@ -1,9 +1,14 @@
 ﻿using System.Windows.Input;
+using Calame.DataModelViewer.ViewModels;
+using Calame.Viewer;
+using Glyph.WpfInterop;
 
 namespace Calame.DataModelViewer.Views
 {
-    public partial class DataModelViewerView
+    public partial class DataModelViewerView : IViewerView
     {
+        public IWpfGlyphClient Client => GlyphWpfViewer;
+
         public DataModelViewerView()
         {
             InitializeComponent();

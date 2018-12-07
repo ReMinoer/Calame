@@ -1,124 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Input;
-using Calame.SceneViewer.Views;
+using Calame.Viewer;
 using Caliburn.Micro;
 using Diese.Collections;
 using Fingear;
-using Fingear.Controls;
-using Fingear.Controls.Containers;
-using Fingear.MonoGame;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph;
-using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Inputs;
+using Glyph.Core.Tracking;
 using Glyph.Engine;
 using Glyph.Graphics;
-using Glyph.Math.Shapes;
-using Glyph.Tools;
-using Glyph.Tools.ShapeRendering;
 using Glyph.WpfInterop;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : HandleDocument, IDocumentContext<GlyphEngine>, IHandle<ISelection<IGlyphComponent>>, IDisposable
+    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDisposable
     {
         private readonly IShell _shell;
         private readonly IContentManagerProvider _contentManagerProvider;
-
-        private SceneViewerView _view;
+        private readonly IEventAggregator _eventAggregator;
+        
+        private GlyphEngine _engine;
+        private readonly ViewerViewModel _viewerViewModel;
         private Cursor _viewerCursor;
-        private GlyphWpfRunner _runner;
-        private IBoxedComponent _boxedSelection;
-        private ShapedObjectSelector _shapedObjectSelector;
-        private AreaComponentRenderer _selectionRenderer;
+        private MessagingTracker<IView> _viewTracker;
+
         public ISession Session { get; set; }
-        public FreeCamera EditorCamera { get; private set; }
-        public Glyph.Graphics.View EditorView { get; private set; }
-        public GlyphWpfViewer Viewer { get; private set; }
-        public IEnumerable<IView> RunnerViews => _runner?.Engine.ViewManager.Views.Where(x => !(x.Camera.Parent is FreeCamera));
-        GlyphEngine IDocumentContext<GlyphEngine>.Context => Runner?.Engine;
-
-        public IBoxedComponent BoxedSelection
-        {
-            get => _boxedSelection;
-            private set
-            {
-                if (SetValue(ref _boxedSelection, value))
-                {
-                    if (_selectionRenderer != null)
-                    {
-                        Runner.Engine.Root.Remove(_selectionRenderer);
-                        _selectionRenderer.Dispose();
-                    }
-
-                    _boxedSelection = value;
-
-                    if (_boxedSelection != null)
-                    {
-                        _selectionRenderer = new AreaComponentRenderer(_boxedSelection, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>()) { Name = "Selection Renderer", Color = Color.Purple * 0.5f, DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera };
-                        Runner.Engine.Root.Add(_selectionRenderer);
-                    }
-                }
-            }
-        }
-
-        public GlyphWpfRunner Runner
-        {
-            get => _runner;
-            set
-            {
-                if (_runner != null)
-                {
-                    _runner.Engine.ViewManager.UnregisterView(EditorView);
-                    _runner.Engine.Root.RemoveAndDispose(EditorCamera);
-                }
-                
-                _runner = value;
-
-                if (_runner != null)
-                {
-                    _shapedObjectSelector = _runner.Engine.Root.Add<ShapedObjectSelector>();
-                    _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
-                    {
-                        TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
-                        ValueControl = new SceneCursorControl("Scene cursor", InputSystem.Instance.Mouse.Cursor, _runner.Engine.InputClientManager, _runner.Engine.ViewManager)
-                    };
-                    _shapedObjectSelector.HandleInputs = true;
-                    _shapedObjectSelector.SelectionChanged += ShapedObjectSelectorOnSelectionChanged;
-
-                    EditorView = _runner.Engine.Injector.Resolve<Glyph.Graphics.View>();
-                    EditorView.Name = "Editor View";
-                    EditorView.BoundingBox = new TopLeftRectangle(Vector2.Zero, VirtualResolution.Size);
-                    EditorView.DrawClientFilter = new ExcludingFilter<IDrawClient>();
-
-                    EditorCamera = _runner.Engine.Root.Add<FreeCamera>();
-                    EditorCamera.View = EditorView;
-                    _runner.Engine.ViewManager.RegisterView(EditorView);
-
-                    _runner.Engine.Root.Schedulers.Update.Plan(EditorCamera).AtStart();
-                }
-                
-                ConnectView();
-                
-                if (IsActive)
-                    OnActivated();
-            }
-        }
+        public GlyphWpfRunner Runner => _viewerViewModel.Runner;
+        GlyphEngine IDocumentContext<GlyphEngine>.Context => _viewerViewModel.Runner?.Engine;
 
         public Cursor ViewerCursor
         {
             get => _viewerCursor;
-            set => SetValue(ref _viewerCursor, value);
+            set => this.SetValue(ref _viewerCursor, value);
         }
 
         public ICommand PlayCommand { get; }
@@ -127,18 +47,19 @@ namespace Calame.SceneViewer.ViewModels
 
         public ICommand FreeCameraCommand { get; }
         public ICommand DefaultViewsCommand { get; }
-
-        public ICommand SelectViewCommand { get; }
         public ICommand NewViewerCommand { get; }
 
         public ICommand CursorInputsCommand { get; }
         public ICommand DefaultInputsCommand { get; }
         
         public SceneViewerViewModel(IShell shell, IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
-            : base(eventAggregator)
         {
             _shell = shell;
             _contentManagerProvider = contentManagerProvider;
+            _eventAggregator = eventAggregator;
+
+            _viewerViewModel = new ViewerViewModel(this, _eventAggregator);
+            _viewerViewModel.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
             DisplayName = "Scene Viewer";
 
@@ -148,92 +69,69 @@ namespace Calame.SceneViewer.ViewModels
 
             FreeCameraCommand = new RelayCommand(FreeCameraAction, x => Runner?.Engine != null);
             DefaultViewsCommand = new RelayCommand(DefaultViewsAction, x => Runner?.Engine != null);
-
-            SelectViewCommand = new RelayCommand(SelectViewAction, x => Runner?.Engine != null);
             NewViewerCommand = new RelayCommand(NewViewerAction, x => Runner?.Engine != null);
 
             CursorInputsCommand = new RelayCommand(CursorInputsAction, x => Runner?.Engine != null);
             DefaultInputsCommand = new RelayCommand(DefaultInputsAction, x => Runner?.Engine != null);
         }
+        
+        public SceneViewerViewModel(SceneViewerViewModel viewModel)
+            : this(viewModel._shell, viewModel._contentManagerProvider, viewModel._eventAggregator)
+        {
+            _viewTracker = viewModel._viewTracker;
+            Session = viewModel.Session;
+
+            _viewerViewModel.Runner = viewModel.Runner;
+        }
 
         public void InitializeSession()
         {
-            var engine = new GlyphEngine(_contentManagerProvider.Get(Session.ContentPath));
-            Session.PrepareSession(engine);
+            _viewTracker?.Dispose();
+            _viewTracker = null;
 
-            Runner = new GlyphWpfRunner
-            {
-                Engine = engine
-            };
+            _engine = new GlyphEngine(_contentManagerProvider.Get(Session.ContentPath));
+            _engine.Root.Add<SceneNode>();
+            _engine.RootView.Camera = _engine.Root.Add<Camera>();
+            
+            var sessionView = _engine.Root.Add<FillView>();
+            sessionView.ParentView = _engine.RootView;
+
+            _viewTracker = _engine.Injector.Resolve<MessagingTracker<IView>>();
+
+            _viewerViewModel.Runner = new GlyphWpfRunner { Engine = _engine };
+            Session.PrepareSession(_engine, sessionView, _viewerViewModel.EditorRoot);
+
+            _engine.Initialize();
+            _engine.LoadContent();
+            _engine.Start();
         }
 
         protected override void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-
-            _view = (SceneViewerView)view;
-            Viewer = _view.GlyphWpfViewer;
-
-            ConnectView();
-
-            Activated += OnActivated;
-            Deactivated += OnDeactivated;
-        }
-
-        private void ConnectView()
-        {
-            if (_view == null)
-                return;
-
-            _view.ViewsComboBox.SelectedItems.Clear();
-
-            if (Runner == null)
+            if (view == null)
                 return;
             
-            Viewer.Runner = Runner;
-            EditorCamera.Client = Viewer;
-            Runner.Engine.FocusedClient = Viewer;
-
-            foreach (IView runnerView in RunnerViews.Where(x => x.DrawClientFilter == null || x.DrawClientFilter.Filter(Viewer)))
-                _view.ViewsComboBox.SelectedItems.Add(runnerView);
-
-            FreeCameraAction(null);
+            _viewerViewModel.ConnectView((IViewerView)view);
+            FreeCameraAction();
         }
 
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
+        private void FreeCameraAction(object obj = null)
         {
-            if (Runner.Engine.FocusedClient == Viewer && message.Item is IBoxedComponent boxedComponent)
-                BoxedSelection = boxedComponent;
-        }
-
-        private void ShapedObjectSelectorOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
-        {
-            if (Runner.Engine.FocusedClient == Viewer)
-            {
-                BoxedSelection = boxedComponent;
-                EventAggregator.PublishOnUIThread(Selection.New(_boxedSelection));
-            }
-        }
-
-        private void FreeCameraAction(object obj)
-        {
-            foreach (IView runnerView in _runner.Engine.ViewManager.Views)
-                SelectView(runnerView, runnerView == EditorView);
-        }
-
-        private void DefaultViewsAction(object obj)
-        {
-            foreach (IView runnerView in _runner.Engine.ViewManager.Views)
-                SelectView(runnerView, _view.ViewsComboBox.SelectedItems.Contains(runnerView));
-        }
-
-        private void SelectViewAction(object obj)
-        {
-            if (EditorView.DrawClientFilter.Filter(Viewer))
+            if (_viewTracker == null)
                 return;
 
-            var runnerView = (IView)obj;
-            SelectView(runnerView, _view.ViewsComboBox.SelectedItems.Contains(runnerView));
+            foreach (IView runnerView in _viewTracker)
+                SelectView(runnerView, runnerView == _viewerViewModel.EditorView);
+        }
+
+        private void DefaultViewsAction(object obj = null)
+        {
+            if (_viewTracker == null)
+                return;
+
+            foreach (IView runnerView in _viewTracker)
+                SelectView(runnerView, runnerView != _viewerViewModel.EditorView);
         }
 
         private void SelectView(IView view, bool isSelected)
@@ -242,14 +140,14 @@ namespace Calame.SceneViewer.ViewModels
                 view.DrawClientFilter = new ExcludingFilter<IDrawClient>();
 
             if (isSelected ^ view.DrawClientFilter.Excluding)
-                view.DrawClientFilter.Items.Add(Viewer);
+                view.DrawClientFilter.Items.Add(_viewerViewModel.Client);
             else
-                view.DrawClientFilter.Items.Remove(Viewer);
+                view.DrawClientFilter.Items.Remove(_viewerViewModel.Client);
         }
 
         private void NewViewerAction(object obj)
         {
-            _shell.OpenDocument(new SceneViewerViewModel(_shell, _contentManagerProvider, EventAggregator) { Runner = Runner });
+            _shell.OpenDocument(new SceneViewerViewModel(this));
         }
 
         private void CursorInputsAction(object obj)
@@ -268,29 +166,18 @@ namespace Calame.SceneViewer.ViewModels
             ViewerCursor = Cursors.None;
         }
 
+        private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
+        {
+            FreeCameraAction();
+        }
+
         public void Dispose()
         {
-            Activated -= OnActivated;
-            Deactivated -= OnDeactivated;
+            _engine.Stop();
+            _viewTracker?.Dispose();
 
-            Runner?.Dispose();
-            Runner = null;
-        }
-
-        private void OnActivated()
-        {
-            if (Runner?.Engine != null)
-                Runner.Engine.FocusedClient = Viewer;
-
-            EventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
-        }
-
-        private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();
-
-        private void OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)
-        {
-            if (Runner?.Engine != null && Runner.Engine.FocusedClient == Viewer)
-                Runner.Engine.FocusedClient = null;
+            _viewerViewModel.RunnerChanged -= ViewerViewModelOnRunnerChanged;
+            _viewerViewModel.Dispose();
         }
     }
 }

@@ -5,15 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfInterop="clr-namespace:Glyph.WpfInterop;assembly=Glyph.WpfInterop"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:utils="clr-namespace:Calame.SceneViewer.Utils"
              xmlns:viewModels="clr-namespace:Calame.SceneViewer.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:SceneViewerViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="180" d:DesignWidth="500">
     <UserControl.Resources>
         <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}" />
-        <utils:MoreThanOneToVisibilityConverter x:Key="MoreThanOneToVisibilityConverter"/>
     </UserControl.Resources>
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
@@ -48,14 +45,6 @@
                     <iconPacks:PackIconMaterial Kind="Airplay"/>
                 </RadioButton>
                 <Separator />
-                <xctk:CheckComboBox x:Name="ViewsComboBox"
-                                    Height="18"
-                                    Width="150"
-                                    Margin="2"
-                                    ItemsSource="{Binding RunnerViews}"
-                                    Command="{Binding SelectViewCommand}"
-                                    Delimiter=" / "
-                                    Visibility="{Binding Items, RelativeSource={RelativeSource Self}, Converter={StaticResource MoreThanOneToVisibilityConverter}}"/>
                 <Button Command="{Binding NewViewerCommand}">
                     <iconPacks:PackIconMaterial Kind="ShapeRectanglePlus"/>
                 </Button>

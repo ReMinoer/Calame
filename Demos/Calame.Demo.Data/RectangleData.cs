@@ -19,16 +19,16 @@ namespace Calame.Demo.Data
 
         static RectangleData()
         {
-            Bindings.Add(x => x.Position, x => x.Components.First<SceneNode>().Position);
-            Bindings.Add(x => x.Color, x => x.Components.First<SpriteTransformer>().Color);
+            Bindings.Add(x => x.Position, x => x.Components.FirstOfType<SceneNode>().Position);
+            Bindings.Add(x => x.Color, x => x.Components.FirstOfType<SpriteTransformer>().Color);
             Bindings.Add(
                 x => x.Width,
-                x => x.Components.First<SpriteTransformer>().Scale,
-                (width, m, v) => v.Components.First<SpriteTransformer>().Scale.SetX(width / v.Components.First<FilledRectangleSprite>().Width));
+                x => x.Components.FirstOfType<SpriteTransformer>().Scale,
+                (width, m, v) => v.Components.FirstOfType<SpriteTransformer>().Scale.SetX(width / v.Components.FirstOfType<FilledRectangleSprite>().Width));
             Bindings.Add(
                 x => x.Height,
-                x => x.Components.First<SpriteTransformer>().Scale,
-                (height, m, v) => v.Components.First<SpriteTransformer>().Scale.SetY(height / v.Components.First<FilledRectangleSprite>().Height));
+                x => x.Components.FirstOfType<SpriteTransformer>().Scale,
+                (height, m, v) => v.Components.FirstOfType<SpriteTransformer>().Scale.SetY(height / v.Components.FirstOfType<FilledRectangleSprite>().Height));
         }
 
         protected override GlyphObject New()

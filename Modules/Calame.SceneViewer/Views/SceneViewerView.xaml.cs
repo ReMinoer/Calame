@@ -1,9 +1,13 @@
 ﻿using System.Windows.Input;
+using Calame.Viewer;
+using Glyph.WpfInterop;
 
 namespace Calame.SceneViewer.Views
 {
-    public partial class SceneViewerView
+    public partial class SceneViewerView : IViewerView
     {
+        public IWpfGlyphClient Client => GlyphWpfViewer;
+
         public SceneViewerView()
         {
             InitializeComponent();

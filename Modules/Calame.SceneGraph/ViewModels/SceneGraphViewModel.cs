@@ -12,7 +12,7 @@ namespace Calame.SceneGraph.ViewModels
     {
         private GlyphEngine _engine;
         private IGlyphComponent _selection;
-        private ISceneNode _selectionNode;
+        private SceneNode _selectionNode;
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public GlyphEngine Engine
@@ -36,7 +36,7 @@ namespace Calame.SceneGraph.ViewModels
             }
         }
 
-        public ISceneNode SelectionNode
+        public SceneNode SelectionNode
         {
             get => _selectionNode;
             set

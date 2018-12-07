@@ -74,6 +74,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Calame.Viewer\Calame.Viewer.csproj">
+      <Project>{2EDFE6B4-8E1E-4B22-85BE-D80E8573B3FD}</Project>
+      <Name>Calame.Viewer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Calame\Calame.csproj">
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>

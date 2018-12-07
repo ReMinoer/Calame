@@ -38,7 +38,7 @@ namespace Calame.DataModelViewer
 
         public IDocument Create()
         {
-            return new DataModelViewerViewModel(_contentManagerProvider, _eventAggregator, _importedTypeProvider);
+            return new DataModelViewerViewModel(_contentManagerProvider, _eventAggregator);
         }
 
         public async Task New(IDocument document, string name)

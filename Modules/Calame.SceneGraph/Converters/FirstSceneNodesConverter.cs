@@ -22,7 +22,7 @@ namespace Calame.SceneGraph.Converters
 
         private IEnumerable<object> Convert(IGlyphComponent glyphComponent)
         {
-            if (glyphComponent.Components.Any(out SceneNode sceneNode))
+            if (glyphComponent.Components.AnyOfType(out SceneNode sceneNode))
             {
                 yield return sceneNode;
                 yield break;

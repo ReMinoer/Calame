@@ -17,12 +17,12 @@ namespace Calame.Demo.Data
 
         static CircleData()
         {
-            Bindings.Add(x => x.Position, x => x.Components.First<SceneNode>().Position);
-            Bindings.Add(x => x.Color, x => x.Components.First<SpriteTransformer>().Color);
+            Bindings.Add(x => x.Position, x => x.Components.FirstOfType<SceneNode>().Position);
+            Bindings.Add(x => x.Color, x => x.Components.FirstOfType<SpriteTransformer>().Color);
             Bindings.Add(
                 x => x.Radius,
-                x => x.Components.First<SpriteTransformer>().Scale,
-                (radius, m, v) => radius / v.Components.First<FilledCircleSprite>().Radius * Vector2.One);
+                x => x.Components.FirstOfType<SpriteTransformer>().Scale,
+                (radius, m, v) => radius / v.Components.FirstOfType<FilledCircleSprite>().Radius * Vector2.One);
         }
 
         protected override GlyphObject New()
