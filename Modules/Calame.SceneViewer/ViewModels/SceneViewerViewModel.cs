@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Input;
 using Calame.Viewer;
+using Calame.Viewer.Modules;
 using Caliburn.Micro;
 using Diese.Collections;
 using Fingear;
@@ -58,7 +59,13 @@ namespace Calame.SceneViewer.ViewModels
             _contentManagerProvider = contentManagerProvider;
             _eventAggregator = eventAggregator;
 
-            _viewerViewModel = new ViewerViewModel(this, _eventAggregator);
+            var viewerModules = new IViewerModule[]
+            {
+                new BoxedComponentSelectorModule(eventAggregator),
+                new SelectionRendererModule(eventAggregator)
+            };
+
+            _viewerViewModel = new ViewerViewModel(this, _eventAggregator, viewerModules);
             _viewerViewModel.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
             DisplayName = "Scene Viewer";

@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 using Calame.Viewer;
+using Calame.Viewer.Modules;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Glyph.Composition;
@@ -20,8 +21,11 @@ namespace Calame.DataModelViewer.ViewModels
         private readonly IContentManagerProvider _contentManagerProvider;
         private readonly IEventAggregator _eventAggregator;
 
-        private GlyphEngine _engine;
         private readonly ViewerViewModel _viewerViewModel;
+        private readonly BoxedComponentSelectorModule _boxedComponentSelectorModule;
+
+        private GlyphEngine _engine;
+
         public IEditor Editor { get; set; }
         public IGlyphCreator Data { get; private set; }
 
@@ -32,10 +36,17 @@ namespace Calame.DataModelViewer.ViewModels
         {
             _contentManagerProvider = contentManagerProvider;
             _eventAggregator = eventAggregator;
+            
+            var viewerModules = new IViewerModule[]
+            {
+                _boxedComponentSelectorModule = new BoxedComponentSelectorModule(eventAggregator),
+                new SelectionRendererModule(eventAggregator)
+            };
 
-            _viewerViewModel = new ViewerViewModel(this, eventAggregator);
+            _viewerViewModel = new ViewerViewModel(this, eventAggregator, viewerModules);
             _viewerViewModel.RunnerChanged += ViewerViewModelOnRunnerChanged;
-            _viewerViewModel.SelectionChanged += ViewerViewModelOnSelectionChanged;
+
+            _boxedComponentSelectorModule.SelectionChanged += BoxedComponentSelectorModuleOnSelectionChanged;
         }
 
         protected override async Task DoNew()
@@ -95,17 +106,17 @@ namespace Calame.DataModelViewer.ViewModels
             Activated += OnActivated;
         }
 
-        private void ViewerViewModelOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
+        private void BoxedComponentSelectorModuleOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
         {
-            _eventAggregator.PublishOnUIThread(Selection.New(Data.GetData(boxedComponent)));
+            _eventAggregator.PublishOnUIThread(Selection.Of(Data.GetData(boxedComponent)));
         }
 
         public void Dispose()
         {
             _engine.Stop();
-
+            
+            _boxedComponentSelectorModule.SelectionChanged -= BoxedComponentSelectorModuleOnSelectionChanged;
             _viewerViewModel.RunnerChanged -= ViewerViewModelOnRunnerChanged;
-            _viewerViewModel.SelectionChanged -= ViewerViewModelOnSelectionChanged;
             Activated -= OnActivated;
 
             Data.Dispose();

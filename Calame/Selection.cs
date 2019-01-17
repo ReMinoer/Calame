@@ -12,19 +12,19 @@ namespace Calame
             return Selection<T>.Empty;
         }
 
-        static public Selection<T> New<T>(T item)
+        static public Selection<T> Of<T>(T item)
             where T : class
         {
             return new Selection<T>(item);
         }
         
-        static public Selection<T> New<T>(params T[] items)
+        static public Selection<T> Of<T>(params T[] items)
             where T : class
         {
             return new Selection<T>(items);
         }
 
-        static public Selection<T> New<T>(IEnumerable<T> items)
+        static public Selection<T> Of<T>(IEnumerable<T> items)
             where T : class
         {
             return new Selection<T>(items);

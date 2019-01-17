@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework, Version=3.7.0.1097, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\Remi\.nuget\packages\monogame.framework.portable\3.7.0.1097-develop\lib\portable-net45+win8+wpa81\MonoGame.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="Niddle">
       <HintPath>..\..\External\Glyph\External\Niddle\Niddle\bin\Debug\netstandard1.0\Niddle.dll</HintPath>
     </Reference>

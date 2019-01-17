@@ -1,63 +1,27 @@
 ﻿using System;
 using Caliburn.Micro;
 using Diese.Collections;
-using Fingear.Controls;
-using Fingear.Controls.Containers;
-using Fingear.MonoGame;
-using Fingear.MonoGame.Inputs;
 using Glyph;
-using Glyph.Composition;
 using Glyph.Core;
-using Glyph.Core.Inputs;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.Tools;
-using Glyph.Tools.ShapeRendering;
 using Glyph.WpfInterop;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame.Viewer
 {
-    public class ViewerViewModel : PropertyChangedBase, IHandle<ISelection<IGlyphComponent>>, IDisposable
+    public class ViewerViewModel : PropertyChangedBase, IDisposable
     {
         private readonly IViewerViewModelOwner _owner;
         private readonly IEventAggregator _eventAggregator;
         
         private GlyphWpfRunner _runner;
-        private IBoxedComponent _boxedSelection;
-        private ShapedObjectSelector _shapedObjectSelector;
-        private AreaComponentRenderer _selectionRenderer;
+        private readonly IViewerModule[] _modules;
 
         public IWpfGlyphClient Client { get; private set; }
         public FillView EditorView { get; private set; }
         public FreeCamera EditorCamera { get; private set; }
         public GlyphObject EditorRoot { get; private set; }
-
-        public IBoxedComponent BoxedSelection
-        {
-            get => _boxedSelection;
-            private set
-            {
-                if (this.SetValue(ref _boxedSelection, value))
-                {
-                    if (_selectionRenderer != null)
-                    {
-                        EditorRoot.Remove(_selectionRenderer);
-                        _selectionRenderer.Dispose();
-                        _selectionRenderer = null;
-                    }
-
-                    _boxedSelection = value;
-
-                    if (_boxedSelection != null)
-                    {
-                        _selectionRenderer = new AreaComponentRenderer(_boxedSelection, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>()) { Name = "Selection Renderer", Color = Color.Purple * 0.5f, DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera };
-                        EditorRoot.Add(_selectionRenderer);
-                    }
-                }
-            }
-        }
 
         public GlyphWpfRunner Runner
         {
@@ -66,9 +30,10 @@ namespace Calame.Viewer
             {
                 if (_runner != null)
                 {
-                    GlyphEngine engine = _runner.Engine;
+                    foreach (IViewerModule module in _modules)
+                        module.Disconnect();
 
-                    engine.Root.RemoveAndDispose(EditorRoot);
+                    _runner.Engine.Root.RemoveAndDispose(EditorRoot);
                     EditorRoot = null;
                 }
 
@@ -91,14 +56,8 @@ namespace Calame.Viewer
                     ConnectRunner();
                     EditorCamera.View = EditorView;
 
-                    _shapedObjectSelector = EditorRoot.Add<ShapedObjectSelector>();
-                    _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
-                    {
-                        TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
-                        ValueControl = new ProjectionCursorControl("Scene cursor", InputSystem.Instance.Mouse.Cursor, engine.RootView, new ReadOnlySceneNodeDelegate(EditorCamera.GetSceneNode), engine.ProjectionManager)
-                    };
-                    _shapedObjectSelector.HandleInputs = true;
-                    _shapedObjectSelector.SelectionChanged += ShapedObjectSelectorOnSelectionChanged;
+                    foreach (IViewerModule module in _modules)
+                        module.Connect(this);
                 }
                 else
                     ConnectRunner();
@@ -109,13 +68,13 @@ namespace Calame.Viewer
         }
 
         public event EventHandler<GlyphWpfRunner> RunnerChanged;
-        public event EventHandler<IBoxedComponent> SelectionChanged;
 
-        public ViewerViewModel(IViewerViewModelOwner owner, IEventAggregator eventAggregator)
+        public ViewerViewModel(IViewerViewModelOwner owner, IEventAggregator eventAggregator, IViewerModule[] modules)
         {
             _owner = owner;
-
             _eventAggregator = eventAggregator;
+            _modules = modules;
+
             _eventAggregator.Subscribe(this);
         }
 
@@ -139,16 +98,6 @@ namespace Calame.Viewer
             Runner.Engine.FocusedClient = Client;
         }
 
-        private void ShapedObjectSelectorOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
-        {
-            if (Runner.Engine.FocusedClient == Client)
-            {
-                BoxedSelection = boxedComponent;
-                _eventAggregator.PublishOnUIThread(Selection.New(_boxedSelection));
-                SelectionChanged?.Invoke(this, boxedComponent);
-            }
-        }
-
         private void Activate()
         {
             if (Runner?.Engine != null)
@@ -165,16 +114,13 @@ namespace Calame.Viewer
                 Runner.Engine.FocusedClient = null;
         }
 
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
-        {
-            if (Runner.Engine.FocusedClient == Client && message.Item is IBoxedComponent boxedComponent)
-                BoxedSelection = boxedComponent;
-        }
-
         public void Dispose()
         {
             _owner.Activated -= OnActivated;
             _owner.Deactivated -= OnDeactivated;
+
+            foreach (IViewerModule module in _modules)
+                module.Disconnect();
 
             _eventAggregator.Unsubscribe(this);
 
