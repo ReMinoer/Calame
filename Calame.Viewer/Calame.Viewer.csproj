@@ -39,6 +39,8 @@
     <Compile Include="IViewerModule.cs" />
     <Compile Include="IViewerView.cs" />
     <Compile Include="IViewerViewModelOwner.cs" />
+    <Compile Include="Modules\SceneNodeEditorModule.cs" />
+    <Compile Include="Modules\Base\SelectionHandlerModuleBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\SelectionRendererModule.cs" />
     <Compile Include="Modules\Base\ViewerModuleBase.cs" />

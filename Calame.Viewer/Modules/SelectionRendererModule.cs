@@ -2,7 +2,6 @@
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
 using Glyph.Composition;
-using Glyph.Core;
 using Glyph.Graphics;
 using Glyph.Tools;
 using Glyph.Tools.ShapeRendering;
@@ -11,31 +10,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame.Viewer.Modules
 {
-    public class SelectionRendererModule : ViewerModuleBase, IHandle<ISelection<IGlyphComponent>>
+    public class SelectionRendererModule : SelectionHandlerModuleBase, IHandle<ISelection<IGlyphComponent>>
     {
-        private readonly IEventAggregator _eventAggregator;
-
-        private IBoxedComponent _selection;
         private AreaComponentRenderer _selectionRenderer;
 
         public SelectionRendererModule(IEventAggregator eventAggregator)
+            : base(eventAggregator)
         {
-            _eventAggregator = eventAggregator;
         }
 
-        protected override void ConnectRunner()
+        protected override void HandleSelection()
         {
-            _eventAggregator.Subscribe(this);
-        }
-
-        protected override void DisconnectRunner()
-        {
-            _eventAggregator.Unsubscribe(this);
-        }
-
-        private void AddRenderer()
-        {
-            _selectionRenderer = new AreaComponentRenderer(_selection, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>())
+            _selectionRenderer = new AreaComponentRenderer(Selection, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>())
             {
                 Name = "Selection Renderer",
                 Color = Color.Purple * 0.5f,
@@ -45,37 +31,12 @@ namespace Calame.Viewer.Modules
             Model.EditorRoot.Add(_selectionRenderer);
         }
 
-        private void RemoveRenderer()
+        protected override void ReleaseSelection()
         {
             Model.EditorRoot.Remove(_selectionRenderer);
 
             _selectionRenderer.Dispose();
             _selectionRenderer = null;
-        }
-
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
-        {
-            if (Runner.Engine.FocusedClient != Model.Client)
-                return;
-
-            IBoxedComponent boxedComponent = null;
-            if (message.Item != null)
-            {
-                boxedComponent = message.Item as IBoxedComponent;
-                if (boxedComponent == null)
-                    return;
-            }
-
-            if (boxedComponent == _selection)
-                return;
-
-            if (_selection != null)
-                RemoveRenderer();
-
-            _selection = boxedComponent;
-
-            if (_selection != null)
-                AddRenderer();
         }
     }
 }

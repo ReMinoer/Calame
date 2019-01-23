@@ -46,6 +46,9 @@ namespace Calame.Viewer.Modules
             {
                 TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
                 ValueControl = new ProjectionCursorControl("Scene cursor", InputSystem.Instance.Mouse.Cursor, engine.RootView, new ReadOnlySceneNodeDelegate(Model.EditorCamera.GetSceneNode), engine.ProjectionManager)
+                {
+                    RaycastClient = Model.Client
+                }
             };
 
             _shapedObjectSelector.SelectionChanged += OnShapedObjectSelectorSelectionChanged;

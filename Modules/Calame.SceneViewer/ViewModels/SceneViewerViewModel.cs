@@ -62,7 +62,8 @@ namespace Calame.SceneViewer.ViewModels
             var viewerModules = new IViewerModule[]
             {
                 new BoxedComponentSelectorModule(eventAggregator),
-                new SelectionRendererModule(eventAggregator)
+                new SelectionRendererModule(eventAggregator),
+                new SceneNodeEditorModule(eventAggregator)
             };
 
             _viewerViewModel = new ViewerViewModel(this, _eventAggregator, viewerModules);
