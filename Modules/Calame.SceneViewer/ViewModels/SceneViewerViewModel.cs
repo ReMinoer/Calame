@@ -109,6 +109,8 @@ namespace Calame.SceneViewer.ViewModels
             _viewerViewModel.Runner = new GlyphWpfRunner { Engine = _engine };
             Session.PrepareSession(_engine, sessionView, _viewerViewModel.EditorRoot);
 
+            FreeCameraAction();
+
             _engine.Initialize();
             _engine.LoadContent();
             _engine.Start();
