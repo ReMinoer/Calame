@@ -1,17 +1,14 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Windows.Input;
 using Calame.Viewer;
 using Calame.Viewer.Modules;
 using Caliburn.Micro;
 using Diese.Collections;
-using Fingear;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph;
 using Glyph.Core;
-using Glyph.Core.Inputs;
 using Glyph.Core.Tracking;
 using Glyph.Engine;
 using Glyph.Graphics;
@@ -61,9 +58,9 @@ namespace Calame.SceneViewer.ViewModels
 
             var viewerModules = new IViewerModule[]
             {
+                new SceneNodeEditorModule(eventAggregator),
                 new BoxedComponentSelectorModule(eventAggregator),
-                new SelectionRendererModule(eventAggregator),
-                new SceneNodeEditorModule(eventAggregator)
+                new SelectionRendererModule(eventAggregator)
             };
 
             _viewerViewModel = new ViewerViewModel(this, _eventAggregator, viewerModules);
@@ -107,7 +104,9 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker = _engine.Injector.Resolve<MessagingTracker<IView>>();
 
             _viewerViewModel.Runner = new GlyphWpfRunner { Engine = _engine };
-            Session.PrepareSession(_engine, sessionView, _viewerViewModel.EditorRoot);
+
+            var context = new SessionContext(_viewerViewModel, sessionView);
+            Session.PrepareSession(context);
 
             FreeCameraAction();
 
@@ -162,17 +161,13 @@ namespace Calame.SceneViewer.ViewModels
 
         private void CursorInputsAction(object obj)
         {
-            foreach (ControlLayer controlLayer in Runner.Engine.ControlManager.Layers.Where(x => x.Tags.Contains(ControlLayerTag.Debug) || x.Tags.Contains(ControlLayerTag.Tools)))
-                controlLayer.Enabled = true;
-
+            _viewerViewModel.EditorSessionInteractive.EditionMode = true;
             ViewerCursor = Cursors.Cross;
         }
 
         private void DefaultInputsAction(object obj)
         {
-            foreach (ControlLayer controlLayer in Runner.Engine.ControlManager.Layers.Where(x => x.Tags.Contains(ControlLayerTag.Debug) || x.Tags.Contains(ControlLayerTag.Tools)))
-                controlLayer.Enabled = false;
-
+            _viewerViewModel.EditorSessionInteractive.EditionMode = false;
             ViewerCursor = Cursors.None;
         }
 

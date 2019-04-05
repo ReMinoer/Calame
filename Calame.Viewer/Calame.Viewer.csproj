@@ -35,6 +35,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditorSessionInteractive.cs" />
     <Compile Include="Modules\BoxedComponentSelectorModule.cs" />
     <Compile Include="IViewerModule.cs" />
     <Compile Include="IViewerView.cs" />

@@ -40,8 +40,6 @@ namespace Calame.Viewer.Modules
             GlyphEngine engine = Model.Runner.Engine;
 
             _shapedObjectSelector = Model.EditorRoot.Add<ShapedObjectSelector>();
-
-            _shapedObjectSelector.HandleInputs = true;
             _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
             {
                 TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Calame.SceneViewer;
+using Fingear;
 using Glyph.Core;
 using Glyph.Core.Inputs;
 using Glyph.Engine;
@@ -21,18 +22,18 @@ namespace Calame.Demo.Modules.DemoGameData.Session
         public string DisplayName => "Moving Demo";
         public string ContentPath => "Content/";
 
-        public void PrepareSession(GlyphEngine engine, IView rootView, GlyphObject editorRoot)
+        public void PrepareSession(ISessionContext context)
         {
-            var gameRoot = editorRoot.Add<GlyphObject>();
+            var gameRoot = context.EditorRoot.Add<GlyphObject>();
             gameRoot.Name = "Game Root";
             gameRoot.Add<SceneNode>();
 
-            var gameViewRoot = engine.Root.Add<GlyphObject>();
+            var gameViewRoot = context.Engine.Root.Add<GlyphObject>();
             gameViewRoot.Add<SceneNode>().MakesRoot();
 
             var gameView = gameViewRoot.Add<UniformFillTargetView>();
             gameView.UniformView.Name = "Game View";
-            gameView.ParentView = rootView;
+            gameView.ParentView = context.RootView;
             gameView.Size = new Vector2(1920, 1080);
 
             gameView.Camera = gameRoot.Add<Camera>();
@@ -43,8 +44,10 @@ namespace Calame.Demo.Modules.DemoGameData.Session
             player.Add<FilledRectangleSprite>();
             player.Add<SpriteRenderer>();
 
+            context.EditorRoot.Add<InteractiveRoot>().Interactive.Parent = context.SessionInteractive;
+
             var playerMoveInput = new Control<System.Numerics.Vector2>(InputSystem.Instance.Keyboard[Keys.Left, Keys.Right, Keys.Down, Keys.Up].Vector(-System.Numerics.Vector2.One, System.Numerics.Vector2.One));
-            player.Add<Controls>().Register(playerMoveInput);
+            player.Add<Controls>().Add(playerMoveInput);
             
             player.Schedulers.Update.Plan(elapsedTime =>
             {

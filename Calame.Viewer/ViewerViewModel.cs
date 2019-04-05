@@ -1,8 +1,10 @@
 ﻿using System;
 using Caliburn.Micro;
 using Diese.Collections;
+using Fingear.Interactives;
 using Glyph;
 using Glyph.Core;
+using Glyph.Core.Inputs;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.Tools;
@@ -22,6 +24,8 @@ namespace Calame.Viewer
         public FillView EditorView { get; private set; }
         public FreeCamera EditorCamera { get; private set; }
         public GlyphObject EditorRoot { get; private set; }
+        public EditorSessionInteractive EditorSessionInteractive { get; private set; }
+        public InteractiveComposite SessionInteractive { get; private set; }
 
         public GlyphWpfRunner Runner
         {
@@ -46,6 +50,13 @@ namespace Calame.Viewer
                     EditorRoot = engine.Root.Add<GlyphObject>();
                     EditorRoot.Name = "Editor Root";
                     EditorRoot.Add<SceneNode>().MakesRoot();
+
+                    EditorSessionInteractive = new EditorSessionInteractive
+                    {
+                        Editor = EditorRoot.Add<InteractiveRoot>().Interactive,
+                        Session = SessionInteractive = new InteractiveComposite()
+                    };
+                    engine.InteractionManager.Root.Add(EditorSessionInteractive);
 
                     EditorView = engine.Root.Add<FillView>();
                     EditorView.Name = "Editor View";

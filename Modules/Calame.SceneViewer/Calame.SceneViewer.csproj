@@ -39,8 +39,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ISessionContext.cs" />
     <Compile Include="MenuDefinitions.cs" />
     <Compile Include="Module.cs" />
+    <Compile Include="SessionContext.cs" />
     <Compile Include="SessionProvider.cs" />
     <Compile Include="ISession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
