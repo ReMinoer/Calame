@@ -25,7 +25,7 @@ namespace Calame.DataModelViewer
 
         public virtual IGlyphComposite<IGlyphComponent> PrepareEditor(GlyphEngine engine, GlyphObject editorRoot)
         {
-            var pixel = new Texture2D(engine.Injector.Resolve<Func<GraphicsDevice>>()(), 1, 1);
+            var pixel = new Texture2D(engine.Resolver.Resolve<Func<GraphicsDevice>>()(), 1, 1);
             pixel.SetData(new[] { Color.White });
 
             editorRoot.Schedulers.Draw.Plan(drawer =>

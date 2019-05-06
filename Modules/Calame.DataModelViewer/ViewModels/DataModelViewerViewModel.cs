@@ -83,7 +83,7 @@ namespace Calame.DataModelViewer.ViewModels
             
             _viewerViewModel.Runner = new GlyphWpfRunner { Engine = _engine };
             
-            Data.Injector = _engine.Injector;
+            Data.Resolver = _engine.Resolver;
             Data.Instantiate();
 
             IGlyphComposite<IGlyphComponent> dataRoot = Editor.PrepareEditor(_viewerViewModel.Runner.Engine, _viewerViewModel.EditorRoot);

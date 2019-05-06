@@ -21,7 +21,7 @@ namespace Calame.Viewer.Modules
 
         protected override void HandleSelection()
         {
-            _selectionRenderer = new AreaComponentRenderer(Selection, Runner.Engine.Injector.Resolve<Func<GraphicsDevice>>())
+            _selectionRenderer = new AreaComponentRenderer(Selection, Runner.Engine.Resolver.Resolve<Func<GraphicsDevice>>())
             {
                 Name = "Selection Renderer",
                 Color = Color.Purple * 0.5f,

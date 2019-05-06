@@ -101,7 +101,7 @@ namespace Calame.SceneViewer.ViewModels
             var sessionView = _engine.Root.Add<FillView>();
             sessionView.ParentView = _engine.RootView;
 
-            _viewTracker = _engine.Injector.Resolve<MessagingTracker<IView>>();
+            _viewTracker = _engine.Resolver.Resolve<MessagingTracker<IView>>();
 
             _viewerViewModel.Runner = new GlyphWpfRunner { Engine = _engine };
 
