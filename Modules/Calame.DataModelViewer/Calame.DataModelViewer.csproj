@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Niddle">
-      <HintPath>..\..\External\Glyph\External\Niddle\Niddle\bin\Debug\netstandard1.0\Niddle.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -101,6 +98,10 @@
     <ProjectReference Include="..\..\External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj">
       <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
       <Name>MonoGame.Framework.WpfInterop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Niddle\Niddle\Niddle.csproj">
+      <Project>{b10bcc2d-3824-440e-a15c-d8c64ec51839}</Project>
+      <Name>Niddle</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
       <Project>{91b676a6-3501-4a25-b2bd-4c8519d43faf}</Project>
