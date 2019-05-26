@@ -37,8 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\SceneGraphCommand.cs" />
-    <Compile Include="Converters\FirstSceneNodesConverter.cs" />
-    <Compile Include="Converters\GlyphObjectFilter.cs" />
     <Compile Include="MenuDefinitions.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
