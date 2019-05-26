@@ -48,6 +48,7 @@
     <Compile Include="ContentManagerProvider.cs" />
     <Compile Include="Converters\EnumerableToString.cs" />
     <Compile Include="Converters\MonoGameToWpfColorConverter.cs" />
+    <Compile Include="Converters\ObjectToEnumerableConverter.cs" />
     <Compile Include="DocumentContext.cs" />
     <Compile Include="HandleTool.cs" />
     <Compile Include="IContentManagerProvider.cs" />

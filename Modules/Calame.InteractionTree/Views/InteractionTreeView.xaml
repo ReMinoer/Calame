@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="Calame.InteractionTree.Views.InteractionTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:Calame.InteractionTree.ViewModels"
+             xmlns:utils="clr-namespace:Calame.Utils;assembly=Calame"
+             xmlns:fingear="clr-namespace:Fingear;assembly=Fingear"
+             xmlns:calame="clr-namespace:Calame;assembly=Calame"
+             xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
+             xmlns:stave="clr-namespace:Stave;assembly=Stave"
+             xmlns:localconverters="clr-namespace:Calame.InteractionTree.Converters"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:InteractionTreeViewModel, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300"
+             d:DesignWidth="300">
+    <UserControl.Resources>
+        <converters:ObjectToEnumerableConverter x:Key="ObjectToEnumerableConverter" />
+        <localconverters:InteractiveComponentsAndControlsConverter x:Key="InteractiveComponentsAndControlsConverter" />
+        <calame:InterfaceTemplateSelector x:Key="InterfaceTemplateSelector" />
+    </UserControl.Resources>
+    <Grid>
+        <TreeView MinWidth="200"
+                  ItemsSource="{Binding Engine.InteractionManager.Root, Converter={StaticResource ObjectToEnumerableConverter}}"
+                  ItemTemplateSelector="{StaticResource InterfaceTemplateSelector}"
+                  >
+            <TreeView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <utils:VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </TreeView.ItemsPanel>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="Focusable" Value="False"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate ItemsSource="{Binding ., Converter={StaticResource InteractiveComponentsAndControlsConverter}}"
+                                          DataType="{x:Type fingear:IInteractive}">
+                    <TextBlock Text="{Binding (fingear:IInteractive.Name)}" />
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding (stave:IComponent.Components)}"
+                                          DataType="{x:Type fingear:IControl}">
+                    <TextBlock Text="{Binding (fingear:IControl.Name)}" />
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+    </Grid>
+</UserControl>

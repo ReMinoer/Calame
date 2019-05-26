@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ED371A46-D089-452E-850B-8D8FBA310152}</ProjectGuid>
+    <ProjectGuid>{882DAE3C-7714-4CF9-88E6-EB6DFE156DCD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Calame.DataModelTree</RootNamespace>
-    <AssemblyName>Calame.DataModelTree</AssemblyName>
+    <RootNamespace>Calame.InteractionTree</RootNamespace>
+    <AssemblyName>Calame.InteractionTree</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,17 +36,18 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\DataModelTreeCommand.cs" />
+    <Compile Include="Commands\InteractionTreeCommand.cs" />
+    <Compile Include="Converters\InteractiveComponentsAndControlsConverter.cs" />
     <Compile Include="MenuDefinitions.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\DataModelTreeViewModel.cs" />
-    <Compile Include="Views\DataModelTreeView.xaml.cs">
-      <DependentUpon>DataModelTreeView.xaml</DependentUpon>
+    <Compile Include="ViewModels\InteractionTreeViewModel.cs" />
+    <Compile Include="Views\InteractionTreeView.xaml.cs">
+      <DependentUpon>InteractionTreeView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\DataModelTreeView.xaml">
+    <Page Include="Views\InteractionTreeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -71,12 +72,12 @@
       <Name>Calame</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
-      <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
+      <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
       <Name>Stave</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
-      <Project>{91b676a6-3501-4a25-b2bd-4c8519d43faf}</Project>
-      <Name>Simulacra</Name>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj">
+      <Project>{7EE0B116-6B49-4073-99D8-827DD68B8AE0}</Project>
+      <Name>Fingear</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
       <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
@@ -86,9 +87,9 @@
       <Project>{25400349-233E-404D-BB4E-A0CB4AF893EA}</Project>
       <Name>Glyph.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj">
-      <Project>{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}</Project>
-      <Name>Glyph</Name>
+    <ProjectReference Include="..\Calame.DataModelTree\Calame.DataModelTree.csproj">
+      <Project>{ED371A46-D089-452E-850B-8D8FBA310152}</Project>
+      <Name>Calame.DataModelTree</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

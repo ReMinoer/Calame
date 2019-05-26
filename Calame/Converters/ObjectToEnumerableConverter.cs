@@ -3,7 +3,7 @@ using System.Collections;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Calame.DataModelTree.Converters
+namespace Calame.Converters
 {
     public class ObjectToEnumerableConverter : IValueConverter
     {

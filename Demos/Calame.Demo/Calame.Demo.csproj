@@ -154,6 +154,10 @@
       <Project>{a88c8133-f38b-4374-9022-ef27ae25141e}</Project>
       <Name>Calame.DataModelViewer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Modules\Calame.InteractionTree\Calame.InteractionTree.csproj">
+      <Project>{882dae3c-7714-4cf9-88e6-eb6dfe156dcd}</Project>
+      <Name>Calame.InteractionTree</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Modules\Calame.LogConsole\Calame.LogConsole.csproj">
       <Project>{ba726253-52ba-4543-be12-0cce2556e3da}</Project>
       <Name>Calame.LogConsole</Name>
