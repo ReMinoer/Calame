@@ -22,8 +22,7 @@
     <Grid>
         <TreeView MinWidth="200"
                   ItemsSource="{Binding Engine.InteractionManager.Root, Converter={StaticResource ObjectToEnumerableConverter}}"
-                  ItemTemplateSelector="{StaticResource InterfaceTemplateSelector}"
-                  >
+                  ItemTemplateSelector="{StaticResource InterfaceTemplateSelector}">
             <TreeView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <utils:VirtualizingStackPanel/>
@@ -37,11 +36,41 @@
             <TreeView.Resources>
                 <HierarchicalDataTemplate ItemsSource="{Binding ., Converter={StaticResource InteractiveComponentsAndControlsConverter}}"
                                           DataType="{x:Type fingear:IInteractive}">
-                    <TextBlock Text="{Binding (fingear:IInteractive.Name)}" />
+                    <TextBlock Text="{Binding Path=(fingear:IInteractive.Name)}"
+                               IsEnabled="{Binding Path=(fingear:IInteractive.Enabled)}"/>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding (stave:IComponent.Components)}"
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=(stave:IComponent.Components)}"
                                           DataType="{x:Type fingear:IControl}">
-                    <TextBlock Text="{Binding (fingear:IControl.Name)}" />
+                    <TextBlock x:Name="templateTextBlock"
+                               Text="{Binding Path=(fingear:IControl.Name)}"
+                               Background="Transparent">
+                        <TextBlock.Style>
+                            <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=(fingear:IControl.IsActive)}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    To="#FF008000"
+                                                                    Duration="0:0:0" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    From="#FF008000" To="#00008000"
+                                                                    Duration="0:0:0.5" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
         </TreeView>
