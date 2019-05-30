@@ -52,10 +52,8 @@ namespace Calame.Viewer
 
         public override void Reset()
         {
-            if (EditionMode)
-                Editor.Reset();
-            else
-                Session.Reset();
+            Editor.Reset();
+            Session.Reset();
         }
     }
 }

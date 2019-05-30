@@ -11,6 +11,7 @@
     <DockPanel>
         <wpfInterop:GlyphWpfViewer x:Name="GlyphWpfViewer"
                                    PreviewKeyDown="Viewer_OnPreviewKeyDown"
-                                   PreviewKeyUp="Viewer_OnPreviewKeyUp"/>
+                                   PreviewKeyUp="Viewer_OnPreviewKeyUp"
+                                   Cursor="Cross"/>
     </DockPanel>
 </UserControl>

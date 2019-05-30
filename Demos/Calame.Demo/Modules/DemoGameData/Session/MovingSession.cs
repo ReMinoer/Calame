@@ -44,7 +44,7 @@ namespace Calame.Demo.Modules.DemoGameData.Session
             player.Add<FilledRectangleSprite>();
             player.Add<SpriteRenderer>();
 
-            context.EditorRoot.Add<InteractiveRoot>().Interactive.Parent = context.SessionInteractive;
+            context.SessionInteractive.Add(gameRoot.Add<InteractiveRoot>().Interactive);
 
             var playerMoveInput = new Control<System.Numerics.Vector2>(InputSystem.Instance.Keyboard[Keys.Left, Keys.Right, Keys.Down, Keys.Up].Vector(-System.Numerics.Vector2.One, System.Numerics.Vector2.One));
             player.Add<Controls>().Add(playerMoveInput);

@@ -9,6 +9,6 @@ namespace Calame.SceneViewer
         GlyphEngine Engine { get; }
         IView RootView { get; }
         GlyphObject EditorRoot { get; }
-        IInteractiveContainer SessionInteractive { get; } 
+        IInteractiveComposite<IInteractive> SessionInteractive { get; } 
     }
 }

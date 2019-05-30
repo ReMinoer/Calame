@@ -92,6 +92,8 @@ namespace Calame.DataModelViewer.ViewModels
             _engine.Initialize();
             _engine.LoadContent();
             _engine.Start();
+
+            _viewerViewModel.EditorSessionInteractive.EditionMode = true;
         }
 
         private void OnActivated()

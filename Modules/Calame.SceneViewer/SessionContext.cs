@@ -1,5 +1,6 @@
 ﻿using Calame.Viewer;
 using Fingear;
+using Fingear.Interactives;
 using Glyph.Core;
 using Glyph.Engine;
 
@@ -10,7 +11,7 @@ namespace Calame.SceneViewer
         public GlyphEngine Engine { get; }
         public IView RootView { get; }
         public GlyphObject EditorRoot { get; }
-        public IInteractiveContainer SessionInteractive { get; }
+        public IInteractiveComposite<IInteractive> SessionInteractive { get; }
 
         public SessionContext(GlyphEngine engine)
         {
@@ -28,7 +29,7 @@ namespace Calame.SceneViewer
             SessionInteractive = viewerViewModel.SessionInteractive;
         }
 
-        public SessionContext(GlyphEngine engine, IView rootView, GlyphObject editorRoot, IInteractiveContainer sessionInteractive)
+        public SessionContext(GlyphEngine engine, IView rootView, GlyphObject editorRoot, IInteractiveComposite<IInteractive> sessionInteractive)
         {
             Engine = engine;
             RootView = rootView;

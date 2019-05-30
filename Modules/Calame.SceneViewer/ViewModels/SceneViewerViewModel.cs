@@ -72,12 +72,12 @@ namespace Calame.SceneViewer.ViewModels
             PauseCommand = new RelayCommand(x => Runner.Engine.Pause(), x => Runner?.Engine != null && Runner.Engine.IsStarted && !Runner.Engine.IsPaused);
             StopCommand = new RelayCommand(x => Runner.Engine.Stop(), x => Runner?.Engine?.IsStarted ?? false);
 
-            FreeCameraCommand = new RelayCommand(FreeCameraAction, x => Runner?.Engine != null);
-            DefaultViewsCommand = new RelayCommand(DefaultViewsAction, x => Runner?.Engine != null);
-            NewViewerCommand = new RelayCommand(NewViewerAction, x => Runner?.Engine != null);
+            FreeCameraCommand = new RelayCommand(x => FreeCameraAction(), x => Runner?.Engine != null);
+            DefaultViewsCommand = new RelayCommand(x => DefaultViewsAction(), x => Runner?.Engine != null);
+            NewViewerCommand = new RelayCommand(x => NewViewerAction(), x => Runner?.Engine != null);
 
-            CursorInputsCommand = new RelayCommand(CursorInputsAction, x => Runner?.Engine != null);
-            DefaultInputsCommand = new RelayCommand(DefaultInputsAction, x => Runner?.Engine != null);
+            CursorInputsCommand = new RelayCommand(x => CursorInputsAction(), x => Runner?.Engine != null);
+            DefaultInputsCommand = new RelayCommand(x => DefaultInputsAction(), x => Runner?.Engine != null);
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
@@ -113,6 +113,8 @@ namespace Calame.SceneViewer.ViewModels
             _engine.Initialize();
             _engine.LoadContent();
             _engine.Start();
+
+            CursorInputsAction();
         }
 
         protected override void OnViewLoaded(object view)
@@ -125,7 +127,7 @@ namespace Calame.SceneViewer.ViewModels
             FreeCameraAction();
         }
 
-        private void FreeCameraAction(object obj = null)
+        private void FreeCameraAction()
         {
             if (_viewTracker == null)
                 return;
@@ -134,7 +136,7 @@ namespace Calame.SceneViewer.ViewModels
                 SelectView(runnerView, runnerView == _viewerViewModel.EditorView);
         }
 
-        private void DefaultViewsAction(object obj = null)
+        private void DefaultViewsAction()
         {
             if (_viewTracker == null)
                 return;
@@ -154,18 +156,18 @@ namespace Calame.SceneViewer.ViewModels
                 view.DrawClientFilter.Items.Remove(_viewerViewModel.Client);
         }
 
-        private void NewViewerAction(object obj)
+        private void NewViewerAction()
         {
             _shell.OpenDocument(new SceneViewerViewModel(this));
         }
 
-        private void CursorInputsAction(object obj)
+        private void CursorInputsAction()
         {
             _viewerViewModel.EditorSessionInteractive.EditionMode = true;
             ViewerCursor = Cursors.Cross;
         }
 
-        private void DefaultInputsAction(object obj)
+        private void DefaultInputsAction()
         {
             _viewerViewModel.EditorSessionInteractive.EditionMode = false;
             ViewerCursor = Cursors.None;
