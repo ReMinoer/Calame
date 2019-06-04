@@ -22,6 +22,7 @@ namespace Calame.Viewer.Modules
 
             _sceneNodeEditor = Model.EditorRoot.Add<SceneNodeEditor>();
             _sceneNodeEditor.EditedObject = sceneNode;
+            _sceneNodeEditor.RaycastClient = Model.Client;
         }
 
         protected override void ReleaseSelection()
