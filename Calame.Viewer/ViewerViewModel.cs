@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 using Caliburn.Micro;
 using Diese.Collections;
+using Fingear;
 using Fingear.Interactives;
 using Glyph;
 using Glyph.Core;
@@ -9,6 +12,7 @@ using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.Tools;
 using Glyph.WpfInterop;
+using MahApps.Metro.IconPacks;
 
 namespace Calame.Viewer
 {
@@ -19,13 +23,16 @@ namespace Calame.Viewer
         
         private GlyphWpfRunner _runner;
         private readonly IViewerModule[] _modules;
+        private IInteractive _editorInteractive;
 
         public IWpfGlyphClient Client { get; private set; }
         public FillView EditorView { get; private set; }
         public FreeCamera EditorCamera { get; private set; }
         public GlyphObject EditorRoot { get; private set; }
-        public EditorSessionInteractive EditorSessionInteractive { get; private set; }
-        public InteractiveComposite SessionInteractive { get; private set; }
+
+        public ObservableCollection<IViewerMode> InteractiveModules { get; }
+        public InteractiveToggle InteractiveToggle { get; private set; }
+        public SessionModeModule SessionMode { get; private set; }
 
         public GlyphWpfRunner Runner
         {
@@ -34,11 +41,22 @@ namespace Calame.Viewer
             {
                 if (_runner != null)
                 {
+                    GlyphEngine engine = _runner.Engine;
+
                     foreach (IViewerModule module in _modules)
                         module.Disconnect();
-
+                    
+                    engine.InteractionManager.Root.Remove(_editorInteractive);
+                    engine.InteractionManager.Root.Remove(InteractiveToggle);
                     _runner.Engine.Root.RemoveAndDispose(EditorRoot);
+
+                    _editorInteractive = null;
+                    EditorView = null;
+                    EditorCamera = null;
                     EditorRoot = null;
+
+                    InteractiveToggle = null;
+                    SessionMode = null;
                 }
 
                 _runner = value;
@@ -51,12 +69,21 @@ namespace Calame.Viewer
                     EditorRoot.Name = "Editor Root";
                     EditorRoot.Add<SceneNode>().MakesRoot();
 
-                    EditorSessionInteractive = new EditorSessionInteractive
+                    _editorInteractive = EditorRoot.Add<InteractiveRoot>().Interactive;
+                    engine.InteractionManager.Root.Add(_editorInteractive);
+
+                    SessionMode = new SessionModeModule();
+                    InteractiveModules.Add(SessionMode);
+
+                    InteractiveToggle = new InteractiveToggle
                     {
-                        Editor = EditorRoot.Add<InteractiveRoot>().Interactive,
-                        Session = SessionInteractive = new InteractiveComposite()
+                        Components =
+                        {
+                            SessionMode.Interactive
+                        },
+                        SelectedInteractive = SessionMode.Interactive
                     };
-                    engine.InteractionManager.Root.Add(EditorSessionInteractive);
+                    engine.InteractionManager.Root.Add(InteractiveToggle);
 
                     EditorView = engine.Root.Add<FillView>();
                     EditorView.Name = "Editor View";
@@ -85,6 +112,7 @@ namespace Calame.Viewer
             _owner = owner;
             _eventAggregator = eventAggregator;
             _modules = modules;
+            InteractiveModules = new ObservableCollection<IViewerMode>();
 
             _eventAggregator.Subscribe(this);
         }
@@ -137,6 +165,18 @@ namespace Calame.Viewer
 
             Runner?.Dispose();
             Runner = null;
+        }
+
+        public class SessionModeModule : IViewerMode
+        {
+            public string Name => "Session";
+            public object IconId => PackIconMaterialKind.GamepadVariant;
+
+            public InteractiveComposite Interactive { get; } = new InteractiveComposite();
+            IInteractive IViewerMode.Interactive => Interactive;
+
+            public Cursor Cursor => Cursors.None;
+            public bool UseFreeCamera => false;
         }
     }
 }

@@ -1,23 +1,28 @@
 ﻿using System;
+using System.Windows.Input;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
+using Fingear;
 using Fingear.Controls;
 using Fingear.Controls.Containers;
 using Fingear.MonoGame;
-using Fingear.MonoGame.Inputs;
 using Glyph.Core;
 using Glyph.Core.Inputs;
 using Glyph.Engine;
 using Glyph.Tools;
+using MahApps.Metro.IconPacks;
+using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.Viewer.Modules
 {
-    public class BoxedComponentSelectorModule : ViewerModuleBase
+    public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerMode
     {
         private readonly IEventAggregator _eventAggregator;
-        private ShapedObjectSelector _shapedObjectSelector;
-        private IBoxedComponent _selectedComponent;
 
+        private GlyphObject _root;
+        private ShapedObjectSelector _shapedObjectSelector;
+
+        private IBoxedComponent _selectedComponent;
         public IBoxedComponent SelectedComponent
         {
             get => _selectedComponent;
@@ -27,6 +32,18 @@ namespace Calame.Viewer.Modules
                     SelectionChanged?.Invoke(this, value);
             }
         }
+        
+        private IInteractive _interactive;
+        public IInteractive Interactive
+        {
+            get => _interactive;
+            private set => this.SetValue(ref _interactive, value);
+        }
+        
+        public string Name => "Editor";
+        public object IconId => PackIconMaterialKind.CursorDefaultOutline;
+        Cursor IViewerMode.Cursor => Cursors.Cross;
+        bool IViewerMode.UseFreeCamera => true;
 
         public event EventHandler<IBoxedComponent> SelectionChanged;
 
@@ -39,7 +56,13 @@ namespace Calame.Viewer.Modules
         {
             GlyphEngine engine = Model.Runner.Engine;
 
-            _shapedObjectSelector = Model.EditorRoot.Add<ShapedObjectSelector>();
+            _root = Model.EditorRoot.Add<GlyphObject>();
+
+            Interactive = _root.Add<InteractiveRoot>().Interactive;
+            Model.InteractiveToggle.Add(Interactive);
+            Model.InteractiveModules.Add(this);
+
+            _shapedObjectSelector = _root.Add<ShapedObjectSelector>();
             _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
             {
                 TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
@@ -55,11 +78,13 @@ namespace Calame.Viewer.Modules
         protected override void DisconnectRunner()
         {
             _shapedObjectSelector.SelectionChanged -= OnShapedObjectSelectorSelectionChanged;
+            
+            Model.InteractiveModules.Add(this);
+            Model.EditorRoot.Remove(_root);
+            _root.Dispose();
 
-            Model.EditorRoot.Remove(_shapedObjectSelector);
-
-            _shapedObjectSelector.Dispose();
             _shapedObjectSelector = null;
+            _root = null;
         }
 
         private void OnShapedObjectSelectorSelectionChanged(object sender, IBoxedComponent boxedComponent)

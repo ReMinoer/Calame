@@ -35,7 +35,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EditorSessionInteractive.cs" />
+    <Compile Include="IViewerMode.cs" />
     <Compile Include="Modules\BoxedComponentSelectorModule.cs" />
     <Compile Include="IViewerModule.cs" />
     <Compile Include="IViewerView.cs" />
@@ -112,6 +112,9 @@
   <ItemGroup>
     <PackageReference Include="Caliburn.Micro">
       <Version>2.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="MahApps.Metro.IconPacks.Material">
+      <Version>1.9.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

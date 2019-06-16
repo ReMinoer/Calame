@@ -26,7 +26,7 @@ namespace Calame.SceneViewer
             Engine = viewerViewModel.Runner.Engine;
             RootView = rootView;
             EditorRoot = viewerViewModel.EditorRoot;
-            SessionInteractive = viewerViewModel.SessionInteractive;
+            SessionInteractive = viewerViewModel.SessionMode.Interactive;
         }
 
         public SessionContext(GlyphEngine engine, IView rootView, GlyphObject editorRoot, IInteractiveComposite<IInteractive> sessionInteractive)

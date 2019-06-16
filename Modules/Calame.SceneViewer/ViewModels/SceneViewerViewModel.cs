@@ -25,13 +25,14 @@ namespace Calame.SceneViewer.ViewModels
         private readonly IEventAggregator _eventAggregator;
         
         private GlyphEngine _engine;
-        private readonly ViewerViewModel _viewerViewModel;
         private Cursor _viewerCursor;
         private MessagingTracker<IView> _viewTracker;
+        private IViewerMode _selectedMode;
 
+        public ViewerViewModel Viewer { get; }
         public ISession Session { get; set; }
-        public GlyphWpfRunner Runner => _viewerViewModel.Runner;
-        GlyphEngine IDocumentContext<GlyphEngine>.Context => _viewerViewModel.Runner?.Engine;
+        public GlyphWpfRunner Runner => Viewer.Runner;
+        GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
 
         public Cursor ViewerCursor
         {
@@ -47,8 +48,7 @@ namespace Calame.SceneViewer.ViewModels
         public ICommand DefaultViewsCommand { get; }
         public ICommand NewViewerCommand { get; }
 
-        public ICommand CursorInputsCommand { get; }
-        public ICommand DefaultInputsCommand { get; }
+        public ICommand SwitchModeCommand { get; }
         
         public SceneViewerViewModel(IShell shell, IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
         {
@@ -63,8 +63,8 @@ namespace Calame.SceneViewer.ViewModels
                 new SelectionRendererModule(eventAggregator)
             };
 
-            _viewerViewModel = new ViewerViewModel(this, _eventAggregator, viewerModules);
-            _viewerViewModel.RunnerChanged += ViewerViewModelOnRunnerChanged;
+            Viewer = new ViewerViewModel(this, _eventAggregator, viewerModules);
+            Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
             DisplayName = "Scene Viewer";
 
@@ -75,9 +75,8 @@ namespace Calame.SceneViewer.ViewModels
             FreeCameraCommand = new RelayCommand(x => FreeCameraAction(), x => Runner?.Engine != null);
             DefaultViewsCommand = new RelayCommand(x => DefaultViewsAction(), x => Runner?.Engine != null);
             NewViewerCommand = new RelayCommand(x => NewViewerAction(), x => Runner?.Engine != null);
-
-            CursorInputsCommand = new RelayCommand(x => CursorInputsAction(), x => Runner?.Engine != null);
-            DefaultInputsCommand = new RelayCommand(x => DefaultInputsAction(), x => Runner?.Engine != null);
+            
+            SwitchModeCommand = new RelayCommand(x => SwitchModeAction((IViewerMode)x), x => Runner?.Engine != null);
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
@@ -86,7 +85,7 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker = viewModel._viewTracker;
             Session = viewModel.Session;
 
-            _viewerViewModel.Runner = viewModel.Runner;
+            Viewer.Runner = viewModel.Runner;
         }
 
         public void InitializeSession()
@@ -103,9 +102,9 @@ namespace Calame.SceneViewer.ViewModels
 
             _viewTracker = _engine.Resolver.Resolve<MessagingTracker<IView>>();
 
-            _viewerViewModel.Runner = new GlyphWpfRunner { Engine = _engine };
+            Viewer.Runner = new GlyphWpfRunner { Engine = _engine };
 
-            var context = new SessionContext(_viewerViewModel, sessionView);
+            var context = new SessionContext(Viewer, sessionView);
             Session.PrepareSession(context);
 
             FreeCameraAction();
@@ -114,7 +113,7 @@ namespace Calame.SceneViewer.ViewModels
             _engine.LoadContent();
             _engine.Start();
 
-            CursorInputsAction();
+            SwitchModeAction(Viewer.SessionMode);
         }
 
         protected override void OnViewLoaded(object view)
@@ -123,7 +122,7 @@ namespace Calame.SceneViewer.ViewModels
             if (view == null)
                 return;
             
-            _viewerViewModel.ConnectView((IViewerView)view);
+            Viewer.ConnectView((IViewerView)view);
             FreeCameraAction();
         }
 
@@ -133,7 +132,7 @@ namespace Calame.SceneViewer.ViewModels
                 return;
 
             foreach (IView runnerView in _viewTracker)
-                SelectView(runnerView, runnerView == _viewerViewModel.EditorView);
+                SelectView(runnerView, runnerView == Viewer.EditorView);
         }
 
         private void DefaultViewsAction()
@@ -142,7 +141,7 @@ namespace Calame.SceneViewer.ViewModels
                 return;
 
             foreach (IView runnerView in _viewTracker)
-                SelectView(runnerView, runnerView != _viewerViewModel.EditorView);
+                SelectView(runnerView, runnerView != Viewer.EditorView);
         }
 
         private void SelectView(IView view, bool isSelected)
@@ -151,9 +150,9 @@ namespace Calame.SceneViewer.ViewModels
                 view.DrawClientFilter = new ExcludingFilter<IDrawClient>();
 
             if (isSelected ^ view.DrawClientFilter.Excluding)
-                view.DrawClientFilter.Items.Add(_viewerViewModel.Client);
+                view.DrawClientFilter.Items.Add(Viewer.Client);
             else
-                view.DrawClientFilter.Items.Remove(_viewerViewModel.Client);
+                view.DrawClientFilter.Items.Remove(Viewer.Client);
         }
 
         private void NewViewerAction()
@@ -161,16 +160,16 @@ namespace Calame.SceneViewer.ViewModels
             _shell.OpenDocument(new SceneViewerViewModel(this));
         }
 
-        private void CursorInputsAction()
+        private void SwitchModeAction(IViewerMode mode)
         {
-            _viewerViewModel.EditorSessionInteractive.EditionMode = true;
-            ViewerCursor = Cursors.Cross;
-        }
+            if (_selectedMode == mode)
+                return;
+            
+            _selectedMode = mode;
 
-        private void DefaultInputsAction()
-        {
-            _viewerViewModel.EditorSessionInteractive.EditionMode = false;
-            ViewerCursor = Cursors.None;
+            Viewer.InteractiveToggle.SelectedInteractive = mode.Interactive;
+            ViewerCursor = mode.Cursor;
+            Viewer.EditorCamera.Enabled = mode.UseFreeCamera;
         }
 
         private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
@@ -183,8 +182,8 @@ namespace Calame.SceneViewer.ViewModels
             _engine.Stop();
             _viewTracker?.Dispose();
 
-            _viewerViewModel.RunnerChanged -= ViewerViewModelOnRunnerChanged;
-            _viewerViewModel.Dispose();
+            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
+            Viewer.Dispose();
         }
     }
 }
