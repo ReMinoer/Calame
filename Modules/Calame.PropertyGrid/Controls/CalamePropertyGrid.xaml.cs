@@ -29,6 +29,15 @@ namespace Calame.PropertyGrid.Controls
         
         static public readonly DependencyProperty SelectedObjectProperty =
             DependencyProperty.Register("SelectedObject", typeof(object), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+        
+        public bool CompactMode
+        {
+            get => (bool)GetValue(CompactModeProperty);
+            set => SetValue(CompactModeProperty, value);
+        }
+        
+        static public readonly DependencyProperty CompactModeProperty =
+            DependencyProperty.Register("CompactMode", typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false));
 
         public CalamePropertyGrid()
         {
