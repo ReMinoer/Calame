@@ -1,14 +1,17 @@
-﻿using Calame.Viewer.Modules.Base;
+﻿using System.ComponentModel.Composition;
+using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
 using Glyph.Core;
 using Glyph.Tools;
 
 namespace Calame.Viewer.Modules
 {
+    [Export(typeof(IViewerModule))]
     public class SceneNodeEditorModule : SelectionHandlerModuleBase
     {
         private SceneNodeEditor _sceneNodeEditor;
-
+        
+        [ImportingConstructor]
         public SceneNodeEditorModule(IEventAggregator eventAggregator)
             : base(eventAggregator)
         {

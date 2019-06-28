@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
 using Glyph.Composition;
@@ -10,10 +11,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame.Viewer.Modules
 {
+    [Export(typeof(IViewerModule))]
     public class SelectionRendererModule : SelectionHandlerModuleBase, IHandle<ISelection<IGlyphComponent>>
     {
         private AreaComponentRenderer _selectionRenderer;
-
+        
+        [ImportingConstructor]
         public SelectionRendererModule(IEventAggregator eventAggregator)
             : base(eventAggregator)
         {

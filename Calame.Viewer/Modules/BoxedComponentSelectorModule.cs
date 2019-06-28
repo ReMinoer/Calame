@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Input;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
@@ -15,6 +16,7 @@ using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.Viewer.Modules
 {
+    [Export(typeof(IViewerModule))]
     public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerMode
     {
         private readonly IEventAggregator _eventAggregator;
@@ -46,7 +48,8 @@ namespace Calame.Viewer.Modules
         bool IViewerMode.UseFreeCamera => true;
 
         public event EventHandler<IBoxedComponent> SelectionChanged;
-
+        
+        [ImportingConstructor]
         public BoxedComponentSelectorModule(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
@@ -79,7 +82,7 @@ namespace Calame.Viewer.Modules
         {
             _shapedObjectSelector.SelectionChanged -= OnShapedObjectSelectorSelectionChanged;
             
-            Model.InteractiveModules.Add(this);
+            Model.InteractiveModules.Remove(this);
             Model.EditorRoot.Remove(_root);
             _root.Dispose();
 

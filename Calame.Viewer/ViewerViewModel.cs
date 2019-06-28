@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Diese.Collections;
@@ -22,7 +24,6 @@ namespace Calame.Viewer
         private readonly IEventAggregator _eventAggregator;
         
         private GlyphWpfRunner _runner;
-        private readonly IViewerModule[] _modules;
         private IInteractive _editorInteractive;
 
         public IWpfGlyphClient Client { get; private set; }
@@ -30,6 +31,7 @@ namespace Calame.Viewer
         public FreeCamera EditorCamera { get; private set; }
         public GlyphObject EditorRoot { get; private set; }
 
+        public Diese.Collections.ReadOnlyCollection<IViewerModule> Modules { get; }
         public ObservableCollection<IViewerMode> InteractiveModules { get; }
         public InteractiveToggle InteractiveToggle { get; private set; }
         public SessionModeModule SessionMode { get; private set; }
@@ -43,7 +45,7 @@ namespace Calame.Viewer
                 {
                     GlyphEngine engine = _runner.Engine;
 
-                    foreach (IViewerModule module in _modules)
+                    foreach (IViewerModule module in Modules)
                         module.Disconnect();
                     
                     engine.InteractionManager.Root.Remove(_editorInteractive);
@@ -94,7 +96,7 @@ namespace Calame.Viewer
                     ConnectRunner();
                     EditorCamera.View = EditorView;
 
-                    foreach (IViewerModule module in _modules)
+                    foreach (IViewerModule module in Modules)
                         module.Connect(this);
                 }
                 else
@@ -107,11 +109,11 @@ namespace Calame.Viewer
 
         public event EventHandler<GlyphWpfRunner> RunnerChanged;
 
-        public ViewerViewModel(IViewerViewModelOwner owner, IEventAggregator eventAggregator, IViewerModule[] modules)
+        public ViewerViewModel(IViewerViewModelOwner owner, IEventAggregator eventAggregator, IEnumerable<IViewerModule> modules)
         {
             _owner = owner;
             _eventAggregator = eventAggregator;
-            _modules = modules;
+            Modules = new Diese.Collections.ReadOnlyCollection<IViewerModule>(modules.ToArray());
             InteractiveModules = new ObservableCollection<IViewerMode>();
 
             _eventAggregator.Subscribe(this);
@@ -141,7 +143,8 @@ namespace Calame.Viewer
         {
             if (Runner?.Engine != null)
                 Runner.Engine.FocusedClient = Client;
-
+            
+            _eventAggregator.PublishOnUIThread(new DocumentContext<ViewerViewModel>(this));
             _eventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
         }
 
@@ -158,7 +161,7 @@ namespace Calame.Viewer
             _owner.Activated -= OnActivated;
             _owner.Deactivated -= OnDeactivated;
 
-            foreach (IViewerModule module in _modules)
+            foreach (IViewerModule module in Modules)
                 module.Disconnect();
 
             _eventAggregator.Unsubscribe(this);

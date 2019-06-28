@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 using Calame.Viewer;
-using Calame.Viewer.Modules;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Glyph.Composition;
@@ -16,13 +16,12 @@ namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<IGlyphCreator>, IDisposable
+    public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IGlyphCreator>, IHandle<ISelection<IBoxedComponent>>, IDisposable
     {
         private readonly IContentManagerProvider _contentManagerProvider;
         private readonly IEventAggregator _eventAggregator;
 
         private readonly ViewerViewModel _viewerViewModel;
-        private readonly BoxedComponentSelectorModule _boxedComponentSelectorModule;
 
         private GlyphEngine _engine;
 
@@ -30,24 +29,18 @@ namespace Calame.DataModelViewer.ViewModels
         public IGlyphCreator Data { get; private set; }
 
         GlyphEngine IDocumentContext<GlyphEngine>.Context => _viewerViewModel.Runner?.Engine;
+        ViewerViewModel IDocumentContext<ViewerViewModel>.Context => _viewerViewModel;
         IGlyphCreator IDocumentContext<IGlyphCreator>.Context => Data;
-
-        public DataModelViewerViewModel(IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
+        
+        [ImportingConstructor]
+        public DataModelViewerViewModel(IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
         {
             _contentManagerProvider = contentManagerProvider;
             _eventAggregator = eventAggregator;
-            
-            var viewerModules = new IViewerModule[]
-            {
-                new SceneNodeEditorModule(eventAggregator),
-                _boxedComponentSelectorModule = new BoxedComponentSelectorModule(eventAggregator),
-                new SelectionRendererModule(eventAggregator)
-            };
+            _eventAggregator.Subscribe(this);
 
             _viewerViewModel = new ViewerViewModel(this, eventAggregator, viewerModules);
             _viewerViewModel.RunnerChanged += ViewerViewModelOnRunnerChanged;
-
-            _boxedComponentSelectorModule.SelectionChanged += BoxedComponentSelectorModuleOnSelectionChanged;
         }
 
         protected override async Task DoNew()
@@ -107,16 +100,16 @@ namespace Calame.DataModelViewer.ViewModels
             Activated += OnActivated;
         }
 
-        private void BoxedComponentSelectorModuleOnSelectionChanged(object sender, IBoxedComponent boxedComponent)
+        public void Handle(ISelection<IBoxedComponent> message)
         {
-            _eventAggregator.PublishOnUIThread(Selection.Of(Data.GetData(boxedComponent)));
+            _eventAggregator.PublishOnUIThread(Selection.Of(Data.GetData(message.Item)));
         }
 
         public void Dispose()
         {
+            _eventAggregator.Unsubscribe(this);
             _engine.Stop();
             
-            _boxedComponentSelectorModule.SelectionChanged -= BoxedComponentSelectorModuleOnSelectionChanged;
             _viewerViewModel.RunnerChanged -= ViewerViewModelOnRunnerChanged;
             Activated -= OnActivated;
 

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Windows.Input;
 using Calame.Viewer;
 using Calame.Viewer.Modules;
@@ -18,7 +20,7 @@ namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDisposable
+    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDisposable
     {
         private readonly IShell _shell;
         private readonly IContentManagerProvider _contentManagerProvider;
@@ -32,7 +34,9 @@ namespace Calame.SceneViewer.ViewModels
         public ViewerViewModel Viewer { get; }
         public ISession Session { get; set; }
         public GlyphWpfRunner Runner => Viewer.Runner;
+
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
+        ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
 
         public Cursor ViewerCursor
         {
@@ -50,18 +54,12 @@ namespace Calame.SceneViewer.ViewModels
 
         public ICommand SwitchModeCommand { get; }
         
-        public SceneViewerViewModel(IShell shell, IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator)
+        [ImportingConstructor]
+        public SceneViewerViewModel(IShell shell, IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
         {
             _shell = shell;
             _contentManagerProvider = contentManagerProvider;
             _eventAggregator = eventAggregator;
-
-            var viewerModules = new IViewerModule[]
-            {
-                new SceneNodeEditorModule(eventAggregator),
-                new BoxedComponentSelectorModule(eventAggregator),
-                new SelectionRendererModule(eventAggregator)
-            };
 
             Viewer = new ViewerViewModel(this, _eventAggregator, viewerModules);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
@@ -80,12 +78,14 @@ namespace Calame.SceneViewer.ViewModels
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
-            : this(viewModel._shell, viewModel._contentManagerProvider, viewModel._eventAggregator)
+            : this(viewModel._shell, viewModel._contentManagerProvider, viewModel._eventAggregator, Enumerable.Empty<IViewerModule>())
         {
-            _viewTracker = viewModel._viewTracker;
-            Session = viewModel.Session;
+            throw new NotSupportedException();
 
-            Viewer.Runner = viewModel.Runner;
+            //_viewTracker = viewModel._viewTracker;
+            //Session = viewModel.Session;
+
+            //Viewer.Runner = viewModel.Runner;
         }
 
         public void InitializeSession()
