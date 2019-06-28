@@ -18,37 +18,49 @@
         <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
             <ToolBar>
                 <Button Command="{Binding PlayCommand}">
-                    <iconPacks:PackIconMaterial Kind="Play"
+                    <Border Background="Transparent">
+                        <iconPacks:PackIconMaterial Kind="Play"
                                                     Foreground="Green"
                                                     Width="14"
                                                     Height="14"
                                                     VerticalAlignment="Center"/>
+                    </Border>
                 </Button>
                 <Button Command="{Binding PauseCommand}">
-                    <iconPacks:PackIconMaterial Kind="Pause"
-                                                Foreground="CornflowerBlue"
-                                                Width="14"
-                                                Height="14"
-                                                VerticalAlignment="Center"/>
+                    <Border Background="Transparent">
+                        <iconPacks:PackIconMaterial Kind="Pause"
+                                                    Foreground="CornflowerBlue"
+                                                    Width="14"
+                                                    Height="14"
+                                                    VerticalAlignment="Center"/>
+                    </Border>
                 </Button>
                 <Button Command="{Binding StopCommand}">
-                    <iconPacks:PackIconMaterial Kind="Stop"
-                                                Foreground="DarkRed"
-                                                Width="14"
-                                                Height="14"
-                                                VerticalAlignment="Center"/>
+                    <Border Background="Transparent">
+                        <iconPacks:PackIconMaterial Kind="Stop"
+                                                    Foreground="DarkRed"
+                                                    Width="14"
+                                                    Height="14"
+                                                    VerticalAlignment="Center"/>
+                    </Border>
                 </Button>
             </ToolBar>
             <ToolBar>
                 <RadioButton Command="{Binding FreeCameraCommand}" IsChecked="True">
-                    <iconPacks:PackIconMaterial Kind="Camcorder"/>
+                    <Border Background="Transparent">
+                        <iconPacks:PackIconMaterial Kind="Camcorder"/>
+                    </Border>
                 </RadioButton>
                 <RadioButton Command="{Binding DefaultViewsCommand}">
-                    <iconPacks:PackIconMaterial Kind="Airplay"/>
+                    <Border Background="Transparent">
+                        <iconPacks:PackIconMaterial Kind="Airplay"/>
+                    </Border>
                 </RadioButton>
                 <Separator />
                 <Button Command="{Binding NewViewerCommand}">
-                    <iconPacks:PackIconMaterial Kind="ShapeRectanglePlus"/>
+                    <Border Background="Transparent">
+                        <iconPacks:PackIconMaterial Kind="ShapeRectanglePlus"/>
+                    </Border>
                 </Button>
             </ToolBar>
             <ToolBar ItemsSource="{Binding Viewer.InteractiveModules}"
@@ -60,7 +72,9 @@
                                      Command="{Binding DataContext.SwitchModeCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
                                      CommandParameter="{Binding}">
                             <RadioButton.Content>
-                                <iconPacks:PackIconMaterial Kind="{Binding IconId}"/>
+                                <Border Background="Transparent">
+                                    <iconPacks:PackIconMaterial Kind="{Binding IconId}"/>
+                                </Border>
                             </RadioButton.Content>
                             <RadioButton.Style>
                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
