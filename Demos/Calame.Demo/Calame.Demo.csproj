@@ -142,6 +142,10 @@
       <Project>{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}</Project>
       <Name>Glyph</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Modules\Calame.BrushPanel\Calame.BrushPanel.csproj">
+      <Project>{fa854785-1965-4cdb-ba79-29ced215dcb6}</Project>
+      <Name>Calame.BrushPanel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Modules\Calame.CompositionGraph\Calame.CompositionGraph.csproj">
       <Project>{f44fcc70-3106-4f78-bc8b-ba3ce8ad41fd}</Project>
       <Name>Calame.CompositionGraph</Name>
