@@ -80,9 +80,17 @@
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj">
+      <Project>{68a01741-9a9c-4262-9193-1b214b67ebe7}</Project>
+      <Name>Diese.Collections %28Stave%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
       <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
+      <Project>{175e74a9-6756-4d8a-bdb4-f3f664c4b366}</Project>
+      <Name>Diese %28Taskete%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Taskete\Taskete.csproj">
       <Project>{88c50d55-d13c-46fb-afb2-0b6fb4fd4d3b}</Project>
