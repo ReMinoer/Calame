@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using System;
+using Caliburn.Micro;
 using Glyph.Composition;
 using Glyph.Core;
 
@@ -27,29 +28,35 @@ namespace Calame.Viewer.Modules.Base
         protected abstract void HandleSelection();
         protected abstract void ReleaseSelection();
 
+        private bool _handlingSelection;
         void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
         {
-            if (Runner.Engine.FocusedClient != Model.Client)
+            if (_handlingSelection)
                 return;
 
-            IBoxedComponent boxedComponent = null;
-            if (message.Item != null)
+            _handlingSelection = true;
+
+            try
             {
-                boxedComponent = message.Item as IBoxedComponent;
-                if (boxedComponent == null)
+                if (Runner.Engine.FocusedClient != Model.Client)
                     return;
+
+                var boxedComponent = message.Item as IBoxedComponent;
+                if (boxedComponent == Selection)
+                    return;
+
+                if (Selection != null)
+                    ReleaseSelection();
+
+                Selection = boxedComponent;
+
+                if (Selection != null)
+                    HandleSelection();
             }
-
-            if (boxedComponent == Selection)
-                return;
-
-            if (Selection != null)
-                ReleaseSelection();
-
-            Selection = boxedComponent;
-
-            if (Selection != null)
-                HandleSelection();
+            finally
+            {
+                _handlingSelection = false;
+            }
         }
     }
 }

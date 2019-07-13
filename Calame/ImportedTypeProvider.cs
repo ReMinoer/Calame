@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Diese.Collections;
+using Diese.Collections.ReadOnly;
 using Glyph.Export;
 
 namespace Calame

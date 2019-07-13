@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Calame.Viewer.Modules
 {
     [Export(typeof(IViewerModule))]
-    public class SelectionRendererModule : SelectionHandlerModuleBase, IHandle<ISelection<IGlyphComponent>>
+    public class SelectionRendererModule : SelectionHandlerModuleBase
     {
         private AreaComponentRenderer _selectionRenderer;
         
