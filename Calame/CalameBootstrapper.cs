@@ -30,6 +30,8 @@ namespace Calame
                 return;
             
             mainWindow.Title = "Calame";
+            mainWindow.Top = 0;
+            mainWindow.Left = 0;
             mainWindow.WindowState = WindowState.Maximized;
             mainWindow.Icon = _icon;
         }
