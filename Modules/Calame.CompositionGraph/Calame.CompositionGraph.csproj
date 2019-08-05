@@ -70,17 +70,37 @@
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj">
+      <Project>{532EE357-6303-45DA-A605-A5D8253AC03C}</Project>
+      <Name>Diese.Collections %28Stave%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
       <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
+      <Project>{407C6A9E-23AF-42C1-B38D-03268A12C476}</Project>
+      <Name>Diese %28Taskete%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
       <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
       <Name>Glyph.Composition</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Core\Glyph.Core.csproj">
+      <Project>{bc40e833-0eaa-4bbc-97d8-1541276bba54}</Project>
+      <Name>Glyph.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj">
       <Project>{25400349-233E-404D-BB4E-A0CB4AF893EA}</Project>
       <Name>Glyph.Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj">
+      <Project>{26405f4b-4532-4f48-a96f-594a70c12b3e}</Project>
+      <Name>Glyph.Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj">
+      <Project>{457cbbf3-26c7-478b-b4eb-1f85ff3c07f5}</Project>
+      <Name>Glyph</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

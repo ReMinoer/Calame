@@ -60,6 +60,9 @@
     <Compile Include="NotifyPropertyChangedExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserControls\Base\VectorControlBase.cs" />
+    <Compile Include="UserControls\CalameTreeView.xaml.cs">
+      <DependentUpon>CalameTreeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\PointControl.cs" />
     <Compile Include="UserControls\Vector2Control.cs" />
     <Compile Include="UserControls\Vector3Control.cs" />
@@ -69,6 +72,7 @@
     <Compile Include="Selection.cs" />
     <Compile Include="Utils\DependencyObjectExtension.cs" />
     <Compile Include="Utils\EnumerableTypeExtension.cs" />
+    <Compile Include="Utils\TreeViewItemModel.cs" />
     <Compile Include="Utils\VirtualizingStackPanel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +83,10 @@
     <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
       <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
+      <Project>{407c6a9e-23af-42c1-b38d-03268a12c476}</Project>
+      <Name>Diese %28Taskete%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj">
       <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
@@ -107,6 +115,11 @@
       <Version>1.2.4</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Page Include="UserControls\CalameTreeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

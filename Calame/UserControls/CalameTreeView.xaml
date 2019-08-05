@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="Calame.UserControls.CalameTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:calame="clr-namespace:Calame"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:utils="clr-namespace:Calame.Utils"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="200">
+    <DockPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
+        <TextBox DockPanel.Dock="Top" Text="{Binding FilterText}" />
+        <TreeView ItemsSource="{Binding TreeItems}">
+            <i:Interaction.Behaviors>
+                <utils:BindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}" />
+            </i:Interaction.Behaviors>
+            <TreeView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <utils:VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </TreeView.ItemsPanel>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding DataContext.IsExpanded, RelativeSource={RelativeSource Self}}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type utils:ITreeViewItemModel}">
+                    <TextBlock Text="{Binding DisplayName}" />
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </DockPanel>
+</UserControl>

@@ -1,6 +1,10 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.ComponentModel;
+using System.ComponentModel.Composition;
+using Calame.UserControls;
+using Calame.Utils;
 using Caliburn.Micro;
 using Gemini.Framework.Services;
+using Glyph;
 using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Engine;
@@ -8,7 +12,7 @@ using Glyph.Engine;
 namespace Calame.SceneGraph.ViewModels
 {
     [Export(typeof(SceneGraphViewModel))]
-    public sealed class SceneGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelection<IGlyphComponent>>
+    public sealed class SceneGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelection<IGlyphComponent>>, ITreeContext
     {
         private GlyphEngine _engine;
         private IGlyphComponent _selection;
@@ -68,5 +72,20 @@ namespace Calame.SceneGraph.ViewModels
         }
 
         void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
+        
+        public ITreeViewItemModel CreateTreeItemModel(object data)
+        {
+            var sceneNode = (ISceneNode)data;
+            var glyphComponent = (IGlyphComponent)data;
+
+            return new TreeViewItemModel<ISceneNode>(
+                this,
+                sceneNode,
+                x => (x as IGlyphComponent)?.Parent.Name ?? x.ToString(),
+                x => x.Children,
+                nameof(IGlyphComponent.Name),
+                nameof(SceneNode.Children),
+                (INotifyPropertyChanged)glyphComponent.Parent);
+        }
     }
 }
