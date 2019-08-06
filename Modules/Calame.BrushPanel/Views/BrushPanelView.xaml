@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls;assembly=Calame.PropertyGrid"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:BrushPanelViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -16,6 +17,11 @@
     </UserControl.Resources>
     <StackPanel Orientation="Vertical" x:Name="BrushPanelRoot">
         <StackPanel>
+            <userControls:CalameTreeView MinWidth="200"
+                                         Height="300"
+                                         TreeContext="{Binding}"
+                                         ItemsSource="{Binding Engine.Root.Components}"
+                                         SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"/>
             <ItemsControl ItemsSource="{Binding Brushes}"
                           AlternationCount="{x:Static system:Int32.MaxValue}">
                 <ItemsControl.ItemsPanel>

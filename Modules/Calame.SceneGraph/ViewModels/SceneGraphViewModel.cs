@@ -73,7 +73,7 @@ namespace Calame.SceneGraph.ViewModels
 
         void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
         
-        public ITreeViewItemModel CreateTreeItemModel(object data)
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {
             var sceneNode = (ISceneNode)data;
             var glyphComponent = (IGlyphComponent)data;
@@ -87,5 +87,7 @@ namespace Calame.SceneGraph.ViewModels
                 nameof(SceneNode.Children),
                 (INotifyPropertyChanged)glyphComponent.Parent);
         }
+        
+        bool ITreeContext.BaseFilter(object data) => true;
     }
 }

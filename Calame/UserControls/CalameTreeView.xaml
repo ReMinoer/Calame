@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="200">
     <DockPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
-        <TextBox DockPanel.Dock="Top" Text="{Binding FilterText}" />
+        <TextBox DockPanel.Dock="Top" Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <TreeView ItemsSource="{Binding TreeItems}">
             <i:Interaction.Behaviors>
                 <utils:BindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}" />
@@ -21,12 +21,29 @@
             </TreeView.ItemsPanel>
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="IsExpanded" Value="{Binding DataContext.IsExpanded, RelativeSource={RelativeSource Self}}" />
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding VisibleForFilter}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type utils:ITreeViewItemModel}">
-                    <TextBlock Text="{Binding DisplayName}" />
+                    <TextBlock Text="{Binding DisplayName}">
+                        <TextBlock.Style>
+                            <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
+                                        <Setter Property="Foreground" Value="Gray" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

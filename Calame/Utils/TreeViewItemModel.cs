@@ -12,8 +12,10 @@ namespace Calame.Utils
     {
         object Data { get; }
         string DisplayName { get; }
-        bool IsExpanded { get; }
-        bool MatchingFilter { get; }
+        bool IsExpanded { get; set; }
+        bool MatchingFilter { get; set; }
+        bool VisibleForFilter { get; set; }
+        bool VisibleAsParent { get; set; }
         IReadOnlyObservableList<ITreeViewItemModel> Children { get; }
     }
 
@@ -49,12 +51,26 @@ namespace Calame.Utils
             get => _isExpanded;
             set => Set(ref _isExpanded, value);
         }
-        
-        private bool _matchingFilter = true;
+
+        private bool _matchingFilter;
         public bool MatchingFilter
         {
             get => _matchingFilter;
             set => Set(ref _matchingFilter, value);
+        }
+        
+        private bool _visibleForFilter = true;
+        public bool VisibleForFilter
+        {
+            get => _visibleForFilter;
+            set => Set(ref _visibleForFilter, value);
+        }
+
+        private bool _visibleAsParent;
+        public bool VisibleAsParent
+        {
+            get => _visibleAsParent;
+            set => Set(ref _visibleAsParent, value);
         }
 
         public TreeViewItemModel(

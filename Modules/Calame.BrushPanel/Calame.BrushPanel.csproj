@@ -91,6 +91,10 @@
       <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
       <Name>Stave</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
+      <Project>{407c6a9e-23af-42c1-b38d-03268a12c476}</Project>
+      <Name>Diese %28Taskete%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj">
       <Project>{9eef1863-44be-423e-a29d-088c23aac45e}</Project>
       <Name>Fingear.MonoGame</Name>

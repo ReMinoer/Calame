@@ -45,7 +45,7 @@ namespace Calame.CompositionGraph.ViewModels
         void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => SetValue(ref _selection, message.Item, nameof(Selection));
         void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Root = message.Context.Root;
         
-        public ITreeViewItemModel CreateTreeItemModel(object data)
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {
             return new TreeViewItemModel<IGlyphComponent>(
                 this,
@@ -55,5 +55,7 @@ namespace Calame.CompositionGraph.ViewModels
                 nameof(IGlyphComponent.Name),
                 nameof(IGlyphComponent.Components));
         }
+        
+        bool ITreeContext.BaseFilter(object data) => true;
     }
 }
