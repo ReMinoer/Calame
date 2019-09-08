@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Calame.UserControls;
 using Diese;
+using Diese.Collections.Children;
+using Diese.Collections.Children.Observables;
 using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
 
 namespace Calame.Utils
 {
-    public interface ITreeViewItemModel : IEquatable<ITreeViewItemModel>, IDisposable
+    public interface ITreeViewItemModel : IParentable<ITreeViewItemModel>, IEquatable<ITreeViewItemModel>, IDisposable
     {
         object Data { get; }
         string DisplayName { get; }
@@ -16,7 +18,8 @@ namespace Calame.Utils
         bool MatchingFilter { get; set; }
         bool VisibleForFilter { get; set; }
         bool VisibleAsParent { get; set; }
-        IReadOnlyObservableList<ITreeViewItemModel> Children { get; }
+        new ITreeViewItemModel Parent { get; set; }
+        IObservableList<ITreeViewItemModel> Children { get; }
     }
 
     public class TreeViewItemModel<T> : NotifyPropertyChangedBase, ITreeViewItemModel
@@ -34,9 +37,6 @@ namespace Calame.Utils
 
         public IObservableList<ITreeViewItemModel> Children { get; }
         private readonly ObservableListSynchronizer<object, ITreeViewItemModel> _childrenSynchronizer;
-
-        private readonly IReadOnlyObservableList<ITreeViewItemModel> _readOnlyChildren;
-        IReadOnlyObservableList<ITreeViewItemModel> ITreeViewItemModel.Children => _readOnlyChildren;
 
         private string _displayName;
         public string DisplayName
@@ -73,6 +73,21 @@ namespace Calame.Utils
             set => Set(ref _visibleAsParent, value);
         }
 
+        private ITreeViewItemModel _parent;
+        public ITreeViewItemModel Parent
+        {
+            get => _parent;
+            set
+            {
+                if (_parent.NullableEquals(value))
+                    return;
+                
+                _parent?.Children.Remove(this);
+                _parent = value;
+                _parent?.Children.Add(this);
+            }
+        }
+
         public TreeViewItemModel(
             ITreeContext treeContext,
             T data,
@@ -99,9 +114,9 @@ namespace Calame.Utils
             _childrenPropertyName = childrenPropertyName;
             _childrenNotifier = childrenNotifier ?? notifyingData ?? Data as INotifyPropertyChanged;
 
-            Children = new ObservableList<ITreeViewItemModel>();
-            _readOnlyChildren = new ReadOnlyObservableList<ITreeViewItemModel>(Children);
-            _childrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(_childrenFunc(Data), treeContext.CreateTreeItemModel);
+            Children = new ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel>(this);
+
+            _childrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(_childrenFunc(Data), treeContext.CreateTreeItemModel, x => x.Data, x => x.Dispose());
             _childrenSynchronizer.Subscribe(Children);
 
             if (_childrenNotifier != null)
@@ -111,7 +126,7 @@ namespace Calame.Utils
         private void OnDisplayNameNotifierPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == _displayNamePropertyName)
-                DisplayName = _displayNameFunc(Data);
+                DisplayName = _displayNameFunc(Data);  
         }
 
         private void OnChildrenNotifierPropertyChanged(object sender, PropertyChangedEventArgs e)
