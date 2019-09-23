@@ -8,7 +8,7 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
     [Export(typeof(IEditor))]
     public class SceneEditor : SerializingViewerEditorBase<SceneData>
     {
-        public override string ContentPath => "Content/";
+        public override string ContentPath => null;
         protected override ISerializationFormat<SceneData> SerializationFormat => new DataContractSerializationFormat<SceneData>("Scene", ".scene");
 
         [ImportingConstructor]

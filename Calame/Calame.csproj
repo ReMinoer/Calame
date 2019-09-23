@@ -45,14 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CalameBootstrapper.cs" />
-    <Compile Include="ContentManagerProvider.cs" />
+    <Compile Include="ContentLibraryProvider.cs" />
     <Compile Include="Converters\EnumerableToString.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\MonoGameToWpfColorConverter.cs" />
     <Compile Include="Converters\ObjectToEnumerableConverter.cs" />
     <Compile Include="DocumentContext.cs" />
     <Compile Include="HandleTool.cs" />
-    <Compile Include="IContentManagerProvider.cs" />
+    <Compile Include="IContentLibraryProvider.cs" />
     <Compile Include="IDocumentContext.cs" />
     <Compile Include="IImportedTypeProvider.cs" />
     <Compile Include="ImportedTypeProvider.cs" />

@@ -8,7 +8,7 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
     [Export(typeof(IEditor))]
     public class CircleEditor : SerializingViewerEditorBase<CircleData>
     {
-        public override string ContentPath => "Content/";
+        public override string ContentPath => null;
         protected override ISerializationFormat<CircleData> SerializationFormat => new DataContractSerializationFormat<CircleData>("Circle", ".circle");
 
         [ImportingConstructor]

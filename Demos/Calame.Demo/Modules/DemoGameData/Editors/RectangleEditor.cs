@@ -8,7 +8,7 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
     [Export(typeof(IEditor))]
     public class RectangleEditor : SerializingViewerEditorBase<RectangleData>
     {
-        public override string ContentPath => "Content/";
+        public override string ContentPath => null;
         protected override ISerializationFormat<RectangleData> SerializationFormat => new DataContractSerializationFormat<RectangleData>("Rectangle", ".rectangle");
 
         [ImportingConstructor]

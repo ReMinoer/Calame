@@ -18,7 +18,7 @@ namespace Calame.DataModelViewer.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IGlyphCreator>, IHandle<ISelection<IBoxedComponent>>, IDisposable
     {
-        private readonly IContentManagerProvider _contentManagerProvider;
+        private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IEventAggregator _eventAggregator;
 
         private readonly ViewerViewModel _viewerViewModel;
@@ -33,9 +33,9 @@ namespace Calame.DataModelViewer.ViewModels
         IGlyphCreator IDocumentContext<IGlyphCreator>.Context => Data;
         
         [ImportingConstructor]
-        public DataModelViewerViewModel(IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
+        public DataModelViewerViewModel(IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
         {
-            _contentManagerProvider = contentManagerProvider;
+            _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
 
@@ -70,7 +70,7 @@ namespace Calame.DataModelViewer.ViewModels
 
         private void InitializeEngine()
         {
-            _engine = new GlyphEngine(_contentManagerProvider.Get(Editor.ContentPath));
+            _engine = new GlyphEngine(_contentLibraryProvider.Get(Editor.ContentPath));
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();
             

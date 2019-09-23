@@ -20,7 +20,7 @@ namespace Calame.Demo.Modules.DemoGameData.Session
     public class MovingSession : ISession
     {
         public string DisplayName => "Moving Demo";
-        public string ContentPath => "Content/";
+        public string ContentPath => null;
 
         public void PrepareSession(ISessionContext context)
         {

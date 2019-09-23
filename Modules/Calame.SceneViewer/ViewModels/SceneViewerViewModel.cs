@@ -23,7 +23,7 @@ namespace Calame.SceneViewer.ViewModels
     public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDisposable
     {
         private readonly IShell _shell;
-        private readonly IContentManagerProvider _contentManagerProvider;
+        private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IEventAggregator _eventAggregator;
         
         private GlyphEngine _engine;
@@ -55,10 +55,10 @@ namespace Calame.SceneViewer.ViewModels
         public ICommand SwitchModeCommand { get; }
         
         [ImportingConstructor]
-        public SceneViewerViewModel(IShell shell, IContentManagerProvider contentManagerProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
+        public SceneViewerViewModel(IShell shell, IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
         {
             _shell = shell;
-            _contentManagerProvider = contentManagerProvider;
+            _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
 
             Viewer = new ViewerViewModel(this, _eventAggregator, viewerModules);
@@ -78,7 +78,7 @@ namespace Calame.SceneViewer.ViewModels
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
-            : this(viewModel._shell, viewModel._contentManagerProvider, viewModel._eventAggregator, Enumerable.Empty<IViewerModule>())
+            : this(viewModel._shell, viewModel._contentLibraryProvider, viewModel._eventAggregator, Enumerable.Empty<IViewerModule>())
         {
             throw new NotSupportedException();
 
@@ -93,7 +93,7 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker?.Dispose();
             _viewTracker = null;
 
-            _engine = new GlyphEngine(_contentManagerProvider.Get(Session.ContentPath));
+            _engine = new GlyphEngine(_contentLibraryProvider.Get(Session.ContentPath));
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();
             

@@ -1,32 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.Xna.Framework.Content;
+using Glyph;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 
 namespace Calame
 {
-    public class ContentManagerProvider : IContentManagerProvider
+    public class ContentLibraryProvider : IContentLibraryProvider
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly Dictionary<string, ContentManager> _contentManagers = new Dictionary<string, ContentManager>();
-        
-        public ContentManagerProvider(GraphicsDevice graphicsDevice)
+        static private readonly IServiceProvider ServiceProvider = new DummyServiceProvider(D3D11Client.GraphicsDevice);
+        static private readonly IContentLibrary NullContentLibrary = new UnusedContentLibrary(ServiceProvider);
+
+        private readonly Dictionary<string, IContentLibrary> _contentLibraries = new Dictionary<string, IContentLibrary>(StringComparer.OrdinalIgnoreCase);
+
+        public IContentLibrary Get(string path)
         {
-            _serviceProvider = new DummyServiceProvider(graphicsDevice);
-        }
-        
-        public ContentManager Get(string path)
-        {
+            if (path == null)
+                return NullContentLibrary;
+
             string fullPath = Path.GetFullPath(path);
-            if (!_contentManagers.TryGetValue(fullPath, out ContentManager contentManager))
-                _contentManagers.Add(fullPath, contentManager = new ContentManager(_serviceProvider, path));
+            if (!_contentLibraries.TryGetValue(fullPath, out IContentLibrary contentManager))
+                _contentLibraries.Add(fullPath, contentManager = new ContentLibrary(ServiceProvider, path));
+
             return contentManager;
         }
 
         public bool Remove(string path)
         {
-            return _contentManagers.Remove(Path.GetFullPath(path));
+            return _contentLibraries.Remove(Path.GetFullPath(path));
         }
 
         private sealed class DummyServiceProvider : IServiceProvider

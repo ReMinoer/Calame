@@ -39,7 +39,7 @@ namespace Calame
         protected override void BindServices(CompositionBatch batch)
         {
             base.BindServices(batch);
-            batch.AddExportedValue<IContentManagerProvider>(new ContentManagerProvider(D3D11Client.GraphicsDevice));
+            batch.AddExportedValue<IContentLibraryProvider>(new ContentLibraryProvider());
             batch.AddExportedValue<IImportedTypeProvider>(new ImportedTypeProvider());
         }
 
