@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -13,7 +14,7 @@ namespace Calame.PropertyGrid.Controls
     public partial class InlineCollectionControl : UserControl
     {
         static public readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register(nameof(ItemsSource), typeof(object), typeof(InlineCollectionControl), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(ItemsSource), typeof(IList), typeof(InlineCollectionControl), new PropertyMetadata(null));
         static public readonly DependencyProperty NewItemTypeRegistryProperty =
             DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(InlineCollectionControl), new PropertyMetadata(null));
         static public readonly DependencyProperty IsReadOnlyProperty =
@@ -21,9 +22,9 @@ namespace Calame.PropertyGrid.Controls
         static public readonly DependencyProperty EditorDefinitionsProperty =
             DependencyProperty.Register(nameof(EditorDefinitions), typeof(EditorDefinitionCollection), typeof(InlineCollectionControl), new PropertyMetadata(null));
 
-        public object ItemsSource
+        public IList ItemsSource
         {
-            get => GetValue(ItemsSourceProperty);
+            get => (IList)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
 
@@ -57,28 +58,14 @@ namespace Calame.PropertyGrid.Controls
                 Margin = new Thickness(10)
             };
 
-            if (ItemsSource.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICollection<>), out Type type))
+            Type[] interfaces = ItemsSource.GetType().GetInterfaces();
+            if (interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>), out Type collectionType))
             {
-                Type itemType = type.GenericTypeArguments[0];
+                Type itemType = collectionType.GenericTypeArguments[0];
                 collectionControl.NewItemTypes = NewItemTypeRegistry?.Where(x => itemType.IsAssignableFrom(x)).ToList();
             }
-
-            collectionControl.ItemAdded += CollectionControlOnItemAdded;
-            collectionControl.ItemDeleted += CollectionControlOnItemDeleted;
-            collectionControl.ItemMovedUp += CollectionControlOnItemMovedUp;
-            collectionControl.ItemMovedDown += CollectionControlOnItemMovedDown;
             
-            BindingOperations.SetBinding(collectionControl, CollectionControl.ItemsSourceProperty, new Binding(nameof(ItemsSource))
-            {
-                Source = this,
-                Mode = BindingOperations.GetBinding(this, ItemsSourceProperty)?.Mode ?? BindingMode.Default
-            });
-            
-            BindingOperations.SetBinding(collectionControl, CollectionControl.IsReadOnlyProperty, new Binding(nameof(IsReadOnly))
-            {
-                Source = this,
-                Mode = BindingOperations.GetBinding(this, IsReadOnlyProperty)?.Mode ?? BindingMode.Default
-            });
+            collectionControl.ItemsSource = ItemsSource;
 
             var window = new Window
             {
@@ -89,9 +76,12 @@ namespace Calame.PropertyGrid.Controls
             
             collectionControl.PropertyGrid.EditorDefinitions = EditorDefinitions;
 
-            window.ShowDialog();
+            collectionControl.ItemAdded += CollectionControlOnItemAdded;
+            collectionControl.ItemDeleted += CollectionControlOnItemDeleted;
+            collectionControl.ItemMovedUp += CollectionControlOnItemMovedUp;
+            collectionControl.ItemMovedDown += CollectionControlOnItemMovedDown;
 
-            BindingOperations.ClearAllBindings(collectionControl);
+            window.ShowDialog();
 
             collectionControl.ItemAdded -= CollectionControlOnItemAdded;
             collectionControl.ItemDeleted -= CollectionControlOnItemDeleted;

@@ -22,6 +22,7 @@
     </UserControl.Resources>
     <xctk:PropertyGrid Name="PropertyGrid"
                        SelectedObject="{Binding SelectedObject, ElementName=This}"
+                       ShowAdvancedOptions="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowDescriptionByTooltip="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowPreview="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowSearchBox="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"

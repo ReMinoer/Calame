@@ -96,6 +96,10 @@
       <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
       <Name>Stave</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra.Injection\Simulacra.Injection.csproj">
+      <Project>{9c7a9012-5536-43be-8055-2c3ff297c902}</Project>
+      <Name>Simulacra.Injection</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
       <Project>{91b676a6-3501-4a25-b2bd-4c8519d43faf}</Project>
       <Name>Simulacra</Name>

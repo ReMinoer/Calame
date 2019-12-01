@@ -103,9 +103,13 @@
       <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
       <Name>MonoGame.Framework.WpfInterop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Niddle\Niddle\Niddle.csproj">
-      <Project>{b10bcc2d-3824-440e-a15c-d8c64ec51839}</Project>
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\External\Niddle\Niddle\Niddle.csproj">
+      <Project>{dac69c23-d782-4ccf-bc99-72c0eed2c92d}</Project>
       <Name>Niddle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra.Injection\Simulacra.Injection.csproj">
+      <Project>{9c7a9012-5536-43be-8055-2c3ff297c902}</Project>
+      <Name>Simulacra.Injection</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
       <Project>{91b676a6-3501-4a25-b2bd-4c8519d43faf}</Project>

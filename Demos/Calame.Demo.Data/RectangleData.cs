@@ -1,12 +1,12 @@
 ﻿using Diese.Collections;
 using Glyph;
-using Glyph.Binding;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Graphics;
 using Glyph.Graphics.Renderer;
 using Glyph.Graphics.Shapes;
 using Microsoft.Xna.Framework;
+using Simulacra.Injection.Binding;
 
 namespace Calame.Demo.Data
 {
@@ -19,13 +19,13 @@ namespace Calame.Demo.Data
 
         static RectangleData()
         {
-            Bindings.Add(x => x.Position, x => x.Components.FirstOfType<SceneNode>().Position);
-            Bindings.Add(x => x.Color, x => x.Components.FirstOfType<SpriteTransformer>().Color);
-            Bindings.Add(
+            PropertyBindings.AddProperty(x => x.Position, x => x.Components.FirstOfType<SceneNode>().Position);
+            PropertyBindings.AddProperty(x => x.Color, x => x.Components.FirstOfType<SpriteTransformer>().Color);
+            PropertyBindings.AddProperty(
                 x => x.Width,
                 x => x.Components.FirstOfType<SpriteTransformer>().Scale,
                 (width, m, v) => v.Components.FirstOfType<SpriteTransformer>().Scale.SetX(width / v.Components.FirstOfType<FilledRectangleSprite>().Width));
-            Bindings.Add(
+            PropertyBindings.AddProperty(
                 x => x.Height,
                 x => x.Components.FirstOfType<SpriteTransformer>().Scale,
                 (height, m, v) => v.Components.FirstOfType<SpriteTransformer>().Scale.SetY(height / v.Components.FirstOfType<FilledRectangleSprite>().Height));

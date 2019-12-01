@@ -80,8 +80,8 @@
       <Project>{809f0d79-aedc-4754-a213-fdbe97ccd6d6}</Project>
       <Name>MonoGame.Framework.WpfInterop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\External\Niddle\Niddle\Niddle.csproj">
-      <Project>{A6492B13-F890-48D4-A7F7-EA6EC61D0589}</Project>
+    <ProjectReference Include="..\External\Glyph\External\Simulacra\External\Niddle\Niddle\Niddle.csproj">
+      <Project>{dac69c23-d782-4ccf-bc99-72c0eed2c92d}</Project>
       <Name>Niddle</Name>
     </ProjectReference>
     <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">

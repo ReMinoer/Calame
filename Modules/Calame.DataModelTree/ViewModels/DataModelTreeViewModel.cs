@@ -9,17 +9,17 @@ namespace Calame.DataModelTree.ViewModels
     [Export(typeof(DataModelTreeViewModel))]
     public sealed class DataModelTreeViewModel : HandleTool, IHandle<ISelection<IGlyphComponent>>, IHandle<IDocumentContext<IGlyphCreator>>
     {
-        private IGlyphCreator _root;
-        private IGlyphCreator _selection;
+        private IGlyphData _root;
+        private IGlyphData _selection;
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
-        public IGlyphCreator Root
+        public IGlyphData Root
         {
             get => _root;
             private set => SetValue(ref _root, value);
         }
 
-        public IGlyphCreator Selection
+        public IGlyphData Selection
         {
             get => _selection;
             set
@@ -29,7 +29,7 @@ namespace Calame.DataModelTree.ViewModels
                 if (_selection != null)
                 {
                     EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection.BindedObject));
-                    EventAggregator.PublishOnUIThread(new Selection<IGlyphCreator>(_selection));
+                    EventAggregator.PublishOnUIThread(new Selection<IGlyphData>(_selection));
                 }
             }
         }

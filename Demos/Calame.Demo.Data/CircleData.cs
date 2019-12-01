@@ -1,11 +1,11 @@
 ﻿using Diese.Collections;
-using Glyph.Binding;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Graphics;
 using Glyph.Graphics.Renderer;
 using Glyph.Graphics.Shapes;
 using Microsoft.Xna.Framework;
+using Simulacra.Injection.Binding;
 
 namespace Calame.Demo.Data
 {
@@ -17,9 +17,9 @@ namespace Calame.Demo.Data
 
         static CircleData()
         {
-            Bindings.Add(x => x.Position, x => x.Components.FirstOfType<SceneNode>().Position);
-            Bindings.Add(x => x.Color, x => x.Components.FirstOfType<SpriteTransformer>().Color);
-            Bindings.Add(
+            PropertyBindings.AddProperty(x => x.Position, x => x.Components.FirstOfType<SceneNode>().Position);
+            PropertyBindings.AddProperty(x => x.Color, x => x.Components.FirstOfType<SpriteTransformer>().Color);
+            PropertyBindings.AddProperty(
                 x => x.Radius,
                 x => x.Components.FirstOfType<SpriteTransformer>().Scale,
                 (radius, m, v) => radius / v.Components.FirstOfType<FilledCircleSprite>().Radius * Vector2.One);

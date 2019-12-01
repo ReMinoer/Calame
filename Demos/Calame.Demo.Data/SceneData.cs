@@ -1,15 +1,16 @@
-﻿using Glyph.Composition.Modelization;
+﻿using Diese.Collections.Observables;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 
 namespace Calame.Demo.Data
 {
     public class SceneData : BindedData<SceneData, GlyphObject>
     {
-        public FactoryConfigurator<IShapeData, GlyphObject> Rectangles { get; }
+        public ObservableCollection<IShapeData> Shapes { get; } = new ObservableCollection<IShapeData>();
 
-        public SceneData()
+        static SceneData()
         {
-            SubConfigurators.Add(Rectangles = new FactoryConfigurator<IShapeData, GlyphObject>(this));
+            CollectionBindings.AddFactory(x => x.Shapes);
         }
 
         protected override GlyphObject New()
