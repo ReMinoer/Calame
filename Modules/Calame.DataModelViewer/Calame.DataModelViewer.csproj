@@ -38,8 +38,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EditorProvider.cs" />
+    <Compile Include="EditorSource.cs" />
     <Compile Include="IEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerializingEditorSource.cs" />
     <Compile Include="SerializingViewerEditorBase.cs" />
     <Compile Include="ViewerEditorBase.cs" />
     <Compile Include="ViewModels\DataModelViewerViewModel.cs" />

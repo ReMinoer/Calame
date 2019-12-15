@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using Caliburn.Micro;
 using Diese.Collections;
 using Diese.Collections.Observables;
@@ -15,7 +14,6 @@ using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.Tools;
 using Glyph.WpfInterop;
-using MahApps.Metro.IconPacks;
 
 namespace Calame.Viewer
 {
@@ -35,7 +33,6 @@ namespace Calame.Viewer
         public ReadOnlyCollection<IViewerModule> Modules { get; }
         public ObservableCollection<IViewerMode> InteractiveModules { get; }
         public InteractiveToggle InteractiveToggle { get; private set; }
-        public SessionModeModule SessionMode { get; private set; }
 
         public GlyphWpfRunner Runner
         {
@@ -59,7 +56,6 @@ namespace Calame.Viewer
                     EditorRoot = null;
 
                     InteractiveToggle = null;
-                    SessionMode = null;
                 }
 
                 _runner = value;
@@ -75,17 +71,7 @@ namespace Calame.Viewer
                     _editorInteractive = EditorRoot.Add<InteractiveRoot>().Interactive;
                     engine.InteractionManager.Root.Add(_editorInteractive);
 
-                    SessionMode = new SessionModeModule();
-                    InteractiveModules.Add(SessionMode);
-
-                    InteractiveToggle = new InteractiveToggle
-                    {
-                        Components =
-                        {
-                            SessionMode.Interactive
-                        },
-                        SelectedInteractive = SessionMode.Interactive
-                    };
+                    InteractiveToggle = new InteractiveToggle();
                     engine.InteractionManager.Root.Add(InteractiveToggle);
 
                     EditorView = engine.Root.Add<FillView>();
@@ -169,18 +155,6 @@ namespace Calame.Viewer
 
             Runner?.Dispose();
             Runner = null;
-        }
-
-        public class SessionModeModule : IViewerMode
-        {
-            public string Name => "Session";
-            public object IconId => PackIconMaterialKind.GamepadVariant;
-
-            public InteractiveComposite Interactive { get; } = new InteractiveComposite();
-            IInteractive IViewerMode.Interactive => Interactive;
-
-            public Cursor Cursor => Cursors.None;
-            public bool UseFreeCamera => false;
         }
     }
 }

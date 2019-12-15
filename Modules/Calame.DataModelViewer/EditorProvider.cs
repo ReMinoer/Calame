@@ -15,11 +15,11 @@ namespace Calame.DataModelViewer
     {
         private readonly CompositionContainer _compositionContainer;
 
-        public List<IEditor> Editors { get; } = new List<IEditor>();
+        public List<IEditorSource> Editors { get; } = new List<IEditorSource>();
         public IEnumerable<EditorFileType> FileTypes => Editors.SelectMany(x => x.FileExtensions.Select(e => new EditorFileType(x.DisplayName, e)));
 
         [ImportingConstructor]
-        public EditorProvider(CompositionContainer compositionContainer, [ImportMany] IEnumerable<IEditor> editors)
+        public EditorProvider(CompositionContainer compositionContainer, [ImportMany] IEnumerable<IEditorSource> editors)
         {
             _compositionContainer = compositionContainer;
 
@@ -29,7 +29,12 @@ namespace Calame.DataModelViewer
 
         public bool Handles(string path)
         {
-            return Editors.SelectMany(x => x.FileExtensions).Contains(Path.GetExtension(path));
+            return Editors.Any(x => Handles(x, path));
+        }
+
+        static private bool Handles(IEditorSource editor, string path)
+        {
+            return editor.FileExtensions.Contains(Path.GetExtension(path));
         }
 
         public IDocument Create()
@@ -40,14 +45,14 @@ namespace Calame.DataModelViewer
         public async Task New(IDocument document, string name)
         {
             var dataModelViewerViewModel = (DataModelViewerViewModel)document;
-            dataModelViewerViewModel.Editor = Editors.First(x => x.FileExtensions.Contains(Path.GetExtension(name)));
+            dataModelViewerViewModel.Editor = Editors.First(x => Handles(x, name)).CreateInstance();
             await dataModelViewerViewModel.New(name);
         }
 
         public async Task Open(IDocument document, string path)
         {
             var dataModelViewerViewModel = (DataModelViewerViewModel)document;
-            dataModelViewerViewModel.Editor = Editors.First(x => x.FileExtensions.Contains(Path.GetExtension(path)));
+            dataModelViewerViewModel.Editor = Editors.First(x => Handles(x, path)).CreateInstance();
             await dataModelViewerViewModel.Load(path);
         }
     }

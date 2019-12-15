@@ -5,16 +5,20 @@ using Glyph.IO;
 
 namespace Calame.Demo.Modules.DemoGameData.Editors
 {
-    [Export(typeof(IEditor))]
-    public class CircleEditor : SerializingViewerEditorBase<CircleData>
+    [Export(typeof(IEditorSource))]
+    public class CircleEditorSource : SerializingEditorSource<CircleData, CircleEditor>
     {
-        public override string ContentPath => null;
         protected override ISerializationFormat<CircleData> SerializationFormat => new DataContractSerializationFormat<CircleData>("Circle", ".circle");
-
+        
         [ImportingConstructor]
-        public CircleEditor(IImportedTypeProvider importedTypeProvider)
+        public CircleEditorSource(IImportedTypeProvider importedTypeProvider)
             : base(importedTypeProvider)
         {
         }
+    }
+    
+    public class CircleEditor : SerializingViewerEditorBase<CircleData>
+    {
+        public override string ContentPath => null;
     }
 }

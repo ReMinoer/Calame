@@ -1,29 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Glyph;
-using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
 using Glyph.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Niddle;
 
 namespace Calame.DataModelViewer
 {
     public abstract class ViewerEditorBase<T> : IEditor
         where T : IGlyphCreator
     {
-        public string DisplayName => SaveLoadFormat.FileType.DisplayName;
-        public IEnumerable<string> FileExtensions => SaveLoadFormat.FileType.Extensions;
+        protected abstract ISaveLoadFormat<T> SaveLoadFormat { get; }
+        protected T Creator { get; private set; }
         public abstract string ContentPath { get; }
 
-        protected abstract ISaveLoadFormat<T> SaveLoadFormat { get; }
-        public abstract Task<IGlyphCreator> NewDataAsync();
+        public IGlyphData Data => Creator;
+        
+        public async Task NewDataAsync()
+        {
+            Creator = await NewAsync();
+        }
 
-        public virtual IGlyphComposite<IGlyphComponent> PrepareEditor(GlyphEngine engine, GlyphObject editorRoot)
+        public async Task LoadDataAsync(Stream stream)
+        {
+            Creator = await LoadAsync(stream);
+        }
+        
+        public Task SaveDataAsync(Stream stream)
+        {
+            return SaveAsync(Creator, stream);
+        }
+        
+        protected abstract Task<T> NewAsync();
+        protected virtual Task<T> LoadAsync(Stream stream) => Task.Run(() => SaveLoadFormat.Load(stream));
+        protected virtual Task SaveAsync(T data, Stream stream) => Task.Run(() => SaveLoadFormat.Save(Creator, stream));
+
+        public virtual void RegisterDependencies(IDependencyRegistry registry)
+        {
+        }
+
+        public virtual void PrepareEditor(GlyphEngine engine, GlyphObject editorRoot)
         {
             var pixel = new Texture2D(engine.Resolver.Resolve<Func<GraphicsDevice>>()(), 1, 1);
             pixel.SetData(new[] { Color.White });
@@ -38,17 +59,13 @@ namespace Calame.DataModelViewer
             dataRoot.Name = "Data Root";
             dataRoot.Add<SceneNode>();
 
-            return dataRoot;
+            Creator.Instantiate();
+            dataRoot.Add(Creator.BindedObject);
         }
 
-        public virtual Task<IGlyphCreator> LoadDataAsync(Stream stream)
+        public void Dispose()
         {
-            return Task.Run<IGlyphCreator>(() => SaveLoadFormat.Load(stream));
-        }
-        
-        public virtual Task SaveDataAsync(object obj, Stream stream)
-        {
-            return Task.Run(() => SaveLoadFormat.Save((T)obj, stream));
+            Creator?.Dispose();
         }
     }
 }

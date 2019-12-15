@@ -5,16 +5,20 @@ using Glyph.IO;
 
 namespace Calame.Demo.Modules.DemoGameData.Editors
 {
-    [Export(typeof(IEditor))]
-    public class RectangleEditor : SerializingViewerEditorBase<RectangleData>
+    [Export(typeof(IEditorSource))]
+    public class RectangleEditorSource : SerializingEditorSource<RectangleData, RectangleEditor>
     {
-        public override string ContentPath => null;
         protected override ISerializationFormat<RectangleData> SerializationFormat => new DataContractSerializationFormat<RectangleData>("Rectangle", ".rectangle");
-
+        
         [ImportingConstructor]
-        public RectangleEditor(IImportedTypeProvider importedTypeProvider)
+        public RectangleEditorSource(IImportedTypeProvider importedTypeProvider)
             : base(importedTypeProvider)
         {
         }
+    }
+    
+    public class RectangleEditor : SerializingViewerEditorBase<RectangleData>
+    {
+        public override string ContentPath => null;
     }
 }

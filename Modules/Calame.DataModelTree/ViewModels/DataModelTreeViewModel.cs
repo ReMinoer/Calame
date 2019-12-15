@@ -7,7 +7,7 @@ using Glyph.Composition.Modelization;
 namespace Calame.DataModelTree.ViewModels
 {
     [Export(typeof(DataModelTreeViewModel))]
-    public sealed class DataModelTreeViewModel : HandleTool, IHandle<ISelection<IGlyphComponent>>, IHandle<IDocumentContext<IGlyphCreator>>
+    public sealed class DataModelTreeViewModel : HandleTool, IHandle<ISelection<IGlyphComponent>>, IHandle<IDocumentContext<IGlyphData>>
     {
         private IGlyphData _root;
         private IGlyphData _selection;
@@ -45,6 +45,6 @@ namespace Calame.DataModelTree.ViewModels
         }
 
         void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => SetValue(ref _selection, _root.GetData(message.Item), nameof(Selection));
-        void IHandle<IDocumentContext<IGlyphCreator>>.Handle(IDocumentContext<IGlyphCreator> message) => Root = message.Context;
+        void IHandle<IDocumentContext<IGlyphData>>.Handle(IDocumentContext<IGlyphData> message) => Root = message.Context;
     }
 }

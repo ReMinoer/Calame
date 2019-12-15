@@ -7,6 +7,8 @@ using Calame.Viewer;
 using Calame.Viewer.Modules;
 using Caliburn.Micro;
 using Diese.Collections;
+using Fingear;
+using Fingear.Interactives;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph;
@@ -15,6 +17,7 @@ using Glyph.Core.Tracking;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.WpfInterop;
+using MahApps.Metro.IconPacks;
 
 namespace Calame.SceneViewer.ViewModels
 {
@@ -34,6 +37,7 @@ namespace Calame.SceneViewer.ViewModels
         public ViewerViewModel Viewer { get; }
         public ISession Session { get; set; }
         public GlyphWpfRunner Runner => Viewer.Runner;
+        public SessionModeModule SessionMode { get; private set; }
 
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
@@ -92,6 +96,7 @@ namespace Calame.SceneViewer.ViewModels
         {
             _viewTracker?.Dispose();
             _viewTracker = null;
+            SessionMode = null;
 
             _engine = new GlyphEngine(_contentLibraryProvider.Get(Session.ContentPath));
             _engine.Root.Add<SceneNode>();
@@ -104,7 +109,11 @@ namespace Calame.SceneViewer.ViewModels
 
             Viewer.Runner = new GlyphWpfRunner { Engine = _engine };
 
-            var context = new SessionContext(Viewer, sessionView);
+            SessionMode = new SessionModeModule();
+            Viewer.InteractiveToggle.Add(SessionMode.Interactive);
+            Viewer.InteractiveModules.Add(SessionMode);
+
+            var context = new SessionContext(Viewer, sessionView, SessionMode.Interactive);
             Session.PrepareSession(context);
 
             FreeCameraAction();
@@ -113,7 +122,7 @@ namespace Calame.SceneViewer.ViewModels
             _engine.LoadContent();
             _engine.Start();
 
-            SwitchModeAction(Viewer.SessionMode);
+            SwitchModeAction(SessionMode);
         }
 
         protected override void OnViewLoaded(object view)
@@ -184,6 +193,18 @@ namespace Calame.SceneViewer.ViewModels
 
             Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
             Viewer.Dispose();
+        }
+
+        public class SessionModeModule : IViewerMode
+        {
+            public string Name => "Session";
+            public object IconId => PackIconMaterialKind.GamepadVariant;
+
+            public InteractiveComposite Interactive { get; } = new InteractiveComposite();
+            IInteractive IViewerMode.Interactive => Interactive;
+
+            public Cursor Cursor => Cursors.None;
+            public bool UseFreeCamera => false;
         }
     }
 }

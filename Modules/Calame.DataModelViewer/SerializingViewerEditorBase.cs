@@ -8,28 +8,24 @@ namespace Calame.DataModelViewer
     public abstract class SerializingViewerEditorBase<T> : ViewerEditorBase<T>
         where T : IGlyphCreator, new()
     {
-        private readonly IImportedTypeProvider _importedTypeProvider;
-        protected abstract ISerializationFormat<T> SerializationFormat { get; }
+        public IImportedTypeProvider ImportedTypeProvider { get; set; }
+        public ISerializationFormat<T> SerializationFormat { get; set; }
+
         protected override sealed ISaveLoadFormat<T> SaveLoadFormat => SerializationFormat;
 
-        protected SerializingViewerEditorBase(IImportedTypeProvider importedTypeProvider)
+        protected override Task<T> NewAsync()
         {
-            _importedTypeProvider = importedTypeProvider;
+            return Task.FromResult(new T());
         }
 
-        public override Task<IGlyphCreator> NewDataAsync()
+        protected override Task<T> LoadAsync(Stream stream)
         {
-            return Task.Run<IGlyphCreator>(() => new T());
+            return Task.Run(() => SerializationFormat.Load(stream, ImportedTypeProvider.Types));
         }
 
-        public override Task<IGlyphCreator> LoadDataAsync(Stream stream)
+        protected override Task SaveAsync(T data, Stream stream)
         {
-            return Task.Run<IGlyphCreator>(() => SerializationFormat.Load(stream, _importedTypeProvider.Types));
-        }
-
-        public override Task SaveDataAsync(object obj, Stream stream)
-        {
-            return Task.Run(() => SerializationFormat.Save((T)obj, stream, _importedTypeProvider.Types));
+            return Task.Run(() => SerializationFormat.Save(data, stream, ImportedTypeProvider.Types));
         }
     }
 }

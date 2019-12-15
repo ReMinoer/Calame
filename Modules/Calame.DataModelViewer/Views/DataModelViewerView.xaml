@@ -5,10 +5,44 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfInterop="clr-namespace:Glyph.WpfInterop;assembly=Glyph.WpfInterop"
              xmlns:viewModels="clr-namespace:Calame.DataModelViewer.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:viewer="clr-namespace:Calame.Viewer;assembly=Calame.Viewer"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:DataModelViewerViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="180" d:DesignWidth="500">
     <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
+            <ToolBar ItemsSource="{Binding Viewer.InteractiveModules}"
+                     AlternationCount="{x:Static system:Int32.MaxValue}">
+                <ToolBar.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewer:IViewerMode}">
+                        <RadioButton ToolTip="{Binding Name}"
+                                     GroupName="InteractiveModuleButtons"
+                                     Command="{Binding DataContext.SwitchModeCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                     CommandParameter="{Binding}">
+                            <RadioButton.Content>
+                                <Border Background="Transparent">
+                                    <iconPacks:PackIconMaterial Kind="{Binding IconId}"/>
+                                </Border>
+                            </RadioButton.Content>
+                            <RadioButton.Style>
+                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter}}" Value="0">
+                                            <Setter Property="IsChecked" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </RadioButton.Style>
+                        </RadioButton>
+                    </DataTemplate>
+                </ToolBar.ItemTemplate>
+            </ToolBar>
+        </ToolBarTray>
+        <ToolBarTray DockPanel.Dock="Right" Background="{DynamicResource ToolbarDefaultBackground}" />
+        <ToolBarTray DockPanel.Dock="Left" Background="{DynamicResource ToolbarDefaultBackground}" />
+        <ToolBarTray DockPanel.Dock="Bottom" Background="{DynamicResource ToolbarDefaultBackground}" />
         <wpfInterop:GlyphWpfViewer x:Name="GlyphWpfViewer"
                                    PreviewKeyDown="Viewer_OnPreviewKeyDown"
                                    PreviewKeyUp="Viewer_OnPreviewKeyUp"
