@@ -17,9 +17,10 @@ using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 namespace Calame.Viewer.Modules
 {
     [Export(typeof(IViewerModule))]
-    public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerMode
+    public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerMode, IHandle<IDocumentContext>
     {
         private readonly IEventAggregator _eventAggregator;
+        private IDocumentContext _currentDocument;
 
         private GlyphObject _root;
         private ShapedObjectSelector _shapedObjectSelector;
@@ -75,12 +76,14 @@ namespace Calame.Viewer.Modules
                 }
             };
 
+            _eventAggregator.Subscribe(this);
             _shapedObjectSelector.SelectionChanged += OnShapedObjectSelectorSelectionChanged;
         }
 
         protected override void DisconnectRunner()
         {
             _shapedObjectSelector.SelectionChanged -= OnShapedObjectSelectorSelectionChanged;
+            _eventAggregator.Unsubscribe(this);
             
             Model.InteractiveModules.Remove(this);
             Model.EditorRoot.Remove(_root);
@@ -96,7 +99,12 @@ namespace Calame.Viewer.Modules
                 return;
 
             SelectedComponent = boxedComponent;
-            _eventAggregator.PublishOnUIThread(Selection.Of(SelectedComponent));
+            _eventAggregator.PublishOnUIThread(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
+        }
+
+        public void Handle(IDocumentContext message)
+        {
+            _currentDocument = message;
         }
     }
 }

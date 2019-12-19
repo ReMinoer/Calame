@@ -1,13 +1,14 @@
-﻿using System;
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 
 namespace Calame.Viewer.Modules.Base
 {
-    public abstract class SelectionHandlerModuleBase : ViewerModuleBase, IHandle<ISelection<IGlyphComponent>>
+    public abstract class SelectionHandlerModuleBase : ViewerModuleBase, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         private readonly IEventAggregator _eventAggregator;
+        private bool _handlingSelection;
         protected IBoxedComponent Selection;
 
         protected SelectionHandlerModuleBase(IEventAggregator eventAggregator)
@@ -28,8 +29,10 @@ namespace Calame.Viewer.Modules.Base
         protected abstract void HandleSelection();
         protected abstract void ReleaseSelection();
 
-        private bool _handlingSelection;
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
+        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
+
+        private void HandleSelection(IGlyphComponent component)
         {
             if (_handlingSelection)
                 return;
@@ -41,7 +44,7 @@ namespace Calame.Viewer.Modules.Base
                 if (Runner.Engine.FocusedClient != Model.Client)
                     return;
 
-                var boxedComponent = message.Item as IBoxedComponent;
+                var boxedComponent = component as IBoxedComponent;
                 if (boxedComponent == Selection)
                     return;
 

@@ -130,9 +130,6 @@ namespace Calame.Viewer
         {
             if (Runner?.Engine != null)
                 Runner.Engine.FocusedClient = Client;
-            
-            _eventAggregator.PublishOnUIThread(new DocumentContext<ViewerViewModel>(this));
-            _eventAggregator.PublishOnUIThread(new DocumentContext<GlyphEngine>(_runner?.Engine));
         }
 
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => Activate();

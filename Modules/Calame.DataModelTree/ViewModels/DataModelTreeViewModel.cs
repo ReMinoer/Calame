@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using Gemini.Framework.Services;
-using Glyph.Composition;
 using Glyph.Composition.Modelization;
 
 namespace Calame.DataModelTree.ViewModels
 {
     [Export(typeof(DataModelTreeViewModel))]
-    public sealed class DataModelTreeViewModel : HandleTool, IHandle<ISelection<IGlyphComponent>>, IHandle<IDocumentContext<IGlyphData>>
+    public sealed class DataModelTreeViewModel : HandleTool, IHandle<IDocumentContext<IGlyphData>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         private IGlyphData _root;
         private IGlyphData _selection;
@@ -28,8 +27,7 @@ namespace Calame.DataModelTree.ViewModels
 
                 if (_selection != null)
                 {
-                    EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection.BindedObject));
-                    EventAggregator.PublishOnUIThread(new Selection<IGlyphData>(_selection));
+                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphData>(CurrentDocument, _selection));
                 }
             }
         }
@@ -40,11 +38,11 @@ namespace Calame.DataModelTree.ViewModels
         {
             DisplayName = "Data Model Tree";
 
-            if (shell.ActiveItem is IDocumentContext<IGlyphCreator> documentContext)
+            if (shell.ActiveItem is IDocumentContext<IGlyphData> documentContext)
                 Root = documentContext.Context;
         }
 
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => SetValue(ref _selection, _root.GetData(message.Item), nameof(Selection));
         void IHandle<IDocumentContext<IGlyphData>>.Handle(IDocumentContext<IGlyphData> message) => Root = message.Context;
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => SetValue(ref _selection, message.Item, nameof(Selection));
     }
 }

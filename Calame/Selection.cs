@@ -4,40 +4,54 @@ using Diese.Collections;
 
 namespace Calame
 {
-    static public class Selection
+    public class SelectionRequest<T> : SelectionMessageBase<T>, ISelectionRequest<T>
+        where T : class
     {
-        static public Selection<T> Empty<T>()
-            where T : class
+        static public SelectionRequest<T> Empty(IDocumentContext documentcontext) => new SelectionRequest<T>(documentcontext);
+        public ISelectionSpread<T> Promoted => new SelectionSpread<T>(DocumentContext, Items);
+
+        private SelectionRequest(IDocumentContext documentcontext)
+            : base(documentcontext)
         {
-            return Selection<T>.Empty;
         }
 
-        static public Selection<T> Of<T>(T item)
-            where T : class
+        public SelectionRequest(IDocumentContext documentcontext, T item)
+            : base(documentcontext, item)
         {
-            return new Selection<T>(item);
-        }
-        
-        static public Selection<T> Of<T>(params T[] items)
-            where T : class
-        {
-            return new Selection<T>(items);
         }
 
-        static public Selection<T> Of<T>(IEnumerable<T> items)
-            where T : class
+        public SelectionRequest(IDocumentContext documentcontext, IEnumerable<T> items)
+            : base(documentcontext, items)
         {
-            return new Selection<T>(items);
+        }
+    }
+
+    public class SelectionSpread<T> : SelectionMessageBase<T>, ISelectionSpread<T>
+        where T : class
+    {
+        private SelectionSpread(IDocumentContext documentcontext)
+            : base(documentcontext)
+        {
+        }
+
+        public SelectionSpread(IDocumentContext documentcontext, T item)
+            : base(documentcontext, item)
+        {
+        }
+
+        public SelectionSpread(IDocumentContext documentcontext, IEnumerable<T> items)
+            : base(documentcontext, items)
+        {
         }
     }
     
-    public class Selection<T> : ISelection<T>
+    public class SelectionMessageBase<T> : ISelectionMessage<T>
         where T : class
     {
-        static public Selection<T> Empty => new Selection<T>();
-        
         private T _item;
         private T[] _others;
+        
+        public IDocumentContext DocumentContext { get; }
 
         public T Item
         {
@@ -72,25 +86,21 @@ namespace Calame
             }
         }
 
-        private Selection()
+        protected SelectionMessageBase(IDocumentContext documentcontext)
         {
-            _item = null;
+            DocumentContext = documentcontext;
         }
 
-        public Selection(T item)
+        protected SelectionMessageBase(IDocumentContext documentcontext, T item)
+            : this(documentcontext)
         {
             _item = item;
         }
 
-        public Selection(IEnumerable<T> items)
+        protected SelectionMessageBase(IDocumentContext documentcontext, IEnumerable<T> items)
+            : this(documentcontext)
         {
             Items = items;
-        }
-
-        public Selection(params T[] items)
-        {
-            _item = items[0];
-            _others = items.Skip(1).ToArray();
         }
     }
 }

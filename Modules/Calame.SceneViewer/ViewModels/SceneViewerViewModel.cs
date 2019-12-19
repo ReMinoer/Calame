@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Input;
 using Calame.Viewer;
-using Calame.Viewer.Modules;
 using Caliburn.Micro;
 using Diese.Collections;
 using Fingear;
@@ -12,6 +11,7 @@ using Fingear.Interactives;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph;
+using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Tracking;
 using Glyph.Engine;
@@ -23,7 +23,7 @@ namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDisposable
+    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
     {
         private readonly IShell _shell;
         private readonly IContentLibraryProvider _contentLibraryProvider;
@@ -64,6 +64,7 @@ namespace Calame.SceneViewer.ViewModels
             _shell = shell;
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
+            _eventAggregator.Subscribe(this);
 
             Viewer = new ViewerViewModel(this, _eventAggregator, viewerModules);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
@@ -135,6 +136,20 @@ namespace Calame.SceneViewer.ViewModels
             FreeCameraAction();
         }
 
+        private void OnActivated()
+        {
+            _eventAggregator.PublishOnUIThread(this);
+        }
+
+        private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();
+
+        private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
+        {
+            FreeCameraAction();
+            OnActivated();
+            Activated += OnActivated;
+        }
+
         private void FreeCameraAction()
         {
             if (_viewTracker == null)
@@ -181,9 +196,12 @@ namespace Calame.SceneViewer.ViewModels
             Viewer.EditorCamera.Enabled = mode.UseFreeCamera;
         }
 
-        private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
+        public void Handle(ISelectionRequest<IGlyphComponent> message)
         {
-            FreeCameraAction();
+            if (message.DocumentContext != this)
+                return;
+
+            _eventAggregator.PublishOnUIThread(message.Promoted);
         }
 
         public void Dispose()

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Calame.Viewer;
 using Caliburn.Micro;
 using Gemini.Framework;
+using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
@@ -16,7 +17,7 @@ namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IGlyphData>, IHandle<ISelection<IBoxedComponent>>, IDisposable
+    public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
     {
         private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IEventAggregator _eventAggregator;
@@ -97,7 +98,7 @@ namespace Calame.DataModelViewer.ViewModels
 
         private void OnActivated()
         {
-            _eventAggregator.PublishOnUIThread(new DocumentContext<IGlyphData>(Editor.Data));
+            _eventAggregator.PublishOnUIThread(this);
         }
 
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();
@@ -108,9 +109,20 @@ namespace Calame.DataModelViewer.ViewModels
             Activated += OnActivated;
         }
 
-        public void Handle(ISelection<IBoxedComponent> message)
+        public void Handle(ISelectionRequest<IGlyphData> message)
         {
-            _eventAggregator.PublishOnUIThread(Selection.Of(Editor.Data.GetData(message.Item)));
+            if (message.DocumentContext != this)
+                return;
+            
+            _eventAggregator.PublishOnUIThread(message.Promoted);
+        }
+
+        public void Handle(ISelectionRequest<IGlyphComponent> message)
+        {
+            if (message.DocumentContext != this)
+                return;
+            
+            _eventAggregator.PublishOnUIThread(new SelectionSpread<IGlyphData>(message.DocumentContext, Editor.Data.GetData(message.Item)));
         }
 
         private void SwitchModeAction(IViewerMode mode)

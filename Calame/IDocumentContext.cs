@@ -1,6 +1,10 @@
 ﻿namespace Calame
 {
-    public interface IDocumentContext<out T>
+    public interface IDocumentContext
+    {
+    }
+
+    public interface IDocumentContext<out T> : IDocumentContext
     {
         T Context { get; }
     }

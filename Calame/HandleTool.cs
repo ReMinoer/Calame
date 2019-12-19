@@ -6,14 +6,20 @@ using Gemini.Framework;
 
 namespace Calame
 {
-    public abstract class HandleTool : Tool, IDisposable
+    public abstract class HandleTool : Tool, IHandle<IDocumentContext>, IDisposable
     {
         protected readonly IEventAggregator EventAggregator;
+        public IDocumentContext CurrentDocument { get; private set; }
 
         protected HandleTool(IEventAggregator eventAggregator)
         {
             EventAggregator = eventAggregator;
             EventAggregator.Subscribe(this);
+        }
+
+        public void Handle(IDocumentContext message)
+        {
+            CurrentDocument = message;
         }
 
         protected bool SetValue<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)

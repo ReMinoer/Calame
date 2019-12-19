@@ -7,7 +7,6 @@ using Fingear.MonoGame;
 using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Inputs;
-using Glyph.Tools;
 using Glyph.Tools.Brushing;
 using Glyph.Tools.Brushing.Controllers;
 using Glyph.Tools.Brushing.Space;

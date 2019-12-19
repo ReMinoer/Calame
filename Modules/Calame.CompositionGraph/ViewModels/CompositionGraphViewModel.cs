@@ -5,12 +5,13 @@ using Caliburn.Micro;
 using Diese.Collections.Observables.ReadOnly;
 using Gemini.Framework.Services;
 using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Engine;
 
 namespace Calame.CompositionGraph.ViewModels
 {
     [Export(typeof(CompositionGraphViewModel))]
-    public sealed class CompositionGraphViewModel : HandleTool, IHandle<ISelection<IGlyphComponent>>, IHandle<IDocumentContext<GlyphEngine>>, ITreeContext
+    public sealed class CompositionGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
@@ -28,7 +29,7 @@ namespace Calame.CompositionGraph.ViewModels
             set
             {
                 SetValue(ref _selection, value);
-                EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
+                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
             }
         }
 
@@ -41,9 +42,11 @@ namespace Calame.CompositionGraph.ViewModels
             if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
                 Root = documentContext.Context.Root;
         }
-
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message) => SetValue(ref _selection, message.Item, nameof(Selection));
+        
         void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Root = message.Context.Root;
+        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
+        private void HandleSelection(IGlyphComponent component) => SetValue(ref _selection, component, nameof(Selection));
         
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {

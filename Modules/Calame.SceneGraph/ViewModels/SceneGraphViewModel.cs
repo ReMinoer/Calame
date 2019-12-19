@@ -6,13 +6,14 @@ using Caliburn.Micro;
 using Gemini.Framework.Services;
 using Glyph;
 using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
 
 namespace Calame.SceneGraph.ViewModels
 {
     [Export(typeof(SceneGraphViewModel))]
-    public sealed class SceneGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelection<IGlyphComponent>>, ITreeContext
+    public sealed class SceneGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
         private GlyphEngine _engine;
         private IGlyphComponent _selection;
@@ -36,7 +37,7 @@ namespace Calame.SceneGraph.ViewModels
                     NotifyOfPropertyChange(nameof(SelectionNode));
                 }
  
-                EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
+                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
             }
         }
 
@@ -51,7 +52,7 @@ namespace Calame.SceneGraph.ViewModels
                     NotifyOfPropertyChange(nameof(Selection));
                 }
 
-                EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selection));
+                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
             }
         }
 
@@ -64,14 +65,17 @@ namespace Calame.SceneGraph.ViewModels
             if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
                 Engine = documentContext.Context;
         }
+        
+        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
+        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
 
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
+        private void HandleSelection(IGlyphComponent component)
         {
-            SetValue(ref _selection, message.Item, nameof(Selection));
-            SetValue(ref _selectionNode, message.Item?.GetSceneNode(), nameof(SelectionNode));
+            SetValue(ref _selection, component, nameof(Selection));
+            SetValue(ref _selectionNode, component?.GetSceneNode(), nameof(SelectionNode));
         }
 
-        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
         
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {

@@ -13,12 +13,13 @@ using Diese.Collections.Observables.ReadOnly;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Engine;
 
 namespace Calame.BrushPanel.ViewModels
 {
     [Export(typeof(BrushPanelViewModel))]
-    public sealed class BrushPanelViewModel : HandleTool, ITreeContext, IHandle<IDocumentContext<ViewerViewModel>>, IHandle<ISelection<IGlyphComponent>>
+    public sealed class BrushPanelViewModel : HandleTool, ITreeContext, IHandle<IDocumentContext<ViewerViewModel>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
         
@@ -43,7 +44,7 @@ namespace Calame.BrushPanel.ViewModels
                 if (SetValue(ref _selectedCanvas, value))
                     OnCanvasChanged();
  
-                EventAggregator.PublishOnUIThread(new Selection<IGlyphComponent>(_selectedCanvas));
+                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selectedCanvas));
             }
         }
 
@@ -147,9 +148,12 @@ namespace Calame.BrushPanel.ViewModels
             SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == _viewerModule.Paint);
         }
 
-        void IHandle<ISelection<IGlyphComponent>>.Handle(ISelection<IGlyphComponent> message)
+        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
+
+        private void HandleSelection(IGlyphComponent component)
         {
-            if (SetValue(ref _selectedCanvas, message.Item, nameof(SelectedCanvas)))
+            if (SetValue(ref _selectedCanvas, component, nameof(SelectedCanvas)))
                 OnCanvasChanged();
         }
     }

@@ -82,6 +82,14 @@
       <Project>{407C6A9E-23AF-42C1-B38D-03268A12C476}</Project>
       <Name>Diese %28Taskete%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra.Injection\Simulacra.Injection.csproj">
+      <Project>{9c7a9012-5536-43be-8055-2c3ff297c902}</Project>
+      <Name>Simulacra.Injection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
+      <Project>{8ba795fc-e007-40bb-bd70-90d970c99369}</Project>
+      <Name>Simulacra</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
       <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
       <Name>Glyph.Composition</Name>
