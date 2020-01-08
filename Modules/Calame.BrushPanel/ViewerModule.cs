@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.Collections;
+using System.ComponentModel.Composition;
 using System.Windows.Input;
 using Calame.Viewer;
 using Calame.Viewer.Modules.Base;
 using Fingear;
 using Fingear.MonoGame;
+using Glyph;
 using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Core.Inputs;
 using Glyph.Tools.Brushing;
@@ -16,18 +19,37 @@ using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 namespace Calame.BrushPanel
 {
     [Export(typeof(IViewerModule))]
-    public class ViewerModule : ViewerModuleBase, IViewerMode
+    public class EngineViewerModule : ViewerModule<IGlyphComponent, EngineCursorBrushController>
+    {
+        public override bool IsValidForDocument(IDocumentContext documentContext) => !(documentContext is IDocumentContext<IGlyphData>);
+    }
+
+    [Export(typeof(IViewerModule))]
+    public class DataViewerModule : ViewerModule<IGlyphData, DataCursorBrushController>
+    {
+        public override bool IsValidForDocument(IDocumentContext documentContext) => documentContext is IDocumentContext<IGlyphData>;
+    }
+
+    public interface IBrushViewerModule : IViewerModule
+    {
+        object Canvas { get; set; }
+        IBrush Brush { get; set; }
+        IPaint Paint { get; set; }
+    }
+
+    public abstract class ViewerModule<TCanvas, TBrushController> : ViewerModuleBase, IBrushViewerModule, IViewerMode
+        where TBrushController : SimpleCursorBrushControllerBase<TCanvas, IPaint>
     {
         private GlyphObject _root;
-        private CursorBrushController<IGlyphComponent, IPaint> _brushController;
-        
-        public IGlyphComponent Canvas
+        private TBrushController _brushController;
+
+        public TCanvas Canvas
         {
             get => _brushController.Canvas;
             set => _brushController.Canvas = value;
         }
         
-        public IBrush<IGlyphComponent, ISpaceBrushArgs, IPaint> Brush
+        public IBrush<TCanvas, ISpaceBrushArgs, IPaint> Brush
         {
             get => _brushController.Brush;
             set => _brushController.Brush = value;
@@ -37,6 +59,18 @@ namespace Calame.BrushPanel
         {
             get => _brushController.Paint;
             set => _brushController.Paint = value;
+        }
+
+        object IBrushViewerModule.Canvas
+        {
+            get => Canvas;
+            set => Canvas = (TCanvas)value;
+        }
+
+        IBrush IBrushViewerModule.Brush
+        {
+            get => Brush;
+            set => Brush = (IBrush<TCanvas, ISpaceBrushArgs, IPaint>)value;
         }
         
         private IInteractive _interactive;
@@ -59,7 +93,7 @@ namespace Calame.BrushPanel
             Model.InteractiveToggle.Add(Interactive);
             Model.InteractiveModules.Add(this);
 
-            _brushController = _root.Add<CursorBrushController<IGlyphComponent, IPaint>>();
+            _brushController = _root.Add<TBrushController>();
             _brushController.Input = InputSystem.Instance.Mouse[MouseButton.Left];
             _brushController.RaycastClient = Model.Client;
         }

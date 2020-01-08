@@ -20,7 +20,7 @@
             <userControls:CalameTreeView MinWidth="200"
                                          Height="300"
                                          TreeContext="{Binding}"
-                                         ItemsSource="{Binding Engine.Root.Components}"
+                                         ItemsSource="{Binding Items}"
                                          SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"/>
             <ItemsControl ItemsSource="{Binding Brushes}"
                           AlternationCount="{x:Static system:Int32.MaxValue}">

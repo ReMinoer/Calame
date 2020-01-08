@@ -66,7 +66,7 @@ namespace Calame.SceneViewer.ViewModels
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
 
-            Viewer = new ViewerViewModel(this, _eventAggregator, viewerModules);
+            Viewer = new ViewerViewModel(this, _eventAggregator, viewerModules.Where(x => x.IsValidForDocument(this)));
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
             DisplayName = "Scene Viewer";

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Viewer;
@@ -48,7 +49,7 @@ namespace Calame.DataModelViewer.ViewModels
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
 
-            Viewer = new ViewerViewModel(this, eventAggregator, viewerModules);
+            Viewer = new ViewerViewModel(this, eventAggregator, viewerModules.Where(x => x.IsValidForDocument(this)));
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
             
             SwitchModeCommand = new RelayCommand(x => SwitchModeAction((IViewerMode)x), x => Viewer.Runner?.Engine != null);

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Windows.Input;
 using Calame.UserControls;
@@ -22,29 +23,64 @@ namespace Calame.BrushPanel.ViewModels
     public sealed class BrushPanelViewModel : HandleTool, ITreeContext, IHandle<IDocumentContext<ViewerViewModel>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
-        
-        private ViewerModule _viewerModule;
-        private readonly IBrushViewModel[] _allBrushes;
+
+        private bool _dataMode;
+        private GlyphEngine _engine;
+        private IBrushViewerModule _viewerModule;
+
+        private readonly IEngineBrushViewModel[] _allEngineBrushes;
+        private readonly IDataBrushViewModel[] _allDataBrushes;
         private readonly ObservableCollection<IBrushViewModel> _brushes;
         public IEnumerable<IBrushViewModel> Brushes => _brushes;
-        
-        private GlyphEngine _engine;
-        public GlyphEngine Engine
+
+        private IEnumerable _items;
+        public IEnumerable Items
         {
-            get => _engine;
-            private set => SetValue(ref _engine, value);
+            get => _items;
+            private set => SetValue(ref _items, value);
         }
 
-        private IGlyphComponent _selectedCanvas;
-        public IGlyphComponent SelectedCanvas
+        private object _selectedCanvas;
+        public object SelectedCanvas
         {
             get => _selectedCanvas;
             set
             {
+                object previousCanvas = _selectedCanvas;
+
                 if (SetValue(ref _selectedCanvas, value))
+                {
                     OnCanvasChanged();
- 
-                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selectedCanvas));
+
+                    if (_selectedCanvas != null)
+                    {
+                        switch (_selectedCanvas)
+                        {
+                            case IGlyphData data:
+                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphData>(CurrentDocument, data));
+                                break;
+                            case IGlyphComponent component:
+                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, component));
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
+                    }
+                    else
+                    {
+                        switch (previousCanvas)
+                        {
+                            case IGlyphData _:
+                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphData>(CurrentDocument, (IGlyphData)null));
+                                break;
+                            case IGlyphComponent _:
+                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, (IGlyphComponent)null));
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
+                    }
+                }
             }
         }
 
@@ -74,7 +110,7 @@ namespace Calame.BrushPanel.ViewModels
         public ICommand SelectPaintCommand { get; }
 
         [ImportingConstructor]
-        public BrushPanelViewModel(IShell shell, IEventAggregator eventAggregator, CompositionContainer compositionContainer, [ImportMany] IBrushViewModel[] allBrushes)
+        public BrushPanelViewModel(IShell shell, IEventAggregator eventAggregator, [ImportMany] IEngineBrushViewModel[] allEngineBrushes, [ImportMany] IDataBrushViewModel[] allDataBrushes)
             : base(eventAggregator)
         {
             DisplayName = "Brush Panel";
@@ -82,32 +118,55 @@ namespace Calame.BrushPanel.ViewModels
             SelectBrushCommand = new RelayCommand(x => SelectedBrush = (IBrushViewModel)x);
             SelectPaintCommand = new RelayCommand(x => SelectedPaint = (IPaintViewModel)x);
 
-            _allBrushes = allBrushes;
+            _allEngineBrushes = allEngineBrushes;
+            _allDataBrushes = allDataBrushes;
             _brushes = new ObservableCollection<IBrushViewModel>();
 
             if (shell.ActiveItem is IDocumentContext<ViewerViewModel> documentContext)
-                _viewerModule = documentContext.Context.Modules.FirstOfTypeOrDefault<ViewerModule>();
+                _viewerModule = documentContext.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model)
         {
-            return new TreeViewItemModel<IGlyphComponent>(
-                this,
-                (IGlyphComponent)data,
-                x => x.Name,
-                x => new EnumerableReadOnlyObservableList<object>(x.Components),
-                nameof(IGlyphComponent.Name),
-                nameof(IGlyphComponent.Components));
-        }
-        
-        bool ITreeContext.BaseFilter(object data)
-        {
-            return _allBrushes.Any(brush => IsValidBrushForCanvas(data, brush));
+            switch (model)
+            {
+                case IGlyphData data:
+                    return new TreeViewItemModel<IGlyphData>(
+                        this,
+                        data,
+                        x => x.Name,
+                        x => new EnumerableReadOnlyObservableList<object>(x.Children),
+                        nameof(IGlyphData.Name),
+                        nameof(IGlyphData.Children));
+                case IGlyphComponent component:
+                    return new TreeViewItemModel<IGlyphComponent>(
+                        this,
+                        component,
+                        x => x.Name,
+                        x => new EnumerableReadOnlyObservableList<object>(x.Components),
+                        nameof(IGlyphComponent.Name),
+                        nameof(IGlyphComponent.Components));
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
-        static private bool IsValidBrushForCanvas(object canvas, IBrushViewModel brush)
+        bool ITreeContext.BaseFilter(object model)
         {
-            return brush.CanvasType.IsInstanceOfType(canvas);
+            return GetAllBrushesForType(model).Any(brush => brush.IsValidForCanvas(model));
+        }
+
+        private IEnumerable<IBrushViewModel> GetAllBrushesForType(object canvas)
+        {
+            switch (canvas)
+            {
+                case IGlyphData _:
+                    return _allDataBrushes;
+                case IGlyphComponent _:
+                    return _allEngineBrushes;
+                default:
+                    return Enumerable.Empty<IBrushViewModel>();
+            }
         }
 
         private void OnCanvasChanged()
@@ -117,7 +176,7 @@ namespace Calame.BrushPanel.ViewModels
             _brushes.Clear();
 
             if (SelectedCanvas != null)
-                foreach (IBrushViewModel brush in _allBrushes.Where(x => IsValidBrushForCanvas(SelectedCanvas, x)))
+                foreach (IBrushViewModel brush in GetAllBrushesForType(SelectedCanvas).Where(x => x.IsValidForCanvas(SelectedCanvas)))
                     _brushes.Add(brush);
 
             SelectedBrush = _brushes.FirstOrDefault();
@@ -139,21 +198,26 @@ namespace Calame.BrushPanel.ViewModels
 
         void IHandle<IDocumentContext<ViewerViewModel>>.Handle(IDocumentContext<ViewerViewModel> message)
         {
-            Engine = message.Context.Runner.Engine;
+            _engine = message.Context.Runner.Engine;
 
-            _viewerModule = message.Context.Modules.FirstOfTypeOrDefault<ViewerModule>();
+            _viewerModule = message.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
+
+            if (message is IDocumentContext<IGlyphData> dataContext)
+                Items = new[] { dataContext.Context };
+            else
+                Items = _engine.Root.Components;
 
             SelectedCanvas = _viewerModule.Canvas;
-            SelectedBrush = _brushes.FirstOrDefault(x => x.Brush == _viewerModule.Brush);
+            SelectedBrush = _brushes.FirstOrDefault(x => x == _viewerModule.Brush);
             SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == _viewerModule.Paint);
         }
 
         void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) {} //=> HandleSelection(message.Item);
 
-        private void HandleSelection(IGlyphComponent component)
+        private void HandleSelection(object canvas)
         {
-            if (SetValue(ref _selectedCanvas, component, nameof(SelectedCanvas)))
+            if (SetValue(ref _selectedCanvas, canvas, nameof(SelectedCanvas)))
                 OnCanvasChanged();
         }
     }

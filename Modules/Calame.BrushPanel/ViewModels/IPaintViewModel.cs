@@ -1,5 +1,4 @@
-﻿using Glyph.Tools;
-using Glyph.Tools.Brushing;
+﻿using Glyph.Tools.Brushing;
 
 namespace Calame.BrushPanel.ViewModels
 {
