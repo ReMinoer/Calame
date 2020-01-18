@@ -16,6 +16,7 @@ namespace Calame.SceneGraph.ViewModels
     public sealed class SceneGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
         private GlyphEngine _engine;
+        private IDocumentContext<IComponentFilter> _filteringContext;
         private IGlyphComponent _selection;
         private SceneNode _selectionNode;
         public override PaneLocation PreferredLocation => PaneLocation.Left;
@@ -66,7 +67,12 @@ namespace Calame.SceneGraph.ViewModels
                 Engine = documentContext.Context;
         }
         
-        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
+        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message)
+        {
+            Engine = message.Context;
+            _filteringContext = message as IDocumentContext<IComponentFilter>;
+        }
+
         void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
         void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
 
@@ -75,7 +81,6 @@ namespace Calame.SceneGraph.ViewModels
             SetValue(ref _selection, component, nameof(Selection));
             SetValue(ref _selectionNode, component?.GetSceneNode(), nameof(SelectionNode));
         }
-
         
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {
@@ -89,7 +94,10 @@ namespace Calame.SceneGraph.ViewModels
                 x => x.Children,
                 nameof(IGlyphComponent.Name),
                 nameof(SceneNode.Children),
-                (INotifyPropertyChanged)glyphComponent.Parent);
+                (INotifyPropertyChanged)glyphComponent.Parent)
+            {
+                IsEnabled = _filteringContext?.Context.Filter(glyphComponent) ?? true
+            };
         }
         
         bool ITreeContext.BaseFilter(object data) => true;

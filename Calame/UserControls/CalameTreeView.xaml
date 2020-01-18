@@ -21,6 +21,7 @@
             </TreeView.ItemsPanel>
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="Focusable" Value="{Binding IsEnabled}" />
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                     <Setter Property="Visibility" Value="Visible" />
                     <Style.Triggers>
@@ -38,7 +39,10 @@
                                 <Setter Property="Background" Value="Transparent" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
-                                        <Setter Property="Foreground" Value="Gray" />
+                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDisabledByParent}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

@@ -23,7 +23,7 @@ namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
+    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
     {
         private readonly IShell _shell;
         private readonly IContentLibraryProvider _contentLibraryProvider;
@@ -41,6 +41,7 @@ namespace Calame.SceneViewer.ViewModels
 
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
+        IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
 
         public Cursor ViewerCursor
         {

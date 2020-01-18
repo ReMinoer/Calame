@@ -18,7 +18,7 @@ namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
+    public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
     {
         private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IEventAggregator _eventAggregator;
@@ -32,6 +32,7 @@ namespace Calame.DataModelViewer.ViewModels
 
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
+        IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
         IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
 
         public Cursor ViewerCursor

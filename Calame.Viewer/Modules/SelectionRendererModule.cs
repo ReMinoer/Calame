@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
-using Glyph.Composition;
 using Glyph.Graphics;
 using Glyph.Tools;
 using Glyph.Tools.ShapeRendering;
@@ -30,12 +29,14 @@ namespace Calame.Viewer.Modules
                 Color = Color.Purple * 0.5f,
                 DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera
             };
-
+            
+            Model.ComponentsFilter.ExcludedRoots.Add(_selectionRenderer);
             Model.EditorRoot.Add(_selectionRenderer);
         }
 
         protected override void ReleaseSelection()
         {
+            Model.ComponentsFilter.ExcludedRoots.Remove(_selectionRenderer);
             Model.EditorRoot.Remove(_selectionRenderer);
 
             _selectionRenderer.Dispose();

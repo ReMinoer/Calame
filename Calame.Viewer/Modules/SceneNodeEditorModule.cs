@@ -23,7 +23,7 @@ namespace Calame.Viewer.Modules
             if (sceneNode == null)
                 return;
 
-            _sceneNodeEditor = Model.EditorRoot.Add<SceneNodeEditor>();
+            _sceneNodeEditor = Model.EditorRoot.Add<SceneNodeEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
             _sceneNodeEditor.EditedObject = sceneNode;
             _sceneNodeEditor.RaycastClient = Model.Client;
         }
@@ -32,8 +32,10 @@ namespace Calame.Viewer.Modules
         {
             if (_sceneNodeEditor == null)
                 return;
-
+            
+            Model.ComponentsFilter.ExcludedRoots.Remove(_sceneNodeEditor);
             Model.EditorRoot.RemoveAndDispose(_sceneNodeEditor);
+
             _sceneNodeEditor = null;
         }
     }

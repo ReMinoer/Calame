@@ -23,10 +23,10 @@ namespace Calame.BrushPanel.ViewModels
     public sealed class BrushPanelViewModel : HandleTool, ITreeContext, IHandle<IDocumentContext<ViewerViewModel>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
-
-        private bool _dataMode;
+        
         private GlyphEngine _engine;
         private IBrushViewerModule _viewerModule;
+        private IDocumentContext<IComponentFilter> _filteringContext;
 
         private readonly IEngineBrushViewModel[] _allEngineBrushes;
         private readonly IDataBrushViewModel[] _allDataBrushes;
@@ -153,7 +153,21 @@ namespace Calame.BrushPanel.ViewModels
 
         bool ITreeContext.BaseFilter(object model)
         {
-            return GetAllBrushesForType(model).Any(brush => brush.IsValidForCanvas(model));
+            IGlyphComponent componentToFilter;
+            switch (model)
+            {
+                case IGlyphData data:
+                    componentToFilter = data.BindedObject;
+                    break;
+                case IGlyphComponent component:
+                    componentToFilter = component;
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return GetAllBrushesForType(model).Any(brush => brush.IsValidForCanvas(model))
+                   && _filteringContext.Context.Filter(componentToFilter);
         }
 
         private IEnumerable<IBrushViewModel> GetAllBrushesForType(object canvas)
@@ -199,8 +213,8 @@ namespace Calame.BrushPanel.ViewModels
         void IHandle<IDocumentContext<ViewerViewModel>>.Handle(IDocumentContext<ViewerViewModel> message)
         {
             _engine = message.Context.Runner.Engine;
-
             _viewerModule = message.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
+            _filteringContext = message as IDocumentContext<IComponentFilter>;
 
             if (message is IDocumentContext<IGlyphData> dataContext)
                 Items = new[] { dataContext.Context };
@@ -213,7 +227,7 @@ namespace Calame.BrushPanel.ViewModels
         }
 
         void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) {} //=> HandleSelection(message.Item);
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item);
 
         private void HandleSelection(object canvas)
         {

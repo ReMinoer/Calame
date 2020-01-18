@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
@@ -13,6 +14,7 @@ namespace Calame.CompositionGraph.ViewModels
     [Export(typeof(CompositionGraphViewModel))]
     public sealed class CompositionGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
+        private IDocumentContext<IComponentFilter> _filteringContext;
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         private IGlyphComponent _root;
@@ -43,20 +45,33 @@ namespace Calame.CompositionGraph.ViewModels
                 Root = documentContext.Context.Root;
         }
         
-        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Root = message.Context.Root;
+        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message)
+        {
+            Root = message.Context.Root;
+            _filteringContext = message as IDocumentContext<IComponentFilter>;
+        }
+
         void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
         void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
         private void HandleSelection(IGlyphComponent component) => SetValue(ref _selection, component, nameof(Selection));
         
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {
+            var component = (IGlyphComponent)data;
+            bool isEnabled = _filteringContext?.Context.Filter(component) ?? true;
+            if (!isEnabled)
+                Console.WriteLine();
+
             return new TreeViewItemModel<IGlyphComponent>(
                 this,
-                (IGlyphComponent)data,
+                component,
                 x => x.Name,
                 x => new EnumerableReadOnlyObservableList<object>(x.Components),
                 nameof(IGlyphComponent.Name),
-                nameof(IGlyphComponent.Components));
+                nameof(IGlyphComponent.Components))
+            {
+                IsEnabled = _filteringContext?.Context.Filter(component) ?? true
+            };
         }
         
         bool ITreeContext.BaseFilter(object data) => true;

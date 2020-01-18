@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.Windows.Input;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
@@ -7,20 +6,25 @@ using Fingear;
 using Fingear.Controls;
 using Fingear.Controls.Containers;
 using Fingear.MonoGame;
+using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Inputs;
+using Glyph.Core.Resolvers;
 using Glyph.Engine;
+using Glyph.Messaging;
 using Glyph.Tools;
 using MahApps.Metro.IconPacks;
+using Niddle;
 using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.Viewer.Modules
 {
     [Export(typeof(IViewerModule))]
-    public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerMode, IHandle<IDocumentContext>
+    public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerMode, IHandle<IDocumentContext<ViewerViewModel>>
     {
         private readonly IEventAggregator _eventAggregator;
         private IDocumentContext _currentDocument;
+        private IDocumentContext<IComponentFilter> _filteringContext;
 
         private GlyphObject _root;
         private ShapedObjectSelector _shapedObjectSelector;
@@ -29,14 +33,11 @@ namespace Calame.Viewer.Modules
         public IBoxedComponent SelectedComponent
         {
             get => _selectedComponent;
-            private set
-            {
-                if (this.SetValue(ref _selectedComponent, value))
-                    SelectionChanged?.Invoke(this, value);
-            }
+            private set => this.SetValue(ref _selectedComponent, value);
         }
         
         private IInteractive _interactive;
+
         public IInteractive Interactive
         {
             get => _interactive;
@@ -47,8 +48,6 @@ namespace Calame.Viewer.Modules
         public object IconId => PackIconMaterialKind.CursorDefaultOutline;
         Cursor IViewerMode.Cursor => Cursors.Cross;
         bool IViewerMode.UseFreeCamera => true;
-
-        public event EventHandler<IBoxedComponent> SelectionChanged;
         
         [ImportingConstructor]
         public BoxedComponentSelectorModule(IEventAggregator eventAggregator)
@@ -66,7 +65,8 @@ namespace Calame.Viewer.Modules
             Model.InteractiveToggle.Add(Interactive);
             Model.InteractiveModules.Add(this);
 
-            _shapedObjectSelector = _root.Add<ShapedObjectSelector>();
+            _shapedObjectSelector = engine.Resolver.WithLink<ISubscribableRouter, ISubscribableRouter>(ResolverScope.Global).Resolve<ShapedObjectSelector>();
+            _shapedObjectSelector.Filter = ComponentFilter;
             _shapedObjectSelector.Control = new HybridControl<System.Numerics.Vector2>("Pointer")
             {
                 TriggerControl = new Control(InputSystem.Instance.Mouse[MouseButton.Left]),
@@ -75,6 +75,8 @@ namespace Calame.Viewer.Modules
                     RaycastClient = Model.Client
                 }
             };
+
+            _root.Add(_shapedObjectSelector);
 
             _eventAggregator.Subscribe(this);
             _shapedObjectSelector.SelectionChanged += OnShapedObjectSelectorSelectionChanged;
@@ -93,6 +95,11 @@ namespace Calame.Viewer.Modules
             _root = null;
         }
 
+        private bool ComponentFilter(IGlyphComponent glyphComponent)
+        {
+            return _filteringContext.Context.Filter(glyphComponent);
+        }
+
         private void OnShapedObjectSelectorSelectionChanged(object sender, IBoxedComponent boxedComponent)
         {
             if (Model.Runner.Engine.FocusedClient != Model.Client)
@@ -102,9 +109,10 @@ namespace Calame.Viewer.Modules
             _eventAggregator.PublishOnUIThread(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
         }
 
-        public void Handle(IDocumentContext message)
+        public void Handle(IDocumentContext<ViewerViewModel> message)
         {
             _currentDocument = message;
+            _filteringContext = message as IDocumentContext<IComponentFilter>;
         }
     }
 }

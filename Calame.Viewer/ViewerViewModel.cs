@@ -34,6 +34,8 @@ namespace Calame.Viewer
         public ObservableCollection<IViewerMode> InteractiveModules { get; }
         public InteractiveToggle InteractiveToggle { get; private set; }
 
+        public ComponentFilter ComponentsFilter { get; }
+
         public GlyphWpfRunner Runner
         {
             get => _runner;
@@ -45,6 +47,8 @@ namespace Calame.Viewer
 
                     foreach (IViewerModule module in Modules)
                         module.Disconnect();
+                    
+                    ComponentsFilter.ExcludedRoots.Clear();
                     
                     engine.InteractionManager.Root.Remove(_editorInteractive);
                     engine.InteractionManager.Root.Remove(InteractiveToggle);
@@ -100,8 +104,10 @@ namespace Calame.Viewer
         {
             _owner = owner;
             _eventAggregator = eventAggregator;
+
             Modules = new ReadOnlyCollection<IViewerModule>(modules.ToArray());
             InteractiveModules = new ObservableCollection<IViewerMode>();
+            ComponentsFilter = new ComponentFilter();
 
             _eventAggregator.Subscribe(this);
         }

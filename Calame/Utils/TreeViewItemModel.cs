@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Calame.UserControls;
 using Diese;
+using Diese.Collections;
 using Diese.Collections.Children;
 using Diese.Collections.Children.Observables;
 using Diese.Collections.Observables;
@@ -14,6 +16,8 @@ namespace Calame.Utils
     {
         object Data { get; }
         string DisplayName { get; }
+        bool IsEnabled { get; set; }
+        bool IsDisabledByParent { get; set; }
         bool IsExpanded { get; set; }
         bool MatchingFilter { get; set; }
         bool VisibleForFilter { get; set; }
@@ -43,6 +47,27 @@ namespace Calame.Utils
         {
             get => _displayName;
             private set => Set(ref _displayName, value);
+        }
+
+        private bool _isEnabled = true;
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (!Set(ref _isEnabled, value))
+                    return;
+
+                foreach (ITreeViewItemModel item in Tree.DepthFirst<ITreeViewItemModel, ITreeViewItemModel>(this, x => x.Children))
+                    item.IsDisabledByParent = Sequence.Aggregate(item, x => x.Parent).Any(x => !x.IsEnabled);
+            }
+        }
+
+        private bool _isDisabledByParent;
+        public bool IsDisabledByParent
+        {
+            get => _isDisabledByParent;
+            set => Set(ref _isDisabledByParent, value);
         }
 
         private bool _isExpanded;
