@@ -51,8 +51,7 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\MonoGameToWpfColorConverter.cs" />
     <Compile Include="Converters\ObjectToEnumerableConverter.cs" />
-    <Compile Include="DocumentContext.cs" />
-    <Compile Include="HandleTool.cs" />
+    <Compile Include="CalameTool.cs" />
     <Compile Include="IComponentFilter.cs" />
     <Compile Include="IContentLibraryProvider.cs" />
     <Compile Include="IDocumentContext.cs" />

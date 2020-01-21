@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
@@ -12,7 +11,7 @@ using Glyph.Engine;
 namespace Calame.CompositionGraph.ViewModels
 {
     [Export(typeof(CompositionGraphViewModel))]
-    public sealed class CompositionGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
+    public sealed class CompositionGraphViewModel : CalameTool<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
         private IDocumentContext<IComponentFilter> _filteringContext;
         public override PaneLocation PreferredLocation => PaneLocation.Left;
@@ -37,18 +36,21 @@ namespace Calame.CompositionGraph.ViewModels
 
         [ImportingConstructor]
         public CompositionGraphViewModel(IShell shell, IEventAggregator eventAggregator)
-            : base(eventAggregator)
+            : base(shell, eventAggregator)
         {
             DisplayName = "Composition Graph";
-
-            if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
-                Root = documentContext.Context.Root;
         }
-        
-        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message)
+
+        protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
         {
-            Root = message.Context.Root;
-            _filteringContext = message as IDocumentContext<IComponentFilter>;
+            Root = activeDocument.Context.Root;
+            _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+        }
+
+        protected override void OnDocumentsCleaned()
+        {
+            Root = null;
+            _filteringContext = null;
         }
 
         void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
@@ -58,9 +60,6 @@ namespace Calame.CompositionGraph.ViewModels
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {
             var component = (IGlyphComponent)data;
-            bool isEnabled = _filteringContext?.Context.Filter(component) ?? true;
-            if (!isEnabled)
-                Console.WriteLine();
 
             return new TreeViewItemModel<IGlyphComponent>(
                 this,

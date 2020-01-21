@@ -13,7 +13,7 @@ using Glyph.Engine;
 namespace Calame.SceneGraph.ViewModels
 {
     [Export(typeof(SceneGraphViewModel))]
-    public sealed class SceneGraphViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
+    public sealed class SceneGraphViewModel : CalameTool<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
         private GlyphEngine _engine;
         private IDocumentContext<IComponentFilter> _filteringContext;
@@ -59,18 +59,24 @@ namespace Calame.SceneGraph.ViewModels
 
         [ImportingConstructor]
         public SceneGraphViewModel(IShell shell, IEventAggregator eventAggregator)
-            : base(eventAggregator)
+            : base(shell, eventAggregator)
         {
             DisplayName = "Scene Graph";
 
             if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
                 Engine = documentContext.Context;
         }
-        
-        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message)
+
+        protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
         {
-            Engine = message.Context;
-            _filteringContext = message as IDocumentContext<IComponentFilter>;
+            Engine = activeDocument.Context;
+            _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+        }
+
+        protected override void OnDocumentsCleaned()
+        {
+            Engine = null;
+            _filteringContext = null;
         }
 
         void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);

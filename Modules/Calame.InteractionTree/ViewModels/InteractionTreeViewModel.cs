@@ -6,7 +6,7 @@ using Glyph.Engine;
 namespace Calame.InteractionTree.ViewModels
 {
     [Export(typeof(InteractionTreeViewModel))]
-    public sealed class InteractionTreeViewModel : HandleTool, IHandle<IDocumentContext<GlyphEngine>>
+    public sealed class InteractionTreeViewModel : CalameTool<IDocumentContext<GlyphEngine>>
     {
         private GlyphEngine _engine;
         public override PaneLocation PreferredLocation => PaneLocation.Left;
@@ -19,14 +19,19 @@ namespace Calame.InteractionTree.ViewModels
 
         [ImportingConstructor]
         public InteractionTreeViewModel(IShell shell, IEventAggregator eventAggregator)
-            : base(eventAggregator)
+            : base(shell, eventAggregator)
         {
             DisplayName = "Interaction Tree";
-
-            if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
-                Engine = documentContext.Context;
         }
         
-        void IHandle<IDocumentContext<GlyphEngine>>.Handle(IDocumentContext<GlyphEngine> message) => Engine = message.Context;
+        protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
+        {
+            Engine = activeDocument.Context;
+        }
+
+        protected override void OnDocumentsCleaned()
+        {
+            Engine = null;
+        }
     }
 }

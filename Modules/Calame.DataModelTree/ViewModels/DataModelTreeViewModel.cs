@@ -6,7 +6,7 @@ using Glyph.Composition.Modelization;
 namespace Calame.DataModelTree.ViewModels
 {
     [Export(typeof(DataModelTreeViewModel))]
-    public sealed class DataModelTreeViewModel : HandleTool, IHandle<IDocumentContext<IGlyphData>>, IHandle<ISelectionSpread<IGlyphData>>
+    public sealed class DataModelTreeViewModel : CalameTool<IDocumentContext<IGlyphData>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         private IGlyphData _root;
         private IGlyphData _selection;
@@ -34,15 +34,21 @@ namespace Calame.DataModelTree.ViewModels
 
         [ImportingConstructor]
         public DataModelTreeViewModel(IShell shell, IEventAggregator eventAggregator)
-            : base(eventAggregator)
+            : base(shell, eventAggregator)
         {
             DisplayName = "Data Model Tree";
-
-            if (shell.ActiveItem is IDocumentContext<IGlyphData> documentContext)
-                Root = documentContext.Context;
+        }
+        
+        protected override void OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
+        {
+            Root = activeDocument.Context;
         }
 
-        void IHandle<IDocumentContext<IGlyphData>>.Handle(IDocumentContext<IGlyphData> message) => Root = message.Context;
+        protected override void OnDocumentsCleaned()
+        {
+            Root = null;
+        }
+        
         void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => SetValue(ref _selection, message.Item, nameof(Selection));
     }
 }

@@ -8,7 +8,7 @@ using Gemini.Framework.Services;
 namespace Calame.PropertyGrid.ViewModels
 {
     [Export(typeof(PropertyGridViewModel))]
-    public sealed class PropertyGridViewModel : HandleTool, IHandle<ISelectionSpread<object>>
+    public sealed class PropertyGridViewModel : CalameTool<IDocumentContext>, IHandle<ISelectionSpread<object>>
     {
         private object _selectedObject;
         public override PaneLocation PreferredLocation => PaneLocation.Right;
@@ -23,11 +23,21 @@ namespace Calame.PropertyGrid.ViewModels
 
         [ImportingConstructor]
         public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider)
-            : base(eventAggregator)
+            : base(shell, eventAggregator)
         {
             DisplayName = "Property Grid";
 
             NewItemTypeRegistry = importedTypeProvider.Types.Where(t => t.GetConstructor(Type.EmptyTypes) != null).ToList();
+        }
+
+        protected override void OnDocumentActivated(IDocumentContext activeDocument)
+        {
+            SelectedObject = null;
+        }
+
+        protected override void OnDocumentsCleaned()
+        {
+            SelectedObject = null;
         }
 
         public void Handle(ISelectionSpread<object> message) => SelectedObject = message.Item;

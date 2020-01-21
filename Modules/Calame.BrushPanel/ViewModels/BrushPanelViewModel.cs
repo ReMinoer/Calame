@@ -20,7 +20,7 @@ using Glyph.Engine;
 namespace Calame.BrushPanel.ViewModels
 {
     [Export(typeof(BrushPanelViewModel))]
-    public sealed class BrushPanelViewModel : HandleTool, ITreeContext, IHandle<IDocumentContext<ViewerViewModel>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>
+    public sealed class BrushPanelViewModel : CalameTool<IDocumentContext<ViewerViewModel>>, ITreeContext, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
         
@@ -111,7 +111,7 @@ namespace Calame.BrushPanel.ViewModels
 
         [ImportingConstructor]
         public BrushPanelViewModel(IShell shell, IEventAggregator eventAggregator, [ImportMany] IEngineBrushViewModel[] allEngineBrushes, [ImportMany] IDataBrushViewModel[] allDataBrushes)
-            : base(eventAggregator)
+            : base(shell, eventAggregator)
         {
             DisplayName = "Brush Panel";
 
@@ -124,6 +124,35 @@ namespace Calame.BrushPanel.ViewModels
 
             if (shell.ActiveItem is IDocumentContext<ViewerViewModel> documentContext)
                 _viewerModule = documentContext.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
+        }
+
+        protected override void OnDocumentActivated(IDocumentContext<ViewerViewModel> activeDocument)
+        {
+            _engine = activeDocument.Context.Runner.Engine;
+            _viewerModule = activeDocument.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
+            _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+
+            if (activeDocument is IDocumentContext<IGlyphData> dataContext)
+                Items = new[] { dataContext.Context };
+            else
+                Items = _engine.Root.Components;
+
+            SelectedCanvas = _viewerModule.Canvas;
+            SelectedBrush = _brushes.FirstOrDefault(x => x == _viewerModule.Brush);
+            SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == _viewerModule.Paint);
+        }
+
+        protected override void OnDocumentsCleaned()
+        {
+            _engine = null;
+            _viewerModule = null;
+            _filteringContext = null;
+            _brushes.Clear();
+
+            Items = null;
+            SelectedCanvas = null;
+            SelectedBrush = null;
+            SelectedPaint = null;
         }
 
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model)
@@ -183,6 +212,15 @@ namespace Calame.BrushPanel.ViewModels
             }
         }
 
+        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
+        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item);
+
+        private void HandleSelection(object canvas)
+        {
+            if (SetValue(ref _selectedCanvas, canvas, nameof(SelectedCanvas)))
+                OnCanvasChanged();
+        }
+
         private void OnCanvasChanged()
         {
             SelectedBrush = null;
@@ -208,31 +246,6 @@ namespace Calame.BrushPanel.ViewModels
         private void OnPaintChanged()
         {
             _viewerModule.Paint = SelectedPaint?.Paint;
-        }
-
-        void IHandle<IDocumentContext<ViewerViewModel>>.Handle(IDocumentContext<ViewerViewModel> message)
-        {
-            _engine = message.Context.Runner.Engine;
-            _viewerModule = message.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
-            _filteringContext = message as IDocumentContext<IComponentFilter>;
-
-            if (message is IDocumentContext<IGlyphData> dataContext)
-                Items = new[] { dataContext.Context };
-            else
-                Items = _engine.Root.Components;
-
-            SelectedCanvas = _viewerModule.Canvas;
-            SelectedBrush = _brushes.FirstOrDefault(x => x == _viewerModule.Brush);
-            SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == _viewerModule.Paint);
-        }
-
-        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item);
-
-        private void HandleSelection(object canvas)
-        {
-            if (SetValue(ref _selectedCanvas, canvas, nameof(SelectedCanvas)))
-                OnCanvasChanged();
         }
     }
 }
