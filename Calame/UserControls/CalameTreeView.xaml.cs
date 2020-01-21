@@ -44,7 +44,7 @@ namespace Calame.UserControls
                 Synchronizers.Add(control, synchronizer);
             }
 
-            synchronizer.Reference = new EnumerableReadOnlyObservableList(itemsSource);
+            synchronizer.Reference = itemsSource != null ? new EnumerableReadOnlyObservableList(itemsSource) : null;
             control.UpdateFilter();
         }
 
