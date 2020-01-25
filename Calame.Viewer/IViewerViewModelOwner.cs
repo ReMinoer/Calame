@@ -2,7 +2,7 @@
 
 namespace Calame.Viewer
 {
-    public interface IViewerViewModelOwner : IActivate, IDeactivate
+    public interface IViewerViewModelOwner : IDocumentContext, IActivate, IDeactivate
     {
     }
 }

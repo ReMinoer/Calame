@@ -128,6 +128,8 @@ namespace Calame.BrushPanel.ViewModels
 
         protected override void OnDocumentActivated(IDocumentContext<ViewerViewModel> activeDocument)
         {
+            _selectedCanvas = null;
+
             _engine = activeDocument.Context.Runner.Engine;
             _viewerModule = activeDocument.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
             _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
@@ -144,6 +146,8 @@ namespace Calame.BrushPanel.ViewModels
 
         protected override void OnDocumentsCleaned()
         {
+            _selectedCanvas = null;
+
             _engine = null;
             _viewerModule = null;
             _filteringContext = null;

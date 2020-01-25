@@ -7,7 +7,7 @@ using Gemini.Framework.Services;
 
 namespace Calame
 {
-    public abstract class CalameTool<THandledDocument> : Tool, IHandle<THandledDocument>, IDisposable
+    public abstract class CalameTool<THandledDocument> : Tool, IHandle<IDocumentContext>, IDisposable
         where THandledDocument : class, IDocumentContext
     {
         protected readonly IEventAggregator EventAggregator;
@@ -32,14 +32,25 @@ namespace Calame
 
         private void ShellOnActiveDocumentChanged(object sender, EventArgs e)
         {
-            if (Shell.ActiveItem == null)
-                OnDocumentsCleaned();
+            if (Shell.ActiveItem != null)
+                return;
+
+            CurrentDocument = null;
+            OnDocumentsCleaned();
         }
 
-        void IHandle<THandledDocument>.Handle(THandledDocument message)
+        void IHandle<IDocumentContext>.Handle(IDocumentContext message)
         {
-            CurrentDocument = message;
-            OnDocumentActivated(CurrentDocument);
+            if (message is THandledDocument handledDocument)
+            {
+                CurrentDocument = handledDocument;
+                OnDocumentActivated(CurrentDocument);
+            }
+            else
+            {
+                CurrentDocument = null;
+                OnDocumentsCleaned();
+            }
         }
         
         protected abstract void OnDocumentActivated(THandledDocument activeDocument);

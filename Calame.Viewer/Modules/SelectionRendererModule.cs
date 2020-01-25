@@ -10,7 +10,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame.Viewer.Modules
 {
-    [Export(typeof(IViewerModule))]
+    [Export(typeof(IViewerModuleSource))]
+    public class SelectionRendererModuleSource : IViewerModuleSource
+    {
+        private readonly IEventAggregator _eventAggregator;
+
+        [ImportingConstructor]
+        public SelectionRendererModuleSource(IEventAggregator eventAggregator)
+        {
+            _eventAggregator = eventAggregator;
+        }
+
+        public bool IsValidForDocument(IDocumentContext documentContext) => true;
+        public IViewerModule CreateInstance() => new SelectionRendererModule(_eventAggregator);
+    }
+    
     public class SelectionRendererModule : SelectionHandlerModuleBase
     {
         private AreaComponentRenderer _selectionRenderer;

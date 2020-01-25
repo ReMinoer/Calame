@@ -23,12 +23,8 @@ namespace Calame.DataModelTree.ViewModels
             get => _selection;
             set
             {
-                SetValue(ref _selection, value);
-
-                if (_selection != null)
-                {
+                if (SetValue(ref _selection, value))
                     EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphData>(CurrentDocument, _selection));
-                }
             }
         }
 
@@ -41,11 +37,13 @@ namespace Calame.DataModelTree.ViewModels
         
         protected override void OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
         {
+            _selection = null;
             Root = activeDocument.Context;
         }
 
         protected override void OnDocumentsCleaned()
         {
+            _selection = null;
             Root = null;
         }
         

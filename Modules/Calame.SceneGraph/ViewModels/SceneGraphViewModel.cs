@@ -35,10 +35,10 @@ namespace Calame.SceneGraph.ViewModels
                 if (SetValue(ref _selection, value))
                 {
                     _selectionNode = _selection?.GetSceneNode();
+
                     NotifyOfPropertyChange(nameof(SelectionNode));
+                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
                 }
- 
-                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
             }
         }
 
@@ -50,10 +50,10 @@ namespace Calame.SceneGraph.ViewModels
                 if (SetValue(ref _selectionNode, value))
                 {
                     _selection = _selectionNode?.Parent;
-                    NotifyOfPropertyChange(nameof(Selection));
-                }
 
-                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
+                    NotifyOfPropertyChange(nameof(Selection));
+                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
+                }
             }
         }
 
@@ -69,12 +69,18 @@ namespace Calame.SceneGraph.ViewModels
 
         protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
         {
+            _selection = null;
+            _selectionNode = null;
+
             Engine = activeDocument.Context;
             _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
         }
 
         protected override void OnDocumentsCleaned()
         {
+            _selection = null;
+            _selectionNode = null;
+
             Engine = null;
             _filteringContext = null;
         }

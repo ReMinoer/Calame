@@ -3,7 +3,7 @@ using Fingear;
 
 namespace Calame.Viewer
 {
-    public interface IViewerMode
+    public interface IViewerInteractiveMode
     {
         string Name { get; }
         object IconId { get; }

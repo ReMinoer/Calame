@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using Caliburn.Micro;
 using Diese.Collections;
 using Diese.Collections.Observables;
+using Diese.Collections.Observables.ReadOnly;
 using Diese.Collections.ReadOnly;
 using Fingear;
 using Fingear.Interactives;
@@ -24,6 +26,7 @@ namespace Calame.Viewer
         
         private GlyphWpfRunner _runner;
         private IInteractive _editorInteractive;
+        private InteractiveToggle _interactiveToggle;
 
         public IWpfGlyphClient Client { get; private set; }
         public FillView EditorView { get; private set; }
@@ -31,10 +34,33 @@ namespace Calame.Viewer
         public GlyphObject EditorRoot { get; private set; }
 
         public ReadOnlyCollection<IViewerModule> Modules { get; }
-        public ObservableCollection<IViewerMode> InteractiveModules { get; }
-        public InteractiveToggle InteractiveToggle { get; private set; }
-
+        public ReadOnlyObservableCollection<IViewerInteractiveMode> InteractiveModes { get; }
+        private readonly ObservableCollection<IViewerInteractiveMode> _interactiveModes;
+        
         public ComponentFilter ComponentsFilter { get; }
+        public ISelectionSpread<object> LastSelection { get; set; }
+
+        private IViewerInteractiveMode _selectedNode;
+        public IViewerInteractiveMode SelectedMode
+        {
+            get => _selectedNode;
+            set
+            {
+                if (!this.SetValue(ref _selectedNode, value))
+                    return;
+
+                _interactiveToggle.SelectedInteractive = SelectedMode.Interactive;
+                Cursor = SelectedMode.Cursor;
+                EditorCamera.Enabled = SelectedMode.UseFreeCamera;
+            }
+        }
+        
+        private Cursor _cursor;
+        public Cursor Cursor
+        {
+            get => _cursor;
+            private set => this.SetValue(ref _cursor, value);
+        }
 
         public GlyphWpfRunner Runner
         {
@@ -51,7 +77,7 @@ namespace Calame.Viewer
                     ComponentsFilter.ExcludedRoots.Clear();
                     
                     engine.InteractionManager.Root.Remove(_editorInteractive);
-                    engine.InteractionManager.Root.Remove(InteractiveToggle);
+                    engine.InteractionManager.Root.Remove(_interactiveToggle);
                     _runner.Engine.Root.RemoveAndDispose(EditorRoot);
 
                     _editorInteractive = null;
@@ -59,7 +85,7 @@ namespace Calame.Viewer
                     EditorCamera = null;
                     EditorRoot = null;
 
-                    InteractiveToggle = null;
+                    _interactiveToggle = null;
                 }
 
                 _runner = value;
@@ -75,8 +101,8 @@ namespace Calame.Viewer
                     _editorInteractive = EditorRoot.Add<InteractiveRoot>().Interactive;
                     engine.InteractionManager.Root.Add(_editorInteractive);
 
-                    InteractiveToggle = new InteractiveToggle();
-                    engine.InteractionManager.Root.Add(InteractiveToggle);
+                    _interactiveToggle = new InteractiveToggle();
+                    engine.InteractionManager.Root.Add(_interactiveToggle);
 
                     EditorView = engine.Root.Add<FillView>();
                     EditorView.Name = "Editor View";
@@ -94,32 +120,31 @@ namespace Calame.Viewer
                     ConnectRunner();
 
                 RunnerChanged?.Invoke(this, Runner);
-                Activate();
             }
         }
 
         public event EventHandler<GlyphWpfRunner> RunnerChanged;
 
-        public ViewerViewModel(IViewerViewModelOwner owner, IEventAggregator eventAggregator, IEnumerable<IViewerModule> modules)
+        public ViewerViewModel(IViewerViewModelOwner owner, IEventAggregator eventAggregator, IEnumerable<IViewerModuleSource> moduleSources)
         {
             _owner = owner;
             _eventAggregator = eventAggregator;
 
-            Modules = new ReadOnlyCollection<IViewerModule>(modules.ToArray());
-            InteractiveModules = new ObservableCollection<IViewerMode>();
+            Modules = new ReadOnlyCollection<IViewerModule>(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance()).ToArray());
+
+            _interactiveModes = new ObservableCollection<IViewerInteractiveMode>();
+            InteractiveModes = new ReadOnlyObservableCollection<IViewerInteractiveMode>(_interactiveModes);
+
             ComponentsFilter = new ComponentFilter();
 
-            _eventAggregator.Subscribe(this);
+            _owner.Activated += OnActivated;
+            _owner.Deactivated += OnDeactivated;
         }
 
         public void ConnectView(IViewerView view)
         {
             Client = view?.Client;
-
             ConnectRunner();
-
-            _owner.Activated += OnActivated;
-            _owner.Deactivated += OnDeactivated;
         }
 
         private void ConnectRunner()
@@ -132,14 +157,31 @@ namespace Calame.Viewer
             Runner.Engine.FocusedClient = Client;
         }
 
-        private void Activate()
+        public void AddInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
-            if (Runner?.Engine != null)
-                Runner.Engine.FocusedClient = Client;
+            _interactiveModes.Add(interactiveMode);
+            _interactiveToggle.Add(interactiveMode.Interactive);
         }
 
+        public void RemoveInteractiveMode(IViewerInteractiveMode interactiveMode)
+        {
+            _interactiveToggle.Remove(interactiveMode.Interactive);
+            _interactiveModes.Remove(interactiveMode);
+        }
+        
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => Activate();
+        public void Activate()
+        {
+            if (Runner?.Engine == null)
+                return;
 
+            Runner.Engine.FocusedClient = Client;
+            _eventAggregator.PublishOnUIThread(_owner);
+
+            if (LastSelection != null)
+                _eventAggregator.PublishOnUIThread(LastSelection);
+        }
+        
         private void OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)
         {
             if (Runner?.Engine != null && Runner.Engine.FocusedClient == Client)
@@ -148,13 +190,14 @@ namespace Calame.Viewer
 
         public void Dispose()
         {
-            _owner.Activated -= OnActivated;
-            _owner.Deactivated -= OnDeactivated;
+            if (Client != null)
+            {
+                _owner.Activated -= OnActivated;
+                _owner.Deactivated -= OnDeactivated;
+            }
 
             foreach (IViewerModule module in Modules)
                 module.Disconnect();
-
-            _eventAggregator.Unsubscribe(this);
 
             Runner?.Dispose();
             Runner = null;

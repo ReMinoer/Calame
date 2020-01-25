@@ -6,7 +6,21 @@ using Glyph.Tools;
 
 namespace Calame.Viewer.Modules
 {
-    [Export(typeof(IViewerModule))]
+    [Export(typeof(IViewerModuleSource))]
+    public class SceneNodeEditorModuleSource : IViewerModuleSource
+    {
+        private readonly IEventAggregator _eventAggregator;
+
+        [ImportingConstructor]
+        public SceneNodeEditorModuleSource(IEventAggregator eventAggregator)
+        {
+            _eventAggregator = eventAggregator;
+        }
+
+        public bool IsValidForDocument(IDocumentContext documentContext) => true;
+        public IViewerModule CreateInstance() => new SceneNodeEditorModule(_eventAggregator);
+    }
+    
     public class SceneNodeEditorModule : SelectionHandlerModuleBase
     {
         private SceneNodeEditor _sceneNodeEditor;

@@ -18,16 +18,18 @@ using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.BrushPanel
 {
-    [Export(typeof(IViewerModule))]
-    public class EngineViewerModule : ViewerModule<IGlyphComponent, EngineCursorBrushController>
+    [Export(typeof(IViewerModuleSource))]
+    public class EngineViewerModuleSource : IViewerModuleSource
     {
-        public override bool IsValidForDocument(IDocumentContext documentContext) => !(documentContext is IDocumentContext<IGlyphData>);
+        public bool IsValidForDocument(IDocumentContext documentContext) => !(documentContext is IDocumentContext<IGlyphData>);
+        public IViewerModule CreateInstance() => new ViewerModule<IGlyphComponent, EngineCursorBrushController>();
     }
 
-    [Export(typeof(IViewerModule))]
-    public class DataViewerModule : ViewerModule<IGlyphData, DataCursorBrushController>
+    [Export(typeof(IViewerModuleSource))]
+    public class DataViewerModuleSource : IViewerModuleSource
     {
-        public override bool IsValidForDocument(IDocumentContext documentContext) => documentContext is IDocumentContext<IGlyphData>;
+        public bool IsValidForDocument(IDocumentContext documentContext) => documentContext is IDocumentContext<IGlyphData>;
+        public IViewerModule CreateInstance() => new ViewerModule<IGlyphData, DataCursorBrushController>();
     }
 
     public interface IBrushViewerModule : IViewerModule
@@ -37,7 +39,7 @@ namespace Calame.BrushPanel
         IPaint Paint { get; set; }
     }
 
-    public abstract class ViewerModule<TCanvas, TBrushController> : ViewerModuleBase, IBrushViewerModule, IViewerMode
+    public class ViewerModule<TCanvas, TBrushController> : ViewerModuleBase, IBrushViewerModule, IViewerInteractiveMode
         where TBrushController : SimpleCursorBrushControllerBase<TCanvas, IPaint>
     {
         private GlyphObject _root;
@@ -82,16 +84,15 @@ namespace Calame.BrushPanel
         
         public string Name => "Brush";
         public object IconId => PackIconMaterialKind.Brush;
-        Cursor IViewerMode.Cursor => Cursors.Pen;
-        bool IViewerMode.UseFreeCamera => true;
+        Cursor IViewerInteractiveMode.Cursor => Cursors.Pen;
+        bool IViewerInteractiveMode.UseFreeCamera => true;
         
         protected override void ConnectRunner()
         {
             _root = Model.EditorRoot.Add<GlyphObject>();
 
             Interactive = _root.Add<InteractiveRoot>().Interactive;
-            Model.InteractiveToggle.Add(Interactive);
-            Model.InteractiveModules.Add(this);
+            Model.AddInteractiveMode(this);
 
             _brushController = _root.Add<TBrushController>();
             _brushController.Input = InputSystem.Instance.Mouse[MouseButton.Left];
@@ -100,7 +101,7 @@ namespace Calame.BrushPanel
 
         protected override void DisconnectRunner()
         {
-            Model.InteractiveModules.Remove(this);
+            Model.RemoveInteractiveMode(this);
             Model.EditorRoot.Remove(_root);
             _root.Dispose();
 

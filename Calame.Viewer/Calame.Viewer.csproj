@@ -35,7 +35,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IViewerMode.cs" />
+    <Compile Include="IViewerDocument.cs" />
+    <Compile Include="IViewerInteractiveMode.cs" />
+    <Compile Include="IViewerModuleSource.cs" />
     <Compile Include="Modules\BoxedComponentSelectorModule.cs" />
     <Compile Include="IViewerModule.cs" />
     <Compile Include="IViewerView.cs" />

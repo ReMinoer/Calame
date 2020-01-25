@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -18,14 +17,12 @@ namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : PersistedDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
+    public class DataModelViewerViewModel : PersistedDocument, IViewerDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IEventAggregator _eventAggregator;
 
         private GlyphEngine _engine;
-        private Cursor _viewerCursor;
-        private IViewerMode _selectedMode;
         
         public ViewerViewModel Viewer { get; }
         public IEditor Editor { get; set; }
@@ -35,25 +32,18 @@ namespace Calame.DataModelViewer.ViewModels
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
         IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
 
-        public Cursor ViewerCursor
-        {
-            get => _viewerCursor;
-            set => this.SetValue(ref _viewerCursor, value);
-        }
-
         public ICommand SwitchModeCommand { get; }
         
         [ImportingConstructor]
-        public DataModelViewerViewModel(IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
+        public DataModelViewerViewModel(IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
         {
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
 
-            Viewer = new ViewerViewModel(this, eventAggregator, viewerModules.Where(x => x.IsValidForDocument(this)));
-            Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
+            Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             
-            SwitchModeCommand = new RelayCommand(x => SwitchModeAction((IViewerMode)x), x => Viewer.Runner?.Engine != null);
+            SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Viewer.Runner?.Engine != null);
         }
 
         protected override async Task DoNew()
@@ -96,53 +86,35 @@ namespace Calame.DataModelViewer.ViewModels
             _engine.Initialize();
             _engine.LoadContent();
             _engine.Start();
-        }
-
-        private void OnActivated()
-        {
-            _eventAggregator.PublishOnUIThread(this);
-        }
-
-        private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();
-
-        private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
-        {
-            OnActivated();
-            Activated += OnActivated;
+            
+            Viewer.SelectedMode = Viewer.InteractiveModes.FirstOrDefault();
+            Viewer.Activate();
         }
 
         public void Handle(ISelectionRequest<IGlyphData> message)
         {
             if (message.DocumentContext != this)
                 return;
-            
-            _eventAggregator.PublishOnUIThread(message.Promoted);
+
+            ISelectionSpread<IGlyphData> selection = message.Promoted;
+
+            Viewer.LastSelection = selection;
+            _eventAggregator.PublishOnUIThread(selection);
         }
 
         public void Handle(ISelectionRequest<IGlyphComponent> message)
         {
             if (message.DocumentContext != this)
                 return;
-            
-            _eventAggregator.PublishOnUIThread(new SelectionSpread<IGlyphData>(message.DocumentContext, Editor.Data.GetData(message.Item)));
-        }
 
-        private void SwitchModeAction(IViewerMode mode)
-        {
-            if (_selectedMode == mode)
-                return;
+            ISelectionSpread<IGlyphData> selection = new SelectionSpread<IGlyphData>(message.DocumentContext, Editor.Data.GetData(message.Item));
             
-            _selectedMode = mode;
-
-            Viewer.InteractiveToggle.SelectedInteractive = mode.Interactive;
-            ViewerCursor = mode.Cursor;
-            Viewer.EditorCamera.Enabled = mode.UseFreeCamera;
+            Viewer.LastSelection = selection;
+            _eventAggregator.PublishOnUIThread(selection);
         }
 
         public void Dispose()
         {
-            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
-            Activated -= OnActivated;
             _eventAggregator.Unsubscribe(this);
 
             _engine.Stop();

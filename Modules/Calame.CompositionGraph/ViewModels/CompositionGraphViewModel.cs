@@ -29,8 +29,8 @@ namespace Calame.CompositionGraph.ViewModels
             get => _selection;
             set
             {
-                SetValue(ref _selection, value);
-                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
+                if (SetValue(ref _selection, value))
+                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
             }
         }
 
@@ -43,12 +43,16 @@ namespace Calame.CompositionGraph.ViewModels
 
         protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
         {
+            _selection = null;
+
             Root = activeDocument.Context.Root;
             _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
         }
 
         protected override void OnDocumentsCleaned()
         {
+            _selection = null;
+
             Root = null;
             _filteringContext = null;
         }

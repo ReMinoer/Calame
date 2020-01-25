@@ -8,8 +8,6 @@ namespace Calame.Viewer.Modules.Base
         protected ViewerViewModel Model { get; private set; }
         protected GlyphWpfRunner Runner { get; private set; }
 
-        public virtual bool IsValidForDocument(IDocumentContext documentContext) => true;
-
         public void Connect(ViewerViewModel model)
         {
             Model = model;

@@ -23,31 +23,22 @@ namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : Document, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>, IHandle<ISelectionRequest<IGlyphComponent>>, IDisposable
+    public sealed class SceneViewerViewModel : Document, IViewerDocument, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IShell _shell;
         private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IEventAggregator _eventAggregator;
         
         private GlyphEngine _engine;
-        private Cursor _viewerCursor;
         private MessagingTracker<IView> _viewTracker;
-        private IViewerMode _selectedMode;
 
         public ViewerViewModel Viewer { get; }
         public ISession Session { get; set; }
-        public GlyphWpfRunner Runner => Viewer.Runner;
         public SessionModeModule SessionMode { get; private set; }
 
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
-
-        public Cursor ViewerCursor
-        {
-            get => _viewerCursor;
-            set => this.SetValue(ref _viewerCursor, value);
-        }
 
         public ICommand PlayCommand { get; }
         public ICommand PauseCommand { get; }
@@ -58,16 +49,18 @@ namespace Calame.SceneViewer.ViewModels
         public ICommand NewViewerCommand { get; }
 
         public ICommand SwitchModeCommand { get; }
+
+        private GlyphWpfRunner Runner => Viewer.Runner;
         
         [ImportingConstructor]
-        public SceneViewerViewModel(IShell shell, IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModule> viewerModules)
+        public SceneViewerViewModel(IShell shell, IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
         {
             _shell = shell;
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
             _eventAggregator.Subscribe(this);
 
-            Viewer = new ViewerViewModel(this, _eventAggregator, viewerModules.Where(x => x.IsValidForDocument(this)));
+            Viewer = new ViewerViewModel(this, _eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
             DisplayName = "Scene Viewer";
@@ -80,11 +73,11 @@ namespace Calame.SceneViewer.ViewModels
             DefaultViewsCommand = new RelayCommand(x => DefaultViewsAction(), x => Runner?.Engine != null);
             NewViewerCommand = new RelayCommand(x => NewViewerAction(), x => Runner?.Engine != null);
             
-            SwitchModeCommand = new RelayCommand(x => SwitchModeAction((IViewerMode)x), x => Runner?.Engine != null);
+            SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Runner?.Engine != null);
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
-            : this(viewModel._shell, viewModel._contentLibraryProvider, viewModel._eventAggregator, Enumerable.Empty<IViewerModule>())
+            : this(viewModel._shell, viewModel._contentLibraryProvider, viewModel._eventAggregator, Enumerable.Empty<IViewerModuleSource>())
         {
             throw new NotSupportedException();
 
@@ -112,8 +105,7 @@ namespace Calame.SceneViewer.ViewModels
             Viewer.Runner = new GlyphWpfRunner { Engine = _engine };
 
             SessionMode = new SessionModeModule();
-            Viewer.InteractiveToggle.Add(SessionMode.Interactive);
-            Viewer.InteractiveModules.Add(SessionMode);
+            Viewer.AddInteractiveMode(SessionMode);
 
             var context = new SessionContext(Viewer, sessionView, SessionMode.Interactive);
             Session.PrepareSession(context);
@@ -124,7 +116,8 @@ namespace Calame.SceneViewer.ViewModels
             _engine.LoadContent();
             _engine.Start();
 
-            SwitchModeAction(SessionMode);
+            Viewer.SelectedMode = SessionMode;
+            Viewer.Activate();
         }
 
         protected override void OnViewLoaded(object view)
@@ -137,18 +130,9 @@ namespace Calame.SceneViewer.ViewModels
             FreeCameraAction();
         }
 
-        private void OnActivated()
-        {
-            _eventAggregator.PublishOnUIThread(this);
-        }
-
-        private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => OnActivated();
-
         private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
         {
             FreeCameraAction();
-            OnActivated();
-            Activated += OnActivated;
         }
 
         private void FreeCameraAction()
@@ -185,42 +169,34 @@ namespace Calame.SceneViewer.ViewModels
             _shell.OpenDocument(new SceneViewerViewModel(this));
         }
 
-        private void SwitchModeAction(IViewerMode mode)
-        {
-            if (_selectedMode == mode)
-                return;
-            
-            _selectedMode = mode;
-
-            Viewer.InteractiveToggle.SelectedInteractive = mode.Interactive;
-            ViewerCursor = mode.Cursor;
-            Viewer.EditorCamera.Enabled = mode.UseFreeCamera;
-        }
-
         public void Handle(ISelectionRequest<IGlyphComponent> message)
         {
             if (message.DocumentContext != this)
                 return;
 
-            _eventAggregator.PublishOnUIThread(message.Promoted);
+            ISelectionSpread<IGlyphComponent> selection = message.Promoted;
+
+            Viewer.LastSelection = selection;
+            _eventAggregator.PublishOnUIThread(selection);
         }
 
         public void Dispose()
         {
+            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
+
             _engine.Stop();
             _viewTracker?.Dispose();
 
-            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
             Viewer.Dispose();
         }
 
-        public class SessionModeModule : IViewerMode
+        public class SessionModeModule : IViewerInteractiveMode
         {
             public string Name => "Session";
             public object IconId => PackIconMaterialKind.GamepadVariant;
 
             public InteractiveComposite Interactive { get; } = new InteractiveComposite();
-            IInteractive IViewerMode.Interactive => Interactive;
+            IInteractive IViewerInteractiveMode.Interactive => Interactive;
 
             public Cursor Cursor => Cursors.None;
             public bool UseFreeCamera => false;

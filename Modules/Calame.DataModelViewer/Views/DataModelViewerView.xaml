@@ -13,10 +13,10 @@
              d:DesignHeight="180" d:DesignWidth="500">
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
-            <ToolBar ItemsSource="{Binding Viewer.InteractiveModules}"
+            <ToolBar ItemsSource="{Binding Viewer.InteractiveModes}"
                      AlternationCount="{x:Static system:Int32.MaxValue}">
                 <ToolBar.ItemTemplate>
-                    <DataTemplate DataType="{x:Type viewer:IViewerMode}">
+                    <DataTemplate DataType="{x:Type viewer:IViewerInteractiveMode}">
                         <RadioButton ToolTip="{Binding Name}"
                                      GroupName="InteractiveModuleButtons"
                                      Command="{Binding DataContext.SwitchModeCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
@@ -46,6 +46,6 @@
         <wpfInterop:GlyphWpfViewer x:Name="GlyphWpfViewer"
                                    PreviewKeyDown="Viewer_OnPreviewKeyDown"
                                    PreviewKeyUp="Viewer_OnPreviewKeyUp"
-                                   Cursor="Cross"/>
+                                   Cursor="{Binding Viewer.Cursor}"/>
     </DockPanel>
 </UserControl>

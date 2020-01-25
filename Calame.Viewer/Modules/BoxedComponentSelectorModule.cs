@@ -19,8 +19,22 @@ using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.Viewer.Modules
 {
-    [Export(typeof(IViewerModule))]
-    public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerMode, IHandle<IDocumentContext<ViewerViewModel>>
+    [Export(typeof(IViewerModuleSource))]
+    public class BoxedComponentSelectorModuleSource : IViewerModuleSource
+    {
+        private readonly IEventAggregator _eventAggregator;
+
+        [ImportingConstructor]
+        public BoxedComponentSelectorModuleSource(IEventAggregator eventAggregator)
+        {
+            _eventAggregator = eventAggregator;
+        }
+
+        public bool IsValidForDocument(IDocumentContext documentContext) => true;
+        public IViewerModule CreateInstance() => new BoxedComponentSelectorModule(_eventAggregator);
+    }
+
+    public class BoxedComponentSelectorModule : ViewerModuleBase, IViewerInteractiveMode, IHandle<IDocumentContext<ViewerViewModel>>
     {
         private readonly IEventAggregator _eventAggregator;
         private IDocumentContext _currentDocument;
@@ -46,8 +60,8 @@ namespace Calame.Viewer.Modules
         
         public string Name => "Editor";
         public object IconId => PackIconMaterialKind.CursorDefaultOutline;
-        Cursor IViewerMode.Cursor => Cursors.Cross;
-        bool IViewerMode.UseFreeCamera => true;
+        Cursor IViewerInteractiveMode.Cursor => Cursors.Cross;
+        bool IViewerInteractiveMode.UseFreeCamera => true;
         
         [ImportingConstructor]
         public BoxedComponentSelectorModule(IEventAggregator eventAggregator)
@@ -62,8 +76,7 @@ namespace Calame.Viewer.Modules
             _root = Model.EditorRoot.Add<GlyphObject>();
 
             Interactive = _root.Add<InteractiveRoot>().Interactive;
-            Model.InteractiveToggle.Add(Interactive);
-            Model.InteractiveModules.Add(this);
+            Model.AddInteractiveMode(this);
 
             _shapedObjectSelector = engine.Resolver.WithLink<ISubscribableRouter, ISubscribableRouter>(ResolverScope.Global).Resolve<ShapedObjectSelector>();
             _shapedObjectSelector.Filter = ComponentFilter;
@@ -87,8 +100,7 @@ namespace Calame.Viewer.Modules
             _shapedObjectSelector.SelectionChanged -= OnShapedObjectSelectorSelectionChanged;
             _eventAggregator.Unsubscribe(this);
             
-            Model.InteractiveModules.Remove(this);
-            Model.EditorRoot.Remove(_root);
+            Model.RemoveInteractiveMode(this);
             _root.Dispose();
 
             _shapedObjectSelector = null;
@@ -97,7 +109,7 @@ namespace Calame.Viewer.Modules
 
         private bool ComponentFilter(IGlyphComponent glyphComponent)
         {
-            return _filteringContext.Context.Filter(glyphComponent);
+            return _filteringContext?.Context.Filter(glyphComponent) ?? true;
         }
 
         private void OnShapedObjectSelectorSelectionChanged(object sender, IBoxedComponent boxedComponent)
