@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Input;
@@ -10,6 +9,7 @@ using Calame.Utils;
 using Calame.Viewer;
 using Caliburn.Micro;
 using Diese.Collections;
+using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
 using Gemini.Framework;
 using Gemini.Framework.Services;
@@ -31,7 +31,7 @@ namespace Calame.BrushPanel.ViewModels
         private readonly IEngineBrushViewModel[] _allEngineBrushes;
         private readonly IDataBrushViewModel[] _allDataBrushes;
         private readonly ObservableCollection<IBrushViewModel> _brushes;
-        public IEnumerable<IBrushViewModel> Brushes => _brushes;
+        public IReadOnlyObservableCollection<IBrushViewModel> Brushes { get; }
 
         private IEnumerable _items;
         public IEnumerable Items
@@ -121,6 +121,7 @@ namespace Calame.BrushPanel.ViewModels
             _allEngineBrushes = allEngineBrushes;
             _allDataBrushes = allDataBrushes;
             _brushes = new ObservableCollection<IBrushViewModel>();
+            Brushes = new ReadOnlyObservableCollection<IBrushViewModel>(_brushes);
 
             if (shell.ActiveItem is IDocumentContext<ViewerViewModel> documentContext)
                 _viewerModule = documentContext.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
@@ -138,10 +139,17 @@ namespace Calame.BrushPanel.ViewModels
                 Items = new[] { dataContext.Context };
             else
                 Items = _engine.Root.Components;
+            
+            _brushes.Clear();
+            //IBrush previousBrush = _viewerModule.Brush;
+            //IPaint previousPaint = _viewerModule.Paint;
 
             SelectedCanvas = _viewerModule.Canvas;
-            SelectedBrush = _brushes.FirstOrDefault(x => x == _viewerModule.Brush);
-            SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == _viewerModule.Paint);
+            SelectedBrush = _brushes.FirstOrDefault();
+
+            //TODO: Handle selection binding
+            //SelectedBrush = _brushes.FirstOrDefault(x => x == previousBrush);
+            //SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == previousPaint);
         }
 
         protected override void OnDocumentsCleaned()
@@ -151,12 +159,10 @@ namespace Calame.BrushPanel.ViewModels
             _engine = null;
             _viewerModule = null;
             _filteringContext = null;
-            _brushes.Clear();
 
             Items = null;
             SelectedCanvas = null;
-            SelectedBrush = null;
-            SelectedPaint = null;
+            _brushes.Clear();
         }
 
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model)
@@ -228,21 +234,20 @@ namespace Calame.BrushPanel.ViewModels
         private void OnCanvasChanged()
         {
             SelectedBrush = null;
-
             _brushes.Clear();
 
             if (SelectedCanvas != null)
                 foreach (IBrushViewModel brush in GetAllBrushesForType(SelectedCanvas).Where(x => x.IsValidForCanvas(SelectedCanvas)))
                     _brushes.Add(brush);
-
-            SelectedBrush = _brushes.FirstOrDefault();
-
+            
             _viewerModule.Canvas = SelectedCanvas;
+            SelectedBrush = _brushes.FirstOrDefault();
         }
 
         private void OnBrushChanged()
         {
             SelectedPaint = null;
+
             _viewerModule.Brush = SelectedBrush;
             SelectedPaint = SelectedBrush?.Paints.FirstOrDefault();
         }
