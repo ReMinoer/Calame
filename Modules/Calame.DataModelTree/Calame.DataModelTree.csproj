@@ -70,9 +70,17 @@
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj">
+      <Project>{532EE357-6303-45DA-A605-A5D8253AC03C}</Project>
+      <Name>Diese.Collections %28Stave%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
       <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
+      <Project>{407c6a9e-23af-42c1-b38d-03268a12c476}</Project>
+      <Name>Diese %28Taskete%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra.Injection\Simulacra.Injection.csproj">
       <Project>{9c7a9012-5536-43be-8055-2c3ff297c902}</Project>
