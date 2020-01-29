@@ -26,6 +26,7 @@ namespace Calame.BrushPanel.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Right;
 
         public IIconProvider IconProvider { get; }
+        public IIconDescriptorManager IconDescriptorManager { get; }
         private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
         
         private GlyphEngine _engine;
@@ -120,6 +121,7 @@ namespace Calame.BrushPanel.ViewModels
             DisplayName = "Brush Panel";
 
             IconProvider = iconProvider;
+            IconDescriptorManager = iconDescriptorManager;
             _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             SelectBrushCommand = new RelayCommand(x => SelectedBrush = (IBrushViewModel)x);

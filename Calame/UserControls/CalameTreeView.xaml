@@ -36,8 +36,7 @@
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type utils:ITreeViewItemModel}">
                     <DockPanel>
                         <userControls:CalameIcon DockPanel.Dock="Left"
-                                                 IconKey="{Binding IconDescription.Key}"
-                                                 IconBrush="{Binding IconDescription.Brush}"
+                                                 IconDescription="{Binding IconDescription}"
                                                  IconSize="14"
                                                  IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
                                                  Margin="0 0 2 0"

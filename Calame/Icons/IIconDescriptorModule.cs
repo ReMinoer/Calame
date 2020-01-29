@@ -4,7 +4,8 @@
     {
     }
 
-    public interface IIconDescriptorModule<in T> : IIconDescriptorModule, IIconDescriptor<T>
+    public interface IIconDescriptorModule<in T> : IIconDescriptorModule
     {
+        IconDescription GetIcon(T model);
     }
 }

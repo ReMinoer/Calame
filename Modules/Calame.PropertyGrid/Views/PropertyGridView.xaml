@@ -10,6 +10,9 @@
              d:DesignHeight="500"
              d:DesignWidth="300">
     <Grid>
-        <controls:CalamePropertyGrid SelectedObject="{Binding SelectedObject}" NewItemTypeRegistry="{Binding NewItemTypeRegistry}" />
+        <controls:CalamePropertyGrid SelectedObject="{Binding SelectedObject}"
+                                     NewItemTypeRegistry="{Binding NewItemTypeRegistry}"
+                                     IconProvider="{Binding IconProvider}"
+                                     IconDescriptorManager="{Binding IconDescriptorManager}" />
     </Grid>
 </UserControl>

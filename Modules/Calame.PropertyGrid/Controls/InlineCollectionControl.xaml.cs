@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
+using Calame.Icons;
 using Diese.Collections;
 using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid;
@@ -21,6 +21,12 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(InlineCollectionControl), new PropertyMetadata(false));
         static public readonly DependencyProperty EditorDefinitionsProperty =
             DependencyProperty.Register(nameof(EditorDefinitions), typeof(EditorDefinitionCollection), typeof(InlineCollectionControl), new PropertyMetadata(null));
+        static public readonly DependencyProperty IconProviderProperty =
+            DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(InlineCollectionControl), new PropertyMetadata(null));
+        static public readonly DependencyProperty IconDescriptorProperty =
+            DependencyProperty.Register(nameof(IconDescriptor), typeof(IIconDescriptor), typeof(InlineCollectionControl), new PropertyMetadata(null));
+        static public readonly DependencyProperty IconTargetSelectorProperty =
+            DependencyProperty.Register(nameof(IconTargetSelector), typeof(IIconTargetSelector), typeof(InlineCollectionControl), new PropertyMetadata(null));
 
         public IList ItemsSource
         {
@@ -44,6 +50,24 @@ namespace Calame.PropertyGrid.Controls
         {
             get => (EditorDefinitionCollection)GetValue(EditorDefinitionsProperty);
             set => SetValue(EditorDefinitionsProperty, value);
+        }
+
+        public IIconProvider IconProvider
+        {
+            get => (IIconProvider)GetValue(IconProviderProperty);
+            set => SetValue(IconProviderProperty, value);
+        }
+
+        public IIconDescriptor IconDescriptor
+        {
+            get => (IIconDescriptor)GetValue(IconDescriptorProperty);
+            set => SetValue(IconDescriptorProperty, value);
+        }
+
+        public IIconTargetSelector IconTargetSelector
+        {
+            get => (IIconTargetSelector)GetValue(IconTargetSelectorProperty);
+            set => SetValue(IconTargetSelectorProperty, value);
         }
 
         public InlineCollectionControl()

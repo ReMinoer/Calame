@@ -41,7 +41,10 @@
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
                         <DataTemplate>
-                            <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}" />
+                            <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
+                                                              IconTargetSelector="{Binding GlyphCreatorIconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              IconDescriptor="{Binding ComponentIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
                 </xctk:EditorTemplateDefinition>

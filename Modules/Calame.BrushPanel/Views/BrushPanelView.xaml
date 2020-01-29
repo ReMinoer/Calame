@@ -59,7 +59,10 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <controls:CalamePropertyGrid SelectedObject="{Binding SelectedBrush.Brush}" CompactMode="True" />
+            <controls:CalamePropertyGrid SelectedObject="{Binding SelectedBrush.Brush}"
+                                         CompactMode="True"
+                                         IconProvider="{Binding IconProvider}"
+                                         IconDescriptorManager="{Binding IconDescriptorManager}" />
             <ItemsControl ItemsSource="{Binding SelectedBrush.Paints}"
                           AlternationCount="{x:Static system:Int32.MaxValue}">
                 <ItemsControl.ItemsPanel>
@@ -96,7 +99,10 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <controls:CalamePropertyGrid SelectedObject="{Binding SelectedPaint.Paint}" CompactMode="True" />
+            <controls:CalamePropertyGrid SelectedObject="{Binding SelectedPaint.Paint}"
+                                         CompactMode="True"
+                                         IconProvider="{Binding IconProvider}"
+                                         IconDescriptorManager="{Binding IconDescriptorManager}" />
         </StackPanel>
     </StackPanel>
 </UserControl>
