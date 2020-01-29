@@ -87,10 +87,6 @@
       <Project>{25400349-233E-404D-BB4E-A0CB4AF893EA}</Project>
       <Name>Glyph.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Calame.DataModelTree\Calame.DataModelTree.csproj">
-      <Project>{ED371A46-D089-452E-850B-8D8FBA310152}</Project>
-      <Name>Calame.DataModelTree</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
