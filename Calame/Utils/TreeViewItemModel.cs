@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Calame.Icons;
 using Calame.UserControls;
 using Diese;
 using Diese.Collections;
@@ -16,6 +17,7 @@ namespace Calame.Utils
     {
         object Data { get; }
         string DisplayName { get; }
+        IconDescription IconDescription { get; }
         bool IsEnabled { get; set; }
         bool IsDisabledByParent { get; set; }
         bool IsExpanded { get; set; }
@@ -48,6 +50,8 @@ namespace Calame.Utils
             get => _displayName;
             private set => Set(ref _displayName, value);
         }
+
+        public IconDescription IconDescription { get; }
 
         private bool _isEnabled = true;
         public bool IsEnabled
@@ -118,6 +122,7 @@ namespace Calame.Utils
             T data,
             Func<T, string> displayNameFunc,
             Func<T, IReadOnlyObservableList<object>> childrenFunc,
+            IconDescription iconDescription,
             string displayNamePropertyName,
             string childrenPropertyName,
             INotifyPropertyChanged displayNameNotifier = null,
@@ -146,6 +151,8 @@ namespace Calame.Utils
 
             if (_childrenNotifier != null)
                 _childrenNotifier.PropertyChanged += OnChildrenNotifierPropertyChanged;
+
+            IconDescription = iconDescription;
         }
 
         private void OnDisplayNameNotifierPropertyChanged(object sender, PropertyChangedEventArgs e)

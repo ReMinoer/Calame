@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.Composition;
+using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
@@ -15,11 +16,15 @@ namespace Calame.SceneGraph.ViewModels
     [Export(typeof(SceneGraphViewModel))]
     public sealed class SceneGraphViewModel : CalameTool<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
+        public override PaneLocation PreferredLocation => PaneLocation.Left;
+
+        public IIconProvider IconProvider { get; }
+        private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
+
         private GlyphEngine _engine;
         private IDocumentContext<IComponentFilter> _filteringContext;
         private IGlyphComponent _selection;
         private SceneNode _selectionNode;
-        public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public GlyphEngine Engine
         {
@@ -58,10 +63,13 @@ namespace Calame.SceneGraph.ViewModels
         }
 
         [ImportingConstructor]
-        public SceneGraphViewModel(IShell shell, IEventAggregator eventAggregator)
+        public SceneGraphViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
             : base(shell, eventAggregator)
         {
             DisplayName = "Scene Graph";
+            
+            IconProvider = iconProvider;
+            _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
                 Engine = documentContext.Context;
@@ -104,6 +112,7 @@ namespace Calame.SceneGraph.ViewModels
                 sceneNode,
                 x => (x as IGlyphComponent)?.Parent.Name ?? x.ToString(),
                 x => x.Children,
+                _iconDescriptor.GetIcon((sceneNode as IGlyphComponent)?.Parent),
                 nameof(IGlyphComponent.Name),
                 nameof(SceneNode.Children),
                 (INotifyPropertyChanged)glyphComponent.Parent)

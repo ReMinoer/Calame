@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
@@ -13,8 +14,12 @@ namespace Calame.CompositionGraph.ViewModels
     [Export(typeof(CompositionGraphViewModel))]
     public sealed class CompositionGraphViewModel : CalameTool<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
-        private IDocumentContext<IComponentFilter> _filteringContext;
         public override PaneLocation PreferredLocation => PaneLocation.Left;
+        
+        public IIconProvider IconProvider { get; }
+        private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
+        
+        private IDocumentContext<IComponentFilter> _filteringContext;
 
         private IGlyphComponent _root;
         public IGlyphComponent Root
@@ -35,10 +40,13 @@ namespace Calame.CompositionGraph.ViewModels
         }
 
         [ImportingConstructor]
-        public CompositionGraphViewModel(IShell shell, IEventAggregator eventAggregator)
+        public CompositionGraphViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
             : base(shell, eventAggregator)
         {
             DisplayName = "Composition Graph";
+            
+            IconProvider = iconProvider;
+            _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
         }
 
         protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
@@ -70,6 +78,7 @@ namespace Calame.CompositionGraph.ViewModels
                 component,
                 x => x.Name,
                 x => new EnumerableReadOnlyObservableList<object>(x.Components),
+                _iconDescriptor.GetIcon(component),
                 nameof(IGlyphComponent.Name),
                 nameof(IGlyphComponent.Components))
             {

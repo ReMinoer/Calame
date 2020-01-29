@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using Calame.Icons;
 using Calame.Utils;
 using Diese.Collections;
 using Diese.Collections.Observables;
@@ -61,7 +62,8 @@ namespace Calame.UserControls
             item.Dispose();
         }
 
-        static public readonly DependencyProperty TreeContextProperty = DependencyProperty.Register(nameof(TreeContext), typeof(ITreeContext), typeof(CalameTreeView), new PropertyMetadata(default(ITreeContext)));
+        static public readonly DependencyProperty TreeContextProperty
+            = DependencyProperty.Register(nameof(TreeContext), typeof(ITreeContext), typeof(CalameTreeView), new PropertyMetadata(default(ITreeContext)));
 
         public ITreeContext TreeContext
         {
@@ -69,7 +71,8 @@ namespace Calame.UserControls
             set => SetValue(TreeContextProperty, value);
         }
 
-        static public readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(CalameTreeView), new PropertyMetadata(default(object), OnSelectedItemChanged));
+        static public readonly DependencyProperty SelectedItemProperty
+            = DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(CalameTreeView), new PropertyMetadata(default(object), OnSelectedItemChanged));
 
         public object SelectedItem
         {
@@ -83,6 +86,15 @@ namespace Calame.UserControls
             object value = e.NewValue;
 
             control.SelectedTreeItem = control.TreeItems.SelectMany(x => Tree.BreadthFirst(x, y => y.Children)).FirstOrDefault(y => y.Data == value);
+        }
+
+        static public readonly DependencyProperty IconProviderProperty =
+            DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(CalameTreeView), new PropertyMetadata());
+
+        public IIconProvider IconProvider
+        {
+            get => (IIconProvider)GetValue(IconProviderProperty);
+            set => SetValue(IconProviderProperty, value);
         }
 
         private readonly ObservableList<ITreeViewItemModel> _treeItems;

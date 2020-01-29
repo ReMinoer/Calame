@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Input;
+using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
 using Calame.Viewer;
@@ -23,6 +24,9 @@ namespace Calame.BrushPanel.ViewModels
     public sealed class BrushPanelViewModel : CalameTool<IDocumentContext<ViewerViewModel>>, ITreeContext, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
+
+        public IIconProvider IconProvider { get; }
+        private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
         
         private GlyphEngine _engine;
         private IBrushViewerModule _viewerModule;
@@ -110,10 +114,13 @@ namespace Calame.BrushPanel.ViewModels
         public ICommand SelectPaintCommand { get; }
 
         [ImportingConstructor]
-        public BrushPanelViewModel(IShell shell, IEventAggregator eventAggregator, [ImportMany] IEngineBrushViewModel[] allEngineBrushes, [ImportMany] IDataBrushViewModel[] allDataBrushes)
+        public BrushPanelViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEngineBrushViewModel[] allEngineBrushes, [ImportMany] IDataBrushViewModel[] allDataBrushes)
             : base(shell, eventAggregator)
         {
             DisplayName = "Brush Panel";
+
+            IconProvider = iconProvider;
+            _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             SelectBrushCommand = new RelayCommand(x => SelectedBrush = (IBrushViewModel)x);
             SelectPaintCommand = new RelayCommand(x => SelectedPaint = (IPaintViewModel)x);
@@ -175,6 +182,7 @@ namespace Calame.BrushPanel.ViewModels
                         data,
                         x => x.Name,
                         x => new EnumerableReadOnlyObservableList<object>(x.Children),
+                        _iconDescriptor.GetIcon(data.BindedObject),
                         nameof(IGlyphData.Name),
                         nameof(IGlyphData.Children));
                 case IGlyphComponent component:
@@ -183,6 +191,7 @@ namespace Calame.BrushPanel.ViewModels
                         component,
                         x => x.Name,
                         x => new EnumerableReadOnlyObservableList<object>(x.Components),
+                        _iconDescriptor.GetIcon(component),
                         nameof(IGlyphComponent.Name),
                         nameof(IGlyphComponent.Components));
                 default:

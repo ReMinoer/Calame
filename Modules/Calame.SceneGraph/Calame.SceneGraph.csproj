@@ -64,8 +64,15 @@
     <PackageReference Include="MahApps.Metro">
       <Version>1.2.4</Version>
     </PackageReference>
+    <PackageReference Include="MahApps.Metro.IconPacks.Material">
+      <Version>1.9.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Calame.Icons\Calame.Icons.csproj">
+      <Project>{86BCF6D2-1B27-4209-9872-EE40028B48A9}</Project>
+      <Name>Calame.Icons</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Calame\Calame.csproj">
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>

@@ -21,7 +21,8 @@
                                          Height="300"
                                          TreeContext="{Binding}"
                                          ItemsSource="{Binding Items}"
-                                         SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"/>
+                                         SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"
+                                         IconProvider="{Binding IconProvider}" />
             <ItemsControl ItemsSource="{Binding Brushes}"
                           AlternationCount="{x:Static system:Int32.MaxValue}">
                 <ItemsControl.ItemsPanel>

@@ -75,6 +75,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Calame.Icons\Calame.Icons.csproj">
+      <Project>{86BCF6D2-1B27-4209-9872-EE40028B48A9}</Project>
+      <Name>Calame.Icons</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Calame.Viewer\Calame.Viewer.csproj">
       <Project>{2EDFE6B4-8E1E-4B22-85BE-D80E8573B3FD}</Project>
       <Name>Calame.Viewer</Name>

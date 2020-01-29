@@ -90,6 +90,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Calame.Icons\Calame.Icons.csproj">
+      <Project>{86bcf6d2-1b27-4209-9872-ee40028b48a9}</Project>
+      <Name>Calame.Icons</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Calame\Calame.csproj">
       <Project>{8cc36da5-321d-49ba-9ee2-56015ef5081f}</Project>
       <Name>Calame</Name>

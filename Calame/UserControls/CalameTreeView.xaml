@@ -3,9 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:calame="clr-namespace:Calame"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:utils="clr-namespace:Calame.Utils"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:userControls="clr-namespace:Calame.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="200">
     <DockPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
@@ -33,21 +34,30 @@
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type utils:ITreeViewItemModel}">
-                    <TextBlock Text="{Binding DisplayName}">
-                        <TextBlock.Style>
-                            <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsDisabledByParent}" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <DockPanel>
+                        <userControls:CalameIcon DockPanel.Dock="Left"
+                                                 IconKey="{Binding IconDescription.Key}"
+                                                 IconBrush="{Binding IconDescription.Brush}"
+                                                 IconSize="14"
+                                                 IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
+                                                 Margin="0 0 2 0"
+                                                 VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding DisplayName}">
+                            <TextBlock.Style>
+                                <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsDisabledByParent}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DockPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

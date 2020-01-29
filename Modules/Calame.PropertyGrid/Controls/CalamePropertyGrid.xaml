@@ -24,11 +24,11 @@
                        SelectedObject="{Binding SelectedObject, ElementName=This}"
                        ShowAdvancedOptions="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowDescriptionByTooltip="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
-                       ShowPreview="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowSearchBox="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowSortOptions="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowSummary="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
-                       ShowTitle="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}">
+                       ShowTitle="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
+                       ShowPreview="False">
         <xctk:PropertyGrid.EditorDefinitions>
             <xctk:EditorDefinitionCollection>
                 <xctk:EditorTemplateDefinition>

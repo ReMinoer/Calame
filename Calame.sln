@@ -107,6 +107,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Niddle", "External\Glyph\Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Niddle.Test", "External\Glyph\External\Simulacra\External\Niddle\Tests\Niddle.Test\Niddle.Test.csproj", "{C3703B6C-C15F-4BDF-971B-1E9723EA7F52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Icons", "Calame.Icons\Calame.Icons.csproj", "{86BCF6D2-1B27-4209-9872-EE40028B48A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -305,6 +307,10 @@ Global
 		{C3703B6C-C15F-4BDF-971B-1E9723EA7F52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3703B6C-C15F-4BDF-971B-1E9723EA7F52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3703B6C-C15F-4BDF-971B-1E9723EA7F52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86BCF6D2-1B27-4209-9872-EE40028B48A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86BCF6D2-1B27-4209-9872-EE40028B48A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86BCF6D2-1B27-4209-9872-EE40028B48A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86BCF6D2-1B27-4209-9872-EE40028B48A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

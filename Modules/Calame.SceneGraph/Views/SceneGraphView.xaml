@@ -11,5 +11,6 @@
              d:DesignWidth="300">
     <userControls:CalameTreeView TreeContext="{Binding}"
                                  ItemsSource="{Binding Engine.ProjectionManager.SceneRoots}"
-                                 SelectedItem="{Binding SelectionNode, Mode=TwoWay}" />
+                                 SelectedItem="{Binding SelectionNode, Mode=TwoWay}"
+                                 IconProvider="{Binding IconProvider}" />
 </UserControl>
