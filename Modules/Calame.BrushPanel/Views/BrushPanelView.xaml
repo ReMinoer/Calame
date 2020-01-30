@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Calame.BrushPanel.ViewModels"
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls;assembly=Calame.PropertyGrid"
-             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+             xmlns:views="clr-namespace:Calame.BrushPanel.Views"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:BrushPanelViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -40,10 +40,10 @@
                                      HorizontalAlignment="Stretch">
                             <RadioButton.Content>
                                 <Border Background="Transparent">
-                                    <iconPacks:PackIconMaterial Kind="{Binding IconKey}"
-                                                                Width="32"
-                                                                Height="32"
-                                                                Margin="5"/>
+                                    <userControls:CalameIcon IconDescription="{Binding IconDescription}"
+                                                             IconSize="32"
+                                                             IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType=views:BrushPanelView}}"
+                                                             Margin="5"/>
                                 </Border>
                             </RadioButton.Content>
                             <RadioButton.Style>
@@ -80,10 +80,10 @@
                                      HorizontalAlignment="Stretch">
                             <RadioButton.Content>
                                 <Border Background="Transparent">
-                                    <iconPacks:PackIconMaterial Kind="{Binding IconKey}"
-                                                                Width="32"
-                                                                Height="32"
-                                                                Margin="5"/>
+                                    <userControls:CalameIcon IconDescription="{Binding IconDescription}"
+                                                             IconSize="32"
+                                                             IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType=views:BrushPanelView}}"
+                                                             Margin="5"/>
                                 </Border>
                             </RadioButton.Content>
                             <RadioButton.Style>

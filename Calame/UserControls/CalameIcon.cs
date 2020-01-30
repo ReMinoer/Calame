@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using Calame.Icons;
 
 namespace Calame.UserControls

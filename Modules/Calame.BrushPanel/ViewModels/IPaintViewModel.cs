@@ -1,11 +1,12 @@
-﻿using Glyph.Tools.Brushing;
+﻿using Calame.Icons;
+using Glyph.Tools.Brushing;
 
 namespace Calame.BrushPanel.ViewModels
 {
     public interface IPaintViewModel
     {
         string DisplayName { get; }
-        object IconKey { get; }
+        IconDescription IconDescription { get; }
         IPaint Paint { get; }
     }
 

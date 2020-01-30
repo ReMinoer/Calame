@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Calame.Icons;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Tools.Brushing;
@@ -9,7 +10,7 @@ namespace Calame.BrushPanel.ViewModels
     public interface IBrushViewModel : IBrush
     {
         string DisplayName { get; }
-        object IconKey { get; }
+        IconDescription IconDescription { get; }
         bool IsValidForCanvas(object canvas);
         IEnumerable<IPaintViewModel> Paints { get; }
     }

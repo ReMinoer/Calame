@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using Calame.Icons;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Tools.Brushing;
@@ -15,7 +16,7 @@ namespace Calame.BrushPanel.ViewModels
         [Browsable(false)]
         public abstract string DisplayName { get; }
         [Browsable(false)]
-        public abstract object IconKey { get; }
+        public abstract IconDescription IconDescription { get; }
         [Browsable(false)]
         protected abstract IBrush<TCanvas, TArgs, TPaint> Brush { get; }
         
@@ -83,7 +84,7 @@ namespace Calame.BrushPanel.ViewModels
         [Browsable(false)]
         public abstract string DisplayName { get; }
         [Browsable(false)]
-        public abstract object IconKey { get; }
+        public abstract IconDescription IconDescription { get; }
         [Browsable(false)]
         protected abstract IBrush<TComponentCanvas, TArgs, TPaint> ComponentBrush { get; }
         [Browsable(false)]
