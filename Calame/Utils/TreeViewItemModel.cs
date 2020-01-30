@@ -18,14 +18,20 @@ namespace Calame.Utils
         object Data { get; }
         string DisplayName { get; }
         IconDescription IconDescription { get; }
+
+        new ITreeViewItemModel Parent { get; set; }
+        IObservableList<ITreeViewItemModel> Children { get; }
+
         bool IsEnabled { get; set; }
         bool IsDisabledByParent { get; set; }
+        
         bool IsExpanded { get; set; }
+
+        bool IsTriggered { get; }
+
         bool MatchingFilter { get; set; }
         bool VisibleForFilter { get; set; }
         bool VisibleAsParent { get; set; }
-        new ITreeViewItemModel Parent { get; set; }
-        IObservableList<ITreeViewItemModel> Children { get; }
     }
 
     public class TreeViewItemModel<T> : NotifyPropertyChangedBase, ITreeViewItemModel
@@ -35,11 +41,14 @@ namespace Calame.Utils
         
         private readonly string _displayNamePropertyName;
         private readonly string _childrenPropertyName;
+        private readonly string _isTriggeredPropertyName;
         private readonly INotifyPropertyChanged _displayNameNotifier;
         private readonly INotifyPropertyChanged _childrenNotifier;
+        private readonly INotifyPropertyChanged _isTriggeredNotifier;
 
         private readonly Func<T, string> _displayNameFunc;
         private readonly Func<T, IReadOnlyObservableList<object>> _childrenFunc;
+        private readonly Func<T, bool> _isTriggeredFunc;
 
         public IObservableList<ITreeViewItemModel> Children { get; }
         private readonly ObservableListSynchronizer<object, ITreeViewItemModel> _childrenSynchronizer;
@@ -79,6 +88,13 @@ namespace Calame.Utils
         {
             get => _isExpanded;
             set => Set(ref _isExpanded, value);
+        }
+
+        private bool _isTriggered;
+        public bool IsTriggered
+        {
+            get => _isTriggered;
+            private set => Set(ref _isTriggered, value);
         }
 
         private bool _matchingFilter;
@@ -126,7 +142,10 @@ namespace Calame.Utils
             string displayNamePropertyName,
             string childrenPropertyName,
             INotifyPropertyChanged displayNameNotifier = null,
-            INotifyPropertyChanged childrenNotifier = null)
+            INotifyPropertyChanged childrenNotifier = null,
+            Func<T, bool> isTriggeredFunc = null,
+            string isTriggeredPropertyName = null,
+            INotifyPropertyChanged isTriggeredNotifier = null)
         {
             Data = data;
             INotifyPropertyChanged notifyingData = null;
@@ -142,7 +161,7 @@ namespace Calame.Utils
             
             _childrenFunc = childrenFunc;
             _childrenPropertyName = childrenPropertyName;
-            _childrenNotifier = childrenNotifier ?? notifyingData ?? Data as INotifyPropertyChanged;
+            _childrenNotifier = childrenNotifier ?? notifyingData ?? (notifyingData = Data as INotifyPropertyChanged);
 
             Children = new ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel>(this);
 
@@ -151,6 +170,16 @@ namespace Calame.Utils
 
             if (_childrenNotifier != null)
                 _childrenNotifier.PropertyChanged += OnChildrenNotifierPropertyChanged;
+            
+            _isTriggeredFunc = isTriggeredFunc;
+            _isTriggeredPropertyName = isTriggeredPropertyName;
+            _isTriggeredNotifier = isTriggeredNotifier ?? notifyingData ?? Data as INotifyPropertyChanged;
+
+            if (_isTriggeredFunc != null)
+                IsTriggered = _isTriggeredFunc(Data);
+
+            if (_isTriggeredNotifier != null)
+                _isTriggeredNotifier.PropertyChanged += OnIsTriggeredNotifierPropertyChanged;
 
             IconDescription = iconDescription;
         }
@@ -165,6 +194,12 @@ namespace Calame.Utils
         {
             if (e.PropertyName == _childrenPropertyName)
                 _childrenSynchronizer.Reference = _childrenFunc(Data);
+        }
+
+        private void OnIsTriggeredNotifierPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == _isTriggeredPropertyName && _isTriggeredFunc != null)
+                IsTriggered = _isTriggeredFunc(Data);
         }
 
         public bool Equals(ITreeViewItemModel other)
@@ -198,10 +233,14 @@ namespace Calame.Utils
 
         public void Dispose()
         {
-            _displayNameNotifier.PropertyChanged -= OnDisplayNameNotifierPropertyChanged;
-            _childrenNotifier.PropertyChanged -= OnChildrenNotifierPropertyChanged;
-            _childrenSynchronizer.Dispose();
+            if (_displayNameNotifier != null)
+                _displayNameNotifier.PropertyChanged -= OnDisplayNameNotifierPropertyChanged;
+            if (_childrenNotifier != null)
+                _childrenNotifier.PropertyChanged -= OnChildrenNotifierPropertyChanged;
+            if (_isTriggeredNotifier != null)
+                _isTriggeredNotifier.PropertyChanged -= OnIsTriggeredNotifierPropertyChanged;
 
+            _childrenSynchronizer.Dispose();
             foreach (ITreeViewItemModel child in Children)
                 child.Dispose();
         }
