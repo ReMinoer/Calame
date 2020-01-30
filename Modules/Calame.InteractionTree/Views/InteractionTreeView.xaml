@@ -4,75 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Calame.InteractionTree.ViewModels"
-             xmlns:utils="clr-namespace:Calame.Utils;assembly=Calame"
-             xmlns:fingear="clr-namespace:Fingear;assembly=Fingear"
-             xmlns:calame="clr-namespace:Calame;assembly=Calame"
              xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
-             xmlns:stave="clr-namespace:Stave;assembly=Stave"
-             xmlns:localconverters="clr-namespace:Calame.InteractionTree.Converters"
+             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:InteractionTreeViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="300">
     <UserControl.Resources>
         <converters:ObjectToEnumerableConverter x:Key="ObjectToEnumerableConverter" />
-        <localconverters:InteractiveComponentsAndControlsConverter x:Key="InteractiveComponentsAndControlsConverter" />
-        <calame:InterfaceTemplateSelector x:Key="InterfaceTemplateSelector" />
     </UserControl.Resources>
-    <Grid>
-        <TreeView MinWidth="200"
-                  ItemsSource="{Binding Engine.InteractionManager.Root, Converter={StaticResource ObjectToEnumerableConverter}}"
-                  ItemTemplateSelector="{StaticResource InterfaceTemplateSelector}">
-            <TreeView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <utils:VirtualizingStackPanel/>
-                </ItemsPanelTemplate>
-            </TreeView.ItemsPanel>
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="Focusable" Value="False"/>
-                </Style>
-            </TreeView.ItemContainerStyle>
-            <TreeView.Resources>
-                <HierarchicalDataTemplate ItemsSource="{Binding ., Converter={StaticResource InteractiveComponentsAndControlsConverter}}"
-                                          DataType="{x:Type fingear:IInteractive}">
-                    <TextBlock Text="{Binding Path=(fingear:IInteractive.Name)}"
-                               IsEnabled="{Binding Path=(fingear:IInteractive.Enabled)}"/>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=(stave:IComponent.Components)}"
-                                          DataType="{x:Type fingear:IControl}">
-                    <TextBlock x:Name="templateTextBlock"
-                               Text="{Binding Path=(fingear:IControl.Name)}"
-                               Background="Transparent">
-                        <TextBlock.Style>
-                            <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Path=(fingear:IControl.IsActive)}" Value="True">
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
-                                                                    To="#FF008000"
-                                                                    Duration="0:0:0" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </DataTrigger.EnterActions>
-                                        <DataTrigger.ExitActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
-                                                                    From="#FF008000" To="#00008000"
-                                                                    Duration="0:0:0.5" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </DataTrigger.ExitActions>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>
-        </TreeView>
-    </Grid>
+    <userControls:CalameTreeView MinWidth="200"
+                                 TreeContext="{Binding}"
+                                 ItemsSource="{Binding Engine.InteractionManager.Root, Converter={StaticResource ObjectToEnumerableConverter}}"
+                                 SelectedItem="{Binding Selection, Mode=TwoWay}"
+                                 IconProvider="{Binding IconProvider}" />
 </UserControl>

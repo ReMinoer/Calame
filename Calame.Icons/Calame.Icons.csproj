@@ -38,6 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentIconProvider.cs" />
+    <Compile Include="ControlIconProvider.cs" />
+    <Compile Include="InteractiveIconProvider.cs" />
     <Compile Include="MaterialIconProviderModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -48,15 +50,30 @@
     <PackageReference Include="MahApps.Metro.IconPacks.Material">
       <Version>1.9.1</Version>
     </PackageReference>
+    <PackageReference Include="MonoGame.Framework.Portable">
+      <Version>3.7.1.189</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Calame\Calame.csproj">
       <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
       <Name>Calame</Name>
     </ProjectReference>
+    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj">
+      <Project>{532EE357-6303-45DA-A605-A5D8253AC03C}</Project>
+      <Name>Diese.Collections %28Stave%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
       <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
       <Name>Stave</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj">
+      <Project>{9EEF1863-44BE-423E-A29D-088C23AAC45E}</Project>
+      <Name>Fingear.MonoGame</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\External\Glyph\External\Fingear\Fingear\Fingear.csproj">
+      <Project>{7EE0B116-6B49-4073-99D8-827DD68B8AE0}</Project>
+      <Name>Fingear</Name>
     </ProjectReference>
     <ProjectReference Include="..\External\Glyph\Glyph.Animation\Glyph.Animation.csproj">
       <Project>{2384DA3A-F989-4B1B-9044-A005CE8F4AB6}</Project>
