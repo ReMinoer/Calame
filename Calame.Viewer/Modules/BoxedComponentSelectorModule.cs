@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
@@ -91,7 +93,7 @@ namespace Calame.Viewer.Modules
 
             _root.Add(_shapedObjectSelector);
 
-            _eventAggregator.Subscribe(this);
+            _eventAggregator.SubscribeOnUIThread(this);
             _shapedObjectSelector.SelectionChanged += OnShapedObjectSelectorSelectionChanged;
         }
 
@@ -112,19 +114,21 @@ namespace Calame.Viewer.Modules
             return _filteringContext?.Context.Filter(glyphComponent) ?? true;
         }
 
-        private void OnShapedObjectSelectorSelectionChanged(object sender, IBoxedComponent boxedComponent)
+        private async void OnShapedObjectSelectorSelectionChanged(object sender, IBoxedComponent boxedComponent)
         {
             if (Model.Runner.Engine.FocusedClient != Model.Client)
                 return;
 
             SelectedComponent = boxedComponent;
-            _eventAggregator.PublishOnUIThread(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
+            await _eventAggregator.PublishOnBackgroundThreadAsync(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
         }
 
-        public void Handle(IDocumentContext<ViewerViewModel> message)
+        Task IHandle<IDocumentContext<ViewerViewModel>>.HandleAsync(IDocumentContext<ViewerViewModel> message, CancellationToken cancellationToken)
         {
             _currentDocument = message;
             _filteringContext = message as IDocumentContext<IComponentFilter>;
+
+            return Task.CompletedTask;
         }
     }
 }

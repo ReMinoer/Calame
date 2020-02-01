@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Viewer;
@@ -39,7 +40,7 @@ namespace Calame.DataModelViewer.ViewModels
         {
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
-            _eventAggregator.Subscribe(this);
+            _eventAggregator.SubscribeOnUIThread(this);
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             
@@ -49,14 +50,14 @@ namespace Calame.DataModelViewer.ViewModels
         protected override async Task DoNew()
         {
             await Editor.NewDataAsync();
-            InitializeEngine();
+            await InitializeEngine();
         }
 
         protected override async Task DoLoad(string filePath)
         {
             using (FileStream fileStream = File.OpenRead(filePath))
                 await Editor.LoadDataAsync(fileStream);
-            InitializeEngine();
+            await InitializeEngine();
         }
 
         protected override async Task DoSave(string filePath)
@@ -71,7 +72,7 @@ namespace Calame.DataModelViewer.ViewModels
             Viewer.ConnectView((IViewerView)view);
         }
 
-        private void InitializeEngine()
+        private async Task InitializeEngine()
         {
             _engine = new GlyphEngine(_contentLibraryProvider.Get(Editor.ContentPath));
             _engine.Root.Add<SceneNode>();
@@ -91,10 +92,10 @@ namespace Calame.DataModelViewer.ViewModels
             _engine.Start();
             
             Viewer.SelectedMode = Viewer.InteractiveModes.FirstOrDefault();
-            Viewer.Activate();
+            await Viewer.Activate();
         }
 
-        public void Handle(ISelectionRequest<IGlyphData> message)
+        async Task IHandle<ISelectionRequest<IGlyphData>>.HandleAsync(ISelectionRequest<IGlyphData> message, CancellationToken cancellationToken)
         {
             if (message.DocumentContext != this)
                 return;
@@ -102,10 +103,10 @@ namespace Calame.DataModelViewer.ViewModels
             ISelectionSpread<IGlyphData> selection = message.Promoted;
 
             Viewer.LastSelection = selection;
-            _eventAggregator.PublishOnUIThread(selection);
+            await _eventAggregator.PublishOnCurrentThreadAsync(selection, cancellationToken);
         }
 
-        public void Handle(ISelectionRequest<IGlyphComponent> message)
+        async Task IHandle<ISelectionRequest<IGlyphComponent>>.HandleAsync(ISelectionRequest<IGlyphComponent> message, CancellationToken cancellationToken)
         {
             if (message.DocumentContext != this)
                 return;
@@ -113,7 +114,7 @@ namespace Calame.DataModelViewer.ViewModels
             ISelectionSpread<IGlyphData> selection = new SelectionSpread<IGlyphData>(message.DocumentContext, Editor.Data.GetData(message.Item));
             
             Viewer.LastSelection = selection;
-            _eventAggregator.PublishOnUIThread(selection);
+            await _eventAggregator.PublishOnCurrentThreadAsync(selection, cancellationToken);
         }
 
         public void Dispose()

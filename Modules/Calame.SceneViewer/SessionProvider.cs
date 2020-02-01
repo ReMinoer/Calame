@@ -40,7 +40,7 @@ namespace Calame.SceneViewer
         {
             var sceneViewerViewModel = (SceneViewerViewModel)document;
             sceneViewerViewModel.Session = Sessions.First();
-            sceneViewerViewModel.InitializeSession();
+            await sceneViewerViewModel.InitializeSession();
         }
 
         public async Task Open(IDocument document, string path)

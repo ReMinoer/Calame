@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Viewer;
 using Caliburn.Micro;
@@ -58,7 +60,7 @@ namespace Calame.SceneViewer.ViewModels
             _shell = shell;
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
-            _eventAggregator.Subscribe(this);
+            _eventAggregator.SubscribeOnUIThread(this);
 
             Viewer = new ViewerViewModel(this, _eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
@@ -87,7 +89,7 @@ namespace Calame.SceneViewer.ViewModels
             //Viewer.Runner = viewModel.Runner;
         }
 
-        public void InitializeSession()
+        public async Task InitializeSession()
         {
             _viewTracker?.Dispose();
             _viewTracker = null;
@@ -118,7 +120,7 @@ namespace Calame.SceneViewer.ViewModels
             _engine.Start();
 
             Viewer.SelectedMode = SessionMode;
-            Viewer.Activate();
+            await Viewer.Activate();
         }
 
         protected override void OnViewLoaded(object view)
@@ -167,10 +169,10 @@ namespace Calame.SceneViewer.ViewModels
 
         private void NewViewerAction()
         {
-            _shell.OpenDocument(new SceneViewerViewModel(this));
+            Task.Run(async () => await _shell.OpenDocumentAsync(new SceneViewerViewModel(this))).Wait();
         }
 
-        public void Handle(ISelectionRequest<IGlyphComponent> message)
+        async Task IHandle<ISelectionRequest<IGlyphComponent>>.HandleAsync(ISelectionRequest<IGlyphComponent> message, CancellationToken cancellationToken)
         {
             if (message.DocumentContext != this)
                 return;
@@ -178,7 +180,7 @@ namespace Calame.SceneViewer.ViewModels
             ISelectionSpread<IGlyphComponent> selection = message.Promoted;
 
             Viewer.LastSelection = selection;
-            _eventAggregator.PublishOnUIThread(selection);
+            await _eventAggregator.PublishOnCurrentThreadAsync(selection, cancellationToken);
         }
 
         public void Dispose()

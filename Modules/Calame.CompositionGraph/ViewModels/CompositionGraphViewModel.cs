@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -34,8 +36,11 @@ namespace Calame.CompositionGraph.ViewModels
             get => _selection;
             set
             {
-                if (SetValue(ref _selection, value))
-                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
+                if (!SetValue(ref _selection, value))
+                    return;
+
+                var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
+                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
             }
         }
 
@@ -49,24 +54,38 @@ namespace Calame.CompositionGraph.ViewModels
             _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
         }
 
-        protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
         {
             _selection = null;
 
             Root = activeDocument.Context.Root;
             _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+
+            return Task.CompletedTask;
         }
 
-        protected override void OnDocumentsCleaned()
+        protected override Task OnDocumentsCleaned()
         {
             _selection = null;
 
             Root = null;
             _filteringContext = null;
+
+            return Task.CompletedTask;
         }
 
-        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
+        Task IHandle<ISelectionSpread<IGlyphComponent>>.HandleAsync(ISelectionSpread<IGlyphComponent> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item);
+            return Task.CompletedTask;
+        }
+
+        Task IHandle<ISelectionSpread<IGlyphData>>.HandleAsync(ISelectionSpread<IGlyphData> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item?.BindedObject);
+            return Task.CompletedTask;
+        }
+
         private void HandleSelection(IGlyphComponent component) => SetValue(ref _selection, component, nameof(Selection));
         
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)

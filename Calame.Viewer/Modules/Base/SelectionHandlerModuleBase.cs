@@ -1,4 +1,6 @@
-﻿using Caliburn.Micro;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Caliburn.Micro;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
@@ -18,7 +20,7 @@ namespace Calame.Viewer.Modules.Base
 
         protected override void ConnectRunner()
         {
-            _eventAggregator.Subscribe(this);
+            _eventAggregator.SubscribeOnUIThread(this);
         }
 
         protected override void DisconnectRunner()
@@ -29,8 +31,17 @@ namespace Calame.Viewer.Modules.Base
         protected abstract void HandleSelection();
         protected abstract void ReleaseSelection();
 
-        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
+        Task IHandle<ISelectionSpread<IGlyphComponent>>.HandleAsync(ISelectionSpread<IGlyphComponent> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item);
+            return Task.CompletedTask;
+        }
+
+        Task IHandle<ISelectionSpread<IGlyphData>>.HandleAsync(ISelectionSpread<IGlyphData> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item?.BindedObject);
+            return Task.CompletedTask;
+        }
 
         private void HandleSelection(IGlyphComponent component)
         {

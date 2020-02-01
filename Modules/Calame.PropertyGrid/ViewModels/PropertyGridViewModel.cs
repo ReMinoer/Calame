@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework.Services;
@@ -37,16 +39,22 @@ namespace Calame.PropertyGrid.ViewModels
             IconDescriptorManager = iconDescriptorManager;
         }
 
-        protected override void OnDocumentActivated(IDocumentContext activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext activeDocument)
         {
             SelectedObject = null;
+            return Task.CompletedTask;
         }
 
-        protected override void OnDocumentsCleaned()
+        protected override Task OnDocumentsCleaned()
         {
             SelectedObject = null;
+            return Task.CompletedTask;
         }
 
-        public void Handle(ISelectionSpread<object> message) => SelectedObject = message.Item;
+        public Task HandleAsync(ISelectionSpread<object> message, CancellationToken cancellationToken)
+        {
+            SelectedObject = message.Item;
+            return Task.CompletedTask;
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interactivity;
 using System.Windows.Media;
+using Microsoft.Xaml.Behaviors;
 
 namespace Calame.Utils
 {

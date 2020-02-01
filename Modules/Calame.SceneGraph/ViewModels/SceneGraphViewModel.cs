@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -37,13 +39,14 @@ namespace Calame.SceneGraph.ViewModels
             get => _selection;
             set
             {
-                if (SetValue(ref _selection, value))
-                {
-                    _selectionNode = _selection?.GetSceneNode();
+                if (!SetValue(ref _selection, value))
+                    return;
 
-                    NotifyOfPropertyChange(nameof(SelectionNode));
-                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
-                }
+                _selectionNode = _selection?.GetSceneNode();
+                NotifyOfPropertyChange(nameof(SelectionNode));
+
+                var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
+                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
             }
         }
 
@@ -52,13 +55,14 @@ namespace Calame.SceneGraph.ViewModels
             get => _selectionNode;
             set
             {
-                if (SetValue(ref _selectionNode, value))
-                {
-                    _selection = _selectionNode?.Parent;
+                if (!SetValue(ref _selectionNode, value))
+                    return;
 
-                    NotifyOfPropertyChange(nameof(Selection));
-                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection));
-                }
+                _selection = _selectionNode?.Parent;
+                NotifyOfPropertyChange(nameof(Selection));
+                
+                var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
+                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
             }
         }
 
@@ -75,26 +79,39 @@ namespace Calame.SceneGraph.ViewModels
                 Engine = documentContext.Context;
         }
 
-        protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
         {
             _selection = null;
             _selectionNode = null;
 
             Engine = activeDocument.Context;
             _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+
+            return Task.CompletedTask;
         }
 
-        protected override void OnDocumentsCleaned()
+        protected override Task OnDocumentsCleaned()
         {
             _selection = null;
             _selectionNode = null;
 
             Engine = null;
             _filteringContext = null;
+
+            return Task.CompletedTask;
         }
 
-        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item?.BindedObject);
+        Task IHandle<ISelectionSpread<IGlyphComponent>>.HandleAsync(ISelectionSpread<IGlyphComponent> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item);
+            return Task.CompletedTask;
+        }
+
+        Task IHandle<ISelectionSpread<IGlyphData>>.HandleAsync(ISelectionSpread<IGlyphData> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item?.BindedObject);
+            return Task.CompletedTask;
+        }
 
         private void HandleSelection(IGlyphComponent component)
         {

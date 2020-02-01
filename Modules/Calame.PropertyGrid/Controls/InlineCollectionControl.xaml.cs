@@ -115,32 +115,26 @@ namespace Calame.PropertyGrid.Controls
 
         private void CollectionControlOnItemAdded(object sender, ItemEventArgs itemEventArgs)
         {
-            var collectionControl = (CollectionControl)sender;
-            collectionControl.ItemsSource.Add(itemEventArgs.Item);
+            ItemsSource.Add(itemEventArgs.Item);
         }
 
         private void CollectionControlOnItemDeleted(object sender, ItemEventArgs itemEventArgs)
         {
-            var collectionControl = (CollectionControl)sender;
-            collectionControl.ItemsSource.Remove(itemEventArgs.Item);
+            ItemsSource.Remove(itemEventArgs.Item);
         }
 
         private void CollectionControlOnItemMovedUp(object sender, ItemEventArgs itemEventArgs)
         {
-            var collectionControl = (CollectionControl)sender;
-
-            int index = collectionControl.ItemsSource.IndexOf(itemEventArgs.Item);
-            collectionControl.ItemsSource.RemoveAt(index);
-            collectionControl.ItemsSource.Insert(--index, itemEventArgs.Item);
+            int index = ItemsSource.IndexOf(itemEventArgs.Item);
+            ItemsSource.RemoveAt(index);
+            ItemsSource.Insert(--index, itemEventArgs.Item);
         }
 
         private void CollectionControlOnItemMovedDown(object sender, ItemEventArgs itemEventArgs)
         {
-            var collectionControl = (CollectionControl)sender;
-
-            int index = collectionControl.ItemsSource.IndexOf(itemEventArgs.Item);
-            collectionControl.ItemsSource.RemoveAt(index);
-            collectionControl.ItemsSource.Insert(++index, itemEventArgs.Item);
+            int index = ItemsSource.IndexOf(itemEventArgs.Item);
+            ItemsSource.RemoveAt(index);
+            ItemsSource.Insert(++index, itemEventArgs.Item);
         }
     }
 }

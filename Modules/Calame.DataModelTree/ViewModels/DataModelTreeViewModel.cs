@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -32,8 +34,11 @@ namespace Calame.DataModelTree.ViewModels
             get => _selection;
             set
             {
-                if (SetValue(ref _selection, value))
-                    EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphData>(CurrentDocument, _selection));
+                if (!SetValue(ref _selection, value))
+                    return;
+
+                var selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, _selection);
+                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
             }
         }
 
@@ -47,20 +52,28 @@ namespace Calame.DataModelTree.ViewModels
             _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
         }
         
-        protected override void OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
         {
             _selection = null;
             Root = activeDocument.Context;
+
+            return Task.CompletedTask;
         }
 
-        protected override void OnDocumentsCleaned()
+        protected override Task OnDocumentsCleaned()
         {
             _selection = null;
             Root = null;
+
+            return Task.CompletedTask;
         }
         
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => SetValue(ref _selection, message.Item, nameof(Selection));
-        
+        Task IHandle<ISelectionSpread<IGlyphData>>.HandleAsync(ISelectionSpread<IGlyphData> message, CancellationToken cancellationToken)
+        {
+            SetValue(ref _selection, message.Item, nameof(Selection));
+            return Task.CompletedTask;
+        }
+
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
         {
             var glyphCreator = (IGlyphCreator)data;

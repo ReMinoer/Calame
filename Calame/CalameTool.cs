@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Services;
@@ -21,7 +23,7 @@ namespace Calame
             EventAggregator = eventAggregator;
             
             Shell.ActiveDocumentChanged += ShellOnActiveDocumentChanged;
-            EventAggregator.Subscribe(this);
+            EventAggregator.SubscribeOnUIThread(this);
         }
 
         public void Dispose()
@@ -39,22 +41,22 @@ namespace Calame
             OnDocumentsCleaned();
         }
 
-        void IHandle<IDocumentContext>.Handle(IDocumentContext message)
+        public async Task HandleAsync(IDocumentContext message, CancellationToken cancellationToken)
         {
             if (message is THandledDocument handledDocument)
             {
                 CurrentDocument = handledDocument;
-                OnDocumentActivated(CurrentDocument);
+                await OnDocumentActivated(CurrentDocument);
             }
             else
             {
                 CurrentDocument = null;
-                OnDocumentsCleaned();
+                await OnDocumentsCleaned();
             }
         }
         
-        protected abstract void OnDocumentActivated(THandledDocument activeDocument);
-        protected abstract void OnDocumentsCleaned();
+        protected abstract Task OnDocumentActivated(THandledDocument activeDocument);
+        protected abstract Task OnDocumentsCleaned();
 
         protected bool SetValue<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
         {

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Icons;
 using Calame.UserControls;
@@ -53,39 +55,42 @@ namespace Calame.BrushPanel.ViewModels
             {
                 object previousCanvas = _selectedCanvas;
 
-                if (SetValue(ref _selectedCanvas, value))
-                {
-                    OnCanvasChanged();
+                if (!SetValue(ref _selectedCanvas, value))
+                    return;
 
-                    if (_selectedCanvas != null)
+                OnCanvasChanged();
+
+                ISelectionRequest<object> selectionRequest;
+                if (_selectedCanvas != null)
+                {
+                    switch (_selectedCanvas)
                     {
-                        switch (_selectedCanvas)
-                        {
-                            case IGlyphData data:
-                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphData>(CurrentDocument, data));
-                                break;
-                            case IGlyphComponent component:
-                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, component));
-                                break;
-                            default:
-                                throw new NotSupportedException();
-                        }
-                    }
-                    else
-                    {
-                        switch (previousCanvas)
-                        {
-                            case IGlyphData _:
-                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphData>(CurrentDocument, (IGlyphData)null));
-                                break;
-                            case IGlyphComponent _:
-                                EventAggregator.PublishOnUIThread(new SelectionRequest<IGlyphComponent>(CurrentDocument, (IGlyphComponent)null));
-                                break;
-                            default:
-                                throw new NotSupportedException();
-                        }
+                        case IGlyphData data:
+                            selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, data);
+                            break;
+                        case IGlyphComponent component:
+                            selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, component);
+                            break;
+                        default:
+                            throw new NotSupportedException();
                     }
                 }
+                else
+                {
+                    switch (previousCanvas)
+                    {
+                        case IGlyphData _:
+                            selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, (IGlyphData)null);
+                            break;
+                        case IGlyphComponent _:
+                            selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, (IGlyphComponent)null);
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                }
+
+                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
             }
         }
 
@@ -136,7 +141,7 @@ namespace Calame.BrushPanel.ViewModels
                 _viewerModule = documentContext.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
         }
 
-        protected override void OnDocumentActivated(IDocumentContext<ViewerViewModel> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<ViewerViewModel> activeDocument)
         {
             _selectedCanvas = null;
 
@@ -159,9 +164,11 @@ namespace Calame.BrushPanel.ViewModels
             //TODO: Handle selection binding
             //SelectedBrush = _brushes.FirstOrDefault(x => x == previousBrush);
             //SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == previousPaint);
+
+            return Task.CompletedTask;
         }
 
-        protected override void OnDocumentsCleaned()
+        protected override Task OnDocumentsCleaned()
         {
             _selectedCanvas = null;
 
@@ -172,6 +179,8 @@ namespace Calame.BrushPanel.ViewModels
             Items = null;
             SelectedCanvas = null;
             _brushes.Clear();
+
+            return Task.CompletedTask;
         }
 
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model)
@@ -233,8 +242,17 @@ namespace Calame.BrushPanel.ViewModels
             }
         }
 
-        void IHandle<ISelectionSpread<IGlyphComponent>>.Handle(ISelectionSpread<IGlyphComponent> message) => HandleSelection(message.Item);
-        void IHandle<ISelectionSpread<IGlyphData>>.Handle(ISelectionSpread<IGlyphData> message) => HandleSelection(message.Item);
+        Task IHandle<ISelectionSpread<IGlyphComponent>>.HandleAsync(ISelectionSpread<IGlyphComponent> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item);
+            return Task.CompletedTask;
+        }
+
+        Task IHandle<ISelectionSpread<IGlyphData>>.HandleAsync(ISelectionSpread<IGlyphData> message, CancellationToken cancellationToken)
+        {
+            HandleSelection(message.Item);
+            return Task.CompletedTask;
+        }
 
         private void HandleSelection(object canvas)
         {

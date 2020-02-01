@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Diese.Collections;
@@ -170,16 +171,16 @@ namespace Calame.Viewer
         }
         
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => Activate();
-        public void Activate()
+        public async Task Activate()
         {
             if (Runner?.Engine == null)
                 return;
 
             Runner.Engine.FocusedClient = Client;
-            _eventAggregator.PublishOnUIThread(_owner);
+            await _eventAggregator.PublishOnCurrentThreadAsync(_owner);
 
             if (LastSelection != null)
-                _eventAggregator.PublishOnUIThread(LastSelection);
+                await _eventAggregator.PublishOnCurrentThreadAsync(LastSelection);
         }
         
         private void OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)

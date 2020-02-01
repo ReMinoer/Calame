@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -38,14 +39,16 @@ namespace Calame.InteractionTree.ViewModels
             _controlIconDescriptor = iconDescriptorManager.GetDescriptor<IControl>();
         }
         
-        protected override void OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
         {
             Engine = activeDocument.Context;
+            return Task.CompletedTask;
         }
 
-        protected override void OnDocumentsCleaned()
+        protected override Task OnDocumentsCleaned()
         {
             Engine = null;
+            return Task.CompletedTask;
         }
 
         public ITreeViewItemModel CreateTreeItemModel(object data)
