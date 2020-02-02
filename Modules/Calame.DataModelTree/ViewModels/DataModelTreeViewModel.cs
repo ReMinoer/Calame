@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using Calame.Icons;
@@ -18,10 +19,10 @@ namespace Calame.DataModelTree.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
-        private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
 
         private IGlyphData _root;
         private IGlyphData _selection;
+        private readonly TreeViewItemModelBuilder<IGlyphCreator> _treeItemBuilder;
 
         public IGlyphData Root
         {
@@ -49,7 +50,12 @@ namespace Calame.DataModelTree.ViewModels
             DisplayName = "Data Model Tree";
 
             IconProvider = iconProvider;
-            _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+            IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+
+            _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphCreator>()
+                               .DisplayName(x => x.Name, nameof(IGlyphCreator.Name))
+                               .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphCreator.Children))
+                               .IconDescription(x => iconDescriptor.GetIcon(x.BindedObject));
         }
         
         protected override Task OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
@@ -74,20 +80,7 @@ namespace Calame.DataModelTree.ViewModels
             return Task.CompletedTask;
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
-        {
-            var glyphCreator = (IGlyphCreator)data;
-
-            return new TreeViewItemModel<IGlyphCreator>(
-                this,
-                glyphCreator,
-                x => x.Name,
-                x => new EnumerableReadOnlyObservableList<object>(x.Children),
-                _iconDescriptor.GetIcon(glyphCreator.BindedObject),
-                nameof(IGlyphCreator.Name),
-                nameof(IGlyphCreator.Children));
-        }
-        
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data) => _treeItemBuilder.Build(this, (IGlyphCreator)data);
         bool ITreeContext.BaseFilter(object data) => true;
     }
 }

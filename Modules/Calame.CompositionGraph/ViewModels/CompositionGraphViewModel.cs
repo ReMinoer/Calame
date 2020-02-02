@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using Calame.Icons;
@@ -19,8 +20,8 @@ namespace Calame.CompositionGraph.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
         
         public IIconProvider IconProvider { get; }
-        private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
-        
+
+        private readonly TreeViewItemModelBuilder<IGlyphComponent> _treeItemBuilder;
         private IDocumentContext<IComponentFilter> _filteringContext;
 
         private IGlyphComponent _root;
@@ -51,7 +52,13 @@ namespace Calame.CompositionGraph.ViewModels
             DisplayName = "Composition Graph";
             
             IconProvider = iconProvider;
-            _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+            IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+
+            _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()
+                               .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
+                               .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
+                               .IconDescription(x => iconDescriptor.GetIcon(x))
+                               .IsEnabled(x => _filteringContext?.Context.Filter(x) ?? true);
         }
 
         protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
@@ -88,23 +95,7 @@ namespace Calame.CompositionGraph.ViewModels
 
         private void HandleSelection(IGlyphComponent component) => SetValue(ref _selection, component, nameof(Selection));
         
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
-        {
-            var component = (IGlyphComponent)data;
-
-            return new TreeViewItemModel<IGlyphComponent>(
-                this,
-                component,
-                x => x.Name,
-                x => new EnumerableReadOnlyObservableList<object>(x.Components),
-                _iconDescriptor.GetIcon(component),
-                nameof(IGlyphComponent.Name),
-                nameof(IGlyphComponent.Components))
-            {
-                IsEnabled = _filteringContext?.Context.Filter(component) ?? true
-            };
-        }
-        
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data) => _treeItemBuilder.Build(this, (IGlyphComponent)data);
         bool ITreeContext.BaseFilter(object data) => true;
     }
 }

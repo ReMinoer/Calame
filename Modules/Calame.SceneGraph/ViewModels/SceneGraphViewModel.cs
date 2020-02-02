@@ -21,12 +21,12 @@ namespace Calame.SceneGraph.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
-        private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
 
         private GlyphEngine _engine;
         private IDocumentContext<IComponentFilter> _filteringContext;
         private IGlyphComponent _selection;
         private SceneNode _selectionNode;
+        private readonly TreeViewItemModelBuilder<ISceneNode> _treeItemBuilder;
 
         public GlyphEngine Engine
         {
@@ -73,7 +73,13 @@ namespace Calame.SceneGraph.ViewModels
             DisplayName = "Scene Graph";
             
             IconProvider = iconProvider;
-            _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+            IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+
+            _treeItemBuilder = new TreeViewItemModelBuilder<ISceneNode>()
+                               .DisplayName(x => (x as IGlyphComponent)?.Parent.Name ?? x.ToString(), nameof(IGlyphComponent.Name), x => (x as IGlyphComponent)?.Parent as INotifyPropertyChanged)
+                               .ChildrenSource(x => x.Children, nameof(ISceneNode.Children))
+                               .IconDescription(x => iconDescriptor.GetIcon((x as IGlyphComponent)?.Parent))
+                               .IsEnabled(x => _filteringContext?.Context.Filter(x as IGlyphComponent) ?? true);
 
             if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
                 Engine = documentContext.Context;
@@ -118,26 +124,8 @@ namespace Calame.SceneGraph.ViewModels
             SetValue(ref _selection, component, nameof(Selection));
             SetValue(ref _selectionNode, component?.GetSceneNode(), nameof(SelectionNode));
         }
-        
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data)
-        {
-            var sceneNode = (ISceneNode)data;
-            var glyphComponent = (IGlyphComponent)data;
 
-            return new TreeViewItemModel<ISceneNode>(
-                this,
-                sceneNode,
-                x => (x as IGlyphComponent)?.Parent.Name ?? x.ToString(),
-                x => x.Children,
-                _iconDescriptor.GetIcon((sceneNode as IGlyphComponent)?.Parent),
-                nameof(IGlyphComponent.Name),
-                nameof(SceneNode.Children),
-                (INotifyPropertyChanged)glyphComponent.Parent)
-            {
-                IsEnabled = _filteringContext?.Context.Filter(glyphComponent) ?? true
-            };
-        }
-        
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data) => _treeItemBuilder.Build(this, (ISceneNode)data);
         bool ITreeContext.BaseFilter(object data) => true;
     }
 }

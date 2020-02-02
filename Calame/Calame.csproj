@@ -87,7 +87,9 @@
     <Compile Include="Selection.cs" />
     <Compile Include="Utils\DependencyObjectExtension.cs" />
     <Compile Include="Utils\EnumerableTypeExtension.cs" />
+    <Compile Include="Utils\ObservableHelpers.cs" />
     <Compile Include="Utils\TreeViewItemModel.cs" />
+    <Compile Include="Utils\TreeViewItemModelBuilder.cs" />
     <Compile Include="Utils\VirtualizingStackPanel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +109,10 @@
       <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
       <Name>MonoGame.Framework.WpfInterop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
+      <Project>{8BA795FC-E007-40BB-BD70-90D970C99369}</Project>
+      <Name>Simulacra</Name>
+    </ProjectReference>
     <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
       <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
       <Name>Glyph.Composition</Name>
@@ -119,6 +125,9 @@
   <ItemGroup>
     <PackageReference Include="GeminiWpf">
       <Version>1.0.9-beta</Version>
+    </PackageReference>
+    <PackageReference Include="System.Reactive">
+      <Version>3.1.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Calame.Icons;
@@ -18,10 +19,11 @@ namespace Calame.InteractionTree.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
-        private readonly IIconDescriptor<IInteractive> _interactiveIconDescriptor;
-        private readonly IIconDescriptor<IControl> _controlIconDescriptor;
-        
+
         private GlyphEngine _engine;
+        private readonly TreeViewItemModelBuilder<IInteractive> _interactiveTreeItemBuilder;
+        private readonly TreeViewItemModelBuilder<IControl> _controlTreeItemBuilder;
+
         public GlyphEngine Engine
         {
             get => _engine;
@@ -35,8 +37,24 @@ namespace Calame.InteractionTree.ViewModels
             DisplayName = "Interaction Tree";
 
             IconProvider = iconProvider;
-            _interactiveIconDescriptor = iconDescriptorManager.GetDescriptor<IInteractive>();
-            _controlIconDescriptor = iconDescriptorManager.GetDescriptor<IControl>();
+            IIconDescriptor<IInteractive> interactiveIconDescriptor = iconDescriptorManager.GetDescriptor<IInteractive>();
+            IIconDescriptor<IControl> controlIconDescriptor = iconDescriptorManager.GetDescriptor<IControl>();
+
+            _interactiveTreeItemBuilder = new TreeViewItemModelBuilder<IInteractive>()
+                                          .DisplayName(x => x.Name, nameof(IInteractive.Name))
+                                          .ChildrenSource(x => new CompositeReadOnlyObservableList<object>
+                                          (
+                                              new EnumerableReadOnlyObservableList<object>(x.Components),
+                                              new EnumerableReadOnlyObservableList<object>(x.Controls)
+                                          ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IInteractive.Components), nameof(IInteractive.Controls)))
+                                          .IconDescription(x => interactiveIconDescriptor.GetIcon(x))
+                                          .IsEnabled(x => x.Enabled, nameof(IInteractive.Enabled));
+
+            _controlTreeItemBuilder = new TreeViewItemModelBuilder<IControl>()
+                                      .DisplayName(x => x.Name, nameof(IControl.Name))
+                                      .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IControl.Components))
+                                      .IconDescription(x => controlIconDescriptor.GetIcon(x))
+                                      .IsTriggered(x => x.IsActive, nameof(IControl.IsActive));
         }
         
         protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
@@ -56,32 +74,9 @@ namespace Calame.InteractionTree.ViewModels
             switch (data)
             {
                 case IInteractive interactive:
-                    return new TreeViewItemModel<IInteractive>(
-                        this,
-                        interactive,
-                        x => x.Name,
-                        x => new CompositeReadOnlyObservableList<object>
-                        (
-                            new EnumerableReadOnlyObservableList<object>(x.Components),
-                            new EnumerableReadOnlyObservableList<object>(x.Controls)
-                        ),
-                        _interactiveIconDescriptor.GetIcon(interactive),
-                        nameof(IInteractive.Name),
-                        nameof(IInteractive.Components))
-                    {
-                        IsEnabled = interactive.Enabled
-                    };
+                    return _interactiveTreeItemBuilder.Build(this, interactive);
                 case IControl control:
-                    return new TreeViewItemModel<IControl>(
-                        this,
-                        control,
-                        x => x.Name,
-                        x => new EnumerableReadOnlyObservableList<object>(x.Components),
-                        _controlIconDescriptor.GetIcon(control),
-                        nameof(IControl.Name),
-                        nameof(IControl.Components),
-                        isTriggeredFunc: x => x.IsActive,
-                        isTriggeredPropertyName: nameof(IControl.IsActive));
+                    return _controlTreeItemBuilder.Build(this, control);
                 default:
                     throw new NotSupportedException();
             }

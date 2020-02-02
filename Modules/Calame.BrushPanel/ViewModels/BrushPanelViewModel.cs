@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
@@ -30,6 +31,9 @@ namespace Calame.BrushPanel.ViewModels
         public IIconProvider IconProvider { get; }
         public IIconDescriptorManager IconDescriptorManager { get; }
         private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
+
+        private readonly TreeViewItemModelBuilder<IGlyphData> _dataTreeItemBuilder;
+        private readonly TreeViewItemModelBuilder<IGlyphComponent> _componentTreeItemBuilder;
         
         private GlyphEngine _engine;
         private IBrushViewerModule _viewerModule;
@@ -129,6 +133,16 @@ namespace Calame.BrushPanel.ViewModels
             IconDescriptorManager = iconDescriptorManager;
             _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
+            _dataTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
+                                   .DisplayName(x => x.Name, nameof(IGlyphData.Name))
+                                   .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphData.Children))
+                                   .IconDescription(x => _iconDescriptor.GetIcon(x.BindedObject));
+
+            _componentTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()
+                                        .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
+                                        .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
+                                        .IconDescription(x => _iconDescriptor.GetIcon(x));
+
             SelectBrushCommand = new RelayCommand(x => SelectedBrush = (IBrushViewModel)x);
             SelectPaintCommand = new RelayCommand(x => SelectedPaint = (IPaintViewModel)x);
 
@@ -188,23 +202,9 @@ namespace Calame.BrushPanel.ViewModels
             switch (model)
             {
                 case IGlyphData data:
-                    return new TreeViewItemModel<IGlyphData>(
-                        this,
-                        data,
-                        x => x.Name,
-                        x => new EnumerableReadOnlyObservableList<object>(x.Children),
-                        _iconDescriptor.GetIcon(data.BindedObject),
-                        nameof(IGlyphData.Name),
-                        nameof(IGlyphData.Children));
+                    return _dataTreeItemBuilder.Build(this, data);
                 case IGlyphComponent component:
-                    return new TreeViewItemModel<IGlyphComponent>(
-                        this,
-                        component,
-                        x => x.Name,
-                        x => new EnumerableReadOnlyObservableList<object>(x.Components),
-                        _iconDescriptor.GetIcon(component),
-                        nameof(IGlyphComponent.Name),
-                        nameof(IGlyphComponent.Components));
+                    return _componentTreeItemBuilder.Build(this, component);
                 default:
                     throw new NotSupportedException();
             }
