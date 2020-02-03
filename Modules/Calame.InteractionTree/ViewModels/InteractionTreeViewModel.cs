@@ -69,14 +69,14 @@ namespace Calame.InteractionTree.ViewModels
             return Task.CompletedTask;
         }
 
-        public ITreeViewItemModel CreateTreeItemModel(object data)
+        public ITreeViewItemModel CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
         {
             switch (data)
             {
                 case IInteractive interactive:
-                    return _interactiveTreeItemBuilder.Build(this, interactive);
+                    return _interactiveTreeItemBuilder.Build(interactive, dataConverter, itemDisposer);
                 case IControl control:
-                    return _controlTreeItemBuilder.Build(this, control);
+                    return _controlTreeItemBuilder.Build(control, dataConverter, itemDisposer);
                 default:
                     throw new NotSupportedException();
             }

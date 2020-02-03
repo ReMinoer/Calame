@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -125,7 +126,11 @@ namespace Calame.SceneGraph.ViewModels
             SetValue(ref _selectionNode, component?.GetSceneNode(), nameof(SelectionNode));
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data) => _treeItemBuilder.Build(this, (ISceneNode)data);
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
+        {
+            return _treeItemBuilder.Build((ISceneNode)data, dataConverter, itemDisposer);
+        }
+
         bool ITreeContext.BaseFilter(object data) => true;
     }
 }

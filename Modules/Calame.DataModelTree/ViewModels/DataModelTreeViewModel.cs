@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,7 +81,11 @@ namespace Calame.DataModelTree.ViewModels
             return Task.CompletedTask;
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data) => _treeItemBuilder.Build(this, (IGlyphCreator)data);
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
+        {
+            return _treeItemBuilder.Build((IGlyphCreator)data, dataConverter, itemDisposer);
+        }
+
         bool ITreeContext.BaseFilter(object data) => true;
     }
 }

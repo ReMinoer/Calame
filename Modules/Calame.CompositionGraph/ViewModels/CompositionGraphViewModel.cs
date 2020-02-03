@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -95,7 +96,11 @@ namespace Calame.CompositionGraph.ViewModels
 
         private void HandleSelection(IGlyphComponent component) => SetValue(ref _selection, component, nameof(Selection));
         
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data) => _treeItemBuilder.Build(this, (IGlyphComponent)data);
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
+        {
+            return _treeItemBuilder.Build((IGlyphComponent)data, dataConverter, itemDisposer);
+        }
+
         bool ITreeContext.BaseFilter(object data) => true;
     }
 }

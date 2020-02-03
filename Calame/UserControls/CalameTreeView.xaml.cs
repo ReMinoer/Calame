@@ -17,7 +17,7 @@ namespace Calame.UserControls
 {
     public interface ITreeContext
     {
-        ITreeViewItemModel CreateTreeItemModel(object data);
+        ITreeViewItemModel CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer);
         bool BaseFilter(object data);
     }
 
@@ -35,30 +35,30 @@ namespace Calame.UserControls
 
         static private void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = (CalameTreeView)d;
+            var treeView = (CalameTreeView)d;
             var itemsSource = (IEnumerable)e.NewValue;
 
-            if (!Synchronizers.TryGetValue(control, out ObservableListSynchronizer<object, ITreeViewItemModel> synchronizer))
+            if (!Synchronizers.TryGetValue(treeView, out ObservableListSynchronizer<object, ITreeViewItemModel> synchronizer))
             {
-                synchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(x => SynchronizerConverter(control, x), x => x.Data, x => SynchronizerDisposer(control, x));
-                synchronizer.Subscribe(control._treeItems);
-                Synchronizers.Add(control, synchronizer);
+                synchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(x => SynchronizerConverter(treeView, x), x => x.Data, x => SynchronizerDisposer(treeView, x));
+                synchronizer.Subscribe(treeView._treeItems);
+                Synchronizers.Add(treeView, synchronizer);
             }
-
+            
             synchronizer.Reference = itemsSource != null ? new EnumerableReadOnlyObservableList(itemsSource) : null;
-            control.UpdateFilter();
+            treeView.UpdateFilter();
         }
 
         static private ITreeViewItemModel SynchronizerConverter(CalameTreeView treeView, object data)
         {
-            ITreeViewItemModel item = treeView.TreeContext.CreateTreeItemModel(data);
-            treeView.SubscribeChildrenChanged(item);
+            ITreeViewItemModel item = treeView.TreeContext.CreateTreeItemModel(data, x => SynchronizerConverter(treeView, x), x => SynchronizerDisposer(treeView, x));
+            item.Children.CollectionChanged += treeView.OnItemChanged;
             return item;
         }
 
         static private void SynchronizerDisposer(CalameTreeView treeView, ITreeViewItemModel item)
         {
-            treeView.UnsubscribeChildrenChanged(item);
+            item.Children.CollectionChanged -= treeView.OnItemChanged;
             item.Dispose();
         }
 
@@ -101,7 +101,6 @@ namespace Calame.UserControls
         public IReadOnlyObservableList<ITreeViewItemModel> TreeItems { get; }
 
         private ITreeViewItemModel _selectedTreeItem;
-
         public ITreeViewItemModel SelectedTreeItem
         {
             get => _selectedTreeItem;
@@ -118,7 +117,6 @@ namespace Calame.UserControls
         }
 
         private string _filterText;
-
         public string FilterText
         {
             get => _filterText;
@@ -206,31 +204,13 @@ namespace Calame.UserControls
             // Re-apply filter on parents
             foreach (ITreeViewItemModel parent in Sequence.AggregateExclusive(newItem, x => x.Parent))
                 ApplyFilterOnItem(parent);
-
-            // Subscribe to collection changes
-            SubscribeChildrenChanged(newItem);
         }
 
         private void UpdateFilterOnItemRemoved(ITreeViewItemModel oldItem)
         {
-            // Unsubscribe to collection changes
-            UnsubscribeChildrenChanged(oldItem);
-
             // Re-apply filter on parents
             foreach (ITreeViewItemModel parent in Sequence.AggregateExclusive(oldItem, x => x.Parent))
                 ApplyFilterOnItem(parent);
-        }
-
-        private void SubscribeChildrenChanged(ITreeViewItemModel root)
-        {
-            foreach (ITreeViewItemModel item in Tree.DepthFirst<ITreeViewItemModel, ITreeViewItemModel>(root, x => x.Children))
-                item.Children.CollectionChanged += OnItemChanged;
-        }
-
-        private void UnsubscribeChildrenChanged(ITreeViewItemModel root)
-        {
-            foreach (ITreeViewItemModel item in Tree.DepthFirst<ITreeViewItemModel, ITreeViewItemModel>(root, x => x.Children))
-                item.Children.CollectionChanged -= OnItemChanged;
         }
 
         private void ApplyFilterOnItem(ITreeViewItemModel item)

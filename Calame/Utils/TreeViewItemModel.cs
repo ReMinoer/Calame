@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Calame.Icons;
-using Calame.UserControls;
 using Diese;
 using Diese.Collections;
 using Diese.Collections.Children;
@@ -132,12 +131,12 @@ namespace Calame.Utils
             }
         }
 
-        public TreeViewItemModel(ITreeContext treeContext, T data)
+        public TreeViewItemModel(T data, Func<object, ITreeViewItemModel> childConverter, Action<ITreeViewItemModel> childDisposer)
         {
             Data = data;
 
             Children = new ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel>(this);
-            ChildrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(treeContext.CreateTreeItemModel, x => x.Data, x => x.Dispose());
+            ChildrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(childConverter, x => x.Data, childDisposer);
             ChildrenSynchronizer.Subscribe(Children);
         }
 

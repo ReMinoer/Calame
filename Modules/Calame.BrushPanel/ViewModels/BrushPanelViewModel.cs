@@ -197,14 +197,14 @@ namespace Calame.BrushPanel.ViewModels
             return Task.CompletedTask;
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model)
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
         {
             switch (model)
             {
                 case IGlyphData data:
-                    return _dataTreeItemBuilder.Build(this, data);
+                    return _dataTreeItemBuilder.Build(data, dataConverter, itemDisposer);
                 case IGlyphComponent component:
-                    return _componentTreeItemBuilder.Build(this, component);
+                    return _componentTreeItemBuilder.Build(component, dataConverter, itemDisposer);
                 default:
                     throw new NotSupportedException();
             }
