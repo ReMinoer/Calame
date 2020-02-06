@@ -34,9 +34,9 @@ namespace Calame.Viewer
         public FreeCamera EditorCamera { get; private set; }
         public GlyphObject EditorRoot { get; private set; }
 
-        public ReadOnlyCollection<IViewerModule> Modules { get; }
-        public ReadOnlyObservableCollection<IViewerInteractiveMode> InteractiveModes { get; }
-        private readonly ObservableCollection<IViewerInteractiveMode> _interactiveModes;
+        public ReadOnlyList<IViewerModule> Modules { get; }
+        public ReadOnlyObservableList<IViewerInteractiveMode> InteractiveModes { get; }
+        private readonly ObservableList<IViewerInteractiveMode> _interactiveModes;
         
         public ComponentFilter ComponentsFilter { get; }
         public ISelectionSpread<object> LastSelection { get; set; }
@@ -85,8 +85,6 @@ namespace Calame.Viewer
                     EditorView = null;
                     EditorCamera = null;
                     EditorRoot = null;
-
-                    _interactiveToggle = null;
                 }
 
                 _runner = value;
@@ -101,8 +99,6 @@ namespace Calame.Viewer
 
                     _editorInteractive = EditorRoot.Add<InteractiveRoot>().Interactive;
                     engine.InteractionManager.Root.Add(_editorInteractive);
-
-                    _interactiveToggle = new InteractiveToggle();
                     engine.InteractionManager.Root.Add(_interactiveToggle);
 
                     EditorView = engine.Root.Add<FillView>();
@@ -130,11 +126,12 @@ namespace Calame.Viewer
         {
             _owner = owner;
             _eventAggregator = eventAggregator;
-
-            Modules = new ReadOnlyCollection<IViewerModule>(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance()).ToArray());
-
-            _interactiveModes = new ObservableCollection<IViewerInteractiveMode>();
-            InteractiveModes = new ReadOnlyObservableCollection<IViewerInteractiveMode>(_interactiveModes);
+            
+            Modules = new ReadOnlyList<IViewerModule>(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance()).ToArray());
+            
+            _interactiveToggle = new InteractiveToggle();
+            _interactiveModes = new ObservableList<IViewerInteractiveMode>();
+            InteractiveModes = new ReadOnlyObservableList<IViewerInteractiveMode>(_interactiveModes);
 
             ComponentsFilter = new ComponentFilter();
 
@@ -161,6 +158,12 @@ namespace Calame.Viewer
         public void AddInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
             _interactiveModes.Add(interactiveMode);
+            _interactiveToggle.Add(interactiveMode.Interactive);
+        }
+
+        public void InsertInteractiveMode(int index, IViewerInteractiveMode interactiveMode)
+        {
+            _interactiveModes.Insert(index, interactiveMode);
             _interactiveToggle.Add(interactiveMode.Interactive);
         }
 

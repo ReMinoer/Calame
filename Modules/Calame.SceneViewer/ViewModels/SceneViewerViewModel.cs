@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Viewer;
+using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
 using Diese.Collections;
 using Fingear;
@@ -57,6 +58,8 @@ namespace Calame.SceneViewer.ViewModels
         [ImportingConstructor]
         public SceneViewerViewModel(IShell shell, IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
         {
+            DisplayName = "Scene Viewer";
+
             _shell = shell;
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
@@ -65,7 +68,8 @@ namespace Calame.SceneViewer.ViewModels
             Viewer = new ViewerViewModel(this, _eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
-            DisplayName = "Scene Viewer";
+            SessionMode = new SessionModeModule();
+            Viewer.InsertInteractiveMode(0, SessionMode);
 
             PlayCommand = new RelayCommand(x => Runner.Engine.Start(), x => Runner?.Engine != null && !(Runner.Engine.IsStarted && !Runner.Engine.IsPaused));
             PauseCommand = new RelayCommand(x => Runner.Engine.Pause(), x => Runner?.Engine != null && Runner.Engine.IsStarted && !Runner.Engine.IsPaused);
@@ -93,7 +97,6 @@ namespace Calame.SceneViewer.ViewModels
         {
             _viewTracker?.Dispose();
             _viewTracker = null;
-            SessionMode = null;
 
             _engine = new GlyphEngine(_contentLibraryProvider.Get(Session.ContentPath));
             _engine.Root.Add<SceneNode>();
@@ -105,9 +108,6 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker = _engine.Resolver.Resolve<MessagingTracker<IView>>();
 
             Viewer.Runner = new GlyphWpfRunner { Engine = _engine };
-
-            SessionMode = new SessionModeModule();
-            Viewer.AddInteractiveMode(SessionMode);
 
             var context = new SessionContext(Viewer, sessionView, SessionMode.Interactive);
             Session.PrepareSession(context);
@@ -193,7 +193,7 @@ namespace Calame.SceneViewer.ViewModels
             Viewer.Dispose();
         }
 
-        public class SessionModeModule : IViewerInteractiveMode
+        public class SessionModeModule : ViewerModuleBase, IViewerInteractiveMode
         {
             public string Name => "Session";
             public object IconId => PackIconMaterialKind.GamepadVariant;
@@ -203,6 +203,16 @@ namespace Calame.SceneViewer.ViewModels
 
             public Cursor Cursor => Cursors.None;
             public bool UseFreeCamera => false;
+
+            protected override void ConnectRunner()
+            {
+                Model.AddInteractiveMode(this);
+            }
+
+            protected override void DisconnectRunner()
+            {
+                Model.RemoveInteractiveMode(this);
+            }
         }
     }
 }
