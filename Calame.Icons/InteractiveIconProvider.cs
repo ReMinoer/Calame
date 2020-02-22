@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Media;
 using Fingear;
+using Fingear.Interactives.Interfaces;
 using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons
@@ -9,15 +10,28 @@ namespace Calame.Icons
     public class InteractiveIconProvider : IDefaultIconDescriptorModule<IInteractive>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
+        static public readonly Brush UiCategoryBrush = Brushes.OrangeRed;
 
         public IconDescription GetDefaultIcon(IInteractive interactive)
         {
-            return new IconDescription(PackIconMaterialKind.Layers, CoreCategoryBrush);
+            switch (interactive)
+            {
+                case IInteractiveInterface _:
+                    return new IconDescription(PackIconMaterialKind.ViewDashboard, UiCategoryBrush);
+                default:
+                    return new IconDescription(PackIconMaterialKind.Layers, CoreCategoryBrush);
+            }
         }
 
         public IconDescription GetIcon(IInteractive interactive)
         {
-            return IconDescription.None;
+            switch (interactive)
+            {
+                case InteractiveInterfaceRoot _:
+                    return new IconDescription(PackIconMaterialKind.ViewDashboardVariant, UiCategoryBrush);
+                default:
+                    return IconDescription.None;
+            }
         }
     }
 }

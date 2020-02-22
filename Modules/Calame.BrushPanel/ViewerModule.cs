@@ -102,8 +102,7 @@ namespace Calame.BrushPanel
         protected override void DisconnectRunner()
         {
             Model.RemoveInteractiveMode(this);
-            Model.EditorRoot.Remove(_root);
-            _root.Dispose();
+            Model.EditorRoot.RemoveAndDispose(_root);
 
             _brushController = null;
             _root = null;

@@ -82,7 +82,7 @@ namespace Calame.DataModelViewer.ViewModels
 
             Editor.Data.DependencyResolver = _engine.Resolver;
             Editor.RegisterDependencies(_engine.Registry);
-            Editor.PrepareEditor(Viewer.Runner.Engine, Viewer.EditorRoot);
+            Editor.PrepareEditor(Viewer.Runner.Engine, Viewer.UserRoot);
 
             if (Editor.Data.BindedObject is IBoxedComponent boxedComponent)
                 Viewer.EditorCamera.ShowTarget(boxedComponent);

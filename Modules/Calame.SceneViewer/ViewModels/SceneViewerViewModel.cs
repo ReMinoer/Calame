@@ -113,7 +113,7 @@ namespace Calame.SceneViewer.ViewModels
             Session.PrepareSession(context);
 
             FreeCameraAction();
-            Viewer.EditorCamera.ShowTarget(context.EditorRoot);
+            Viewer.EditorCamera.ShowTarget(context.UserRoot);
 
             _engine.Initialize();
             _engine.LoadContent();

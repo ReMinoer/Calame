@@ -177,6 +177,7 @@ namespace Calame.UserControls
             // If the selected tree item is filtered, it will be unselect
             // during the full filter refresh and change the content of an enumerable.
             // So we first unselect the item if necessary. 
+            // TODO: Try to keep selection
             if (SelectedTreeItem != null)
             {
                 UpdateFilter(SelectedTreeItem);

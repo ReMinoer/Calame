@@ -24,7 +24,7 @@ namespace Calame.Demo.Modules.DemoGameData.Session
 
         public void PrepareSession(ISessionContext context)
         {
-            var gameRoot = context.EditorRoot.Add<GlyphObject>();
+            var gameRoot = context.UserRoot.Add<GlyphObject>();
             gameRoot.Name = "Game Root";
             gameRoot.Add<SceneNode>();
 

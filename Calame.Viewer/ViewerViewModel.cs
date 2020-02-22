@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Calame.Viewer.Modules;
+using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
 using Diese.Collections;
 using Diese.Collections.Observables;
@@ -10,13 +12,16 @@ using Diese.Collections.Observables.ReadOnly;
 using Diese.Collections.ReadOnly;
 using Fingear;
 using Fingear.Interactives;
+using Fingear.Interactives.Interfaces;
 using Glyph;
 using Glyph.Core;
 using Glyph.Core.Inputs;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.Tools;
+using Glyph.UI;
 using Glyph.WpfInterop;
+using MahApps.Metro.IconPacks;
 
 namespace Calame.Viewer
 {
@@ -24,24 +29,30 @@ namespace Calame.Viewer
     {
         private readonly IViewerViewModelOwner _owner;
         private readonly IEventAggregator _eventAggregator;
-        
+
         private GlyphWpfRunner _runner;
+        private readonly InteractiveToggle _viewerModeToggle;
+        private readonly ObservableList<IViewerInteractiveMode> _interactiveModes;
+        private readonly EditorModeModule _editorModeModule;
         private IInteractive _editorInteractive;
-        private InteractiveToggle _interactiveToggle;
 
         public IWpfGlyphClient Client { get; private set; }
         public FillView EditorView { get; private set; }
         public FreeCamera EditorCamera { get; private set; }
+        
+        public GlyphObject Root { get; private set; }
+        public GlyphObject UserRoot { get; private set; }
         public GlyphObject EditorRoot { get; private set; }
+        public GlyphObject EditorModeRoot => _editorModeModule.Root;
 
         public ReadOnlyList<IViewerModule> Modules { get; }
         public ReadOnlyObservableList<IViewerInteractiveMode> InteractiveModes { get; }
-        private readonly ObservableList<IViewerInteractiveMode> _interactiveModes;
-        
+
         public ComponentFilter ComponentsFilter { get; }
         public ISelectionSpread<object> LastSelection { get; set; }
 
         private IViewerInteractiveMode _selectedNode;
+
         public IViewerInteractiveMode SelectedMode
         {
             get => _selectedNode;
@@ -50,12 +61,12 @@ namespace Calame.Viewer
                 if (!this.SetValue(ref _selectedNode, value))
                     return;
 
-                _interactiveToggle.SelectedInteractive = SelectedMode.Interactive;
+                _viewerModeToggle.SelectedInteractive = SelectedMode.Interactive;
                 Cursor = SelectedMode.Cursor;
                 EditorCamera.Enabled = SelectedMode.UseFreeCamera;
             }
         }
-        
+
         private Cursor _cursor;
         public Cursor Cursor
         {
@@ -74,17 +85,18 @@ namespace Calame.Viewer
 
                     foreach (IViewerModule module in Modules)
                         module.Disconnect();
-                    
+
                     ComponentsFilter.ExcludedRoots.Clear();
                     
+                    engine.InteractionManager.Root.Remove(_viewerModeToggle);
                     engine.InteractionManager.Root.Remove(_editorInteractive);
-                    engine.InteractionManager.Root.Remove(_interactiveToggle);
-                    _runner.Engine.Root.RemoveAndDispose(EditorRoot);
-
-                    _editorInteractive = null;
+                    _runner.Engine.Root.RemoveAndDispose(Root);
+                    
                     EditorView = null;
                     EditorCamera = null;
                     EditorRoot = null;
+                    UserRoot = null;
+                    Root = null;
                 }
 
                 _runner = value;
@@ -93,19 +105,25 @@ namespace Calame.Viewer
                 {
                     GlyphEngine engine = _runner.Engine;
 
-                    EditorRoot = engine.Root.Add<GlyphObject>();
+                    Root = engine.Root.Add<GlyphObject>();
+                    Root.Name = "Root";
+                    Root.Add<SceneNode>().MakesRoot();
+                    
+                    UserRoot = Root.Add<GlyphObject>();
+                    UserRoot.Name = "User Root";
+
+                    EditorRoot = Root.Add<GlyphObject>();
                     EditorRoot.Name = "Editor Root";
-                    EditorRoot.Add<SceneNode>().MakesRoot();
 
                     _editorInteractive = EditorRoot.Add<InteractiveRoot>().Interactive;
                     engine.InteractionManager.Root.Add(_editorInteractive);
-                    engine.InteractionManager.Root.Add(_interactiveToggle);
+                    engine.InteractionManager.Root.Add(_viewerModeToggle);
 
                     EditorView = engine.Root.Add<FillView>();
                     EditorView.Name = "Editor View";
                     EditorView.ParentView = engine.RootView;
                     EditorView.DrawClientFilter = new ExcludingFilter<IDrawClient>();
-                    
+
                     EditorCamera = EditorRoot.Add<FreeCamera>();
                     ConnectRunner();
                     EditorCamera.View = EditorView;
@@ -126,12 +144,18 @@ namespace Calame.Viewer
         {
             _owner = owner;
             _eventAggregator = eventAggregator;
-            
-            Modules = new ReadOnlyList<IViewerModule>(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance()).ToArray());
-            
-            _interactiveToggle = new InteractiveToggle();
+
+            _viewerModeToggle = new InteractiveToggle { Name = "Viewer Modes" };
+
             _interactiveModes = new ObservableList<IViewerInteractiveMode>();
             InteractiveModes = new ReadOnlyObservableList<IViewerInteractiveMode>(_interactiveModes);
+
+            _editorModeModule = new EditorModeModule();
+            var componentSelectorModule = new BoxedComponentSelectorModule(_eventAggregator);
+
+            var modules = new List<IViewerModule> { _editorModeModule, componentSelectorModule };
+            modules.AddRange(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance()));
+            Modules = new ReadOnlyList<IViewerModule>(modules);
 
             ComponentsFilter = new ComponentFilter();
 
@@ -158,22 +182,23 @@ namespace Calame.Viewer
         public void AddInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
             _interactiveModes.Add(interactiveMode);
-            _interactiveToggle.Add(interactiveMode.Interactive);
+            _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void InsertInteractiveMode(int index, IViewerInteractiveMode interactiveMode)
         {
             _interactiveModes.Insert(index, interactiveMode);
-            _interactiveToggle.Add(interactiveMode.Interactive);
+            _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void RemoveInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
-            _interactiveToggle.Remove(interactiveMode.Interactive);
+            _viewerModeToggle.Remove(interactiveMode.Interactive);
             _interactiveModes.Remove(interactiveMode);
         }
-        
+
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => Activate();
+
         public async Task Activate()
         {
             if (Runner?.Engine == null)
@@ -185,7 +210,7 @@ namespace Calame.Viewer
             if (LastSelection != null)
                 await _eventAggregator.PublishOnCurrentThreadAsync(LastSelection);
         }
-        
+
         private void OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)
         {
             if (Runner?.Engine != null && Runner.Engine.FocusedClient == Client)
@@ -205,6 +230,44 @@ namespace Calame.Viewer
 
             Runner?.Dispose();
             Runner = null;
+        }
+
+        public class EditorModeModule : ViewerModuleBase, IViewerInteractiveMode
+        {
+            private InterfaceRoot _interfaceRoot;
+
+            public string Name => "Editor";
+            public object IconId => PackIconMaterialKind.CursorDefaultOutline;
+            public Cursor Cursor => Cursors.Cross;
+            public bool UseFreeCamera => true;
+
+            public GlyphObject Root { get; private set; }
+
+            public InteractiveInterfaceRoot Interactive => _interfaceRoot.Interactive;
+            IInteractive IViewerInteractiveMode.Interactive => Interactive;
+
+            protected override void ConnectRunner()
+            {
+                _interfaceRoot = Model.EditorRoot.Add<InterfaceRoot>();
+                _interfaceRoot.RaycastClient = Model.Client;
+
+                Root = Model.EditorRoot.Add<GlyphObject>();
+                Root.Name = "Editor Mode Root";
+                Root.Add<UserInterface>();
+
+                Model.AddInteractiveMode(this);
+            }
+
+            protected override void DisconnectRunner()
+            {
+                Model.RemoveInteractiveMode(this);
+                
+                Model.EditorRoot.RemoveAndDispose(Root);
+                Root = null;
+
+                Model.EditorRoot.RemoveAndDispose(_interfaceRoot);
+                _interfaceRoot = null;
+            }
         }
     }
 }

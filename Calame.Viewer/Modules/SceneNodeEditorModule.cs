@@ -25,7 +25,6 @@ namespace Calame.Viewer.Modules
     {
         private SceneNodeEditor _sceneNodeEditor;
         
-        [ImportingConstructor]
         public SceneNodeEditorModule(IEventAggregator eventAggregator)
             : base(eventAggregator)
         {
@@ -37,7 +36,7 @@ namespace Calame.Viewer.Modules
             if (sceneNode == null)
                 return;
 
-            _sceneNodeEditor = Model.EditorRoot.Add<SceneNodeEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
+            _sceneNodeEditor = Model.EditorModeRoot.Add<SceneNodeEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
             _sceneNodeEditor.EditedObject = sceneNode;
             _sceneNodeEditor.RaycastClient = Model.Client;
         }
@@ -47,8 +46,7 @@ namespace Calame.Viewer.Modules
             if (_sceneNodeEditor == null)
                 return;
             
-            Model.ComponentsFilter.ExcludedRoots.Remove(_sceneNodeEditor);
-            Model.EditorRoot.RemoveAndDispose(_sceneNodeEditor);
+            Model.EditorModeRoot.RemoveAndDispose(_sceneNodeEditor);
 
             _sceneNodeEditor = null;
         }

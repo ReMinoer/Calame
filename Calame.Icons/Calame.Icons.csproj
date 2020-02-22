@@ -109,6 +109,10 @@
       <Project>{6692F3F4-E1EA-4D53-B0A1-2DBA67414FC2}</Project>
       <Name>Glyph.Tools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\External\Glyph\Glyph.UI\Glyph.UI.csproj">
+      <Project>{47E66422-AEFC-4B28-92C3-356FFD2E783C}</Project>
+      <Name>Glyph.UI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\External\Glyph\Glyph\Glyph.csproj">
       <Project>{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}</Project>
       <Name>Glyph</Name>

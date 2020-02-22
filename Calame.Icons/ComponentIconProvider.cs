@@ -14,6 +14,7 @@ using Glyph.Graphics.Renderer;
 using Glyph.Scripting;
 using Glyph.Tools;
 using Glyph.Tools.ShapeRendering;
+using Glyph.UI;
 using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons
@@ -29,7 +30,8 @@ namespace Calame.Icons
         static public readonly Brush PhysicsCategoryBrush = Brushes.SaddleBrown;
         static public readonly Brush InputCategoryBrush = Brushes.DeepPink;
         static public readonly Brush ScriptingCategoryBrush = Brushes.DarkOrange;
-        static public readonly Brush ToolCategoryBrush = Brushes.Goldenrod;
+        static public readonly Brush UiCategoryBrush = Brushes.Goldenrod;
+        static public readonly Brush ToolCategoryBrush = Brushes.Black;
         
         public IconDescription GetDefaultIcon(IGlyphComponent glyphComponent)
         {
@@ -98,6 +100,11 @@ namespace Calame.Icons
                     return new IconDescription(PackIconMaterialKind.AccountBox, ScriptingCategoryBrush);
                 case Trigger _:
                     return new IconDescription(PackIconMaterialKind.AlertBoxOutline, ScriptingCategoryBrush);
+                    
+                case InterfaceRoot _:
+                    return new IconDescription(PackIconMaterialKind.ViewDashboardVariant, UiCategoryBrush);
+                case UserInterface _:
+                    return new IconDescription(PackIconMaterialKind.ViewDashboard, UiCategoryBrush);
                     
                 case Flipper _:
                     return new IconDescription(PackIconMaterialKind.FlipHorizontal, CoreCategoryBrush);

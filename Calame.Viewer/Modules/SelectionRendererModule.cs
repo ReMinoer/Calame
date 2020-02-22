@@ -29,7 +29,6 @@ namespace Calame.Viewer.Modules
     {
         private AreaComponentRenderer _selectionRenderer;
         
-        [ImportingConstructor]
         public SelectionRendererModule(IEventAggregator eventAggregator)
             : base(eventAggregator)
         {
@@ -43,15 +42,15 @@ namespace Calame.Viewer.Modules
                 Color = Color.Purple * 0.5f,
                 DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera
             };
-            
+
             Model.ComponentsFilter.ExcludedRoots.Add(_selectionRenderer);
-            Model.EditorRoot.Add(_selectionRenderer);
+            
+            Model.EditorModeRoot.Add(_selectionRenderer);
         }
 
         protected override void ReleaseSelection()
         {
-            Model.ComponentsFilter.ExcludedRoots.Remove(_selectionRenderer);
-            Model.EditorRoot.Remove(_selectionRenderer);
+            Model.EditorModeRoot.RemoveAndDispose(_selectionRenderer);
 
             _selectionRenderer.Dispose();
             _selectionRenderer = null;
