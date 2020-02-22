@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Media;
-using Fingear;
+using Fingear.Interactives;
 using Fingear.Interactives.Interfaces;
 using MahApps.Metro.IconPacks;
 

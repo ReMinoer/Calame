@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel.Composition;
 using Calame.SceneViewer;
-using Fingear;
 using Glyph.Core;
 using Glyph.Core.Inputs;
-using Glyph.Engine;
 using Glyph.Graphics.Renderer;
 using Glyph.Graphics.Shapes;
 using Fingear.Controls;
-using Fingear.Converters;
+using Fingear.Inputs.Converters;
 using Fingear.MonoGame;
 using Glyph;
 using Glyph.Graphics;

@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Media;
 using Diese.Collections;
-using Fingear;
+using Fingear.Controls;
+using Fingear.Inputs;
 using Fingear.MonoGame.Inputs;
 using MahApps.Metro.IconPacks;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Calame.Icons

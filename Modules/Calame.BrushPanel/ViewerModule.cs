@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.Windows.Input;
 using Calame.Viewer;
 using Calame.Viewer.Modules.Base;
-using Fingear;
+using Fingear.Interactives;
 using Fingear.MonoGame;
-using Glyph;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;

@@ -7,7 +7,8 @@ using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
 using Diese.Collections.Observables.ReadOnly;
-using Fingear;
+using Fingear.Controls;
+using Fingear.Interactives;
 using Gemini.Framework.Services;
 using Glyph.Engine;
 

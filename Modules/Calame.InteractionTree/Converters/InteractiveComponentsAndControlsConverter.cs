@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
-using Fingear;
+using Fingear.Interactives;
 
 namespace Calame.InteractionTree.Converters
 {

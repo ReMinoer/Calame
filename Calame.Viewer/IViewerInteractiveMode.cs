@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using Fingear;
+using Fingear.Interactives;
 
 namespace Calame.Viewer
 {
