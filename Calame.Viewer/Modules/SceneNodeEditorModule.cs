@@ -3,6 +3,7 @@ using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
 using Glyph.Core;
 using Glyph.Tools;
+using Glyph.Tools.Transforming;
 
 namespace Calame.Viewer.Modules
 {

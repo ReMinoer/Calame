@@ -14,6 +14,7 @@ using Glyph.Graphics.Renderer;
 using Glyph.Scripting;
 using Glyph.Tools;
 using Glyph.Tools.ShapeRendering;
+using Glyph.Tools.Transforming;
 using Glyph.UI;
 using MahApps.Metro.IconPacks;
 
