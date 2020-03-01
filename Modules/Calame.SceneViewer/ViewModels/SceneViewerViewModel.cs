@@ -112,11 +112,12 @@ namespace Calame.SceneViewer.ViewModels
             var context = new SessionContext(Viewer, sessionView, SessionMode.Interactive);
             Session.PrepareSession(context);
 
+            _engine.Initialize();
+            _engine.LoadContent();
+
             FreeCameraAction();
             Viewer.EditorCamera.ShowTarget(context.UserRoot);
 
-            _engine.Initialize();
-            _engine.LoadContent();
             _engine.Start();
 
             Viewer.SelectedMode = SessionMode;
