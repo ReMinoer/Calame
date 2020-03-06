@@ -11,6 +11,7 @@ using Glyph.Core.Inputs;
 using Glyph.Core.Layers;
 using Glyph.Graphics;
 using Glyph.Graphics.Renderer;
+using Glyph.Graphics.Renderer.Base;
 using Glyph.Scripting;
 using Glyph.Tools;
 using Glyph.Tools.ShapeRendering;
