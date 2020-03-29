@@ -55,6 +55,7 @@
     <Compile Include="Converters\MonoGameToWpfColorConverter.cs" />
     <Compile Include="Converters\ObjectToEnumerableConverter.cs" />
     <Compile Include="CalameTool.cs" />
+    <Compile Include="EventAggregatorExtension.cs" />
     <Compile Include="IComponentFilter.cs" />
     <Compile Include="Icons\IconDescription.cs" />
     <Compile Include="Icons\IconDescriptorManager.cs" />

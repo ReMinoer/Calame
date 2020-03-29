@@ -42,7 +42,7 @@ namespace Calame.CompositionGraph.ViewModels
                     return;
 
                 var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
-                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
+                EventAggregator.PublishAsync(selectionRequest).Wait();
             }
         }
 

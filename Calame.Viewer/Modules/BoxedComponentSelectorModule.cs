@@ -44,7 +44,7 @@ namespace Calame.Viewer.Modules
 
             _root.Add(_shapedObjectSelector);
 
-            _eventAggregator.SubscribeOnUIThread(this);
+            _eventAggregator.SubscribeOnUI(this);
             _shapedObjectSelector.SelectionChanged += OnShapedObjectSelectorSelectionChanged;
         }
 
@@ -70,7 +70,7 @@ namespace Calame.Viewer.Modules
                 return;
 
             SelectedComponent = boxedComponent;
-            await _eventAggregator.PublishOnBackgroundThreadAsync(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
+            await _eventAggregator.PublishAsync(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
         }
 
         Task IHandle<IDocumentContext<ViewerViewModel>>.HandleAsync(IDocumentContext<ViewerViewModel> message, CancellationToken cancellationToken)

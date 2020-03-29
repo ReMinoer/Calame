@@ -47,7 +47,7 @@ namespace Calame.SceneGraph.ViewModels
                 NotifyOfPropertyChange(nameof(SelectionNode));
 
                 var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
-                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
+                EventAggregator.PublishAsync(selectionRequest).Wait();
             }
         }
 
@@ -63,7 +63,7 @@ namespace Calame.SceneGraph.ViewModels
                 NotifyOfPropertyChange(nameof(Selection));
                 
                 var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
-                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
+                EventAggregator.PublishAsync(selectionRequest).Wait();
             }
         }
 

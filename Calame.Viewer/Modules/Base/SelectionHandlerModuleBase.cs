@@ -20,7 +20,7 @@ namespace Calame.Viewer.Modules.Base
 
         protected override void ConnectRunner()
         {
-            _eventAggregator.SubscribeOnUIThread(this);
+            _eventAggregator.SubscribeOnUI(this);
         }
 
         protected override void DisconnectRunner()

@@ -40,7 +40,7 @@ namespace Calame.DataModelViewer.ViewModels
         {
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
-            _eventAggregator.SubscribeOnUIThread(this);
+            _eventAggregator.SubscribeOnUI(this);
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             
@@ -104,7 +104,7 @@ namespace Calame.DataModelViewer.ViewModels
             ISelectionSpread<IGlyphData> selection = message.Promoted;
 
             Viewer.LastSelection = selection;
-            await _eventAggregator.PublishOnCurrentThreadAsync(selection, cancellationToken);
+            await _eventAggregator.PublishAsync(selection, cancellationToken);
         }
 
         async Task IHandle<ISelectionRequest<IGlyphComponent>>.HandleAsync(ISelectionRequest<IGlyphComponent> message, CancellationToken cancellationToken)
@@ -115,7 +115,7 @@ namespace Calame.DataModelViewer.ViewModels
             ISelectionSpread<IGlyphData> selection = new SelectionSpread<IGlyphData>(message.DocumentContext, Editor.Data.GetData(message.Item));
             
             Viewer.LastSelection = selection;
-            await _eventAggregator.PublishOnCurrentThreadAsync(selection, cancellationToken);
+            await _eventAggregator.PublishAsync(selection, cancellationToken);
         }
 
         public void Dispose()

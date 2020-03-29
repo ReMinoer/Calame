@@ -40,7 +40,7 @@ namespace Calame.DataModelTree.ViewModels
                     return;
 
                 var selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, _selection);
-                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
+                EventAggregator.PublishAsync(selectionRequest).Wait();
             }
         }
 

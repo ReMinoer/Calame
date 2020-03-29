@@ -94,7 +94,7 @@ namespace Calame.BrushPanel.ViewModels
                     }
                 }
 
-                EventAggregator.PublishOnBackgroundThreadAsync(selectionRequest).Wait();
+                EventAggregator.PublishAsync(selectionRequest).Wait();
             }
         }
 

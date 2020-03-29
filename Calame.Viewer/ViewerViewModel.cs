@@ -205,10 +205,10 @@ namespace Calame.Viewer
                 return;
 
             Runner.Engine.FocusedClient = Client;
-            await _eventAggregator.PublishOnCurrentThreadAsync(_owner);
+            await _eventAggregator.PublishAsync(_owner);
 
             if (LastSelection != null)
-                await _eventAggregator.PublishOnCurrentThreadAsync(LastSelection);
+                await _eventAggregator.PublishAsync(LastSelection);
         }
 
         private void OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)

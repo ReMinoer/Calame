@@ -4,6 +4,7 @@ using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Gemini;
 using MonoGame.Framework.WpfInterop;
 

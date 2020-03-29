@@ -63,7 +63,7 @@ namespace Calame.SceneViewer.ViewModels
             _shell = shell;
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
-            _eventAggregator.SubscribeOnUIThread(this);
+            _eventAggregator.SubscribeOnUI(this);
 
             Viewer = new ViewerViewModel(this, _eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
@@ -181,7 +181,7 @@ namespace Calame.SceneViewer.ViewModels
             ISelectionSpread<IGlyphComponent> selection = message.Promoted;
 
             Viewer.LastSelection = selection;
-            await _eventAggregator.PublishOnCurrentThreadAsync(selection, cancellationToken);
+            await _eventAggregator.PublishAsync(selection, cancellationToken);
         }
 
         public void Dispose()

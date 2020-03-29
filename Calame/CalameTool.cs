@@ -23,7 +23,7 @@ namespace Calame
             EventAggregator = eventAggregator;
             
             Shell.ActiveDocumentChanged += ShellOnActiveDocumentChanged;
-            EventAggregator.SubscribeOnUIThread(this);
+            EventAggregator.SubscribeOnUI(this);
         }
 
         public void Dispose()
