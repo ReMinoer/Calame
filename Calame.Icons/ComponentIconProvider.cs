@@ -117,7 +117,7 @@ namespace Calame.Icons
                     
                 case FreeCamera _:
                     return new IconDescription(PackIconMaterialKind.VideoSwitch, ToolCategoryBrush);
-                case SceneNodeEditor _:
+                case TransformationEditor _:
                     return new IconDescription(PackIconMaterialKind.AxisArrow, ToolCategoryBrush);
                 case AreaComponentRenderer _:
                     return new IconDescription(PackIconMaterialKind.VectorRectangle, ToolCategoryBrush);
