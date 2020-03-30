@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
+using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Graphics;
 using Glyph.Graphics.Primitives;
@@ -35,8 +36,11 @@ namespace Calame.Viewer.Modules
         {
         }
 
-        protected override void HandleSelection()
+        protected override void HandleComponent(IGlyphComponent selection)
         {
+            if (!(selection is IBoxedComponent boxedSelection))
+                return;
+
             _root = Model.EditorModeRoot.Add<GlyphObject>(Model.ComponentsFilter.ExcludedRoots.Add);
             _root.Add<SceneNode>();
 
@@ -46,13 +50,13 @@ namespace Calame.Viewer.Modules
 
             _root.Schedulers.Update.Plan(_ =>
             {
-                TopLeftRectangle rect = Selection.Area.BoundingBox;
+                TopLeftRectangle rect = boxedSelection.Area.BoundingBox;
                 Vector2[] vertices = { rect.Position, rect.P1, rect.P3, rect.P2, rect.Position };
                 primitiveComponent.Primitive = new LinePrimitive(Color.Purple, vertices);
             });
         }
 
-        protected override void ReleaseSelection()
+        protected override void ReleaseComponent(IGlyphComponent selection)
         {
             Model.EditorModeRoot.RemoveAndDispose(_root);
             _root = null;

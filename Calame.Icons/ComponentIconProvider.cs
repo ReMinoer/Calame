@@ -74,6 +74,8 @@ namespace Calame.Icons
                     return new IconDescription(PackIconMaterialKind.Compare, GraphicsCategoryBrush);
                 case FillingRectangle _:
                     return new IconDescription(PackIconMaterialKind.CameraMeteringMatrix, GraphicsCategoryBrush);
+                case PrimitiveRenderer _:
+                    return new IconDescription(PackIconMaterialKind.Shape, GraphicsCategoryBrush);
                 case RendererBase _:
                     return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);
                     

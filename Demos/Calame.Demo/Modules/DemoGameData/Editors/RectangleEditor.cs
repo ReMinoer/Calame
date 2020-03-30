@@ -2,6 +2,7 @@
 using Calame.DataModelViewer;
 using Calame.Demo.Data;
 using Glyph.IO;
+using Niddle;
 
 namespace Calame.Demo.Modules.DemoGameData.Editors
 {
@@ -20,5 +21,11 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
     public class RectangleEditor : SerializingViewerEditorBase<RectangleData>
     {
         public override string ContentPath => null;
+
+        public override void RegisterDependencies(IDependencyRegistry registry)
+        {
+            base.RegisterDependencies(registry);
+            registry.Add(Dependency.OnType<RectangleObject>());
+        }
     }
 }

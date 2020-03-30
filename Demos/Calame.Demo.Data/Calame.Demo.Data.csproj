@@ -35,10 +35,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircleData.cs" />
+    <Compile Include="CircleObject.cs" />
     <Compile Include="IShapeData.cs" />
+    <Compile Include="PrimitiveObjectBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RectangleData.cs" />
+    <Compile Include="RectangleObject.cs" />
     <Compile Include="SceneData.cs" />
+    <Compile Include="ShapeDataBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Calame\Calame.csproj">
@@ -84,6 +88,10 @@
     <ProjectReference Include="..\..\External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj">
       <Project>{26405F4B-4532-4F48-A96F-594A70C12B3E}</Project>
       <Name>Glyph.Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Tools\Glyph.Tools.csproj">
+      <Project>{6692F3F4-E1EA-4D53-B0A1-2DBA67414FC2}</Project>
+      <Name>Glyph.Tools</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj">
       <Project>{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}</Project>

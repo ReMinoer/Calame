@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.Composition;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
+using Glyph;
+using Glyph.Composition;
+using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Tools.Transforming;
 
@@ -23,32 +26,49 @@ namespace Calame.Viewer.Modules
     
     public class TransformationEditorModule : SelectionHandlerModuleBase
     {
-        private MultiModeTransformationEditor _transformationEditor;
+        private GlyphObject _root;
         
         public TransformationEditorModule(IEventAggregator eventAggregator)
             : base(eventAggregator)
         {
         }
 
-        protected override void HandleSelection()
+        protected override void HandleComponent(IGlyphComponent selection)
         {
-            SceneNode sceneNode = Selection.GetSceneNode();
+            SceneNode sceneNode = selection.GetSceneNode();
             if (sceneNode == null)
                 return;
 
-            _transformationEditor = Model.EditorModeRoot.Add<MultiModeTransformationEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
-            _transformationEditor.EditedObject = new MultiModeTransformationController(sceneNode);
-            _transformationEditor.RaycastClient = Model.Client;
+            var transformationEditor = Model.EditorModeRoot.Add<MultiModeTransformationEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
+            transformationEditor.EditedObject = new MultiModeTransformationController(sceneNode);
+            transformationEditor.RaycastClient = Model.Client;
+
+            _root = transformationEditor;
         }
 
-        protected override void ReleaseSelection()
+        protected override void HandleData(IGlyphData selection)
         {
-            if (_transformationEditor == null)
+            var controller = new TransformableDataController(selection);
+            if (controller.Anchor == null)
+                return;
+
+            var transformationEditor = Model.EditorModeRoot.Add<TransformationEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
+            transformationEditor.EditedObject = controller;
+            transformationEditor.RaycastClient = Model.Client;
+
+            _root = transformationEditor;
+        }
+
+        protected override void ReleaseComponent(IGlyphComponent selection)
+        {
+            if (_root == null)
                 return;
             
-            Model.EditorModeRoot.RemoveAndDispose(_transformationEditor);
-
-            _transformationEditor = null;
+            Model.EditorModeRoot.RemoveAndDispose(_root);
+            _root = null;
         }
+
+
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Diese.Collections.Observables;
+using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 
@@ -6,7 +7,7 @@ namespace Calame.Demo.Data
 {
     public class SceneData : BindedData<SceneData, GlyphObject>
     {
-        public ObservableCollection<IShapeData> Shapes { get; } = new ObservableCollection<IShapeData>();
+        public ObservableCollection<IShapeData<IGlyphComponent>> Shapes { get; } = new ObservableCollection<IShapeData<IGlyphComponent>>();
 
         static SceneData()
         {
