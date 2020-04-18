@@ -1,0 +1,6 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=C5EA89E2C92A2047BB4C03FEB3869F97/AbsolutePath/@EntryValue">D:\Remi\Git\Papyrus\External\Calame\External\Glyph\External\Fingear\External\Stave\External\Diese\External\ReSharperSharedConfig\project.shared.DotSettings</s:String>
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=C5EA89E2C92A2047BB4C03FEB3869F97/RelativePath/@EntryValue">..\External\Glyph\External\Fingear\External\Stave\External\Diese\External\ReSharperSharedConfig\project.shared.DotSettings</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=C5EA89E2C92A2047BB4C03FEB3869F97/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileC5EA89E2C92A2047BB4C03FEB3869F97/@KeyIndexDefined">True</s:Boolean>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileC5EA89E2C92A2047BB4C03FEB3869F97/RelativePriority/@EntryValue">1</s:Double></wpf:ResourceDictionary>
