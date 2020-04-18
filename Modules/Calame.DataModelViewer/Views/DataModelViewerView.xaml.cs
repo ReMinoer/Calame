@@ -1,5 +1,4 @@
 ﻿using System.Windows.Input;
-using Calame.DataModelViewer.ViewModels;
 using Calame.Viewer;
 using Glyph.WpfInterop;
 

@@ -109,7 +109,7 @@ namespace Calame.Utils
                 var itemsHostPanel = (Panel)VisualTreeHelper.GetChild(itemsPresenter, 0);
 
                 // Ensure that the generator for this panel has been created.
-                UIElementCollection dummy = itemsHostPanel.Children;
+                UIElementCollection _ = itemsHostPanel.Children;
 
                 var virtualizingPanel = itemsHostPanel as VirtualizingStackPanel;
 
@@ -118,8 +118,7 @@ namespace Calame.Utils
                     TreeViewItem subContainer;
                     if (virtualizingPanel != null)
                     {
-                        // Bring the item into view so 
-                        // that the container will be generated.
+                        // Bring the item into view so that the container will be generated.
                         virtualizingPanel.BringIntoView(i);
 
                         subContainer =
@@ -132,8 +131,7 @@ namespace Calame.Utils
                             (TreeViewItem)container.ItemContainerGenerator.
                                                     ContainerFromIndex(i);
 
-                        // Bring the item into view to maintain the 
-                        // same behavior as with a virtualizing panel.
+                        // Bring the item into view to maintain the same behavior as with a virtualizing panel.
                         subContainer.BringIntoView();
                     }
 
@@ -142,15 +140,10 @@ namespace Calame.Utils
                         // Search the next level for the object.
                         TreeViewItem resultContainer = GetTreeViewItem(subContainer, item);
                         if (resultContainer != null)
-                        {
                             return resultContainer;
-                        }
-                        else
-                        {
-                            // The object is not under this TreeViewItem
-                            // so collapse it.
-                            subContainer.IsExpanded = false;
-                        }
+
+                        // The object is not under this TreeViewItem so collapse it.
+                        subContainer.IsExpanded = false;
                     }
                 }
             }
@@ -164,24 +157,21 @@ namespace Calame.Utils
         /// <typeparam name="T">The type of element to find.</typeparam>
         /// <param name="visual">The parent element.</param>
         /// <returns></returns>
-        static private T FindVisualChild<T>(Visual visual) where T : Visual
+        static private T FindVisualChild<T>(Visual visual)
+            where T : Visual
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(visual); i++)
             {
-                var child = (Visual)VisualTreeHelper.GetChild(visual, i);
-                if (child != null)
+                DependencyObject child = VisualTreeHelper.GetChild(visual, i);
+                if (child is T correctlyTyped)
                 {
-                    var correctlyTyped = child as T;
-                    if (correctlyTyped != null)
-                    {
-                        return correctlyTyped;
-                    }
+                    return correctlyTyped;
+                }
 
-                    var descendent = FindVisualChild<T>(child);
-                    if (descendent != null)
-                    {
-                        return descendent;
-                    }
+                var descendent = FindVisualChild<T>((Visual)child);
+                if (descendent != null)
+                {
+                    return descendent;
                 }
             }
 

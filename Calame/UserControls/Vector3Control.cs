@@ -12,7 +12,7 @@ namespace Calame.UserControls
         {
         }
 
-        protected override void UpdateVector(ref Vector3? vector, SingleUpDown[] controls) => vector = new Vector3(controls[0].Value ?? 0, controls[1].Value ?? 0, controls[2].Value ?? 0);
+        protected override Vector3? UpdateVector(Vector3? vector, SingleUpDown[] controls) => new Vector3(controls[0].Value ?? 0, controls[1].Value ?? 0, controls[2].Value ?? 0);
 
         protected override float? GetComponent(Vector3? vector, int index)
         {

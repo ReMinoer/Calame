@@ -7,21 +7,21 @@ namespace Calame
     public class SelectionRequest<T> : SelectionMessageBase<T>, ISelectionRequest<T>
         where T : class
     {
-        static public SelectionRequest<T> Empty(IDocumentContext documentcontext) => new SelectionRequest<T>(documentcontext);
+        static public SelectionRequest<T> Empty(IDocumentContext documentContext) => new SelectionRequest<T>(documentContext);
         public ISelectionSpread<T> Promoted => new SelectionSpread<T>(DocumentContext, Items);
 
-        private SelectionRequest(IDocumentContext documentcontext)
-            : base(documentcontext)
+        private SelectionRequest(IDocumentContext documentContext)
+            : base(documentContext)
         {
         }
 
-        public SelectionRequest(IDocumentContext documentcontext, T item)
-            : base(documentcontext, item)
+        public SelectionRequest(IDocumentContext documentContext, T item)
+            : base(documentContext, item)
         {
         }
 
-        public SelectionRequest(IDocumentContext documentcontext, IEnumerable<T> items)
-            : base(documentcontext, items)
+        public SelectionRequest(IDocumentContext documentContext, IEnumerable<T> items)
+            : base(documentContext, items)
         {
         }
     }
@@ -29,18 +29,20 @@ namespace Calame
     public class SelectionSpread<T> : SelectionMessageBase<T>, ISelectionSpread<T>
         where T : class
     {
-        private SelectionSpread(IDocumentContext documentcontext)
-            : base(documentcontext)
+        static public SelectionSpread<T> Empty(IDocumentContext documentContext) => new SelectionSpread<T>(documentContext);
+
+        private SelectionSpread(IDocumentContext documentContext)
+            : base(documentContext)
         {
         }
 
-        public SelectionSpread(IDocumentContext documentcontext, T item)
-            : base(documentcontext, item)
+        public SelectionSpread(IDocumentContext documentContext, T item)
+            : base(documentContext, item)
         {
         }
 
-        public SelectionSpread(IDocumentContext documentcontext, IEnumerable<T> items)
-            : base(documentcontext, items)
+        public SelectionSpread(IDocumentContext documentContext, IEnumerable<T> items)
+            : base(documentContext, items)
         {
         }
     }
@@ -75,6 +77,9 @@ namespace Calame
             }
             set
             {
+                _item = null;
+                _others = null;
+
                 using (IEnumerator<T> enumerator = value.GetEnumerator())
                 {
                     if (!enumerator.MoveNext())
@@ -86,19 +91,19 @@ namespace Calame
             }
         }
 
-        protected SelectionMessageBase(IDocumentContext documentcontext)
+        protected SelectionMessageBase(IDocumentContext documentContext)
         {
-            DocumentContext = documentcontext;
+            DocumentContext = documentContext;
         }
 
-        protected SelectionMessageBase(IDocumentContext documentcontext, T item)
-            : this(documentcontext)
+        protected SelectionMessageBase(IDocumentContext documentContext, T item)
+            : this(documentContext)
         {
             _item = item;
         }
 
-        protected SelectionMessageBase(IDocumentContext documentcontext, IEnumerable<T> items)
-            : this(documentcontext)
+        protected SelectionMessageBase(IDocumentContext documentContext, IEnumerable<T> items)
+            : this(documentContext)
         {
             Items = items;
         }

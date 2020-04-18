@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using Calame.Icons;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
@@ -10,7 +9,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
 {
-    public partial class CalamePropertyGrid : UserControl
+    public partial class CalamePropertyGrid
     {
         static public readonly DependencyProperty NewItemTypeRegistryProperty =
             DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(CalamePropertyGrid), new PropertyMetadata(null));

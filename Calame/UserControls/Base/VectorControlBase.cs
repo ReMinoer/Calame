@@ -54,12 +54,10 @@ namespace Calame.UserControls.Base
 
         private void ControlOnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> routedPropertyChangedEventArgs)
         {
-            TVector value = Value;
-            UpdateVector(ref value, _controls);
-            Value = value;
+            Value = UpdateVector(Value, _controls);
         }
         
-        protected abstract void UpdateVector(ref TVector vector, TControl[] controls);
+        protected abstract TVector UpdateVector(TVector vector, TControl[] controls);
         protected abstract TComponent GetComponent(TVector vector, int index);
     }
 }

@@ -59,7 +59,7 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <controls:CalamePropertyGrid SelectedObject="{Binding SelectedBrush.Brush}"
+            <controls:CalamePropertyGrid SelectedObject="{Binding SelectedBrush}"
                                          CompactMode="True"
                                          IconProvider="{Binding IconProvider}"
                                          IconDescriptorManager="{Binding IconDescriptorManager}" />

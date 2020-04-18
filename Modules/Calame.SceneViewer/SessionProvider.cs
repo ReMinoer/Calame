@@ -43,8 +43,9 @@ namespace Calame.SceneViewer
             await sceneViewerViewModel.InitializeSession();
         }
 
-        public async Task Open(IDocument document, string path)
+        public Task Open(IDocument document, string path)
         {
+            return Task.CompletedTask;
         }
     }
 }

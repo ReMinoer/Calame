@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
 using Calame.Icons;
 using Calame.Utils;
 using Diese.Collections;
@@ -21,7 +20,7 @@ namespace Calame.UserControls
         bool BaseFilter(object data);
     }
 
-    public partial class CalameTreeView : UserControl, INotifyPropertyChanged
+    public partial class CalameTreeView : INotifyPropertyChanged
     {
         static public readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(CalameTreeView), new PropertyMetadata(default(IEnumerable), OnItemsSourceChanged));
 

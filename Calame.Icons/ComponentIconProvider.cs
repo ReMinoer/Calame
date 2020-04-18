@@ -14,7 +14,6 @@ using Glyph.Graphics.Renderer;
 using Glyph.Graphics.Renderer.Base;
 using Glyph.Scripting;
 using Glyph.Tools;
-using Glyph.Tools.ShapeRendering;
 using Glyph.Tools.Transforming;
 using Glyph.UI;
 using MahApps.Metro.IconPacks;
@@ -121,10 +120,6 @@ namespace Calame.Icons
                     return new IconDescription(PackIconMaterialKind.VideoSwitch, ToolCategoryBrush);
                 case TransformationEditor _:
                     return new IconDescription(PackIconMaterialKind.AxisArrow, ToolCategoryBrush);
-                case AreaComponentRenderer _:
-                    return new IconDescription(PackIconMaterialKind.VectorRectangle, ToolCategoryBrush);
-                case ShapedComponentRendererBase _:
-                    return new IconDescription(PackIconMaterialKind.VectorPolygon, ToolCategoryBrush);
 
                 default:
                     return IconDescription.None;

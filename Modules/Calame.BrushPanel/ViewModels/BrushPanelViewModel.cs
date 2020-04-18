@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
@@ -30,7 +29,6 @@ namespace Calame.BrushPanel.ViewModels
 
         public IIconProvider IconProvider { get; }
         public IIconDescriptorManager IconDescriptorManager { get; }
-        private readonly IIconDescriptor<IGlyphComponent> _iconDescriptor;
 
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataTreeItemBuilder;
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _componentTreeItemBuilder;
@@ -131,17 +129,18 @@ namespace Calame.BrushPanel.ViewModels
 
             IconProvider = iconProvider;
             IconDescriptorManager = iconDescriptorManager;
-            _iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+
+            IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _dataTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
                                    .DisplayName(x => x.Name, nameof(IGlyphData.Name))
                                    .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphData.Children))
-                                   .IconDescription(x => _iconDescriptor.GetIcon(x.BindedObject));
+                                   .IconDescription(x => iconDescriptor.GetIcon(x.BindedObject));
 
             _componentTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()
                                         .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
                                         .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
-                                        .IconDescription(x => _iconDescriptor.GetIcon(x));
+                                        .IconDescription(x => iconDescriptor.GetIcon(x));
 
             SelectBrushCommand = new RelayCommand(x => SelectedBrush = (IBrushViewModel)x);
             SelectPaintCommand = new RelayCommand(x => SelectedPaint = (IPaintViewModel)x);

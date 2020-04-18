@@ -40,7 +40,7 @@
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
                             <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
                                                               IconTargetSelector="{Binding GlyphCreatorIconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                               IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
@@ -55,7 +55,7 @@
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
                             <userControls:Vector2Control Value="{Binding Value, Mode=TwoWay}"/>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
@@ -67,7 +67,7 @@
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
                             <userControls:Vector3Control Value="{Binding Value, Mode=TwoWay}"/>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
@@ -79,7 +79,7 @@
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
                             <userControls:Vector4Control Value="{Binding Value, Mode=TwoWay}"/>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
@@ -91,7 +91,7 @@
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
                             <userControls:PointControl Value="{Binding Value, Mode=TwoWay}"/>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
@@ -103,7 +103,7 @@
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
                             <xctk:ColorPicker SelectedColor="{Binding Value, Converter={StaticResource MonoGameToWpfColorConverter}}"
                                               ColorMode="ColorCanvas" />
                         </DataTemplate>

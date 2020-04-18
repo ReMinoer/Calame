@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
-using Glyph;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;

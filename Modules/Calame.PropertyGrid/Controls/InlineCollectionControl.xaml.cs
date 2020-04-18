@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using Calame.Icons;
 using Diese.Collections;
 using Xceed.Wpf.Toolkit;
@@ -11,7 +10,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
 {
-    public partial class InlineCollectionControl : UserControl
+    public partial class InlineCollectionControl
     {
         static public readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(nameof(ItemsSource), typeof(IList), typeof(InlineCollectionControl), new PropertyMetadata(null));
