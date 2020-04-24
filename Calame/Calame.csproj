@@ -1,141 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Calame</RootNamespace>
-    <AssemblyName>Calame</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
+    <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity">
-      <HintPath>C:\Users\Remi\.nuget\packages\mahapps.metro\1.2.4\lib\net45\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
+    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj" />
+    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj" />
+    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj" />
+    <ProjectReference Include="..\External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj" />
+    <ProjectReference Include="..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj" />
+    <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
+    <ProjectReference Include="..\External\Glyph\Glyph\Glyph.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CalameBootstrapper.cs" />
-    <Compile Include="ComponentFilter.cs" />
-    <Compile Include="ContentLibraryProvider.cs" />
-    <Compile Include="Converters\EnumerableToString.cs" />
-    <Compile Include="Converters\ModelToIconConverter.cs" />
-    <Compile Include="Converters\InverseBooleanConverter.cs" />
-    <Compile Include="Converters\MonoGameToWpfColorConverter.cs" />
-    <Compile Include="Converters\ObjectToEnumerableConverter.cs" />
-    <Compile Include="CalameTool.cs" />
-    <Compile Include="EventAggregatorExtension.cs" />
-    <Compile Include="IComponentFilter.cs" />
-    <Compile Include="Icons\IconDescription.cs" />
-    <Compile Include="Icons\IconDescriptorManager.cs" />
-    <Compile Include="Icons\IconProvider.cs" />
-    <Compile Include="Icons\IDefaultIconDescriptorModule.cs" />
-    <Compile Include="Icons\IIconDescriptor.cs" />
-    <Compile Include="Icons\IIconDescriptorManager.cs" />
-    <Compile Include="Icons\IIconDescriptorModule.cs" />
-    <Compile Include="Icons\IIconProvider.cs" />
-    <Compile Include="Icons\IIconProviderModule.cs" />
-    <Compile Include="Icons\IIconTargetSelector.cs" />
-    <Compile Include="IContentLibraryProvider.cs" />
-    <Compile Include="IDocumentContext.cs" />
-    <Compile Include="IImportedTypeProvider.cs" />
-    <Compile Include="ImportedTypeProvider.cs" />
-    <Compile Include="InterfaceTemplateSelector.cs" />
-    <Compile Include="NotifyPropertyChangedExtension.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserControls\Base\VectorControlBase.cs" />
-    <Compile Include="UserControls\CalameIcon.cs" />
-    <Compile Include="UserControls\CalameTreeView.xaml.cs">
-      <DependentUpon>CalameTreeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\PointControl.cs" />
-    <Compile Include="UserControls\Vector2Control.cs" />
-    <Compile Include="UserControls\Vector3Control.cs" />
-    <Compile Include="UserControls\Vector4Control.cs" />
-    <Compile Include="Utils\BindableSelectedItemBehavior.cs" />
-    <Compile Include="ISelection.cs" />
-    <Compile Include="Selection.cs" />
-    <Compile Include="Utils\DependencyObjectExtension.cs" />
-    <Compile Include="Utils\EnumerableTypeExtension.cs" />
-    <Compile Include="Utils\ObservableHelpers.cs" />
-    <Compile Include="Utils\TreeViewItemModel.cs" />
-    <Compile Include="Utils\TreeViewItemModelBuilder.cs" />
-    <Compile Include="Utils\VirtualizingStackPanel.cs" />
+    <PackageReference Include="GeminiWpf" Version="1.0.9-beta" />
+    <PackageReference Include="System.Reactive" Version="3.1.1" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj">
-      <Project>{68a01741-9a9c-4262-9193-1b214b67ebe7}</Project>
-      <Name>Diese.Collections %28Stave%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
-      <Project>{38a041e6-5aa9-4c22-b96f-35167f171959}</Project>
-      <Name>Stave</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
-      <Project>{407c6a9e-23af-42c1-b38d-03268a12c476}</Project>
-      <Name>Diese %28Taskete%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj">
-      <Project>{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}</Project>
-      <Name>MonoGame.Framework.WpfInterop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
-      <Project>{8BA795FC-E007-40BB-BD70-90D970C99369}</Project>
-      <Name>Simulacra</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
-      <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
-      <Name>Glyph.Composition</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\External\Glyph\Glyph\Glyph.csproj">
-      <Project>{457cbbf3-26c7-478b-b4eb-1f85ff3c07f5}</Project>
-      <Name>Glyph</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GeminiWpf">
-      <Version>1.0.9-beta</Version>
-    </PackageReference>
-    <PackageReference Include="System.Reactive">
-      <Version>3.1.1</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="UserControls\CalameTreeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

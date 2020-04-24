@@ -1,91 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{882DAE3C-7714-4CF9-88E6-EB6DFE156DCD}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Calame.InteractionTree</RootNamespace>
-    <AssemblyName>Calame.InteractionTree</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
+    <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <ProjectReference Include="..\..\Calame\Calame.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\InteractionTreeCommand.cs" />
-    <Compile Include="Converters\InteractiveComponentsAndControlsConverter.cs" />
-    <Compile Include="MenuDefinitions.cs" />
-    <Compile Include="Module.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\InteractionTreeViewModel.cs" />
-    <Compile Include="Views\InteractionTreeView.xaml.cs">
-      <DependentUpon>InteractionTreeView.xaml</DependentUpon>
-    </Compile>
+    <PackageReference Include="GeminiWpf" Version="1.0.9-beta" />
   </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\InteractionTreeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GeminiWpf">
-      <Version>1.0.9-beta</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Calame\Calame.csproj">
-      <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
-      <Name>Calame</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj">
-      <Project>{532EE357-6303-45DA-A605-A5D8253AC03C}</Project>
-      <Name>Diese.Collections %28Stave%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
-      <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
-      <Name>Stave</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
-      <Project>{407c6a9e-23af-42c1-b38d-03268a12c476}</Project>
-      <Name>Diese %28Taskete%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj">
-      <Project>{7EE0B116-6B49-4073-99D8-827DD68B8AE0}</Project>
-      <Name>Fingear</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
-      <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
-      <Name>Glyph.Composition</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj">
-      <Project>{25400349-233E-404D-BB4E-A0CB4AF893EA}</Project>
-      <Name>Glyph.Engine</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

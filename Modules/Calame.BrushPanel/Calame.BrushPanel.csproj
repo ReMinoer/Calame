@@ -1,146 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FA854785-1965-4CDB-BA79-29CED215DCB6}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Calame.BrushPanel</RootNamespace>
-    <AssemblyName>Calame.BrushPanel</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
+    <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <ProjectReference Include="..\..\Calame.Icons\Calame.Icons.csproj" />
+    <ProjectReference Include="..\..\Calame.Viewer\Calame.Viewer.csproj" />
+    <ProjectReference Include="..\..\Calame\Calame.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra.Injection\Simulacra.Injection.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Core\Glyph.Core.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Space\Glyph.Space.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Tools\Glyph.Tools.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.WpfInterop\Glyph.WpfInterop.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj" />
+    <ProjectReference Include="..\Calame.PropertyGrid\Calame.PropertyGrid.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\BrushPanelCommand.cs" />
-    <Compile Include="MenuDefinitions.cs" />
-    <Compile Include="Module.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewerModule.cs" />
-    <Compile Include="ViewModels\BrushPanelViewModel.cs" />
-    <Compile Include="ViewModels\BrushViewModelBase.cs" />
-    <Compile Include="ViewModels\IBrushViewModel.cs" />
-    <Compile Include="ViewModels\IPaintViewModel.cs" />
-    <Compile Include="ViewModels\PaintViewModelBase.cs" />
-    <Compile Include="Views\BrushPanelView.xaml.cs">
-      <DependentUpon>BrushPanelView.xaml</DependentUpon>
-    </Compile>
+    <PackageReference Include="GeminiWpf" Version="1.0.9-beta" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="3.2.0" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GeminiWpf">
-      <Version>1.0.9-beta</Version>
-    </PackageReference>
-    <PackageReference Include="MahApps.Metro.IconPacks.Material">
-      <Version>3.2.0</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\BrushPanelView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Calame.Icons\Calame.Icons.csproj">
-      <Project>{86BCF6D2-1B27-4209-9872-EE40028B48A9}</Project>
-      <Name>Calame.Icons</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Calame.Viewer\Calame.Viewer.csproj">
-      <Project>{2EDFE6B4-8E1E-4B22-85BE-D80E8573B3FD}</Project>
-      <Name>Calame.Viewer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Calame\Calame.csproj">
-      <Project>{8CC36DA5-321D-49BA-9EE2-56015EF5081F}</Project>
-      <Name>Calame</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj">
-      <Project>{68a01741-9a9c-4262-9193-1b214b67ebe7}</Project>
-      <Name>Diese.Collections %28Stave%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj">
-      <Project>{38A041E6-5AA9-4C22-B96F-35167F171959}</Project>
-      <Name>Stave</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj">
-      <Project>{407c6a9e-23af-42c1-b38d-03268a12c476}</Project>
-      <Name>Diese %28Taskete%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj">
-      <Project>{9eef1863-44be-423e-a29d-088c23aac45e}</Project>
-      <Name>Fingear.MonoGame</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj">
-      <Project>{7EE0B116-6B49-4073-99D8-827DD68B8AE0}</Project>
-      <Name>Fingear</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra.Injection\Simulacra.Injection.csproj">
-      <Project>{9c7a9012-5536-43be-8055-2c3ff297c902}</Project>
-      <Name>Simulacra.Injection</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj">
-      <Project>{8ba795fc-e007-40bb-bd70-90d970c99369}</Project>
-      <Name>Simulacra</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj">
-      <Project>{8D4F4138-EB36-4427-9A2B-10A50723268C}</Project>
-      <Name>Glyph.Composition</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Core\Glyph.Core.csproj">
-      <Project>{BC40E833-0EAA-4BBC-97D8-1541276BBA54}</Project>
-      <Name>Glyph.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj">
-      <Project>{25400349-233E-404D-BB4E-A0CB4AF893EA}</Project>
-      <Name>Glyph.Engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj">
-      <Project>{26405F4B-4532-4F48-A96F-594A70C12B3E}</Project>
-      <Name>Glyph.Messaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Space\Glyph.Space.csproj">
-      <Project>{068202CC-E943-4718-9771-62D72E50623E}</Project>
-      <Name>Glyph.Space</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.Tools\Glyph.Tools.csproj">
-      <Project>{6692F3F4-E1EA-4D53-B0A1-2DBA67414FC2}</Project>
-      <Name>Glyph.Tools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph.WpfInterop\Glyph.WpfInterop.csproj">
-      <Project>{DE8D6CFE-29E2-4B00-A32B-A85A5CA583C6}</Project>
-      <Name>Glyph.WpfInterop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj">
-      <Project>{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}</Project>
-      <Name>Glyph</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Calame.PropertyGrid\Calame.PropertyGrid.csproj">
-      <Project>{E813C728-F6F2-4278-9473-51E388C9EDC2}</Project>
-      <Name>Calame.PropertyGrid</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
