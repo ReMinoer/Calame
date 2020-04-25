@@ -7,7 +7,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Calame\Calame.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GeminiWpf" Version="1.0.9-beta" />
-  </ItemGroup>
 </Project>
