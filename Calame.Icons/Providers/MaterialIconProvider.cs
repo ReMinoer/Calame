@@ -2,10 +2,10 @@
 using System.Windows.Controls;
 using MahApps.Metro.IconPacks;
 
-namespace Calame.Icons
+namespace Calame.Icons.Providers
 {
     [Export(typeof(IIconProviderModule))]
-    public class MaterialIconProviderModule : IIconProviderModule
+    public class MaterialIconProvider : IIconProviderModule
     {
         public bool Handle(IconDescription iconDescription)
         {

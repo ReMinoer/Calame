@@ -18,10 +18,10 @@ using Glyph.Tools.Transforming;
 using Glyph.UI;
 using MahApps.Metro.IconPacks;
 
-namespace Calame.Icons
+namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
-    public class ComponentIconProvider : IDefaultIconDescriptorModule<IGlyphComponent>
+    public class ComponentIconDescriptor : IDefaultIconDescriptorModule<IGlyphComponent>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
         static public readonly Brush SceneGraphCategoryBrush = Brushes.RoyalBlue;

@@ -4,10 +4,10 @@ using Fingear.Interactives;
 using Fingear.Interactives.Interfaces;
 using MahApps.Metro.IconPacks;
 
-namespace Calame.Icons
+namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
-    public class InteractiveIconProvider : IDefaultIconDescriptorModule<IInteractive>
+    public class InteractiveIconDescriptor : IDefaultIconDescriptorModule<IInteractive>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
         static public readonly Brush UiCategoryBrush = Brushes.OrangeRed;

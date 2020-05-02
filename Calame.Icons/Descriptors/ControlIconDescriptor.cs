@@ -9,10 +9,10 @@ using Fingear.MonoGame.Inputs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Xna.Framework.Input;
 
-namespace Calame.Icons
+namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
-    public class ControlIconProvider : IDefaultIconDescriptorModule<IControl>
+    public class ControlIconDescriptor : IDefaultIconDescriptorModule<IControl>
     {
         static private PackIconMaterialKind DefaultBoxIcon = PackIconMaterialKind.CheckboxBlank;
         static private PackIconMaterialKind DefaultCircleIcon = PackIconMaterialKind.Circle;
