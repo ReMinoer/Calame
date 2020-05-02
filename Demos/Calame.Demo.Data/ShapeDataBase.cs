@@ -1,6 +1,7 @@
 ﻿using Glyph.Composition.Modelization;
 using Glyph.Tools.Transforming;
 using Microsoft.Xna.Framework;
+using Simulacra.Binding;
 using Simulacra.Injection.Binding;
 
 namespace Calame.Demo.Data
@@ -14,8 +15,8 @@ namespace Calame.Demo.Data
 
         static ShapeDataBase()
         {
-            PropertyBindings.AddProperty(x => x.Position, x => x.Position);
-            PropertyBindings.AddProperty(x => x.Color, x => x.Color);
+            PropertyBindings.From(x => x.Position).To(x => x.Position);
+            PropertyBindings.From(x => x.Color).To(x => x.Color);
         }
 
         Vector2 IPositionController.Position

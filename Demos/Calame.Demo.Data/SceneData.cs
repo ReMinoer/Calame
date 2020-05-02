@@ -1,24 +1,25 @@
 ﻿using Diese.Collections.Observables;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
-using Glyph.Core;
+using Glyph.IO;
+using Simulacra.Binding;
+using Simulacra.Injection.Binding;
 
 namespace Calame.Demo.Data
 {
-    public class SceneData : BindedData<SceneData, GlyphObject>
+    public class SceneData : BindedData<SceneData, Scene>
     {
+        public AssetPath MainShapePath { get; set; }
         public ObservableCollection<IShapeData<IGlyphComponent>> Shapes { get; } = new ObservableCollection<IShapeData<IGlyphComponent>>();
 
         static SceneData()
         {
-            CollectionBindings.AddFactory(x => x.Shapes);
-        }
+            PropertyBindings.From(x => x.MainShapePath)
+                .Load(() => new DataContractSerializationFormat<IShapeData<IGlyphComponent>>())
+                .CreateComponent()
+                .To(x => x.MainShape);
 
-        protected override GlyphObject New()
-        {
-            GlyphObject glyphObject = base.New();
-            glyphObject.Add<SceneNode>();
-            return glyphObject;
+            CollectionBindings.From(x => x.Shapes).ToBindedComposite();
         }
     }
 }

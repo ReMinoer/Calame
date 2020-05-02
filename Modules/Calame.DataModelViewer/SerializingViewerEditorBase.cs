@@ -20,12 +20,22 @@ namespace Calame.DataModelViewer
 
         protected override Task<T> LoadAsync(Stream stream)
         {
-            return Task.Run(() => SerializationFormat.Load(stream, ImportedTypeProvider.Types));
+            return Task.Run(() =>
+                {
+                    SerializationFormat.KnownTypes = ImportedTypeProvider.Types;
+                    return SerializationFormat.Load(stream);
+                }
+            );
         }
 
         protected override Task SaveAsync(T data, Stream stream)
         {
-            return Task.Run(() => SerializationFormat.Save(data, stream, ImportedTypeProvider.Types));
+            return Task.Run(() =>
+                {
+                    SerializationFormat.KnownTypes = ImportedTypeProvider.Types;
+                    SerializationFormat.Save(data, stream);
+                }
+            );
         }
     }
 }

@@ -25,6 +25,7 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
         public override void RegisterDependencies(IDependencyRegistry registry)
         {
             base.RegisterDependencies(registry);
+            registry.Add(Dependency.OnType<Scene>());
             registry.Add(Dependency.OnType<RectangleObject>());
             registry.Add(Dependency.OnType<CircleObject>());
         }

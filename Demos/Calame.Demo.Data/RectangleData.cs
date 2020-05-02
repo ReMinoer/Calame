@@ -1,4 +1,5 @@
-﻿using Simulacra.Injection.Binding;
+﻿using Simulacra.Binding;
+using Simulacra.Injection.Binding;
 
 namespace Calame.Demo.Data
 {
@@ -9,8 +10,8 @@ namespace Calame.Demo.Data
 
         static RectangleData()
         {
-            PropertyBindings.AddProperty(x => x.Width, x => x.Width);
-            PropertyBindings.AddProperty(x => x.Height, x => x.Height);
+            PropertyBindings.From(x => x.Width).To(x => x.Width);
+            PropertyBindings.From(x => x.Height).To(x => x.Height);
         }
     }
 }

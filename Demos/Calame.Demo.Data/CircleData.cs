@@ -1,4 +1,5 @@
-﻿using Simulacra.Injection.Binding;
+﻿using Simulacra.Binding;
+using Simulacra.Injection.Binding;
 
 namespace Calame.Demo.Data
 {
@@ -9,8 +10,8 @@ namespace Calame.Demo.Data
 
         static CircleData()
         {
-            PropertyBindings.AddProperty(x => x.Radius, x => x.Radius);
-            PropertyBindings.AddProperty(x => x.Sampling, x => x.Sampling);
+            PropertyBindings.From(x => x.Radius).To(x => x.Radius);
+            PropertyBindings.From(x => x.Sampling).To(x => x.Sampling);
         }
     }
 }

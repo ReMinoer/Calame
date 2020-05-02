@@ -22,6 +22,7 @@ namespace Calame.DataModelViewer.ViewModels
     {
         private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IImportedTypeProvider _importedTypeProvider;
 
         private GlyphEngine _engine;
         
@@ -36,11 +37,12 @@ namespace Calame.DataModelViewer.ViewModels
         public ICommand SwitchModeCommand { get; }
         
         [ImportingConstructor]
-        public DataModelViewerViewModel(IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+        public DataModelViewerViewModel(IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
         {
             _contentLibraryProvider = contentLibraryProvider;
             _eventAggregator = eventAggregator;
             _eventAggregator.SubscribeOnUI(this);
+            _importedTypeProvider = importedTypeProvider;
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             
@@ -81,6 +83,8 @@ namespace Calame.DataModelViewer.ViewModels
             Viewer.Runner = new GlyphWpfRunner { Engine = _engine };
 
             Editor.Data.DependencyResolver = _engine.Resolver;
+            Editor.Data.SerializationKnownTypes = _importedTypeProvider.Types;
+
             Editor.RegisterDependencies(_engine.Registry);
             Editor.PrepareEditor(Viewer.Runner.Engine, Viewer.UserRoot);
 
