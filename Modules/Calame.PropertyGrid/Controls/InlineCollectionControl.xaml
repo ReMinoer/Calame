@@ -5,11 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
-             xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="150">
     <UserControl.Resources>
-        <converters:ModelToIconConverter x:Key="ModelToIconConverter" />
     </UserControl.Resources>
     <DockPanel>
         <Button Width="25" DockPanel.Dock="Right" Click="Button_OnClick">...</Button>
@@ -25,16 +23,11 @@
                         <userControls:CalameIcon DockPanel.Dock="Left"
                                                  IconSize="12"
                                                  IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                                                 Target="{Binding}"
+                                                 IconTargetSelector="{Binding IconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                                                 IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                                                  ToolTip="{Binding}"
-                                                 VerticalAlignment="Center">
-                            <userControls:CalameIcon.IconDescription>
-                                <MultiBinding Converter="{StaticResource ModelToIconConverter}">
-                                    <Binding Path="." />
-                                    <Binding Path="IconDescriptor" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}" />
-                                    <Binding Path="IconTargetSelector" RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}" />
-                                </MultiBinding>
-                            </userControls:CalameIcon.IconDescription>
-                        </userControls:CalameIcon>
+                                                 VerticalAlignment="Center" />
                     </Canvas>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
