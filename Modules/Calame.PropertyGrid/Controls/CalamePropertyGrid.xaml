@@ -12,6 +12,8 @@
              xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
              xmlns:modelization="clr-namespace:Glyph.Composition.Modelization;assembly=Glyph.Composition"
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
+             xmlns:io="clr-namespace:Glyph.IO;assembly=Glyph"
+             xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance controls:CalamePropertyGrid, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -19,6 +21,7 @@
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
+        <converters:AssetPathToStringConverter x:Key="AssetPathToStringConverter" />
     </UserControl.Resources>
     <xctk:PropertyGrid Name="PropertyGrid"
                        SelectedObject="{Binding SelectedObject, ElementName=This}"
@@ -42,9 +45,27 @@
                     <xctk:EditorTemplateDefinition.EditingTemplate>
                         <DataTemplate DataType="xctk:CustomPropertyItem">
                             <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
-                                                              IconTargetSelector="{Binding GlyphCreatorIconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                               IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              IconTargetSelector="{Binding GlyphCreatorIconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                               IconDescriptor="{Binding ComponentIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="io:AssetPath"/>
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
+                            <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                                <userControls:CalameIcon DockPanel.Dock="Left" Width="24" IconSize="12"
+                                                         Target="{x:Static icons:SystemIconKey.File}"
+                                                         IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                         IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                                <userControls:PathControl UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource AssetPathToStringConverter}}" />
+                            </DockPanel>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
                 </xctk:EditorTemplateDefinition>
