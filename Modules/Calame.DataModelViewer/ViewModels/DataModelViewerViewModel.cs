@@ -13,15 +13,15 @@ using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
 using Glyph.WpfInterop;
+using Simulacra.IO.Watching;
 
 namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : PersistedDocument, IViewerDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
+    public class DataModelViewerViewModel : CalamePersistedDocument, IViewerDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IContentLibraryProvider _contentLibraryProvider;
-        private readonly IEventAggregator _eventAggregator;
         private readonly IImportedTypeProvider _importedTypeProvider;
 
         private GlyphEngine _engine;
@@ -37,11 +37,10 @@ namespace Calame.DataModelViewer.ViewModels
         public ICommand SwitchModeCommand { get; }
         
         [ImportingConstructor]
-        public DataModelViewerViewModel(IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+        public DataModelViewerViewModel(IEventAggregator eventAggregator, FileFolderWatcher fileWatcher, IContentLibraryProvider contentLibraryProvider, IImportedTypeProvider importedTypeProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+            : base(eventAggregator, fileWatcher)
         {
             _contentLibraryProvider = contentLibraryProvider;
-            _eventAggregator = eventAggregator;
-            _eventAggregator.SubscribeOnUI(this);
             _importedTypeProvider = importedTypeProvider;
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
@@ -49,20 +48,15 @@ namespace Calame.DataModelViewer.ViewModels
             SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Viewer.Runner?.Engine != null);
         }
 
-        protected override async Task DoNew()
-        {
-            await Editor.NewDataAsync();
-            await InitializeEngine();
-        }
+        protected override async Task NewDocument() => await Editor.NewDataAsync();
 
-        protected override async Task DoLoad(string filePath)
+        protected override async Task LoadDocument(string filePath)
         {
             using (FileStream fileStream = File.OpenRead(filePath))
                 await Editor.LoadDataAsync(fileStream);
-            await InitializeEngine();
         }
 
-        protected override async Task DoSave(string filePath)
+        protected override async Task SaveDocument(string filePath)
         {
             using (FileStream fileStream = File.Create(filePath))
                 await Editor.SaveDataAsync(fileStream);
@@ -74,7 +68,7 @@ namespace Calame.DataModelViewer.ViewModels
             Viewer.ConnectView((IViewerView)view);
         }
 
-        private async Task InitializeEngine()
+        protected override async Task InitializeDocument()
         {
             _engine = new GlyphEngine(_contentLibraryProvider.Get(Editor.ContentPath));
             _engine.Root.Add<SceneNode>();
@@ -108,7 +102,7 @@ namespace Calame.DataModelViewer.ViewModels
             ISelectionSpread<IGlyphData> selection = message.Promoted;
 
             Viewer.LastSelection = selection;
-            await _eventAggregator.PublishAsync(selection, cancellationToken);
+            await EventAggregator.PublishAsync(selection, cancellationToken);
         }
 
         async Task IHandle<ISelectionRequest<IGlyphComponent>>.HandleAsync(ISelectionRequest<IGlyphComponent> message, CancellationToken cancellationToken)
@@ -119,12 +113,12 @@ namespace Calame.DataModelViewer.ViewModels
             ISelectionSpread<IGlyphData> selection = new SelectionSpread<IGlyphData>(message.DocumentContext, Editor.Data.GetData(message.Item));
             
             Viewer.LastSelection = selection;
-            await _eventAggregator.PublishAsync(selection, cancellationToken);
+            await EventAggregator.PublishAsync(selection, cancellationToken);
         }
 
         public void Dispose()
         {
-            _eventAggregator.Unsubscribe(this);
+            EventAggregator.Unsubscribe(this);
 
             _engine.Stop();
 

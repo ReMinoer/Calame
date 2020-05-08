@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Gemini;
+using Simulacra.IO.Watching;
 
 namespace Calame
 {
@@ -40,6 +41,7 @@ namespace Calame
             base.BindServices(batch);
             batch.AddExportedValue<IContentLibraryProvider>(new ContentLibraryProvider());
             batch.AddExportedValue<IImportedTypeProvider>(new ImportedTypeProvider());
+            batch.AddExportedValue(new FileFolderWatcher());
         }
 
 #if DEBUG
