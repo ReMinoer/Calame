@@ -4,17 +4,18 @@ using Glyph.Composition.Modelization;
 using Glyph.IO;
 using Simulacra.Binding;
 using Simulacra.Injection.Binding;
+using Simulacra.IO.Binding;
 
 namespace Calame.Demo.Data
 {
     public class SceneData : BindedData<SceneData, Scene>
     {
-        public AssetPath MainShapePath { get; set; }
+        public FilePath MainShapePath { get; set; }
         public ObservableCollection<IShapeData<IGlyphComponent>> Shapes { get; } = new ObservableCollection<IShapeData<IGlyphComponent>>();
 
         static SceneData()
         {
-            PropertyBindings.From(x => x.MainShapePath)
+            PathBindings.From(x => x.MainShapePath)
                 .Load(() => new DataContractSerializationFormat<IShapeData<IGlyphComponent>>())
                 .CreateComponent()
                 .To(x => x.MainShape);

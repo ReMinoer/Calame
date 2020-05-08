@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Calame.UserControls
 {
@@ -18,8 +18,8 @@ namespace Calame.UserControls
             DependencyProperty.Register(nameof(UserPath), typeof(string), typeof(PathControl), new PropertyMetadata(null, OnUserPathChanged));
         static public readonly DependencyProperty RootProperty =
             DependencyProperty.Register(nameof(Root), typeof(string), typeof(PathControl), new PropertyMetadata(null, OnRootChanged), ValidateRoot);
-        static public readonly DependencyProperty DirectoryModeProperty =
-            DependencyProperty.Register(nameof(DirectoryMode), typeof(bool), typeof(PathControl), new PropertyMetadata(false));
+        static public readonly DependencyProperty FolderModeProperty =
+            DependencyProperty.Register(nameof(FolderMode), typeof(bool), typeof(PathControl), new PropertyMetadata(false));
 
         public string UserPath
         {
@@ -65,10 +65,10 @@ namespace Calame.UserControls
             pathControl._normalizedRoot = newValue != null ? pathControl.NormalizePath(newValue, asDirectory: true) : null;
         }
 
-        public bool DirectoryMode
+        public bool FolderMode
         {
-            get => (bool)GetValue(DirectoryModeProperty);
-            set => SetValue(DirectoryModeProperty, value);
+            get => (bool)GetValue(FolderModeProperty);
+            set => SetValue(FolderModeProperty, value);
         }
 
         public PathControl()
@@ -78,22 +78,46 @@ namespace Calame.UserControls
 
         private void OnButtonClicked(object sender, RoutedEventArgs e)
         {
-            if (DirectoryMode)
+            if (FolderMode)
             {
-                throw new NotSupportedException();
-            }
-            else
-            {
-                var dialog = new OpenFileDialog
+                var dialog = new CommonOpenFileDialog
                 {
-                    InitialDirectory = _normalizedRoot
+                    IsFolderPicker = true
                 };
 
                 if (UserPath != null)
                 {
                     string systemPath = ConvertToFullPath(UserPath);
+                    if (Directory.Exists(systemPath))
+                    {
+                        dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
+                        dialog.DefaultFileName = Path.GetFileName(systemPath);
+                    }
+                }
+                else
+                {
+                    dialog.InitialDirectory = _normalizedRoot;
+                }
+
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    DisplayedPath = ConvertToRelativePathIfPossible(dialog.FileName);
+            }
+            else
+            {
+                var dialog = new OpenFileDialog();
+
+                if (UserPath != null)
+                {
+                    string systemPath = ConvertToFullPath(UserPath);
                     if (File.Exists(systemPath))
-                        dialog.FileName = systemPath;
+                    {
+                        dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
+                        dialog.FileName = Path.GetFileName(systemPath);
+                    }
+                }
+                else
+                {
+                    dialog.InitialDirectory = _normalizedRoot;
                 }
 
                 if (dialog.ShowDialog() == true)
@@ -136,7 +160,7 @@ namespace Calame.UserControls
             path = path.Replace(otherSeparator, separator);
 
             // Add end separator if directory
-            if ((asDirectory ?? DirectoryMode) && path[path.Length - 1] != separator)
+            if ((asDirectory ?? FolderMode) && path[path.Length - 1] != separator)
                 path += separator;
 
             return path;

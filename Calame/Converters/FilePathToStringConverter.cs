@@ -5,16 +5,16 @@ using Glyph.IO;
 
 namespace Calame.Converters
 {
-    public class AssetPathToStringConverter : IValueConverter
+    public class FilePathToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (string)(AssetPath)value;
+            return (string)(FilePath)value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (AssetPath)(string)value;
+            return (FilePath)(string)value;
         }
     }
 }

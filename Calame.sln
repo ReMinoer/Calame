@@ -1,79 +1,79 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stave", "External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj", "{38A041E6-5AA9-4C22-B96F-35167F171959}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fingear", "External\Glyph\External\Fingear\Fingear\Fingear.csproj", "{7EE0B116-6B49-4073-99D8-827DD68B8AE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fingear", "External\Glyph\External\Fingear\Fingear\Fingear.csproj", "{7EE0B116-6B49-4073-99D8-827DD68B8AE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fingear.MonoGame", "External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj", "{9EEF1863-44BE-423E-A29D-088C23AAC45E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fingear.MonoGame", "External\Glyph\External\Fingear\Fingear.MonoGame\Fingear.MonoGame.csproj", "{9EEF1863-44BE-423E-A29D-088C23AAC45E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGame.Framework.WpfInterop", "External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj", "{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame.Framework.WpfInterop", "External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj", "{809F0D79-AEDC-4754-A213-FDBE97CCD6D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Animation", "External\Glyph\Glyph.Animation\Glyph.Animation.csproj", "{2384DA3A-F989-4B1B-9044-A005CE8F4AB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Animation", "External\Glyph\Glyph.Animation\Glyph.Animation.csproj", "{2384DA3A-F989-4B1B-9044-A005CE8F4AB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Application", "External\Glyph\Glyph.Application\Glyph.Application.csproj", "{5D6CC7F3-0720-4242-A0FB-678E7D76F147}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Application", "External\Glyph\Glyph.Application\Glyph.Application.csproj", "{5D6CC7F3-0720-4242-A0FB-678E7D76F147}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Audio", "External\Glyph\Glyph.Audio\Glyph.Audio.csproj", "{46AA8A4B-5A43-45F3-99E4-B7BAD0D47FEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Audio", "External\Glyph\Glyph.Audio\Glyph.Audio.csproj", "{46AA8A4B-5A43-45F3-99E4-B7BAD0D47FEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Composition", "External\Glyph\Glyph.Composition\Glyph.Composition.csproj", "{8D4F4138-EB36-4427-9A2B-10A50723268C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Composition", "External\Glyph\Glyph.Composition\Glyph.Composition.csproj", "{8D4F4138-EB36-4427-9A2B-10A50723268C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Core", "External\Glyph\Glyph.Core\Glyph.Core.csproj", "{BC40E833-0EAA-4BBC-97D8-1541276BBA54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Core", "External\Glyph\Glyph.Core\Glyph.Core.csproj", "{BC40E833-0EAA-4BBC-97D8-1541276BBA54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Effects", "External\Glyph\Glyph.Effects\Glyph.Effects.csproj", "{C1E7FE9C-0D98-4F1C-A6B2-11DFDB431F8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Effects", "External\Glyph\Glyph.Effects\Glyph.Effects.csproj", "{C1E7FE9C-0D98-4F1C-A6B2-11DFDB431F8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Engine", "External\Glyph\Glyph.Engine\Glyph.Engine.csproj", "{25400349-233E-404D-BB4E-A0CB4AF893EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Engine", "External\Glyph\Glyph.Engine\Glyph.Engine.csproj", "{25400349-233E-404D-BB4E-A0CB4AF893EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Graphics", "External\Glyph\Glyph.Graphics\Glyph.Graphics.csproj", "{CC4D895F-646F-43C8-B25E-81CF5803ED7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Graphics", "External\Glyph\Glyph.Graphics\Glyph.Graphics.csproj", "{CC4D895F-646F-43C8-B25E-81CF5803ED7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Graphics.Particles", "External\Glyph\Glyph.Graphics.Particles\Glyph.Graphics.Particles.csproj", "{5292934A-D0E4-47FD-98FA-0A32B37657D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Graphics.Particles", "External\Glyph\Glyph.Graphics.Particles\Glyph.Graphics.Particles.csproj", "{5292934A-D0E4-47FD-98FA-0A32B37657D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Messaging", "External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj", "{26405F4B-4532-4F48-A96F-594A70C12B3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Messaging", "External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj", "{26405F4B-4532-4F48-A96F-594A70C12B3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Particles", "External\Glyph\Glyph.Particles\Glyph.Particles.csproj", "{1070485B-D9FE-4AA2-889A-5F809021C447}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Particles", "External\Glyph\Glyph.Particles\Glyph.Particles.csproj", "{1070485B-D9FE-4AA2-889A-5F809021C447}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Physics", "External\Glyph\Glyph.Physics\Glyph.Physics.csproj", "{008028BF-EE7E-4D70-8FD5-14EC3AFA26DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Physics", "External\Glyph\Glyph.Physics\Glyph.Physics.csproj", "{008028BF-EE7E-4D70-8FD5-14EC3AFA26DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Scripting", "External\Glyph\Glyph.Scripting\Glyph.Scripting.csproj", "{71BD4FA9-4CA8-426B-92D0-D32CF9D40794}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Scripting", "External\Glyph\Glyph.Scripting\Glyph.Scripting.csproj", "{71BD4FA9-4CA8-426B-92D0-D32CF9D40794}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Space", "External\Glyph\Glyph.Space\Glyph.Space.csproj", "{068202CC-E943-4718-9771-62D72E50623E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Space", "External\Glyph\Glyph.Space\Glyph.Space.csproj", "{068202CC-E943-4718-9771-62D72E50623E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Tools", "External\Glyph\Glyph.Tools\Glyph.Tools.csproj", "{6692F3F4-E1EA-4D53-B0A1-2DBA67414FC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Tools", "External\Glyph\Glyph.Tools\Glyph.Tools.csproj", "{6692F3F4-E1EA-4D53-B0A1-2DBA67414FC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.UI", "External\Glyph\Glyph.UI\Glyph.UI.csproj", "{47E66422-AEFC-4B28-92C3-356FFD2E783C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.UI", "External\Glyph\Glyph.UI\Glyph.UI.csproj", "{47E66422-AEFC-4B28-92C3-356FFD2E783C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.WpfInterop", "External\Glyph\Glyph.WpfInterop\Glyph.WpfInterop.csproj", "{DE8D6CFE-29E2-4B00-A32B-A85A5CA583C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.WpfInterop", "External\Glyph\Glyph.WpfInterop\Glyph.WpfInterop.csproj", "{DE8D6CFE-29E2-4B00-A32B-A85A5CA583C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph", "External\Glyph\Glyph\Glyph.csproj", "{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph", "External\Glyph\Glyph\Glyph.csproj", "{457CBBF3-26C7-478B-B4EB-1F85FF3C07F5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{95AFED7A-6211-441D-9643-10354F05477E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.PropertyGrid", "Modules\Calame.PropertyGrid\Calame.PropertyGrid.csproj", "{E813C728-F6F2-4278-9473-51E388C9EDC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.PropertyGrid", "Modules\Calame.PropertyGrid\Calame.PropertyGrid.csproj", "{E813C728-F6F2-4278-9473-51E388C9EDC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.CompositionGraph", "Modules\Calame.CompositionGraph\Calame.CompositionGraph.csproj", "{F44FCC70-3106-4F78-BC8B-BA3CE8AD41FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.CompositionGraph", "Modules\Calame.CompositionGraph\Calame.CompositionGraph.csproj", "{F44FCC70-3106-4F78-BC8B-BA3CE8AD41FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.SceneGraph", "Modules\Calame.SceneGraph\Calame.SceneGraph.csproj", "{4A808252-5BB0-45E4-B814-4C732F12EB40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.SceneGraph", "Modules\Calame.SceneGraph\Calame.SceneGraph.csproj", "{4A808252-5BB0-45E4-B814-4C732F12EB40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.LogConsole", "Modules\Calame.LogConsole\Calame.LogConsole.csproj", "{BA726253-52BA-4543-BE12-0CCE2556E3DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.LogConsole", "Modules\Calame.LogConsole\Calame.LogConsole.csproj", "{BA726253-52BA-4543-BE12-0CCE2556E3DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame", "Calame\Calame.csproj", "{8CC36DA5-321D-49BA-9EE2-56015EF5081F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame", "Calame\Calame.csproj", "{8CC36DA5-321D-49BA-9EE2-56015EF5081F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.App", "Calame.App\Calame.App.csproj", "{2B4325BE-1637-4ED7-A57D-046E24B2119C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.App", "Calame.App\Calame.App.csproj", "{2B4325BE-1637-4ED7-A57D-046E24B2119C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{0FAE2ED9-DF3B-4E4D-8AF4-895D375ABD16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Demo", "Demos\Calame.Demo\Calame.Demo.csproj", "{EA4D5021-5355-46AA-8C50-9637C03BB08E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.Demo", "Demos\Calame.Demo\Calame.Demo.csproj", "{EA4D5021-5355-46AA-8C50-9637C03BB08E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.DataModelViewer", "Modules\Calame.DataModelViewer\Calame.DataModelViewer.csproj", "{A88C8133-F38B-4374-9022-EF27AE25141E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.DataModelViewer", "Modules\Calame.DataModelViewer\Calame.DataModelViewer.csproj", "{A88C8133-F38B-4374-9022-EF27AE25141E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.SceneViewer", "Modules\Calame.SceneViewer\Calame.SceneViewer.csproj", "{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.SceneViewer", "Modules\Calame.SceneViewer\Calame.SceneViewer.csproj", "{49E1CD3F-2B11-42BB-BCD5-7C03C1B81CD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.DataModelTree", "Modules\Calame.DataModelTree\Calame.DataModelTree.csproj", "{ED371A46-D089-452E-850B-8D8FBA310152}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.DataModelTree", "Modules\Calame.DataModelTree\Calame.DataModelTree.csproj", "{ED371A46-D089-452E-850B-8D8FBA310152}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Demo.Data", "Demos\Calame.Demo.Data\Calame.Demo.Data.csproj", "{F5FDE43A-FA06-442E-8447-3A889FCCAE6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.Demo.Data", "Demos\Calame.Demo.Data\Calame.Demo.Data.csproj", "{F5FDE43A-FA06-442E-8447-3A889FCCAE6A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8172B44A-999B-4C86-BBB0-E03E9B1337D1}"
 EndProject
@@ -81,17 +81,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulacra", "External\Glyph
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulacra.Test", "External\Glyph\External\Simulacra\Tests\Simulacra.Test\Simulacra.Test.csproj", "{48BF2EB4-CCC0-448A-A036-DB644C3C8033}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glyph.Tests", "External\Glyph\Tests\Glyph.Tests\Glyph.Tests.csproj", "{94DC85AB-7228-4CFD-8EDF-1BA2AA429354}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Tests", "External\Glyph\Tests\Glyph.Tests\Glyph.Tests.csproj", "{94DC85AB-7228-4CFD-8EDF-1BA2AA429354}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taskete", "External\Glyph\External\Fingear\External\Taskete\Taskete\Taskete.csproj", "{88C50D55-D13C-46FB-AFB2-0B6FB4FD4D3B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OverGraphed", "External\Glyph\External\Fingear\External\Taskete\External\OverGraphed\OverGraphed\OverGraphed.csproj", "{3AB062BA-7D9A-4423-887C-814CDE5A8410}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Viewer", "Calame.Viewer\Calame.Viewer.csproj", "{2EDFE6B4-8E1E-4B22-85BE-D80E8573B3FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.Viewer", "Calame.Viewer\Calame.Viewer.csproj", "{2EDFE6B4-8E1E-4B22-85BE-D80E8573B3FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.InteractionTree", "Modules\Calame.InteractionTree\Calame.InteractionTree.csproj", "{882DAE3C-7714-4CF9-88E6-EB6DFE156DCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.InteractionTree", "Modules\Calame.InteractionTree\Calame.InteractionTree.csproj", "{882DAE3C-7714-4CF9-88E6-EB6DFE156DCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.BrushPanel", "Modules\Calame.BrushPanel\Calame.BrushPanel.csproj", "{FA854785-1965-4CDB-BA79-29CED215DCB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.BrushPanel", "Modules\Calame.BrushPanel\Calame.BrushPanel.csproj", "{FA854785-1965-4CDB-BA79-29CED215DCB6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diese.Collections (Stave)", "External\Glyph\External\Fingear\External\Stave\Diese.Collections (Stave)\Diese.Collections (Stave).csproj", "{68A01741-9A9C-4262-9193-1B214B67EBE7}"
 EndProject
@@ -107,7 +107,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Niddle", "External\Glyph\Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Niddle.Test", "External\Glyph\External\Simulacra\External\Niddle\Tests\Niddle.Test\Niddle.Test.csproj", "{C3703B6C-C15F-4BDF-971B-1E9723EA7F52}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Icons", "Calame.Icons\Calame.Icons.csproj", "{86BCF6D2-1B27-4209-9872-EE40028B48A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.Icons", "Calame.Icons\Calame.Icons.csproj", "{86BCF6D2-1B27-4209-9872-EE40028B48A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulacra.IO", "External\Glyph\External\Simulacra\Simulacra.IO\Simulacra.IO.csproj", "{79183837-B508-4FF8-993D-F3731CD6B11F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -311,6 +313,10 @@ Global
 		{86BCF6D2-1B27-4209-9872-EE40028B48A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86BCF6D2-1B27-4209-9872-EE40028B48A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86BCF6D2-1B27-4209-9872-EE40028B48A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79183837-B508-4FF8-993D-F3731CD6B11F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79183837-B508-4FF8-993D-F3731CD6B11F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79183837-B508-4FF8-993D-F3731CD6B11F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79183837-B508-4FF8-993D-F3731CD6B11F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -361,6 +367,7 @@ Global
 		{F679EC2F-5DD1-4DE1-963B-35102ADB424D} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 		{DAC69C23-D782-4CCF-BC99-72C0EED2C92D} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 		{C3703B6C-C15F-4BDF-971B-1E9723EA7F52} = {8172B44A-999B-4C86-BBB0-E03E9B1337D1}
+		{79183837-B508-4FF8-993D-F3731CD6B11F} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51117004-2C3A-426A-86DF-7881F4FEF766}

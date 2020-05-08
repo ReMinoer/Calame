@@ -21,7 +21,8 @@
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
-        <converters:AssetPathToStringConverter x:Key="AssetPathToStringConverter" />
+        <converters:FilePathToStringConverter x:Key="FilePathToStringConverter" />
+        <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
     </UserControl.Resources>
     <xctk:PropertyGrid Name="PropertyGrid"
                        SelectedObject="{Binding SelectedObject, ElementName=This}"
@@ -54,7 +55,7 @@
                 <xctk:EditorTemplateDefinition>
                     <xctk:EditorTemplateDefinition.TargetProperties>
                         <collections:ArrayList>
-                            <x:Type Type="io:AssetPath"/>
+                            <x:Type Type="io:FilePath"/>
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:EditorTemplateDefinition.EditingTemplate>
@@ -64,7 +65,26 @@
                                                          Target="{x:Static icons:SystemIconKey.File}"
                                                          IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                          IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
-                                <userControls:PathControl UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource AssetPathToStringConverter}}" />
+                                <userControls:PathControl UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="io:FolderPath"/>
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
+                            <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                                <userControls:CalameIcon DockPanel.Dock="Left" Width="24" IconSize="12"
+                                                         Target="{x:Static icons:SystemIconKey.Folder}"
+                                                         IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                         IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                                <userControls:PathControl UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
+                                                          FolderMode="True" />
                             </DockPanel>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>

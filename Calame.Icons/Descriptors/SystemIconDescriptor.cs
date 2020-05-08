@@ -11,8 +11,8 @@ namespace Calame.Icons.Descriptors
         {
             switch (key)
             {
-                case SystemIconKey.File: return new IconDescription(PackIconMaterialKind.File, Brushes.Black);
-                case SystemIconKey.Folder: return new IconDescription(PackIconMaterialKind.Folder, Brushes.Black);
+                case SystemIconKey.File: return new IconDescription(PackIconMaterialKind.FileOutline, Brushes.Black);
+                case SystemIconKey.Folder: return new IconDescription(PackIconMaterialKind.FolderOpen, Brushes.Black);
                 default: return IconDescription.None;
             }
         }
