@@ -225,11 +225,10 @@ namespace Calame.Viewer
                 _owner.Deactivated -= OnDeactivated;
             }
 
-            foreach (IViewerModule module in Modules)
+            foreach (IViewerModule module in Modules.Reverse())
                 module.Disconnect();
 
             Runner?.Dispose();
-            Runner = null;
         }
 
         public class EditorModeModule : ViewerModuleBase, IViewerInteractiveMode
