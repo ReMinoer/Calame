@@ -26,11 +26,10 @@ namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : Document, IViewerDocument, IHandle<ISelectionRequest<IGlyphComponent>>
+    public sealed class SceneViewerViewModel : CalameDocumentBase, IViewerDocument, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IShell _shell;
         private readonly IContentLibraryProvider _contentLibraryProvider;
-        private readonly IEventAggregator _eventAggregator;
         
         private GlyphEngine _engine;
         private MessagingTracker<IView> _viewTracker;
@@ -56,16 +55,15 @@ namespace Calame.SceneViewer.ViewModels
         private GlyphWpfRunner Runner => Viewer.Runner;
         
         [ImportingConstructor]
-        public SceneViewerViewModel(IShell shell, IContentLibraryProvider contentLibraryProvider, IEventAggregator eventAggregator, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+        public SceneViewerViewModel(IEventAggregator eventAggregator, IShell shell, IContentLibraryProvider contentLibraryProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+            : base(eventAggregator)
         {
             DisplayName = "Scene Viewer";
 
             _shell = shell;
             _contentLibraryProvider = contentLibraryProvider;
-            _eventAggregator = eventAggregator;
-            _eventAggregator.SubscribeOnUI(this);
 
-            Viewer = new ViewerViewModel(this, _eventAggregator, viewerModuleSources);
+            Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
             SessionMode = new SessionModeModule();
@@ -83,7 +81,7 @@ namespace Calame.SceneViewer.ViewModels
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
-            : this(viewModel._shell, viewModel._contentLibraryProvider, viewModel._eventAggregator, Enumerable.Empty<IViewerModuleSource>())
+            : this(viewModel.EventAggregator, viewModel._shell, viewModel._contentLibraryProvider, Enumerable.Empty<IViewerModuleSource>())
         {
             throw new NotSupportedException();
 
@@ -139,6 +137,18 @@ namespace Calame.SceneViewer.ViewModels
             FreeCameraAction();
         }
 
+        protected override Task DisposeDocumentAsync()
+        {
+            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
+
+            _engine.Stop();
+            _viewTracker?.Dispose();
+
+            Viewer.Dispose();
+
+            return Task.CompletedTask;
+        }
+
         private void FreeCameraAction()
         {
             if (_viewTracker == null)
@@ -181,17 +191,7 @@ namespace Calame.SceneViewer.ViewModels
             ISelectionSpread<IGlyphComponent> selection = message.Promoted;
 
             Viewer.LastSelection = selection;
-            await _eventAggregator.PublishAsync(selection, cancellationToken);
-        }
-
-        public void Dispose()
-        {
-            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
-
-            _engine.Stop();
-            _viewTracker?.Dispose();
-
-            Viewer.Dispose();
+            await EventAggregator.PublishAsync(selection, cancellationToken);
         }
 
         public class SessionModeModule : ViewerModuleBase, IViewerInteractiveMode

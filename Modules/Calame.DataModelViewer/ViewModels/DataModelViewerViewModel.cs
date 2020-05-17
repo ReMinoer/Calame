@@ -19,7 +19,7 @@ namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : CalamePersistedDocument, IViewerDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
+    public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IImportedTypeProvider _importedTypeProvider;
@@ -37,7 +37,7 @@ namespace Calame.DataModelViewer.ViewModels
         public ICommand SwitchModeCommand { get; }
         
         [ImportingConstructor]
-        public DataModelViewerViewModel(IEventAggregator eventAggregator, FileFolderWatcher fileWatcher, IContentLibraryProvider contentLibraryProvider, IImportedTypeProvider importedTypeProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+        public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IContentLibraryProvider contentLibraryProvider, IImportedTypeProvider importedTypeProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator, fileWatcher)
         {
             _contentLibraryProvider = contentLibraryProvider;
@@ -48,27 +48,26 @@ namespace Calame.DataModelViewer.ViewModels
             SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Viewer.Runner?.Engine != null);
         }
 
-        protected override async Task NewDocument() => await Editor.NewDataAsync();
+        protected override async Task NewDocumentAsync()
+        {
+            await Editor.NewDataAsync();
+            await InitializeEngineAsync();
+        }
 
-        protected override async Task LoadDocument(string filePath)
+        protected override async Task LoadDocumentAsync(string filePath)
         {
             using (FileStream fileStream = File.OpenRead(filePath))
                 await Editor.LoadDataAsync(fileStream);
+            await InitializeEngineAsync();
         }
 
-        protected override async Task SaveDocument(string filePath)
+        protected override async Task SaveDocumentAsync(string filePath)
         {
             using (FileStream fileStream = File.Create(filePath))
                 await Editor.SaveDataAsync(fileStream);
         }
 
-        protected override void OnViewLoaded(object view)
-        {
-            base.OnViewLoaded(view);
-            Viewer.ConnectView((IViewerView)view);
-        }
-
-        protected override async Task InitializeDocument()
+        private async Task InitializeEngineAsync()
         {
             _engine = new GlyphEngine(_contentLibraryProvider.Get(Editor.ContentPath));
             _engine.Root.Add<SceneNode>();
@@ -94,6 +93,24 @@ namespace Calame.DataModelViewer.ViewModels
             await Viewer.Activate();
         }
 
+        protected override void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            Viewer.ConnectView((IViewerView)view);
+        }
+
+        protected override Task DisposeDocumentAsync()
+        {
+            EventAggregator.Unsubscribe(this);
+
+            _engine.Stop();
+
+            Editor.Dispose();
+            Viewer.Dispose();
+
+            return Task.CompletedTask;
+        }
+
         async Task IHandle<ISelectionRequest<IGlyphData>>.HandleAsync(ISelectionRequest<IGlyphData> message, CancellationToken cancellationToken)
         {
             if (message.DocumentContext != this)
@@ -114,16 +131,6 @@ namespace Calame.DataModelViewer.ViewModels
             
             Viewer.LastSelection = selection;
             await EventAggregator.PublishAsync(selection, cancellationToken);
-        }
-
-        public void Dispose()
-        {
-            EventAggregator.Unsubscribe(this);
-
-            _engine.Stop();
-
-            Editor.Dispose();
-            Viewer.Dispose();
         }
     }
 }

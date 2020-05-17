@@ -41,7 +41,7 @@ namespace Calame
             base.BindServices(batch);
             batch.AddExportedValue<IContentLibraryProvider>(new ContentLibraryProvider());
             batch.AddExportedValue<IImportedTypeProvider>(new ImportedTypeProvider());
-            batch.AddExportedValue(new FileFolderWatcher());
+            batch.AddExportedValue(new PathWatcher());
         }
 
 #if DEBUG

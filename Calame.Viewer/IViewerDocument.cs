@@ -1,9 +1,8 @@
-﻿using System;
-using Glyph.Engine;
+﻿using Glyph.Engine;
 
 namespace Calame.Viewer
 {
-    public interface IViewerDocument : IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>, IDisposable
+    public interface IViewerDocument : IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>
     {
         
     }
