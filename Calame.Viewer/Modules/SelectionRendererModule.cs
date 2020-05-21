@@ -44,15 +44,17 @@ namespace Calame.Viewer.Modules
             _root = Model.EditorModeRoot.Add<GlyphObject>(Model.ComponentsFilter.ExcludedRoots.Add);
             _root.Add<SceneNode>();
 
-            var primitiveComponent = _root.Add<PrimitiveComponent<LinePrimitive>>();
+            var linePrimitive = new LinePrimitive(Color.Purple);
+            _root.Add<PrimitivesComponent>().Primitives.Add(linePrimitive);
             var primitiveRenderer = _root.Add<PrimitiveRenderer>();
+
             primitiveRenderer.DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera;
 
             _root.Schedulers.Update.Plan(_ =>
             {
                 TopLeftRectangle rect = boxedSelection.Area.BoundingBox;
                 Vector2[] vertices = { rect.Position, rect.P1, rect.P3, rect.P2, rect.Position };
-                primitiveComponent.Primitive = new LinePrimitive(Color.Purple, vertices);
+                linePrimitive.Points = vertices;
             });
         }
 

@@ -41,7 +41,7 @@ namespace Calame.Demo.Data
         {
             _rectangle = new CenteredRectangle(Vector2.Zero, new Vector2(100, 100));
             _primitive = _rectangle.ToPrimitive(Color.White);
-            PrimitiveRenderer.Primitives.Add(_primitive);
+            PrimitiveRenderer.PrimitiveProviders.Add(_primitive);
         }
 
         private void RefreshPrimitive()

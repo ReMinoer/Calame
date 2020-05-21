@@ -38,7 +38,7 @@ namespace Calame.Demo.Data
             : base(context)
         {
             _primitive = new EllipsePrimitive(Color.White, Vector2.Zero, 50);
-            PrimitiveRenderer.Primitives.Add(_primitive);
+            PrimitiveRenderer.PrimitiveProviders.Add(_primitive);
         }
     }
 }
