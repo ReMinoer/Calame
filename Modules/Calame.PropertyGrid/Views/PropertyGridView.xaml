@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Calame.PropertyGrid.ViewModels"
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:PropertyGridViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="500"
@@ -13,6 +14,12 @@
         <controls:CalamePropertyGrid SelectedObject="{Binding SelectedObject}"
                                      NewItemTypeRegistry="{Binding NewItemTypeRegistry}"
                                      IconProvider="{Binding IconProvider}"
-                                     IconDescriptorManager="{Binding IconDescriptorManager}" />
+                                     IconDescriptorManager="{Binding IconDescriptorManager}">
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="PropertyValueChanged">
+                    <b:InvokeCommandAction Command="{Binding DirtyDocumentCommand}"></b:InvokeCommandAction>
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+        </controls:CalamePropertyGrid>
     </Grid>
 </UserControl>

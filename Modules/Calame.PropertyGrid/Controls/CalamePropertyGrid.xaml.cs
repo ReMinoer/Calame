@@ -55,12 +55,19 @@ namespace Calame.PropertyGrid.Controls
         public IIconDescriptor SystemIconDescriptor { get; private set; }
         public IIconDescriptor ComponentIconDescriptor { get; private set; }
 
+        public event PropertyValueChangedEventHandler PropertyValueChanged;
+
         public CalamePropertyGrid()
         {
             InitializeComponent();
 
             PropertyGrid.PreparePropertyItem += PropertyGridOnPreparePropertyItem;
             PropertyGrid.ClearPropertyItem += PropertyGridOnClearPropertyItem;
+        }
+
+        private void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
+        {
+            PropertyValueChanged?.Invoke(this, e);
         }
 
         private void PropertyGridOnPreparePropertyItem(object sender, PropertyItemEventArgs e)

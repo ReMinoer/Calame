@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Input;
 using Calame.Viewer;
 using Calame.Viewer.Modules.Base;
@@ -30,9 +31,8 @@ namespace Calame.BrushPanel
         public IViewerModule CreateInstance() => new ViewerModule<IGlyphData, DataCursorBrushController>();
     }
 
-    public interface IBrushViewerModule : IViewerModule
+    public interface IBrushViewerModule : IViewerModule, IBrushController<object>
     {
-        object Canvas { get; set; }
         IBrush Brush { get; set; }
         IPaint Paint { get; set; }
     }
@@ -43,12 +43,14 @@ namespace Calame.BrushPanel
         private GlyphObject _root;
         private TBrushController _brushController;
 
+        public bool Enabled { get; set; }
+
         public TCanvas Canvas
         {
             get => _brushController.Canvas;
             set => _brushController.Canvas = value;
         }
-        
+
         public IBrush<TCanvas, ISpaceBrushArgs, IPaint> Brush
         {
             get => _brushController.Brush;
@@ -61,7 +63,7 @@ namespace Calame.BrushPanel
             set => _brushController.Paint = value;
         }
 
-        object IBrushViewerModule.Canvas
+        object IBrushController<object>.Canvas
         {
             get => Canvas;
             set => Canvas = (TCanvas)value;
@@ -79,7 +81,13 @@ namespace Calame.BrushPanel
             get => _interactive;
             private set => this.SetValue(ref _interactive, value);
         }
-        
+
+        public bool ApplyingBrush => _brushController.ApplyingBrush;
+
+        public event EventHandler ApplyStarted;
+        public event EventHandler ApplyCancelled;
+        public event EventHandler ApplyEnded;
+
         public string Name => "Brush";
         public object IconId => PackIconMaterialKind.Brush;
         Cursor IViewerInteractiveMode.Cursor => Cursors.Pen;
@@ -95,15 +103,27 @@ namespace Calame.BrushPanel
             _brushController = _root.Add<TBrushController>();
             _brushController.Input = InputSystem.Instance.Mouse[MouseButton.Left];
             _brushController.RaycastClient = Model.Client;
+
+            _brushController.ApplyStarted += OnApplyStarted;
+            _brushController.ApplyCancelled += OnApplyCancelled;
+            _brushController.ApplyEnded += OnApplyEnded;
         }
 
         protected override void DisconnectRunner()
         {
+            _brushController.ApplyEnded -= OnApplyEnded;
+            _brushController.ApplyCancelled -= OnApplyCancelled;
+            _brushController.ApplyStarted -= OnApplyStarted;
+
             Model.RemoveInteractiveMode(this);
             Model.EditorRoot.RemoveAndDispose(_root);
 
             _brushController = null;
             _root = null;
         }
+
+        private void OnApplyStarted(object sender, EventArgs e) => ApplyStarted?.Invoke(this, e);
+        private void OnApplyCancelled(object sender, EventArgs e) => ApplyCancelled?.Invoke(this, e);
+        private void OnApplyEnded(object sender, EventArgs e) => ApplyEnded?.Invoke(this, e);
     }
 }

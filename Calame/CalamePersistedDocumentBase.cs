@@ -11,7 +11,7 @@ using Simulacra.IO.Watching;
 
 namespace Calame
 {
-    public abstract class CalamePersistedDocumentBase : CalameDocumentBase, IPersistedDocument
+    public abstract class CalamePersistedDocumentBase : CalameDocumentBase, IPersistedDocument, IHandle<IDirtyMessage>
     {
         static private readonly NLogLoggerProvider LoggerProvider = new NLogLoggerProvider();
         protected readonly PathWatcher FileWatcher;
@@ -215,6 +215,14 @@ namespace Calame
                 case MessageBoxResult.Cancel: return null;
                 default: throw new NotSupportedException();
             }
+        }
+
+        Task IHandle<IDirtyMessage>.HandleAsync(IDirtyMessage message, CancellationToken cancellationToken)
+        {
+            if (message.DocumentContext == this)
+                IsDirty = true;
+
+            return Task.CompletedTask;
         }
     }
 }

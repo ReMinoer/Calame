@@ -4,8 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Calame.Icons;
 using Caliburn.Micro;
+using Gemini.Framework;
 using Gemini.Framework.Services;
 
 namespace Calame.PropertyGrid.ViewModels
@@ -27,6 +29,8 @@ namespace Calame.PropertyGrid.ViewModels
 
         public IList<Type> NewItemTypeRegistry { get; }
 
+        public ICommand DirtyDocumentCommand { get; }
+
         [ImportingConstructor]
         public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
             : base(shell, eventAggregator)
@@ -37,6 +41,8 @@ namespace Calame.PropertyGrid.ViewModels
             
             IconProvider = iconProvider;
             IconDescriptorManager = iconDescriptorManager;
+
+            DirtyDocumentCommand = new RelayCommand(x => EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject)).Wait());
         }
 
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)

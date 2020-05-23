@@ -25,6 +25,7 @@
         <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
     </UserControl.Resources>
     <xctk:PropertyGrid Name="PropertyGrid"
+                       PropertyValueChanged="OnPropertyValueChanged"
                        SelectedObject="{Binding SelectedObject, ElementName=This}"
                        ShowAdvancedOptions="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowDescriptionByTooltip="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"

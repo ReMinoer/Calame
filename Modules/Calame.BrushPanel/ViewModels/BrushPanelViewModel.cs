@@ -178,6 +178,8 @@ namespace Calame.BrushPanel.ViewModels
             //SelectedBrush = _brushes.FirstOrDefault(x => x == previousBrush);
             //SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == previousPaint);
 
+            _viewerModule.ApplyEnded += OnBrushApplyEnded;
+
             return Task.CompletedTask;
         }
 
@@ -194,6 +196,11 @@ namespace Calame.BrushPanel.ViewModels
             _brushes.Clear();
 
             return Task.CompletedTask;
+        }
+
+        private void OnBrushApplyEnded(object sender, EventArgs e)
+        {
+            EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedCanvas)).Wait();
         }
 
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
