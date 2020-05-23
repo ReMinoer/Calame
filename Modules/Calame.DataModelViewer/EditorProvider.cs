@@ -45,14 +45,14 @@ namespace Calame.DataModelViewer
         public async Task New(IDocument document, string name)
         {
             var dataModelViewerViewModel = (DataModelViewerViewModel)document;
-            dataModelViewerViewModel.Editor = Editors.First(x => Handles(x, name)).CreateInstance();
+            dataModelViewerViewModel.Editor = Editors.First(x => Handles(x, name)).CreateEditor();
             await dataModelViewerViewModel.New(name);
         }
 
         public async Task Open(IDocument document, string path)
         {
             var dataModelViewerViewModel = (DataModelViewerViewModel)document;
-            dataModelViewerViewModel.Editor = Editors.First(x => Handles(x, path)).CreateInstance();
+            dataModelViewerViewModel.Editor = Editors.First(x => Handles(x, path)).CreateEditor();
             await dataModelViewerViewModel.Load(path);
         }
     }

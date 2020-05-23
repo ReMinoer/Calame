@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Niddle;
 
-namespace Calame.DataModelViewer
+namespace Calame.DataModelViewer.Base
 {
     public abstract class ViewerEditorBase<T> : IEditor
         where T : IGlyphCreator

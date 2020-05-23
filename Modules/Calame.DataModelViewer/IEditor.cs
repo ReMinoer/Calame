@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Glyph.Composition.Modelization;
@@ -20,12 +19,5 @@ namespace Calame.DataModelViewer
 
         void RegisterDependencies(IDependencyRegistry registry);
         void PrepareEditor(GlyphEngine engine, GlyphObject editorRoot);
-    }
-
-    public interface IEditorSource
-    {
-        string DisplayName { get; }
-        IEnumerable<string> FileExtensions { get; }
-        IEditor CreateInstance();
     }
 }
