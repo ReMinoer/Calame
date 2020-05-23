@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using Glyph.IO;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -20,6 +22,8 @@ namespace Calame.UserControls
             DependencyProperty.Register(nameof(Root), typeof(string), typeof(PathControl), new PropertyMetadata(null, OnRootChanged), ValidateRoot);
         static public readonly DependencyProperty FolderModeProperty =
             DependencyProperty.Register(nameof(FolderMode), typeof(bool), typeof(PathControl), new PropertyMetadata(false));
+        static public readonly DependencyProperty FileTypesProperty =
+            DependencyProperty.Register(nameof(FileTypes), typeof(IEnumerable<FileType>), typeof(PathControl), new PropertyMetadata(null));
 
         public string UserPath
         {
@@ -71,6 +75,12 @@ namespace Calame.UserControls
             set => SetValue(FolderModeProperty, value);
         }
 
+        public IEnumerable<FileType> FileTypes
+        {
+            get => (IEnumerable<FileType>)GetValue(FileTypesProperty);
+            set => SetValue(FileTypesProperty, value);
+        }
+
         public PathControl()
         {
             InitializeComponent();
@@ -104,7 +114,11 @@ namespace Calame.UserControls
             }
             else
             {
-                var dialog = new OpenFileDialog();
+                var dialog = new OpenFileDialog
+                {
+                    Filter = FileTypes != null ? string.Join("|", FileTypes.Select(x => $"{x.DisplayName}|*{x.Extensions}")) : string.Empty,
+                    DefaultExt = FileTypes?.FirstOrDefault().Extensions.First() ?? string.Empty
+                };
 
                 if (UserPath != null)
                 {
