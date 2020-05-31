@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="24" d:DesignWidth="300" d:DataContext="{d:DesignInstance local:PathControl}">
     <DockPanel>
-        <Button DockPanel.Dock="Right" Content="..." Click="OnButtonClicked" Width="25" />
+        <Button DockPanel.Dock="Right" Content="..." Click="OnButtonClicked" Width="30" />
         <xctk:PropertyGridEditorTextBox Text="{Binding DisplayedPath, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

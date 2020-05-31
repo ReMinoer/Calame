@@ -6,7 +6,7 @@ using Simulacra.Injection.Binding;
 
 namespace Calame.Demo.Data
 {
-    public class ShapeDataBase<TData, T> : BindedData<TData, T>, IShapeData<T>, IPositionController
+    public abstract class ShapeDataBase<TData, T> : BindedData<TData, T>, IShapeData<T>, IPositionController
         where TData : ShapeDataBase<TData, T>
         where T : PrimitiveObjectBase
     {

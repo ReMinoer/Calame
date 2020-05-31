@@ -5,13 +5,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="20" d:DesignWidth="150">
+             d:DesignHeight="24" d:DesignWidth="150">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
-    <DockPanel>
-        <Button Width="25" DockPanel.Dock="Right" Click="Button_OnClick">...</Button>
-        <ItemsControl Margin="3" VerticalAlignment="Center" ItemsSource="{Binding Value}">
+    <DockPanel MinHeight="24">
+        <Button DockPanel.Dock="Right" Width="30"
+                Visibility="{Binding IsItemsSourceResizable, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                IsEnabled="{Binding AddButtonEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                ToolTip="{Binding AddButtonTooltip, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                Click="OnAddButtonClicked">
+            <userControls:CalameIcon DockPanel.Dock="Left" IconSize="12"
+                                     Target="{Binding AddButtonIconKey, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                                     IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}">
+            </userControls:CalameIcon>
+        </Button>
+        <ItemsControl VerticalAlignment="Stretch"
+                      ItemsSource="{Binding Value}"
+                      AlternationCount="{x:Static system:Int32.MaxValue}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
@@ -19,16 +33,24 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Canvas Height="12" Width="12" Margin="1">
-                        <userControls:CalameIcon DockPanel.Dock="Left"
-                                                 IconSize="12"
+                    <Button Width="24" Height="24"
+                            Command="{Binding ItemClickedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
+                            ToolTip="{Binding}"
+                            PreviewMouseDown="OnItemPreviewMouseDown"
+                            PreviewMouseMove="OnItemPreviewMouseMove"
+                            AllowDrop="True"
+                            DragEnter="OnDragOver"
+                            DragOver="OnDragOver"
+                            Drop="OnItemDrop">
+                        <userControls:CalameIcon IconSize="12"
                                                  IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                                                  Target="{Binding}"
                                                  IconTargetSelector="{Binding IconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                                                  IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
-                                                 ToolTip="{Binding}"
+                                                 Background="Transparent"
                                                  VerticalAlignment="Center" />
-                    </Canvas>
+                    </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

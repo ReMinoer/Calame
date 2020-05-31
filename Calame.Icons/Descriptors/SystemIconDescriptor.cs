@@ -13,6 +13,10 @@ namespace Calame.Icons.Descriptors
             {
                 case SystemIconKey.File: return new IconDescription(PackIconMaterialKind.FileOutline, Brushes.Black);
                 case SystemIconKey.Folder: return new IconDescription(PackIconMaterialKind.FolderOpen, Brushes.Black);
+                case SystemIconKey.Add: return new IconDescription(PackIconMaterialKind.PlusCircle, Brushes.Black);
+                case SystemIconKey.AddFromList: return new IconDescription(PackIconMaterialKind.PlaylistPlus, Brushes.Black);
+                case SystemIconKey.Delete: return new IconDescription(PackIconMaterialKind.CloseCircle, Brushes.Black);
+                case SystemIconKey.ShowIn: return new IconDescription(PackIconMaterialKind.ArrowTopRight, Brushes.Black);
                 default: return IconDescription.None;
             }
         }

@@ -1,0 +1,46 @@
+﻿<Popup x:Class="Calame.PropertyGrid.Controls.PropertyGridPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Calame.PropertyGrid.Controls"
+             xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
+             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="300">
+    <Popup.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+    </Popup.Resources>
+    <Border BorderThickness="1"
+            Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+        <DockPanel>
+            <DockPanel Height="22" DockPanel.Dock="Top">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Padding="0 0 3 0"
+                            Visibility="{Binding CanRemoveItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
+                            Click="OnDelete">
+                        <StackPanel Orientation="Horizontal">
+                            <userControls:CalameIcon IconSize="12"
+                                                     Width="22"
+                                                     Target="{x:Static icons:SystemIconKey.Delete}"
+                                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
+                                                     IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
+                            <TextBlock>Delete</TextBlock>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <userControls:CalameIcon DockPanel.Dock="Left" IconSize="10" Margin="5"
+                                             Target="{x:Static icons:SystemIconKey.ShowIn}"
+                                             IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
+                                             IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
+                    <TextBlock VerticalAlignment="Center">           
+                        <Hyperlink RequestNavigate="OnShowInPropertyGrid">Show in Property Grid</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </DockPanel>
+            <local:CalamePropertyGrid x:Name="PropertyGrid" CompactMode="True" />
+        </DockPanel>
+    </Border>
+</Popup>

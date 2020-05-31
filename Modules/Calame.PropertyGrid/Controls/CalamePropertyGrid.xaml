@@ -14,6 +14,7 @@
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
              xmlns:io="clr-namespace:Glyph.IO;assembly=Glyph"
              xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance controls:CalamePropertyGrid, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -32,8 +33,10 @@
                        ShowSearchBox="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowSortOptions="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                        ShowSummary="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
-                       ShowTitle="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
-                       ShowPreview="False">
+                       ShowTitle="True"
+                       ShowPreview="False"
+                       PreparePropertyItem="OnPreparePropertyItem"
+                       ClearPropertyItem="OnClearPropertyItem">
         <xctk:PropertyGrid.EditorDefinitions>
             <xctk:EditorDefinitionCollection>
                 <xctk:EditorTemplateDefinition>
@@ -48,8 +51,29 @@
                         <DataTemplate DataType="xctk:CustomPropertyItem">
                             <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
                                                               IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                               IconTargetSelector="{Binding GlyphCreatorIconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                              IconDescriptor="{Binding ComponentIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                                                              IconDescriptor="{Binding ComponentIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              ShowItemInPropertyGrid="OnShowItemInPropertyGrid"
+                                                              PropertyValueChanged="OnPropertyValueChanged"/>
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="collections:IList"/>
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
+                            <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
+                                                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              ShowItemInPropertyGrid="OnShowItemInPropertyGrid"
+                                                              PropertyValueChanged="OnPropertyValueChanged"/>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
                 </xctk:EditorTemplateDefinition>
@@ -66,7 +90,8 @@
                                                          Target="{x:Static icons:SystemIconKey.File}"
                                                          IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                          IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
-                                <userControls:PathControl UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}" />
+                                <userControls:PathControl Height="24"
+                                                          UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}" />
                             </DockPanel>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
@@ -84,7 +109,8 @@
                                                          Target="{x:Static icons:SystemIconKey.Folder}"
                                                          IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                          IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
-                                <userControls:PathControl UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
+                                <userControls:PathControl Height="24"
+                                                          UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
                                                           FolderMode="True" />
                             </DockPanel>
                         </DataTemplate>
@@ -148,6 +174,35 @@
                         <DataTemplate DataType="xctk:CustomPropertyItem">
                             <xctk:ColorPicker SelectedColor="{Binding Value, Converter={StaticResource MonoGameToWpfColorConverter}}"
                                               ColorMode="ColorCanvas" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="system:String"/>
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate DataType="xctk:PropertyItem">
+                            <xctk:PropertyGridEditorTextBox Text="{Binding Value, Mode=TwoWay}" IsReadOnly="{Binding IsReadOnly}" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
+                            <x:Type Type="collections:IEnumerable"/>
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
+                            <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
+                                                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              ShowItemInPropertyGrid="OnShowItemInPropertyGrid"
+                                                              PropertyValueChanged="OnPropertyValueChanged"/>
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
                 </xctk:EditorTemplateDefinition>

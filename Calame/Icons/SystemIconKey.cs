@@ -3,6 +3,10 @@
     public enum SystemIconKey
     {
         File,
-        Folder
+        Folder,
+        Add,
+        AddFromList,
+        Delete,
+        ShowIn
     }
 }

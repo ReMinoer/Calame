@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using Calame.Icons;
 using Glyph.Composition;
@@ -9,7 +10,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
 {
-    public partial class CalamePropertyGrid
+    public partial class CalamePropertyGrid : INotifyPropertyChanged
     {
         static public readonly DependencyProperty NewItemTypeRegistryProperty =
             DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(CalamePropertyGrid), new PropertyMetadata(null));
@@ -21,7 +22,7 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty IconDescriptorManagerProperty =
             DependencyProperty.Register(nameof(IconDescriptorManager), typeof(IIconDescriptorManager), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnIconDescriptorManagerChanged));
-
+        
         public IList<Type> NewItemTypeRegistry
         {
             get => (IList<Type>)GetValue(NewItemTypeRegistryProperty);
@@ -52,17 +53,50 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(IconDescriptorManagerProperty, value);
         }
 
-        public IIconDescriptor SystemIconDescriptor { get; private set; }
-        public IIconDescriptor ComponentIconDescriptor { get; private set; }
+        private IIconDescriptor _systemIconDescriptor;
+        public IIconDescriptor SystemIconDescriptor
+        {
+            get => _systemIconDescriptor;
+            private set
+            {
+                if (_systemIconDescriptor == value)
+                    return;
+
+                _systemIconDescriptor = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private IIconDescriptor _componentIconDescriptor;
+        public IIconDescriptor ComponentIconDescriptor
+        {
+            get => _componentIconDescriptor;
+            private set
+            {
+                if (_componentIconDescriptor == value)
+                    return;
+
+                _componentIconDescriptor = value;
+                OnPropertyChanged();
+            }
+        }
+
+        static private readonly DependencyPropertyDescriptor EditorPropertyDescriptor;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public event PropertyValueChangedEventHandler PropertyValueChanged;
+        public event ItemEventHandler ShowItemInPropertyGrid;
+
+        static CalamePropertyGrid()
+        {
+            EditorPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(PropertyItemBase.EditorProperty, typeof(PropertyItem));
+        }
 
         public CalamePropertyGrid()
         {
             InitializeComponent();
-
-            PropertyGrid.PreparePropertyItem += PropertyGridOnPreparePropertyItem;
-            PropertyGrid.ClearPropertyItem += PropertyGridOnClearPropertyItem;
         }
 
         private void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
@@ -70,18 +104,19 @@ namespace Calame.PropertyGrid.Controls
             PropertyValueChanged?.Invoke(this, e);
         }
 
-        private void PropertyGridOnPreparePropertyItem(object sender, PropertyItemEventArgs e)
+        private void OnPreparePropertyItem(object sender, PropertyItemEventArgs e)
         {
-            PropertyChangedEventManager.AddHandler(e.PropertyItem, PropertyItemOnEditorChanged, nameof(PropertyItem.Editor));
+            EditorPropertyDescriptor.AddValueChanged(e.PropertyItem, OnPropertyItemEditorChanged);
         }
 
-        private void PropertyGridOnClearPropertyItem(object sender, PropertyItemEventArgs e)
+        private void OnClearPropertyItem(object sender, PropertyItemEventArgs e)
         {
-            PropertyChangedEventManager.RemoveHandler(e.PropertyItem, PropertyItemOnEditorChanged, nameof(PropertyItem.Editor));
+            EditorPropertyDescriptor.RemoveValueChanged(e.PropertyItem, OnPropertyItemEditorChanged);
         }
 
-        private void PropertyItemOnEditorChanged(object sender, PropertyChangedEventArgs e)
+        private void OnPropertyItemEditorChanged(object sender, EventArgs e)
         {
+            // Workaround to provide imported types and editor definition to collection controls
             if (((PropertyItem)sender).Editor is InlineCollectionControl inlineCollectionControl)
             {
                 inlineCollectionControl.NewItemTypeRegistry = NewItemTypeRegistry;
@@ -97,10 +132,9 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.ComponentIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<IGlyphComponent>();
         }
 
-        public void Dispose()
+        private void OnShowItemInPropertyGrid(object sender, ItemEventArgs args)
         {
-            PropertyGrid.PreparePropertyItem -= PropertyGridOnPreparePropertyItem;
-            PropertyGrid.ClearPropertyItem -= PropertyGridOnClearPropertyItem;
+            ShowItemInPropertyGrid?.Invoke(this, args);
         }
 
         public IIconTargetSelector GlyphCreatorIconTargetSelector { get; } = new GlyphCreatorIconTargetSelectorImplementation();

@@ -30,6 +30,7 @@ namespace Calame.PropertyGrid.ViewModels
         public IList<Type> NewItemTypeRegistry { get; }
 
         public ICommand DirtyDocumentCommand { get; }
+        public ICommand ShowItemInPropertyGridCommand { get; }
 
         [ImportingConstructor]
         public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
@@ -43,6 +44,7 @@ namespace Calame.PropertyGrid.ViewModels
             IconDescriptorManager = iconDescriptorManager;
 
             DirtyDocumentCommand = new RelayCommand(x => EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject)).Wait());
+            ShowItemInPropertyGridCommand = new RelayCommand(x => {});
         }
 
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
