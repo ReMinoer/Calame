@@ -60,8 +60,11 @@ namespace Calame.Viewer.Modules
 
         protected override void ReleaseComponent(IGlyphComponent selection)
         {
-            Model.EditorModeRoot.RemoveAndDispose(_root);
-            _root = null;
+            if (_root != null)
+            {
+                Model.EditorModeRoot.RemoveAndDispose(_root);
+                _root = null;
+            }
         }
     }
 }
