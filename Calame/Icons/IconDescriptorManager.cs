@@ -36,7 +36,7 @@ namespace Calame.Icons
                 return icon.Defined ? icon : _defaultModule.GetDefaultIcon(model);
             }
 
-            IconDescription IIconDescriptor.GetIcon(object model) => GetIcon((T)model);
+            IconDescription IIconDescriptor.GetIcon(object model) => model is T obj ? GetIcon(obj) : IconDescription.None;
         }
     }
 }
