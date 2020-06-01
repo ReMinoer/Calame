@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Media;
+using Calame.Icons.Base;
 using Diese.Collections;
 using Fingear.Controls;
 using Fingear.Inputs;
@@ -12,7 +13,10 @@ using Microsoft.Xna.Framework.Input;
 namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
-    public class ControlIconDescriptor : IDefaultIconDescriptorModule<IControl>
+    [Export(typeof(IDefaultIconDescriptorModule))]
+    [Export(typeof(IIconDescriptorModule<IControl>))]
+    [Export(typeof(IDefaultIconDescriptorModule<IControl>))]
+    public class ControlIconDescriptor : DefaultIconDescriptorModuleBase<IControl>
     {
         static private PackIconMaterialKind DefaultBoxIcon = PackIconMaterialKind.CheckboxBlank;
         static private PackIconMaterialKind DefaultCircleIcon = PackIconMaterialKind.Circle;
@@ -22,7 +26,7 @@ namespace Calame.Icons.Descriptors
         static public readonly Brush KeyboardCategoryBrush = Brushes.DarkMagenta;
         static public readonly Brush MouseCategoryBrush = Brushes.DeepPink;
 
-        public IconDescription GetDefaultIcon(IControl control)
+        public override IconDescription GetDefaultIcon(IControl control)
         {
             if (IsHybrid(control))
                 return new IconDescription(PackIconMaterialKind.CheckboxMultipleBlankCircle, DefaultCategoryBrush);
@@ -30,7 +34,7 @@ namespace Calame.Icons.Descriptors
             return new IconDescription(PackIconMaterialKind.GestureTap, DefaultCategoryBrush);
         }
 
-        public IconDescription GetIcon(IControl control)
+        public override IconDescription GetIcon(IControl control)
         {
             IInput baseInput = control.BaseInputs.FirstOrDefault();
             if (baseInput == null)
@@ -99,8 +103,8 @@ namespace Calame.Icons.Descriptors
                 case Keys.RightAlt: return PackIconMaterialKind.ArrowUpBoldBoxOutline;
                 case Keys.LeftShift: return PackIconMaterialKind.ArrowUpBoldBox;
                 case Keys.RightShift: return PackIconMaterialKind.ArrowUpBoldBox;
-                case Keys.LeftWindows: return PackIconMaterialKind.Windows;
-                case Keys.RightWindows: return PackIconMaterialKind.Windows;
+                case Keys.LeftWindows: return PackIconMaterialKind.MicrosoftWindows;
+                case Keys.RightWindows: return PackIconMaterialKind.MicrosoftWindows;
                 
                 case Keys.Add: return PackIconMaterialKind.PlusBox;
                 case Keys.Subtract: return PackIconMaterialKind.MinusBox;
@@ -143,9 +147,9 @@ namespace Calame.Icons.Descriptors
                 case GamePadButton.RB: return new IconDescription(PackIconMaterialKind.AlphaRBox, DefaultCategoryBrush);
                 case GamePadButton.LS: return new IconDescription(PackIconMaterialKind.AlphaLCircleOutline, DefaultCategoryBrush);
                 case GamePadButton.RS: return new IconDescription(PackIconMaterialKind.AlphaRCircleOutline, DefaultCategoryBrush);
-                case GamePadButton.Start: return new IconDescription(PackIconMaterialKind.XboxControllerMenu, DefaultCategoryBrush);
-                case GamePadButton.Back: return new IconDescription(PackIconMaterialKind.XboxControllerView, DefaultCategoryBrush);
-                case GamePadButton.BigButton: return new IconDescription(PackIconMaterialKind.Xbox, DefaultCategoryBrush);
+                case GamePadButton.Start: return new IconDescription(PackIconMaterialKind.MicrosoftXboxControllerMenu, DefaultCategoryBrush);
+                case GamePadButton.Back: return new IconDescription(PackIconMaterialKind.MicrosoftXboxControllerView, DefaultCategoryBrush);
+                case GamePadButton.BigButton: return new IconDescription(PackIconMaterialKind.MicrosoftXbox, DefaultCategoryBrush);
                 default: return new IconDescription(DefaultCircleIcon, DefaultCategoryBrush);
             }
         }

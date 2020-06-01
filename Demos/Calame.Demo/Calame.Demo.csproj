@@ -32,7 +32,4 @@
     <ProjectReference Include="..\..\Modules\Calame.SceneViewer\Calame.SceneViewer.csproj" />
     <ProjectReference Include="..\Calame.Demo.Data\Calame.Demo.Data.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="3.2.0" />
-  </ItemGroup>
 </Project>

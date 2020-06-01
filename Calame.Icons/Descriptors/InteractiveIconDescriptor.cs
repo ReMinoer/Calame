@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Media;
+using Calame.Icons.Base;
 using Fingear.Interactives;
 using Fingear.Interactives.Interfaces;
 using MahApps.Metro.IconPacks;
@@ -7,12 +8,15 @@ using MahApps.Metro.IconPacks;
 namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
-    public class InteractiveIconDescriptor : IDefaultIconDescriptorModule<IInteractive>
+    [Export(typeof(IDefaultIconDescriptorModule))]
+    [Export(typeof(IIconDescriptorModule<IInteractive>))]
+    [Export(typeof(IDefaultIconDescriptorModule<IInteractive>))]
+    public class InteractiveIconDescriptor : DefaultIconDescriptorModuleBase<IInteractive>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
         static public readonly Brush UiCategoryBrush = Brushes.OrangeRed;
 
-        public IconDescription GetDefaultIcon(IInteractive interactive)
+        public override IconDescription GetDefaultIcon(IInteractive interactive)
         {
             switch (interactive)
             {
@@ -23,7 +27,7 @@ namespace Calame.Icons.Descriptors
             }
         }
 
-        public IconDescription GetIcon(IInteractive interactive)
+        public override IconDescription GetIcon(IInteractive interactive)
         {
             switch (interactive)
             {

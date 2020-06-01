@@ -23,7 +23,7 @@
                         <StackPanel Orientation="Horizontal">
                             <userControls:CalameIcon IconSize="12"
                                                      Width="22"
-                                                     Target="{x:Static icons:SystemIconKey.Delete}"
+                                                     Target="{x:Static icons:CalameIconKey.Delete}"
                                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
                                                      IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
                             <TextBlock>Delete</TextBlock>
@@ -32,7 +32,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <userControls:CalameIcon DockPanel.Dock="Left" IconSize="10" Margin="5"
-                                             Target="{x:Static icons:SystemIconKey.ShowIn}"
+                                             Target="{x:Static icons:CalameIconKey.ShowIn}"
                                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
                                              IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
                     <TextBlock VerticalAlignment="Center">           

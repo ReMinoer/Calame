@@ -7,36 +7,23 @@ namespace Calame.Icons
     public class IconDescriptorManager : IIconDescriptorManager
     {
         private readonly IIconDescriptorModule[] _modules;
-        
+        private readonly IDefaultIconDescriptorModule[] _defaultModules;
+
         [ImportingConstructor]
-        public IconDescriptorManager([ImportMany] IIconDescriptorModule[] modules)
+        public IconDescriptorManager([ImportMany] IIconDescriptorModule[] modules, [ImportMany] IDefaultIconDescriptorModule[] defaultModules)
         {
             _modules = modules;
+            _defaultModules = defaultModules;
+        }
+
+        public IIconDescriptor GetDescriptor()
+        {
+            return new IconDescriptor(_modules, _defaultModules);
         }
 
         public IIconDescriptor<T> GetDescriptor<T>()
         {
-            return new IconDescriptor<T>(_modules.OfType<IIconDescriptorModule<T>>().ToArray(), _modules.OfType<IDefaultIconDescriptorModule<T>>().Single());
-        }
-
-        private class IconDescriptor<T> : IIconDescriptor<T>
-        {
-            private readonly IIconDescriptorModule<T>[] _modules;
-            private readonly IDefaultIconDescriptorModule<T> _defaultModule;
-
-            public IconDescriptor(IIconDescriptorModule<T>[] modules, IDefaultIconDescriptorModule<T> defaultModule)
-            {
-                _modules = modules;
-                _defaultModule = defaultModule;
-            }
-
-            public IconDescription GetIcon(T model)
-            {
-                IconDescription icon = _modules.Select(x => x.GetIcon(model)).FirstOrDefault(x => x.Defined);
-                return icon.Defined ? icon : _defaultModule.GetDefaultIcon(model);
-            }
-
-            IconDescription IIconDescriptor.GetIcon(object model) => model is T obj ? GetIcon(obj) : IconDescription.None;
+            return new IconDescriptor<T>(_modules.OfType<IIconDescriptorModule<T>>().ToArray(), _defaultModules.OfType<IDefaultIconDescriptorModule<T>>().ToArray());
         }
     }
 }

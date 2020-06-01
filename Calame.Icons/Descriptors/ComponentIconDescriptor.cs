@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Media;
+using Calame.Icons.Base;
 using Glyph;
 using Glyph.Animation;
 using Glyph.Animation.Motors.Base;
@@ -21,7 +22,10 @@ using MahApps.Metro.IconPacks;
 namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
-    public class ComponentIconDescriptor : IDefaultIconDescriptorModule<IGlyphComponent>
+    [Export(typeof(IDefaultIconDescriptorModule))]
+    [Export(typeof(IIconDescriptorModule<IGlyphComponent>))]
+    [Export(typeof(IDefaultIconDescriptorModule<IGlyphComponent>))]
+    public class ComponentIconDescriptor : DefaultIconDescriptorModuleBase<IGlyphComponent>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
         static public readonly Brush SceneGraphCategoryBrush = Brushes.RoyalBlue;
@@ -34,7 +38,7 @@ namespace Calame.Icons.Descriptors
         static public readonly Brush UiCategoryBrush = Brushes.Goldenrod;
         static public readonly Brush ToolCategoryBrush = Brushes.Black;
         
-        public IconDescription GetDefaultIcon(IGlyphComponent glyphComponent)
+        public override IconDescription GetDefaultIcon(IGlyphComponent glyphComponent)
         {
             switch (glyphComponent)
             {
@@ -45,7 +49,7 @@ namespace Calame.Icons.Descriptors
             }
         }
 
-        public IconDescription GetIcon(IGlyphComponent glyphComponent)
+        public override IconDescription GetIcon(IGlyphComponent glyphComponent)
         {
             switch (glyphComponent)
             {

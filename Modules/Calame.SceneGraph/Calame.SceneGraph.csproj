@@ -18,6 +18,5 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GeminiWpf" Version="1.0.9-beta" />
-    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="3.2.0" />
   </ItemGroup>
 </Project>

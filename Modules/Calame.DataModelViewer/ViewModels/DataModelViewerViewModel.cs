@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Calame.Icons;
 using Calame.Viewer;
 using Caliburn.Micro;
 using Gemini.Framework;
@@ -35,9 +36,13 @@ namespace Calame.DataModelViewer.ViewModels
         IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
 
         public ICommand SwitchModeCommand { get; }
-        
+
+        public IIconProvider IconProvider { get; }
+        public IIconDescriptor CalameIconDescriptor { get; }
+
         [ImportingConstructor]
-        public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IContentLibraryProvider contentLibraryProvider, IImportedTypeProvider importedTypeProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+        public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IContentLibraryProvider contentLibraryProvider, IImportedTypeProvider importedTypeProvider,
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator, fileWatcher)
         {
             _contentLibraryProvider = contentLibraryProvider;
@@ -46,6 +51,9 @@ namespace Calame.DataModelViewer.ViewModels
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             
             SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Viewer.Runner?.Engine != null);
+
+            IconProvider = iconProvider;
+            CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
         }
 
         protected override async Task NewDocumentAsync()

@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using Calame.Converters;
 using Calame.Icons;
 using Diese.Collections;
 using Gemini.Framework;
@@ -117,7 +115,7 @@ namespace Calame.PropertyGrid.Controls
             }
         }
 
-        public SystemIconKey AddButtonIconKey => NewItemTypes != null && NewItemTypes.Count > 1 ? SystemIconKey.AddFromList : SystemIconKey.Add;
+        public CalameIconKey AddButtonIconKey => NewItemTypes != null && NewItemTypes.Count > 1 ? CalameIconKey.AddFromList : CalameIconKey.Add;
         public bool AddButtonEnabled => NewItemTypes != null && NewItemTypes.Count > 0;
         public string AddButtonTooltip
         {

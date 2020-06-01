@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Calame.Icons;
 using Calame.Viewer;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
@@ -20,7 +21,6 @@ using Glyph.Core.Tracking;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.WpfInterop;
-using MahApps.Metro.IconPacks;
 
 namespace Calame.SceneViewer.ViewModels
 {
@@ -30,7 +30,7 @@ namespace Calame.SceneViewer.ViewModels
     {
         private readonly IShell _shell;
         private readonly IContentLibraryProvider _contentLibraryProvider;
-        
+
         private GlyphEngine _engine;
         private MessagingTracker<IView> _viewTracker;
 
@@ -53,9 +53,14 @@ namespace Calame.SceneViewer.ViewModels
         public ICommand SwitchModeCommand { get; }
 
         private GlyphWpfRunner Runner => Viewer.Runner;
-        
+
+        private readonly IIconDescriptorManager _iconDescriptorManager;
+        public IIconProvider IconProvider { get; }
+        public IIconDescriptor CalameIconDescriptor { get; }
+
         [ImportingConstructor]
-        public SceneViewerViewModel(IEventAggregator eventAggregator, IShell shell, IContentLibraryProvider contentLibraryProvider, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+        public SceneViewerViewModel(IEventAggregator eventAggregator, IShell shell, IContentLibraryProvider contentLibraryProvider,
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator)
         {
             DisplayName = "Scene Viewer";
@@ -78,10 +83,14 @@ namespace Calame.SceneViewer.ViewModels
             NewViewerCommand = new RelayCommand(x => NewViewerAction(), x => Runner?.Engine != null);
             
             SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Runner?.Engine != null);
+
+            _iconDescriptorManager = iconDescriptorManager;
+            IconProvider = iconProvider;
+            CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
-            : this(viewModel.EventAggregator, viewModel._shell, viewModel._contentLibraryProvider, Enumerable.Empty<IViewerModuleSource>())
+            : this(viewModel.EventAggregator, viewModel._shell, viewModel._contentLibraryProvider, viewModel.IconProvider, viewModel._iconDescriptorManager, Enumerable.Empty<IViewerModuleSource>())
         {
             throw new NotSupportedException();
 
@@ -197,7 +206,7 @@ namespace Calame.SceneViewer.ViewModels
         public class SessionModeModule : ViewerModuleBase, IViewerInteractiveMode
         {
             public string Name => "Session";
-            public object IconId => PackIconMaterialKind.GamepadVariant;
+            public object IconKey => CalameIconKey.GameMode;
 
             public InteractiveComposite Interactive { get; } = new InteractiveComposite();
             IInteractive IViewerInteractiveMode.Interactive => Interactive;

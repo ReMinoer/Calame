@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Windows.Input;
+using Calame.Icons;
 using Calame.Viewer;
 using Calame.Viewer.Modules.Base;
 using Fingear.Interactives;
@@ -89,7 +90,7 @@ namespace Calame.BrushPanel
         public event EventHandler ApplyEnded;
 
         public string Name => "Brush";
-        public object IconId => PackIconMaterialKind.Brush;
+        public object IconKey => CalameIconKey.BrushMode;
         Cursor IViewerInteractiveMode.Cursor => Cursors.Pen;
         bool IViewerInteractiveMode.UseFreeCamera => true;
         

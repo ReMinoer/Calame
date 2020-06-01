@@ -1,11 +1,11 @@
 ﻿namespace Calame.Icons
 {
-    public interface IDefaultIconDescriptorModule : IIconDescriptorModule
+    public interface IDefaultIconDescriptorModule
     {
         IconDescription GetDefaultIcon(object model);
     }
 
-    public interface IDefaultIconDescriptorModule<in T> : IIconDescriptorModule<T>
+    public interface IDefaultIconDescriptorModule<in T> : IDefaultIconDescriptorModule
     {
         IconDescription GetDefaultIcon(T model);
     }

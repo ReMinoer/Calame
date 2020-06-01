@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Calame.Icons;
 using Calame.Viewer.Modules;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
@@ -21,7 +22,6 @@ using Glyph.Graphics;
 using Glyph.Tools;
 using Glyph.UI;
 using Glyph.WpfInterop;
-using MahApps.Metro.IconPacks;
 
 namespace Calame.Viewer
 {
@@ -236,7 +236,7 @@ namespace Calame.Viewer
             private InterfaceRoot _interfaceRoot;
 
             public string Name => "Editor";
-            public object IconId => PackIconMaterialKind.CursorDefaultOutline;
+            public object IconKey => CalameIconKey.CursorMode;
             public Cursor Cursor => Cursors.Cross;
             public bool UseFreeCamera => true;
 
