@@ -20,55 +20,43 @@
         <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
             <ToolBar>
                 <Button Command="{Binding PlayCommand}">
-                    <Border Background="Transparent">
-                        <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Play}"
-                                                 IconSize="14"
-                                                 IconProvider="{Binding IconProvider}"
-                                                 IconDescriptor="{Binding CalameIconDescriptor}" />
-                    </Border>
+                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Play}"
+                                             IconSize="14"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding CalameIconDescriptor}" />
                 </Button>
                 <Button Command="{Binding PauseCommand}">
-                    <Border Background="Transparent">
-                        <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Pause}"
-                                                 IconSize="14"
-                                                 IconProvider="{Binding IconProvider}"
-                                                 IconDescriptor="{Binding CalameIconDescriptor}" />
-                    </Border>
+                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Pause}"
+                                             IconSize="14"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding CalameIconDescriptor}" />
                 </Button>
                 <Button Command="{Binding StopCommand}">
-                    <Border Background="Transparent">
-                        <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Stop}"
-                                                 IconSize="14"
-                                                 IconProvider="{Binding IconProvider}"
-                                                 IconDescriptor="{Binding CalameIconDescriptor}" />
-                    </Border>
+                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Stop}"
+                                             IconSize="14"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding CalameIconDescriptor}" />
                 </Button>
             </ToolBar>
             <ToolBar>
                 <RadioButton Command="{Binding FreeCameraCommand}" IsChecked="True">
-                    <Border Background="Transparent">
-                        <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.FreeCamera}"
-                                                 IconSize="14"
-                                                 IconProvider="{Binding IconProvider}"
-                                                 IconDescriptor="{Binding CalameIconDescriptor}" />
-                    </Border>
+                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.FreeCamera}"
+                                             IconSize="14"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding CalameIconDescriptor}" />
                 </RadioButton>
                 <RadioButton Command="{Binding DefaultViewsCommand}">
-                    <Border Background="Transparent">
-                        <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.DefaultCamera}"
-                                                 IconSize="14"
-                                                 IconProvider="{Binding IconProvider}"
-                                                 IconDescriptor="{Binding CalameIconDescriptor}" />
-                    </Border>
+                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.DefaultCamera}"
+                                             IconSize="14"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding CalameIconDescriptor}" />
                 </RadioButton>
                 <Separator />
                 <Button Command="{Binding NewViewerCommand}">
-                    <Border Background="Transparent">
-                        <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.NewViewer}"
-                                                 IconSize="14"
-                                                 IconProvider="{Binding IconProvider}"
-                                                 IconDescriptor="{Binding CalameIconDescriptor}" />
-                    </Border>
+                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.NewViewer}"
+                                             IconSize="14"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding CalameIconDescriptor}" />
                 </Button>
             </ToolBar>
             <ToolBar ItemsSource="{Binding Viewer.InteractiveModes}"
@@ -80,12 +68,10 @@
                                      Command="{Binding DataContext.SwitchModeCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
                                      CommandParameter="{Binding}">
                             <RadioButton.Content>
-                                <Border Background="Transparent">
-                                    <userControls:CalameIcon Target="{Binding IconKey}"
-                                                             IconSize="14"
-                                                             IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:SceneViewerView}}}"
-                                                             IconDescriptor="{Binding DataContext.CalameIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:SceneViewerView}}}" />
-                                </Border>
+                                <userControls:CalameIcon Target="{Binding IconKey}"
+                                                         IconSize="14"
+                                                         IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:SceneViewerView}}}"
+                                                         IconDescriptor="{Binding DataContext.CalameIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:SceneViewerView}}}" />
                             </RadioButton.Content>
                             <RadioButton.Style>
                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">

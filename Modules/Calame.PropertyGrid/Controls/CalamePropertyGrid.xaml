@@ -6,15 +6,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
-             xmlns:utils="clr-namespace:Calame.Utils;assembly=Calame"
              xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
              xmlns:monogame="clr-namespace:Microsoft.Xna.Framework;assembly=MonoGame.Framework"
              xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
-             xmlns:modelization="clr-namespace:Glyph.Composition.Modelization;assembly=Glyph.Composition"
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
              xmlns:io="clr-namespace:Glyph.IO;assembly=Glyph"
              xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:space="clr-namespace:Glyph.Space;assembly=Glyph.Space"
+             xmlns:utils="clr-namespace:Simulacra.Utils;assembly=Simulacra"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance controls:CalamePropertyGrid, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -22,6 +22,7 @@
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
+        <converters:ArrayToDisplayStringConverter x:Key="ArrayToDisplayStringConverter" />
         <converters:FilePathToStringConverter x:Key="FilePathToStringConverter" />
         <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
     </UserControl.Resources>
@@ -142,6 +143,31 @@
                 <xctk:EditorTemplateDefinition>
                     <xctk:EditorTemplateDefinition.TargetProperties>
                         <collections:ArrayList>
+                            <x:Type Type="utils:IArray" />
+                        </collections:ArrayList>
+                    </xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate DataType="xctk:CustomPropertyItem">
+                            <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                                <userControls:CalameIcon DockPanel.Dock="Left" Width="24" Height="24"
+                                                         IconSize="12"
+                                                         Target="{Binding Value}"
+                                                         IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                         IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                                <Border VerticalAlignment="Stretch"
+                                        Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}">
+                                    <TextBlock Text="{Binding Value, Converter={StaticResource ArrayToDisplayStringConverter}}"
+                                               Margin="5 0 0 0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                </Border>
+                            </DockPanel>
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition>
+                    <xctk:EditorTemplateDefinition.TargetProperties>
+                        <collections:ArrayList>
                             <x:Type Type="system:String"/>
                         </collections:ArrayList>
                     </xctk:EditorTemplateDefinition.TargetProperties>
@@ -162,7 +188,7 @@
                             <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
                                                               IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                               IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                              IconDescriptor="{Binding ObjectIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                              IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                               SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                               ShowItemInPropertyGrid="OnShowItemInPropertyGrid"
                                                               PropertyValueChanged="OnPropertyValueChanged"/>

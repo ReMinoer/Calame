@@ -53,6 +53,20 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(IconDescriptorManagerProperty, value);
         }
 
+        private IIconDescriptor _iconDescriptor;
+        public IIconDescriptor IconDescriptor
+        {
+            get => _iconDescriptor;
+            private set
+            {
+                if (_iconDescriptor == value)
+                    return;
+
+                _iconDescriptor = value;
+                OnPropertyChanged();
+            }
+        }
+
         private IIconDescriptor _systemIconDescriptor;
         public IIconDescriptor SystemIconDescriptor
         {
@@ -63,20 +77,6 @@ namespace Calame.PropertyGrid.Controls
                     return;
 
                 _systemIconDescriptor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private IIconDescriptor _objectIconDescriptor;
-        public IIconDescriptor ObjectIconDescriptor
-        {
-            get => _objectIconDescriptor;
-            private set
-            {
-                if (_objectIconDescriptor == value)
-                    return;
-
-                _objectIconDescriptor = value;
                 OnPropertyChanged();
             }
         }
@@ -142,8 +142,8 @@ namespace Calame.PropertyGrid.Controls
         {
             var propertyGrid = (CalamePropertyGrid)d;
 
+            propertyGrid.IconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor();
             propertyGrid.SystemIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<CalameIconKey>();
-            propertyGrid.ObjectIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor();
             propertyGrid.ComponentIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<IGlyphComponent>();
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Calame.Icons;
 
 namespace Calame.UserControls
@@ -74,10 +75,15 @@ namespace Calame.UserControls
         static private void OnDescriptionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((CalameIcon)d).OnDescriptionChanged();
         static private void OnRenderingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((CalameIcon)d).OnRenderingChanged();
 
+        private readonly Border _border;
+
         public CalameIcon()
         {
             HorizontalContentAlignment = HorizontalAlignment.Center;
             VerticalContentAlignment = VerticalAlignment.Center;
+
+            _border = new Border {Background = Brushes.Transparent};
+            Content = _border;
         }
 
         private void OnDescriptionChanged()
@@ -89,7 +95,7 @@ namespace Calame.UserControls
 
         private void OnRenderingChanged()
         {
-            Content = IconProvider?.GetControl(DisplayedIconDescription, IconSize);
+            _border.Child = IconProvider?.GetControl(DisplayedIconDescription, IconSize);
         }
     }
 }

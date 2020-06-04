@@ -7,7 +7,7 @@ namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<CalameIconKey>))]
-    public class CalameIconProvider : DefaultIconDescriptorModuleBase<CalameIconKey>
+    public class CalameIconProvider : IconDescriptorModuleBase<CalameIconKey>
     {
         static public readonly Brush DefaultBrush = Brushes.Black;
 
@@ -36,7 +36,5 @@ namespace Calame.Icons.Descriptors
                 default: return IconDescription.None; 
             }
         }
-
-        public override IconDescription GetDefaultIcon(CalameIconKey model) => IconDescription.None;
     }
 }

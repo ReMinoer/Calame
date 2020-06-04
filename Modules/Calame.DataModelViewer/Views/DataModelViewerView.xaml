@@ -24,12 +24,10 @@
                                      Command="{Binding DataContext.SwitchModeCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
                                      CommandParameter="{Binding}">
                             <RadioButton.Content>
-                                <Border Background="Transparent">
-                                    <userControls:CalameIcon Target="{Binding IconKey}"
-                                                             IconSize="14"
-                                                             IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:DataModelViewerView}}}"
-                                                             IconDescriptor="{Binding DataContext.CalameIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:DataModelViewerView}}}" />
-                                </Border>
+                                <userControls:CalameIcon Target="{Binding IconKey}"
+                                                         IconSize="14"
+                                                         IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:DataModelViewerView}}}"
+                                                         IconDescriptor="{Binding DataContext.CalameIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:DataModelViewerView}}}" />
                             </RadioButton.Content>
                             <RadioButton.Style>
                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">

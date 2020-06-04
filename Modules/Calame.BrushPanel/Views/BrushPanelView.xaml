@@ -39,12 +39,10 @@
                                      Margin="5"
                                      HorizontalAlignment="Stretch">
                             <RadioButton.Content>
-                                <Border Background="Transparent">
-                                    <userControls:CalameIcon IconDescription="{Binding IconDescription}"
-                                                             IconSize="32"
-                                                             IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType=views:BrushPanelView}}"
-                                                             Margin="5"/>
-                                </Border>
+                                <userControls:CalameIcon IconDescription="{Binding IconDescription}"
+                                                         IconSize="32"
+                                                         IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType=views:BrushPanelView}}"
+                                                         Margin="5"/>
                             </RadioButton.Content>
                             <RadioButton.Style>
                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
@@ -79,12 +77,10 @@
                                      Margin="5"
                                      HorizontalAlignment="Stretch">
                             <RadioButton.Content>
-                                <Border Background="Transparent">
-                                    <userControls:CalameIcon IconDescription="{Binding IconDescription}"
-                                                             IconSize="32"
-                                                             IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType=views:BrushPanelView}}"
-                                                             Margin="5"/>
-                                </Border>
+                                <userControls:CalameIcon IconDescription="{Binding IconDescription}"
+                                                         IconSize="32"
+                                                         IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType=views:BrushPanelView}}"
+                                                         Margin="5"/>
                             </RadioButton.Content>
                             <RadioButton.Style>
                                 <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
