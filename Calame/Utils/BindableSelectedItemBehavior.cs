@@ -41,10 +41,9 @@ namespace Calame.Utils
 
         protected override void OnDetaching()
         {
-            base.OnDetaching();
+            AssociatedObject.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
 
-            if (AssociatedObject != null)
-                AssociatedObject.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
+            base.OnDetaching();
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
