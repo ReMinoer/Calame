@@ -19,7 +19,8 @@ namespace Calame.Icons.Providers
                 Kind = (PackIconMaterialKind)iconDescription.Key,
                 Foreground = iconDescription.Brush,
                 Width = size,
-                Height = size
+                Height = size,
+                Focusable = false
             };
         }
     }

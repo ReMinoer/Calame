@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Calame.Icons;
 
 namespace Calame.PropertyGrid.Controls
@@ -23,6 +12,8 @@ namespace Calame.PropertyGrid.Controls
     {
         static public readonly DependencyProperty CanRemoveItemProperty =
             DependencyProperty.Register(nameof(CanRemoveItem), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(true));
+        static public readonly DependencyProperty CanShowInPropertyGridProperty =
+            DependencyProperty.Register(nameof(CanShowInPropertyGrid), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(true));
         static public readonly DependencyProperty IconProviderProperty =
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(PropertyGridPopup), new PropertyMetadata(null));
         static public readonly DependencyProperty SystemIconDescriptorProperty =
@@ -32,6 +23,12 @@ namespace Calame.PropertyGrid.Controls
         {
             get => (bool)GetValue(CanRemoveItemProperty);
             set => SetValue(CanRemoveItemProperty, value);
+        }
+
+        public bool CanShowInPropertyGrid
+        {
+            get => (bool)GetValue(CanShowInPropertyGridProperty);
+            set => SetValue(CanShowInPropertyGridProperty, value);
         }
 
         public IIconProvider IconProvider

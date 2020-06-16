@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Calame.Icons;
+using Calame.Utils;
 using Diese.Collections;
 using Gemini.Framework;
 using Xceed.Wpf.Toolkit.PropertyGrid;
@@ -187,10 +188,27 @@ namespace Calame.PropertyGrid.Controls
             Type itemType = collectionType.GenericTypeArguments[0];
 
             IList<Type> newItemTypes = control.NewItemTypeRegistry?.Where(x => itemType.IsAssignableFrom(x)).ToList() ?? new List<Type>();
-            if (!newItemTypes.Contains(itemType) && (itemType.IsValueType || (!itemType.IsInterface && !itemType.IsAbstract && !itemType.IsGenericType && itemType.GetConstructor(Type.EmptyTypes) != null)))
+            if (!newItemTypes.Contains(itemType) && IsInstantiableWithoutParameter(itemType))
                 newItemTypes.Insert(0, itemType);
 
             control.NewItemTypes = newItemTypes;
+        }
+
+        static private bool IsInstantiableWithoutParameter(Type type)
+        {
+            if (type.IsValueType)
+                return true;
+
+            if (type.IsInterface)
+                return false;
+            if (type.IsAbstract)
+                return false;
+            if (type.IsGenericType)
+                return false;
+            if (type.GetConstructor(Type.EmptyTypes) == null)
+                return false;
+
+            return true;
         }
 
         private void OnShowItemInPropertyGrid(object item)
@@ -265,28 +283,49 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.SetBinding(CalamePropertyGrid.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.IconDescriptorManagerProperty, new Binding(nameof(IconDescriptorManager)) { Source = this });
 
-            void OnRemoved(object sender, EventArgs e) => OnItemRemoved(popup, itemModel);
-            void OnShowInPropertyGrid(object sender, EventArgs e) => OnShowItemInPropertyGrid(itemModel);
+            popup.CanShowInPropertyGrid = !propertyGrid.IsValueTypeObject;
+
+            int currentIndex = GetIndex(frameworkElement);
+            if (currentIndex == -1)
+                throw new InvalidOperationException();
 
             popup.Removed += OnRemoved;
             popup.ShowInPropertyGrid += OnShowInPropertyGrid;
-            propertyGrid.PropertyValueChanged += OnPropertyValueChanged;
+            propertyGrid.PropertyValueChanged += OnPopupPropertyValueChanged;
 
-            popup.Unloaded += (sender, args) =>
+            void OnRemoved(object sender, EventArgs e) => OnItemRemoved(popup, currentIndex);
+            void OnShowInPropertyGrid(object sender, EventArgs e) => OnShowItemInPropertyGrid(itemModel);
+            void OnPopupPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
             {
-                propertyGrid.PropertyValueChanged -= OnPropertyValueChanged;
+                if (propertyGrid.IsValueTypeObject)
+                    _list[currentIndex] = propertyGrid.EditedValueTypeValue;
+
+                PropertyValueChanged?.Invoke(this, e);
+            }
+
+            popup.Closed += (sender, args) =>
+            {
+                propertyGrid.PropertyValueChanged -= OnPopupPropertyValueChanged;
                 popup.ShowInPropertyGrid -= OnShowInPropertyGrid;
                 popup.Removed -= OnRemoved;
             };
-
+            
             popup.IsOpen = true;
+
+            if (propertyGrid.IsValueTypeObject)
+            {
+                FrameworkElement editor = propertyGrid.Properties.First().Editor;
+                UIElement firstFocusableEditorElement = Tree.BreadthFirst<UIElement>(editor, x => x.GetVisualChildren().OfType<UIElement>()).FirstOrDefault(x => x.Focusable);
+
+                firstFocusableEditorElement?.Focus();
+            }
         }
 
-        private void OnItemRemoved(Popup popup, object item)
+        private void OnItemRemoved(Popup sender, int itemIndex)
         {
-            popup.IsOpen = false;
+            sender.IsOpen = false;
 
-            _list.Remove(item);
+            _list.RemoveAt(itemIndex);
             OnPropertyCollectionChanged();
         }
 
@@ -403,7 +442,7 @@ namespace Calame.PropertyGrid.Controls
             return draggedItem;
         }
 
-        private int GetIndex(DependencyObject dependencyObject)
+        static private int GetIndex(DependencyObject dependencyObject)
         {
             while (dependencyObject != null && !(dependencyObject is ContentPresenter))
                 dependencyObject = VisualTreeHelper.GetParent(dependencyObject);

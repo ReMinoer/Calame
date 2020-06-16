@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Calame.Icons;
+using Diese;
 using Glyph.Composition;
-using Glyph.Composition.Modelization;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
@@ -15,7 +16,7 @@ namespace Calame.PropertyGrid.Controls
         static public readonly DependencyProperty NewItemTypeRegistryProperty =
             DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty SelectedObjectProperty =
-            DependencyProperty.Register(nameof(SelectedObject), typeof(object), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(SelectedObject), typeof(object), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnSelectedObjectChanged));
         static public readonly DependencyProperty CompactModeProperty =
             DependencyProperty.Register(nameof(CompactMode), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false));
         static public readonly DependencyProperty IconProviderProperty =
@@ -34,7 +35,52 @@ namespace Calame.PropertyGrid.Controls
             get => GetValue(SelectedObjectProperty);
             set => SetValue(SelectedObjectProperty, value);
         }
-        
+
+        private object _displayedObject;
+        public object DisplayedObject
+        {
+            get => _displayedObject;
+            private set
+            {
+                if (_displayedObject == value)
+                    return;
+
+                _displayedObject = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isValueTypeObject;
+        public bool IsValueTypeObject
+        {
+            get => _isValueTypeObject;
+            private set
+            {
+                if (_isValueTypeObject == value)
+                    return;
+
+                _isValueTypeObject = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Type _valueType;
+        private IValueTypeObject _valueTypeObject;
+
+        private object _editedValueTypeValue;
+        public object EditedValueTypeValue
+        {
+            get => _editedValueTypeValue;
+            private set
+            {
+                if (_editedValueTypeValue == value)
+                    return;
+
+                _editedValueTypeValue = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool CompactMode
         {
             get => (bool)GetValue(CompactModeProperty);
@@ -95,6 +141,8 @@ namespace Calame.PropertyGrid.Controls
             }
         }
 
+        public IEnumerable<PropertyItemBase> Properties => PropertyGrid.Properties.Cast<PropertyItemBase>();
+
         static private readonly DependencyPropertyDescriptor EditorPropertyDescriptor;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -115,6 +163,9 @@ namespace Calame.PropertyGrid.Controls
 
         private void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
         {
+            if (IsValueTypeObject)
+                EditedValueTypeValue = _valueTypeObject.Value;
+
             PropertyValueChanged?.Invoke(this, e);
         }
 
@@ -138,6 +189,36 @@ namespace Calame.PropertyGrid.Controls
             }
         }
 
+        static private void OnSelectedObjectChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var propertyGrid = (CalamePropertyGrid)d;
+
+            Type selectedObjectType = propertyGrid.SelectedObject?.GetType();
+            propertyGrid.IsValueTypeObject = selectedObjectType?.IsValueType ?? false;
+
+            if (propertyGrid.IsValueTypeObject)
+            {
+                // Only instantiate a new ValueTypeObject when type is different to prevent property grid refresh and losing focus.
+                if (propertyGrid._valueType != selectedObjectType)
+                {
+                    propertyGrid._valueType = selectedObjectType;
+                    propertyGrid._valueTypeObject = (IValueTypeObject)Activator.CreateInstance(typeof(ValueTypeObject<>).MakeGenericType(selectedObjectType));
+                }
+
+                // Update displayed value-type value
+                propertyGrid._valueTypeObject.Value = propertyGrid.SelectedObject;
+
+                propertyGrid.DisplayedObject = propertyGrid._valueTypeObject;
+            }
+            else
+            {
+                propertyGrid._valueType = null;
+                propertyGrid._valueTypeObject = null;
+
+                propertyGrid.DisplayedObject = propertyGrid.SelectedObject;
+            }
+        }
+
         static private void OnIconDescriptorManagerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var propertyGrid = (CalamePropertyGrid)d;
@@ -152,10 +233,25 @@ namespace Calame.PropertyGrid.Controls
             ShowItemInPropertyGrid?.Invoke(this, args);
         }
 
-        public IIconTargetSelector GlyphCreatorIconTargetSelector { get; } = new GlyphCreatorIconTargetSelectorImplementation();
-        private class GlyphCreatorIconTargetSelectorImplementation : IIconTargetSelector
+        public interface IValueTypeObject
         {
-            public object GetIconTarget(object model) => ((IGlyphCreator)model).BindedObject;
+            object Value { get; set; }
+        }
+
+        public class ValueTypeObject<T> : NotifyPropertyChangedBase, IValueTypeObject
+        {
+            private T _value;
+            public T Value
+            {
+                get => _value;
+                set => Set(ref _value, value);
+            }
+
+            object IValueTypeObject.Value
+            {
+                get => Value;
+                set => Value = (T)value;
+            }
         }
     }
 }

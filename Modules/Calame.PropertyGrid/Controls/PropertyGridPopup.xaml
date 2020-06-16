@@ -16,21 +16,20 @@
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
         <DockPanel>
             <DockPanel Height="22" DockPanel.Dock="Top">
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Padding="0 0 3 0"
-                            Visibility="{Binding CanRemoveItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
-                            Click="OnDelete">
-                        <StackPanel Orientation="Horizontal">
-                            <userControls:CalameIcon IconSize="12"
+                <Button DockPanel.Dock="Right" Padding="0 0 3 0"
+                        Visibility="{Binding CanRemoveItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
+                        Click="OnDelete">
+                    <StackPanel Orientation="Horizontal">
+                        <userControls:CalameIcon IconSize="12"
                                                      Width="22"
                                                      Target="{x:Static icons:CalameIconKey.Delete}"
                                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
                                                      IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
-                            <TextBlock>Delete</TextBlock>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                        <TextBlock>Delete</TextBlock>
+                    </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal"
+                            Visibility="{Binding CanShowInPropertyGrid, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}">
                     <userControls:CalameIcon DockPanel.Dock="Left" IconSize="10" Margin="5"
                                              Target="{x:Static icons:CalameIconKey.ShowIn}"
                                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
