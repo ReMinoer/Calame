@@ -10,8 +10,8 @@ namespace Calame.Demo.Data
 
         static CircleData()
         {
-            PropertyBindings.From(x => x.Radius).To(x => x.Radius);
-            PropertyBindings.From(x => x.Sampling).To(x => x.Sampling);
+            Bindings.From(x => x.Radius).To(x => x.Radius);
+            Bindings.From(x => x.Sampling).To(x => x.Sampling);
         }
     }
 }

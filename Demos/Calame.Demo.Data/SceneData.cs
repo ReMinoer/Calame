@@ -23,13 +23,13 @@ namespace Calame.Demo.Data
 
         static SceneData()
         {
-            PathBindings.From(x => x.MainShapePath)
+            Bindings.FromPath(x => x.MainShapePath)
                 .Load(() => new DataContractSerializationFormat<IShapeData<IGlyphComponent>>())
                 .CreateComponent()
                 .To(x => x.MainShape);
 
-            CollectionBindings.From(x => x.Shapes).ToBindedComposite();
-            CollectionBindings.From(x => x.SubScenes).ToBindedComposite();
+            Bindings.FromCollection(x => x.Shapes).ToBindedComposite();
+            Bindings.FromCollection(x => x.SubScenes).ToBindedComposite();
         }
     }
 }

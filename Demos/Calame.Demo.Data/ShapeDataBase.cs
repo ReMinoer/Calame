@@ -15,8 +15,8 @@ namespace Calame.Demo.Data
 
         static ShapeDataBase()
         {
-            PropertyBindings.From(x => x.Position).To(x => x.Position);
-            PropertyBindings.From(x => x.Color).To(x => x.Color);
+            Bindings.From(x => x.Position).To(x => x.Position);
+            Bindings.From(x => x.Color).To(x => x.Color);
         }
 
         Vector2 IPositionController.Position

@@ -10,8 +10,8 @@ namespace Calame.Demo.Data
 
         static RectangleData()
         {
-            PropertyBindings.From(x => x.Width).To(x => x.Width);
-            PropertyBindings.From(x => x.Height).To(x => x.Height);
+            Bindings.From(x => x.Width).To(x => x.Width);
+            Bindings.From(x => x.Height).To(x => x.Height);
         }
     }
 }
