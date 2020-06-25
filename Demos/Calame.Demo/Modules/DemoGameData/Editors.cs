@@ -2,6 +2,8 @@
 using Calame.DataModelViewer;
 using Calame.DataModelViewer.Base;
 using Calame.Demo.Data;
+using Calame.Demo.Data.Data;
+using Calame.Demo.Data.Engine;
 using Glyph.Composition.Modelization;
 using Glyph.IO;
 using Niddle;
@@ -52,6 +54,7 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
         {
             base.RegisterDependencies(registry);
             registry.Add(Dependency.OnType<Scene>());
+            registry.Add(Dependency.OnType<InstanceObject>());
             registry.Add(Dependency.OnType<RectangleObject>());
             registry.Add(Dependency.OnType<CircleObject>());
         }

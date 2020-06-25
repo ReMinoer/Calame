@@ -1,8 +1,9 @@
-﻿using Glyph.Core;
+﻿using Calame.Demo.Data.Engine.Base;
+using Glyph.Core;
 using Glyph.Graphics.Primitives;
 using Microsoft.Xna.Framework;
 
-namespace Calame.Demo.Data
+namespace Calame.Demo.Data.Engine
 {
     public class CircleObject : PrimitiveObjectBase
     {

@@ -1,7 +1,7 @@
 ﻿using Glyph.Composition;
 using Glyph.Core;
 
-namespace Calame.Demo.Data
+namespace Calame.Demo.Data.Engine
 {
     public class Scene : GlyphObject
     {

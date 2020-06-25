@@ -2,7 +2,7 @@
 using Glyph.Graphics.Renderer;
 using Microsoft.Xna.Framework;
 
-namespace Calame.Demo.Data
+namespace Calame.Demo.Data.Engine.Base
 {
     public abstract class PrimitiveObjectBase : GlyphObject
     {

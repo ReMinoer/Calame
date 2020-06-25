@@ -1,7 +1,9 @@
-﻿using Simulacra.Binding;
+﻿using Calame.Demo.Data.Data.Base;
+using Calame.Demo.Data.Engine;
+using Simulacra.Binding;
 using Simulacra.Injection.Binding;
 
-namespace Calame.Demo.Data
+namespace Calame.Demo.Data.Data
 {
     public class RectangleData : ShapeDataBase<RectangleData, RectangleObject>
     {

@@ -1,9 +1,10 @@
-﻿using Glyph.Core;
+﻿using Calame.Demo.Data.Engine.Base;
+using Glyph.Core;
 using Glyph.Graphics.Primitives;
 using Glyph.Math.Shapes;
 using Microsoft.Xna.Framework;
 
-namespace Calame.Demo.Data
+namespace Calame.Demo.Data.Engine
 {
     public class RectangleObject : PrimitiveObjectBase
     {

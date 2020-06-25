@@ -133,7 +133,7 @@ namespace Calame.BrushPanel.ViewModels
             IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _dataTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
-                                   .DisplayName(x => x.Name, nameof(IGlyphData.Name))
+                                   .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
                                    .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphData.Children))
                                    .IconDescription(x => iconDescriptor.GetIcon(x.BindedObject));
 

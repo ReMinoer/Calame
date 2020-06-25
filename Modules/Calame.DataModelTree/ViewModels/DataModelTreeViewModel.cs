@@ -53,7 +53,7 @@ namespace Calame.DataModelTree.ViewModels
             IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphCreator>()
-                               .DisplayName(x => x.Name, nameof(IGlyphCreator.Name))
+                               .DisplayName(x => x.DisplayName, nameof(IGlyphCreator.DisplayName))
                                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphCreator.Children))
                                .IconDescription(x => iconDescriptor.GetIcon(x.BindedObject));
         }
