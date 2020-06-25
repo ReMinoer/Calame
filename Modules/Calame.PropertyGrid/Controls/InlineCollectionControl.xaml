@@ -22,7 +22,8 @@
                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                                      IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}" />
         </Button>
-        <ItemsControl VerticalAlignment="Stretch"
+        <ItemsControl x:Name="ItemsControl"
+                      VerticalAlignment="Stretch"
                       ItemsSource="{Binding Value}"
                       AlternationCount="{x:Static system:Int32.MaxValue}">
             <ItemsControl.ItemsPanel>

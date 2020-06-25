@@ -257,8 +257,11 @@ namespace Calame.PropertyGrid.Controls
         private void OnAddItem(object parameter) => OnAddItem((Type)parameter);
         private void OnAddItem(Type itemType)
         {
-            _list.Add(Activator.CreateInstance(itemType));
+            object item = Activator.CreateInstance(itemType);
+            _list.Add(item);
+
             OnPropertyCollectionChanged();
+            OnItemClicked(ItemsControl.ItemContainerGenerator.ContainerFromItem(item));
         }
 
         private void OnItemClicked(object control)
