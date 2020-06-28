@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Input;
 using Calame.Icons;
 using Diese;
 using Glyph.Composition;
@@ -19,11 +20,17 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(SelectedObject), typeof(object), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnSelectedObjectChanged));
         static public readonly DependencyProperty CompactModeProperty =
             DependencyProperty.Register(nameof(CompactMode), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false));
+        static public readonly DependencyProperty ShowNavigationButtonsProperty =
+            DependencyProperty.Register(nameof(ShowNavigationButtons), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false));
         static public readonly DependencyProperty IconProviderProperty =
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty IconDescriptorManagerProperty =
             DependencyProperty.Register(nameof(IconDescriptorManager), typeof(IIconDescriptorManager), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnIconDescriptorManagerChanged));
-        
+        static public readonly DependencyProperty PreviousCommandProperty =
+            DependencyProperty.Register(nameof(PreviousCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+        static public readonly DependencyProperty NextCommandProperty =
+            DependencyProperty.Register(nameof(NextCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+
         public IList<Type> NewItemTypeRegistry
         {
             get => (IList<Type>)GetValue(NewItemTypeRegistryProperty);
@@ -86,7 +93,13 @@ namespace Calame.PropertyGrid.Controls
             get => (bool)GetValue(CompactModeProperty);
             set => SetValue(CompactModeProperty, value);
         }
-        
+
+        public bool ShowNavigationButtons
+        {
+            get => (bool)GetValue(ShowNavigationButtonsProperty);
+            set => SetValue(ShowNavigationButtonsProperty, value);
+        }
+
         public IIconProvider IconProvider
         {
             get => (IIconProvider)GetValue(IconProviderProperty);
@@ -141,6 +154,18 @@ namespace Calame.PropertyGrid.Controls
             }
         }
 
+        public ICommand PreviousCommand
+        {
+            get => (ICommand)GetValue(PreviousCommandProperty);
+            set => SetValue(PreviousCommandProperty, value);
+        }
+
+        public ICommand NextCommand
+        {
+            get => (ICommand)GetValue(NextCommandProperty);
+            set => SetValue(NextCommandProperty, value);
+        }
+
         public IEnumerable<PropertyItemBase> Properties => PropertyGrid.Properties.Cast<PropertyItemBase>();
 
         static private readonly DependencyPropertyDescriptor EditorPropertyDescriptor;
@@ -149,7 +174,7 @@ namespace Calame.PropertyGrid.Controls
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public event PropertyValueChangedEventHandler PropertyValueChanged;
-        public event ItemEventHandler ShowItemInPropertyGrid;
+        public event ItemEventHandler ItemSelected;
 
         static CalamePropertyGrid()
         {
@@ -228,9 +253,9 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.ComponentIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<IGlyphComponent>();
         }
 
-        private void OnShowItemInPropertyGrid(object sender, ItemEventArgs args)
+        private void OnItemSelected(object sender, ItemEventArgs args)
         {
-            ShowItemInPropertyGrid?.Invoke(this, args);
+            ItemSelected?.Invoke(this, args);
         }
 
         public interface IValueTypeObject

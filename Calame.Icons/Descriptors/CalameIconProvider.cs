@@ -27,12 +27,15 @@ namespace Calame.Icons.Descriptors
                 case CalameIconKey.CursorMode: return new IconDescription(PackIconMaterialKind.CursorDefaultOutline, DefaultBrush);
                 case CalameIconKey.BrushMode: return new IconDescription(PackIconMaterialKind.Brush, DefaultBrush);
 
+                case CalameIconKey.Previous: return new IconDescription(PackIconMaterialKind.ArrowLeftCircle, DefaultBrush);
+                case CalameIconKey.Next: return new IconDescription(PackIconMaterialKind.ArrowRightCircle, DefaultBrush);
                 case CalameIconKey.File: return new IconDescription(PackIconMaterialKind.FileOutline, DefaultBrush);
                 case CalameIconKey.Folder: return new IconDescription(PackIconMaterialKind.FolderOpen, DefaultBrush);
                 case CalameIconKey.Add: return new IconDescription(PackIconMaterialKind.PlusCircle, DefaultBrush);
                 case CalameIconKey.AddFromList: return new IconDescription(PackIconMaterialKind.PlaylistPlus, DefaultBrush);
                 case CalameIconKey.Delete: return new IconDescription(PackIconMaterialKind.CloseCircle, DefaultBrush);
-                case CalameIconKey.ShowIn: return new IconDescription(PackIconMaterialKind.ArrowTopRight, DefaultBrush);
+                case CalameIconKey.Select: return new IconDescription(PackIconMaterialKind.ArrowTopRight, DefaultBrush);
+
                 default: return IconDescription.None; 
             }
         }

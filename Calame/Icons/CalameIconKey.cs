@@ -14,11 +14,13 @@
         BrushMode,
 
         // Property Grid
+        Previous,
+        Next,
         File,
         Folder,
         Add,
         AddFromList,
         Delete,
-        ShowIn
+        Select
     }
 }

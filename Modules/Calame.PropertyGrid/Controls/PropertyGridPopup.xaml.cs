@@ -12,8 +12,8 @@ namespace Calame.PropertyGrid.Controls
     {
         static public readonly DependencyProperty CanRemoveItemProperty =
             DependencyProperty.Register(nameof(CanRemoveItem), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(true));
-        static public readonly DependencyProperty CanShowInPropertyGridProperty =
-            DependencyProperty.Register(nameof(CanShowInPropertyGrid), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(true));
+        static public readonly DependencyProperty CanSelectItemProperty =
+            DependencyProperty.Register(nameof(CanSelectItem), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(true));
         static public readonly DependencyProperty IconProviderProperty =
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(PropertyGridPopup), new PropertyMetadata(null));
         static public readonly DependencyProperty SystemIconDescriptorProperty =
@@ -25,10 +25,10 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(CanRemoveItemProperty, value);
         }
 
-        public bool CanShowInPropertyGrid
+        public bool CanSelectItem
         {
-            get => (bool)GetValue(CanShowInPropertyGridProperty);
-            set => SetValue(CanShowInPropertyGridProperty, value);
+            get => (bool)GetValue(CanSelectItemProperty);
+            set => SetValue(CanSelectItemProperty, value);
         }
 
         public IIconProvider IconProvider
@@ -44,7 +44,7 @@ namespace Calame.PropertyGrid.Controls
         }
 
         public event EventHandler Removed;
-        public event EventHandler ShowInPropertyGrid;
+        public event EventHandler Selected;
 
         public PropertyGridPopup()
         {
@@ -52,6 +52,6 @@ namespace Calame.PropertyGrid.Controls
         }
 
         private void OnDelete(object sender, RoutedEventArgs e) => Removed?.Invoke(this, EventArgs.Empty);
-        private void OnShowInPropertyGrid(object sender, RequestNavigateEventArgs e) => ShowInPropertyGrid?.Invoke(this, EventArgs.Empty);
+        private void OnSelect(object sender, RoutedEventArgs e) => Selected?.Invoke(this, EventArgs.Empty);
     }
 }

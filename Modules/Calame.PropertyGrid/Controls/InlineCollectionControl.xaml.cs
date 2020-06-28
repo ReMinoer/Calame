@@ -131,7 +131,7 @@ namespace Calame.PropertyGrid.Controls
         private readonly RelayCommand _addItemCommand;
         public ICommand ItemClickedCommand { get; }
 
-        public event ItemEventHandler ShowItemInPropertyGrid;
+        public event ItemEventHandler ItemSelected;
         public event PropertyValueChangedEventHandler PropertyValueChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -211,16 +211,6 @@ namespace Calame.PropertyGrid.Controls
             return true;
         }
 
-        private void OnShowItemInPropertyGrid(object item)
-        {
-            ShowItemInPropertyGrid?.Invoke(this, new ItemEventArgs(item));
-        }
-
-        private void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
-        {
-            PropertyValueChanged?.Invoke(this, e);
-        }
-
         private void OnPropertyCollectionChanged()
         {
             PropertyValueChanged?.Invoke(this, new PropertyValueChangedEventArgs(Xceed.Wpf.Toolkit.PropertyGrid.PropertyGrid.PropertyValueChangedEvent, this, ItemsSource, ItemsSource));
@@ -286,30 +276,24 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.SetBinding(CalamePropertyGrid.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.IconDescriptorManagerProperty, new Binding(nameof(IconDescriptorManager)) { Source = this });
 
-            popup.CanShowInPropertyGrid = !propertyGrid.IsValueTypeObject;
+            popup.CanSelectItem = !propertyGrid.IsValueTypeObject;
 
             int currentIndex = GetIndex(frameworkElement);
             if (currentIndex == -1)
                 throw new InvalidOperationException();
 
             popup.Removed += OnRemoved;
-            popup.ShowInPropertyGrid += OnShowInPropertyGrid;
-            propertyGrid.PropertyValueChanged += OnPopupPropertyValueChanged;
+            popup.Selected += OnSelected;
+            propertyGrid.PropertyValueChanged += OnPropertyValueChanged;
 
             void OnRemoved(object sender, EventArgs e) => OnItemRemoved(popup, currentIndex);
-            void OnShowInPropertyGrid(object sender, EventArgs e) => OnShowItemInPropertyGrid(itemModel);
-            void OnPopupPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
-            {
-                if (propertyGrid.IsValueTypeObject)
-                    _list[currentIndex] = propertyGrid.EditedValueTypeValue;
-
-                PropertyValueChanged?.Invoke(this, e);
-            }
+            void OnSelected(object sender, EventArgs e) => OnItemSelected(popup, itemModel);
+            void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e) => OnPopupPropertyValueChanged(propertyGrid, currentIndex, e);
 
             popup.Closed += (sender, args) =>
             {
-                propertyGrid.PropertyValueChanged -= OnPopupPropertyValueChanged;
-                popup.ShowInPropertyGrid -= OnShowInPropertyGrid;
+                propertyGrid.PropertyValueChanged -= OnPropertyValueChanged;
+                popup.Selected -= OnSelected;
                 popup.Removed -= OnRemoved;
             };
             
@@ -330,6 +314,20 @@ namespace Calame.PropertyGrid.Controls
 
             _list.RemoveAt(itemIndex);
             OnPropertyCollectionChanged();
+        }
+
+        private void OnItemSelected(Popup sender, object item)
+        {
+            sender.IsOpen = false;
+            ItemSelected?.Invoke(this, new ItemEventArgs(item));
+        }
+
+        private void OnPopupPropertyValueChanged(CalamePropertyGrid propertyGrid, int currentIndex, PropertyValueChangedEventArgs e)
+        {
+            if (propertyGrid.IsValueTypeObject)
+                _list[currentIndex] = propertyGrid.EditedValueTypeValue;
+
+            PropertyValueChanged?.Invoke(this, e);
         }
 
         private FrameworkElement _dragSender;

@@ -6,9 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Icons;
+using Calame.PropertyGrid.Controls;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Services;
+using Glyph.Composition;
+using Glyph.Composition.Modelization;
 
 namespace Calame.PropertyGrid.ViewModels
 {
@@ -16,7 +19,10 @@ namespace Calame.PropertyGrid.ViewModels
     public sealed class PropertyGridViewModel : CalameTool<IDocumentContext>, IHandle<ISelectionSpread<object>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
-        
+
+        private SelectionHistory _selectionHistory;
+        public SelectionHistoryManager SelectionHistoryManager { get; }
+
         public IIconProvider IconProvider { get; }
         public IIconDescriptorManager IconDescriptorManager { get; }
 
@@ -29,22 +35,51 @@ namespace Calame.PropertyGrid.ViewModels
 
         public IList<Type> NewItemTypeRegistry { get; }
 
-        public ICommand DirtyDocumentCommand { get; }
-        public ICommand ShowItemInPropertyGridCommand { get; }
+        public AsyncCommand PreviousCommand { get; }
+        public AsyncCommand NextCommand { get; }
+        public AsyncCommand DirtyDocumentCommand { get; }
+        public RelayCommand SelectItemCommand { get; }
 
         [ImportingConstructor]
-        public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+        public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, SelectionHistoryManager selectionHistoryManager,
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
             : base(shell, eventAggregator)
         {
             DisplayName = "Property Grid";
 
             NewItemTypeRegistry = importedTypeProvider.Types.Where(t => t.GetConstructor(Type.EmptyTypes) != null).ToList();
-            
+
+            SelectionHistoryManager = selectionHistoryManager;
+            SelectionHistoryManager.CurrentDocumentHistoryChanged += OnCurrentDocumentHistoryChanged;
+
             IconProvider = iconProvider;
             IconDescriptorManager = iconDescriptorManager;
 
-            DirtyDocumentCommand = new RelayCommand(x => EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject)).Wait());
-            ShowItemInPropertyGridCommand = new RelayCommand(x => {});
+            PreviousCommand = new AsyncCommand(
+                () => _selectionHistory?.SelectPreviousAsync(),
+                () => _selectionHistory?.HasPrevious ?? false);
+            NextCommand = new AsyncCommand(
+                () => _selectionHistory?.SelectNextAsync(),
+                () => _selectionHistory?.HasNext ?? false);
+
+            DirtyDocumentCommand = new AsyncCommand(() => EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject)));
+            SelectItemCommand = new RelayCommand(x =>
+                {
+                    ISelectionRequest<object> selectionRequest;
+                    switch (((ItemEventArgs)x).Item)
+                    {
+                        case IGlyphData data:
+                            selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, data);
+                            break;
+                        case IGlyphComponent component:
+                            selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, component);
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+                    EventAggregator.PublishAsync(selectionRequest).Wait();
+                }
+            );
         }
 
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
@@ -58,6 +93,29 @@ namespace Calame.PropertyGrid.ViewModels
             SelectedObject = null;
             return Task.CompletedTask;
         }
+
+        private void OnCurrentDocumentHistoryChanged(object sender, EventArgs e)
+        {
+            if (_selectionHistory != null)
+            {
+                _selectionHistory.HasNextChanged -= OnHasNextSelectionChanged;
+                _selectionHistory.HasPreviousChanged -= OnHasPreviousSelectionChanged;
+            }
+
+            _selectionHistory = SelectionHistoryManager.CurrentDocumentHistory;
+
+            PreviousCommand.RaiseCanExecuteChanged();
+            NextCommand.RaiseCanExecuteChanged();
+
+            if (_selectionHistory != null)
+            {
+                _selectionHistory.HasPreviousChanged += OnHasPreviousSelectionChanged;
+                _selectionHistory.HasNextChanged += OnHasNextSelectionChanged;
+            }
+        }
+
+        private void OnHasPreviousSelectionChanged(object sender, EventArgs e) => PreviousCommand.RaiseCanExecuteChanged();
+        private void OnHasNextSelectionChanged(object sender, EventArgs e) => NextCommand.RaiseCanExecuteChanged();
 
         public Task HandleAsync(ISelectionSpread<object> message, CancellationToken cancellationToken)
         {

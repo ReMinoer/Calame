@@ -29,13 +29,13 @@
                     </StackPanel>
                 </Button>
                 <StackPanel Orientation="Horizontal"
-                            Visibility="{Binding CanShowInPropertyGrid, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}">
+                            Visibility="{Binding CanSelectItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}">
                     <userControls:CalameIcon DockPanel.Dock="Left" IconSize="10" Margin="5"
-                                             Target="{x:Static icons:CalameIconKey.ShowIn}"
+                                             Target="{x:Static icons:CalameIconKey.Select}"
                                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
                                              IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
                     <TextBlock VerticalAlignment="Center">           
-                        <Hyperlink RequestNavigate="OnShowInPropertyGrid">Show in Property Grid</Hyperlink>
+                        <Hyperlink Click="OnSelect">Select item</Hyperlink>
                     </TextBlock>
                 </StackPanel>
             </DockPanel>

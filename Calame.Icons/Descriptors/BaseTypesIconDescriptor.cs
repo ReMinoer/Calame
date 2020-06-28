@@ -14,8 +14,6 @@ namespace Calame.Icons.Descriptors
         {
             switch (model)
             {
-                case null:
-                    return new IconDescription(PackIconMaterialKind.Null, DefaultBrush);
                 case bool value:
                     return new IconDescription(value ? PackIconMaterialKind.AlphaTCircle : PackIconMaterialKind.AlphaFCircleOutline, DefaultBrush);
                 case int _:

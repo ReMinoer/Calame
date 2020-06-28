@@ -17,7 +17,8 @@
                 IsEnabled="{Binding AddButtonEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                 ToolTip="{Binding AddButtonTooltip, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                 Click="OnAddButtonClicked">
-            <userControls:CalameIcon DockPanel.Dock="Left" IconSize="12"
+            <userControls:CalameIcon DockPanel.Dock="Left"
+                                     IconSize="12"
                                      Target="{Binding AddButtonIconKey, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                                      IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}" />
@@ -47,9 +48,7 @@
                                                  Target="{Binding}"
                                                  IconTargetSelector="{Binding IconTargetSelector, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                                                  IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
-                                                 IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
-                                                 Background="Transparent"
-                                                 VerticalAlignment="Center" />
+                                                 IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}" />
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
