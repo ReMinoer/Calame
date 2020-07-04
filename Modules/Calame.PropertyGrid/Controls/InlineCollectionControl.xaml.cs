@@ -312,6 +312,8 @@ namespace Calame.PropertyGrid.Controls
         {
             sender.IsOpen = false;
 
+            (_list[itemIndex] as IDisposable)?.Dispose();
+
             _list.RemoveAt(itemIndex);
             OnPropertyCollectionChanged();
         }
