@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Diese.Collections;
+using Glyph;
 
 namespace Calame
 {
     public class SelectionRequest<T> : SelectionMessageBase<T>, ISelectionRequest<T>
-        where T : class
+        where T : class, INotifyDisposed
     {
         static public SelectionRequest<T> Empty(IDocumentContext documentContext) => new SelectionRequest<T>(documentContext);
         public ISelectionSpread<T> Promoted => new SelectionSpread<T>(DocumentContext, Items);
@@ -27,7 +29,7 @@ namespace Calame
     }
 
     public class SelectionSpread<T> : SelectionMessageBase<T>, ISelectionSpread<T>
-        where T : class
+        where T : class, INotifyDisposed
     {
         static public SelectionSpread<T> Empty(IDocumentContext documentContext) => new SelectionSpread<T>(documentContext);
 
@@ -48,7 +50,7 @@ namespace Calame
     }
     
     public class SelectionMessageBase<T> : ISelectionMessage<T>
-        where T : class
+        where T : class, INotifyDisposed
     {
         private T _item;
         private T[] _others;
@@ -60,8 +62,12 @@ namespace Calame
             get => _item;
             set
             {
+                Unsubscribe();
+
                 _item = value;
                 _others = null;
+
+                _item.Disposed += OnItemDisposed;
             }
         }
 
@@ -77,6 +83,8 @@ namespace Calame
             }
             set
             {
+                Unsubscribe();
+
                 _item = null;
                 _others = null;
 
@@ -86,10 +94,17 @@ namespace Calame
                         return;
 
                     _item = enumerator.Current;
+                    _item.Disposed += OnItemDisposed;
+
                     _others = enumerator.AsEnumerable().ToArray();
+                    foreach (T other in _others)
+                        other.Disposed += OnItemDisposed;
                 }
             }
         }
+
+        public bool IsDisposed => _item.IsDisposed && _others.All(x => x.IsDisposed);
+        public event EventHandler Disposed;
 
         protected SelectionMessageBase(IDocumentContext documentContext)
         {
@@ -99,7 +114,7 @@ namespace Calame
         protected SelectionMessageBase(IDocumentContext documentContext, T item)
             : this(documentContext)
         {
-            _item = item;
+            Item = item;
         }
 
         protected SelectionMessageBase(IDocumentContext documentContext, IEnumerable<T> items)
@@ -107,5 +122,17 @@ namespace Calame
         {
             Items = items;
         }
+
+        private void Unsubscribe()
+        {
+            if (_item != null)
+                _item.Disposed -= OnItemDisposed;
+
+            if (_others != null)
+                foreach (T other in _others)
+                    other.Disposed -= OnItemDisposed;
+        }
+
+        private void OnItemDisposed(object sender, EventArgs e) => Disposed?.Invoke(this, e);
     }
 }

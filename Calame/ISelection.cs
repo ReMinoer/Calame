@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Glyph;
 
 namespace Calame
 {
-    public interface ISelectionMessage<out T>
+    public interface ISelectionMessage<out T> : INotifyDisposed
     {
         IDocumentContext DocumentContext { get; }
         T Item { get; }
