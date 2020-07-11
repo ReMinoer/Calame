@@ -105,7 +105,8 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker?.Dispose();
             _viewTracker = null;
 
-            _engine = new GlyphEngine(_contentLibraryProvider.Get(Session.ContentPath));
+            _engine = new GlyphEngine(WpfGraphicsDeviceService.Instance, _contentLibraryProvider.Get(Session.ContentPath));
+
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();
             

@@ -77,7 +77,8 @@ namespace Calame.DataModelViewer.ViewModels
 
         private async Task InitializeEngineAsync()
         {
-            _engine = new GlyphEngine(_contentLibraryProvider.Get(Editor.ContentPath));
+            _engine = new GlyphEngine(WpfGraphicsDeviceService.Instance, _contentLibraryProvider.Get(Editor.ContentPath));
+
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();
             
