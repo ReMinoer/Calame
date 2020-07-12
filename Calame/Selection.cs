@@ -67,7 +67,8 @@ namespace Calame
                 _item = value;
                 _others = null;
 
-                _item.Disposed += OnItemDisposed;
+                if (_item != null)
+                    _item.Disposed += OnItemDisposed;
             }
         }
 
@@ -103,7 +104,7 @@ namespace Calame
             }
         }
 
-        public bool IsDisposed => _item.IsDisposed && _others.All(x => x.IsDisposed);
+        public bool IsDisposed => (_item?.IsDisposed ?? false) && _others.All(x => x.IsDisposed);
         public event EventHandler Disposed;
 
         protected SelectionMessageBase(IDocumentContext documentContext)
