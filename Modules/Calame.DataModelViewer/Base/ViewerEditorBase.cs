@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
 using Glyph;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
@@ -61,6 +63,15 @@ namespace Calame.DataModelViewer.Base
 
             Creator.Instantiate();
             dataRoot.Add(Creator.BindedObject);
+        }
+
+        public virtual void OnDragOver(DragEventArgs dragEventArgs)
+        {
+            dragEventArgs.Effects = DragDropEffects.None;
+        }
+
+        public virtual void OnDrop(DragEventArgs dragEventArgs)
+        {
         }
 
         public void Dispose()

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Calame.Icons;
 using Calame.Viewer;
@@ -37,6 +38,9 @@ namespace Calame.DataModelViewer.ViewModels
 
         public ICommand SwitchModeCommand { get; }
 
+        public ICommand DragOverCommand { get; }
+        public ICommand DropCommand { get; }
+
         public IIconProvider IconProvider { get; }
         public IIconDescriptor CalameIconDescriptor { get; }
 
@@ -51,6 +55,9 @@ namespace Calame.DataModelViewer.ViewModels
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             
             SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Viewer.Runner?.Engine != null);
+
+            DragOverCommand = new RelayCommand(x => Editor.OnDragOver((DragEventArgs)x));
+            DropCommand = new RelayCommand(x => Editor.OnDrop((DragEventArgs)x));
 
             IconProvider = iconProvider;
             CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();

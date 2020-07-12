@@ -1,17 +1,17 @@
 ﻿using System.ComponentModel.Composition;
+using System.Windows;
 using Calame.DataModelViewer;
 using Calame.DataModelViewer.Base;
-using Calame.Demo.Data;
 using Calame.Demo.Data.Data;
 using Calame.Demo.Data.Engine;
 using Glyph.Composition.Modelization;
 using Glyph.IO;
 using Niddle;
 
-namespace Calame.Demo.Modules.DemoGameData.Editors
+namespace Calame.Demo.Modules.DemoGameData
 {
     [Export(typeof(IEditorSource))]
-    public class SceneEditorSource : DemoEditorSource<SceneData>
+    public class SceneEditorSource : DemoEditorSource<SceneData, SceneDemoEditor>
     {
         [ImportingConstructor]
         public SceneEditorSource(IImportedTypeProvider importedTypeProvider)
@@ -19,7 +19,7 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
     }
 
     [Export(typeof(IEditorSource))]
-    public class RectangleEditorSource : DemoEditorSource<RectangleData>
+    public class RectangleEditorSource : DemoEditorSource<RectangleData, DemoEditor<RectangleData>>
     {
         [ImportingConstructor]
         public RectangleEditorSource(IImportedTypeProvider importedTypeProvider)
@@ -27,15 +27,16 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
     }
 
     [Export(typeof(IEditorSource))]
-    public class CircleEditorSource : DemoEditorSource<CircleData>
+    public class CircleEditorSource : DemoEditorSource<CircleData, DemoEditor<CircleData>>
     {
         [ImportingConstructor]
         public CircleEditorSource(IImportedTypeProvider importedTypeProvider)
             : base(importedTypeProvider, "Circle", ".circle") {}
     }
 
-    public class DemoEditorSource<T> : SerializingEditorSourceBase<T, DemoEditor<T>>
+    public class DemoEditorSource<T, TEditor> : SerializingEditorSourceBase<T, TEditor>
         where T : IGlyphCreator, new()
+        where TEditor : SerializingViewerEditorBase<T>, new()
     {
         protected override ISerializationFormat SerializationFormat { get; } = new DataContractSerializationFormat();
 
@@ -57,6 +58,39 @@ namespace Calame.Demo.Modules.DemoGameData.Editors
             registry.Add(Dependency.OnType<InstanceObject>());
             registry.Add(Dependency.OnType<RectangleObject>());
             registry.Add(Dependency.OnType<CircleObject>());
+        }
+    }
+
+    public class SceneDemoEditor : DemoEditor<SceneData>
+    {
+        public override void OnDragOver(DragEventArgs dragEventArgs)
+        {
+            if (dragEventArgs.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                dragEventArgs.Effects = DragDropEffects.Link;
+                dragEventArgs.Handled = true;
+                return;
+            }
+
+            base.OnDragOver(dragEventArgs);
+        }
+
+        public override void OnDrop(DragEventArgs dragEventArgs)
+        {
+            var filePaths = dragEventArgs.Data.GetData(DataFormats.FileDrop) as string[];
+            if (filePaths != null && filePaths.Length != 0)
+            {
+                foreach (string filePath in filePaths)
+                {
+                    Creator.Instances.Add(new InstanceData
+                    {
+                        FilePath = filePath
+                    });
+                }
+                return;
+            }
+
+            base.OnDrop(dragEventArgs);
         }
     }
 }

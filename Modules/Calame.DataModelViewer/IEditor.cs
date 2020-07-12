@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
@@ -19,5 +20,7 @@ namespace Calame.DataModelViewer
 
         void RegisterDependencies(IDependencyRegistry registry);
         void PrepareEditor(GlyphEngine engine, GlyphObject editorRoot);
+        void OnDragOver(DragEventArgs dragEventArgs);
+        void OnDrop(DragEventArgs dragEventArgs);
     }
 }
