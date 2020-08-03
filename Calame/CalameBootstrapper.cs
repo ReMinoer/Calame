@@ -39,7 +39,6 @@ namespace Calame
         protected override void BindServices(CompositionBatch batch)
         {
             base.BindServices(batch);
-            batch.AddExportedValue<IContentLibraryProvider>(new ContentLibraryProvider());
             batch.AddExportedValue<IImportedTypeProvider>(new ImportedTypeProvider());
             batch.AddExportedValue(new PathWatcher());
         }

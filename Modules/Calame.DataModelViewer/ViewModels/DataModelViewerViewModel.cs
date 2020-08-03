@@ -10,11 +10,13 @@ using Calame.Icons;
 using Calame.Viewer;
 using Caliburn.Micro;
 using Gemini.Framework;
+using Glyph;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
 using Glyph.WpfInterop;
+using Microsoft.Xna.Framework.Graphics;
 using Simulacra.IO.Watching;
 
 namespace Calame.DataModelViewer.ViewModels
@@ -23,7 +25,6 @@ namespace Calame.DataModelViewer.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
     {
-        private readonly IContentLibraryProvider _contentLibraryProvider;
         private readonly IImportedTypeProvider _importedTypeProvider;
 
         private GlyphEngine _engine;
@@ -45,11 +46,10 @@ namespace Calame.DataModelViewer.ViewModels
         public IIconDescriptor CalameIconDescriptor { get; }
 
         [ImportingConstructor]
-        public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IContentLibraryProvider contentLibraryProvider, IImportedTypeProvider importedTypeProvider,
+        public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IImportedTypeProvider importedTypeProvider,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator, fileWatcher)
         {
-            _contentLibraryProvider = contentLibraryProvider;
             _importedTypeProvider = importedTypeProvider;
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
@@ -84,7 +84,10 @@ namespace Calame.DataModelViewer.ViewModels
 
         private async Task InitializeEngineAsync()
         {
-            _engine = new GlyphEngine(WpfGraphicsDeviceService.Instance, _contentLibraryProvider.Get(Editor.ContentPath));
+            IGraphicsDeviceService graphicsDeviceService = WpfGraphicsDeviceService.Instance;
+            IContentLibrary contentLibrary = Editor.CreateContentLibrary(graphicsDeviceService);
+
+            _engine = new GlyphEngine(graphicsDeviceService, contentLibrary);
 
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();
@@ -98,7 +101,7 @@ namespace Calame.DataModelViewer.ViewModels
             Editor.PrepareEditor(Viewer.Runner.Engine, Viewer.UserRoot);
 
             _engine.Initialize();
-            _engine.LoadContent();
+            await _engine.LoadContentAsync();
 
             if (Editor.Data.BindedObject is IBoxedComponent boxedComponent)
                 Viewer.EditorCamera.ShowTarget(boxedComponent);

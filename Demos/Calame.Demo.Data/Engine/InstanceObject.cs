@@ -3,7 +3,7 @@ using Glyph.Core;
 
 namespace Calame.Demo.Data.Engine
 {
-    public class InstanceObject : GlyphObject
+    public class InstanceObject : GlyphObject, IInstanceObject
     {
         public SceneNode SceneNode { get; }
 

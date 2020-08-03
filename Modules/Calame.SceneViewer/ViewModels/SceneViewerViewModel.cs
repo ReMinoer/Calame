@@ -21,6 +21,7 @@ using Glyph.Core.Tracking;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.WpfInterop;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame.SceneViewer.ViewModels
 {
@@ -29,7 +30,6 @@ namespace Calame.SceneViewer.ViewModels
     public sealed class SceneViewerViewModel : CalameDocumentBase, IViewerDocument, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IShell _shell;
-        private readonly IContentLibraryProvider _contentLibraryProvider;
 
         private GlyphEngine _engine;
         private MessagingTracker<IView> _viewTracker;
@@ -59,14 +59,13 @@ namespace Calame.SceneViewer.ViewModels
         public IIconDescriptor CalameIconDescriptor { get; }
 
         [ImportingConstructor]
-        public SceneViewerViewModel(IEventAggregator eventAggregator, IShell shell, IContentLibraryProvider contentLibraryProvider,
+        public SceneViewerViewModel(IEventAggregator eventAggregator, IShell shell,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator)
         {
             DisplayName = "Scene Viewer";
 
             _shell = shell;
-            _contentLibraryProvider = contentLibraryProvider;
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
@@ -90,7 +89,7 @@ namespace Calame.SceneViewer.ViewModels
         }
         
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
-            : this(viewModel.EventAggregator, viewModel._shell, viewModel._contentLibraryProvider, viewModel.IconProvider, viewModel._iconDescriptorManager, Enumerable.Empty<IViewerModuleSource>())
+            : this(viewModel.EventAggregator, viewModel._shell, viewModel.IconProvider, viewModel._iconDescriptorManager, Enumerable.Empty<IViewerModuleSource>())
         {
             throw new NotSupportedException();
 
@@ -105,7 +104,10 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker?.Dispose();
             _viewTracker = null;
 
-            _engine = new GlyphEngine(WpfGraphicsDeviceService.Instance, _contentLibraryProvider.Get(Session.ContentPath));
+            IGraphicsDeviceService graphicsDeviceService = WpfGraphicsDeviceService.Instance;
+            IContentLibrary contentLibrary = Session.CreateContentLibrary(graphicsDeviceService);
+
+            _engine = new GlyphEngine(graphicsDeviceService, contentLibrary);
 
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();
@@ -121,7 +123,7 @@ namespace Calame.SceneViewer.ViewModels
             Session.PrepareSession(context);
 
             _engine.Initialize();
-            _engine.LoadContent();
+            await _engine.LoadContentAsync();
 
             FreeCameraAction();
             Viewer.EditorCamera.ShowTarget(context.UserRoot);

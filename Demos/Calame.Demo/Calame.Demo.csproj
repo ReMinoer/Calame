@@ -4,6 +4,9 @@
     <TargetFramework>$(TargetFramework)</TargetFramework>
     <UseWPF>True</UseWPF>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Calame.Icons\Calame.Icons.csproj" />
     <ProjectReference Include="..\..\Calame\Calame.csproj" />
@@ -19,6 +22,7 @@
     <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph.Graphics\Glyph.Graphics.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph.Messaging\Glyph.Messaging.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Pipeline\Glyph.Pipeline.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph.Tools\Glyph.Tools.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj" />
     <ProjectReference Include="..\..\Modules\Calame.BrushPanel\Calame.BrushPanel.csproj" />

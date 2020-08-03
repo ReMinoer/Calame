@@ -19,7 +19,6 @@ namespace Calame.DataModelViewer.Base
     {
         protected abstract ISaveLoadFormat<T> SaveLoadFormat { get; }
         protected T Creator { get; private set; }
-        public abstract string ContentPath { get; }
 
         public IGlyphData Data => Creator;
         
@@ -37,14 +36,13 @@ namespace Calame.DataModelViewer.Base
         {
             return SaveAsync(Creator, stream);
         }
-        
+
         protected abstract Task<T> NewAsync();
         protected virtual Task<T> LoadAsync(Stream stream) => Task.Run(() => SaveLoadFormat.Load(stream));
         protected virtual Task SaveAsync(T data, Stream stream) => Task.Run(() => SaveLoadFormat.Save(Creator, stream));
 
-        public virtual void RegisterDependencies(IDependencyRegistry registry)
-        {
-        }
+        public abstract IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService);
+        public abstract void RegisterDependencies(IDependencyRegistry registry);
 
         public virtual void PrepareEditor(GlyphEngine engine, GlyphObject editorRoot)
         {

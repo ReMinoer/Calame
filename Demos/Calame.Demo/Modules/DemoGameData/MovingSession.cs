@@ -8,17 +8,19 @@ using Fingear.Controls;
 using Fingear.Inputs.Converters;
 using Fingear.MonoGame;
 using Glyph;
+using Glyph.Content;
 using Glyph.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace Calame.Demo.Modules.DemoGameData.Session
+namespace Calame.Demo.Modules.DemoGameData
 {
     [Export(typeof(ISession))]
     public class MovingSession : ISession
     {
         public string DisplayName => "Moving Demo";
-        public string ContentPath => null;
+        public IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService) => new UnusedContentLibrary();
 
         public void PrepareSession(ISessionContext context)
         {
