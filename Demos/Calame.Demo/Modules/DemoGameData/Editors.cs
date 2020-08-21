@@ -11,6 +11,7 @@ using Glyph.Composition.Modelization;
 using Glyph.Content;
 using Glyph.IO;
 using Glyph.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using Niddle;
 
@@ -98,8 +99,20 @@ namespace Calame.Demo.Modules.DemoGameData
                     await Task.Run(() => File.Copy(filePath, copyFilePath));
 
                     IAsset<object> asset = EditorContentLibrary.Instance.GetAsset<object>(assetName);
-                    object content = await asset.GetContentAsync();
-                    await asset.ReleaseAsync();
+
+                    object content;
+                    try
+                    {
+                        content = await asset.GetContentAsync();
+                    }
+                    catch (NoImporterException)
+                    {
+                        content = null;
+                    }
+                    finally
+                    {
+                        await asset.ReleaseAsync();
+                    }
 
                     switch (content)
                     {
@@ -108,13 +121,15 @@ namespace Calame.Demo.Modules.DemoGameData
                             {
                                 AssetPath = assetName
                             });
-                            continue;
+                            break;
+                        case null:
+                            Creator.Instances.Add(new FileInstanceData
+                            {
+                                FilePath = filePath
+                            });
+                            break;
                     }
 
-                    Creator.Instances.Add(new FileInstanceData
-                    {
-                        FilePath = filePath
-                    });
                 }
                 return;
             }
