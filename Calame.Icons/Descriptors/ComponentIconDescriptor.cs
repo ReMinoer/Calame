@@ -81,7 +81,9 @@ namespace Calame.Icons.Descriptors
                     return new IconDescription(PackIconMaterialKind.Shape, GraphicsCategoryBrush);
                 case RendererBase _:
                     return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);
-                    
+
+                case SongPlayer _:
+                    return new IconDescription(PackIconMaterialKind.Radio, AudioCategoryBrush);
                 case SoundLoader _:
                     return new IconDescription(PackIconMaterialKind.MusicBox, AudioCategoryBrush);
                 case SoundEmitter _:
