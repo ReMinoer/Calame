@@ -96,7 +96,7 @@ namespace Calame.Demo.Modules.DemoGameData
                     string fileName = Path.GetFileName(filePath);
                     string copyFilePath = Path.Combine(EditorContentLibrary.RawRootPath, fileName);
 
-                    await Task.Run(() => File.Copy(filePath, copyFilePath));
+                    await Task.Run(() => File.Copy(filePath, copyFilePath, overwrite: true));
 
                     IAsset<object> asset = EditorContentLibrary.Instance.GetAsset<object>(assetName);
 
