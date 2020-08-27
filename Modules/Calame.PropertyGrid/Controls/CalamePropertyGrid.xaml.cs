@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using Calame.Icons;
 using Diese;
+using Gemini.Framework;
 using Glyph.Composition;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
@@ -26,10 +28,15 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty IconDescriptorManagerProperty =
             DependencyProperty.Register(nameof(IconDescriptorManager), typeof(IIconDescriptorManager), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnIconDescriptorManagerChanged));
+        
         static public readonly DependencyProperty PreviousCommandProperty =
             DependencyProperty.Register(nameof(PreviousCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty NextCommandProperty =
             DependencyProperty.Register(nameof(NextCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+        static public readonly DependencyProperty OpenFileCommandProperty =
+            DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+        static public readonly DependencyProperty OpenFolderCommandProperty =
+            DependencyProperty.Register(nameof(OpenFolderCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
 
         public IList<Type> NewItemTypeRegistry
         {
@@ -164,6 +171,18 @@ namespace Calame.PropertyGrid.Controls
         {
             get => (ICommand)GetValue(NextCommandProperty);
             set => SetValue(NextCommandProperty, value);
+        }
+
+        public ICommand OpenFileCommand
+        {
+            get => (ICommand)GetValue(OpenFileCommandProperty);
+            set => SetValue(OpenFileCommandProperty, value);
+        }
+
+        public ICommand OpenFolderCommand
+        {
+            get => (ICommand)GetValue(OpenFolderCommandProperty);
+            set => SetValue(OpenFolderCommandProperty, value);
         }
 
         public IEnumerable<PropertyItemBase> Properties => PropertyGrid.Properties.Cast<PropertyItemBase>();

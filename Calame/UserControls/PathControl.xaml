@@ -5,10 +5,29 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Calame.UserControls"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:icons="clr-namespace:Calame.Icons"
              mc:Ignorable="d" 
              d:DesignHeight="24" d:DesignWidth="300" d:DataContext="{d:DesignInstance local:PathControl}">
-    <DockPanel>
-        <Button DockPanel.Dock="Right" Content="..." Click="OnButtonClicked" Width="30" />
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+    <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <local:CalameIcon DockPanel.Dock="Left" Width="24" IconSize="12"
+                          Target="{Binding DefaultIconKey, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
+                          IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
+                          IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}" />
+        <Button DockPanel.Dock="Right" Width="30"
+                Content="..."
+                Click="OnBrowseButtonClicked" />
+        <Button DockPanel.Dock="Right" Width="20"
+                Visibility="{Binding ShowOpenPathButton, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
+                Command="{Binding OpenPathCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
+                CommandParameter="{Binding FullPath, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}">
+            <local:CalameIcon IconSize="12"
+                              Target="{x:Static icons:CalameIconKey.OpenWith}"
+                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
+                              IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}" />
+        </Button>
         <xctk:PropertyGridEditorTextBox Text="{Binding DisplayedPath, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

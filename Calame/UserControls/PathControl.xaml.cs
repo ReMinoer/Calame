@@ -5,6 +5,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using Calame.Icons;
+using Gemini.Framework;
 using Glyph.IO;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -22,8 +25,16 @@ namespace Calame.UserControls
             DependencyProperty.Register(nameof(Root), typeof(string), typeof(PathControl), new PropertyMetadata(null, OnRootChanged), ValidateRoot);
         static public readonly DependencyProperty FolderModeProperty =
             DependencyProperty.Register(nameof(FolderMode), typeof(bool), typeof(PathControl), new PropertyMetadata(false));
+        static public readonly DependencyProperty ShowOpenPathButtonProperty =
+            DependencyProperty.Register(nameof(ShowOpenPathButton), typeof(bool), typeof(PathControl), new PropertyMetadata(false));
+        static public readonly DependencyProperty OpenPathCommandProperty =
+            DependencyProperty.Register(nameof(OpenPathCommand), typeof(ICommand), typeof(PathControl), new PropertyMetadata(null));
         static public readonly DependencyProperty FileTypesProperty =
             DependencyProperty.Register(nameof(FileTypes), typeof(IEnumerable<FileType>), typeof(PathControl), new PropertyMetadata(null));
+        static public readonly DependencyProperty IconProviderProperty =
+            DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(PathControl), new PropertyMetadata(null));
+        static public readonly DependencyProperty IconDescriptorManagerProperty =
+            DependencyProperty.Register(nameof(IconDescriptorManager), typeof(IIconDescriptorManager), typeof(PathControl), new PropertyMetadata(null, OnIconDescriptorManagerChanged));
 
         public string UserPath
         {
@@ -37,6 +48,8 @@ namespace Calame.UserControls
             string newValue = (string)e.NewValue;
 
             pathControl.DisplayedPath = pathControl.ConvertToRelativePathIfPossible(newValue);
+            pathControl.OnPropertyChanged(nameof(FullPath));
+            pathControl.OnPropertyChanged(nameof(ShowOpenPathButton));
         }
 
         private string _displayedPath;
@@ -51,6 +64,8 @@ namespace Calame.UserControls
                 UserPath = ConvertToRelativePathIfPossible(_displayedPath);
             }
         }
+
+        public string FullPath => ConvertToFullPath(UserPath);
 
         private string _normalizedRoot;
         public string Root
@@ -75,18 +90,58 @@ namespace Calame.UserControls
             set => SetValue(FolderModeProperty, value);
         }
 
+        public bool ShowOpenPathButton
+        {
+            get => (bool)GetValue(ShowOpenPathButtonProperty);
+            set => SetValue(ShowOpenPathButtonProperty, value);
+        }
+
+        public ICommand OpenPathCommand
+        {
+            get => (ICommand)GetValue(OpenPathCommandProperty);
+            set => SetValue(OpenPathCommandProperty, value);
+        }
+
         public IEnumerable<FileType> FileTypes
         {
             get => (IEnumerable<FileType>)GetValue(FileTypesProperty);
             set => SetValue(FileTypesProperty, value);
         }
 
+        public IIconProvider IconProvider
+        {
+            get => (IIconProvider)GetValue(IconProviderProperty);
+            set => SetValue(IconProviderProperty, value);
+        }
+
+        public IIconDescriptorManager IconDescriptorManager
+        {
+            get => (IIconDescriptorManager)GetValue(IconDescriptorManagerProperty);
+            set => SetValue(IconDescriptorManagerProperty, value);
+        }
+
+        private IIconDescriptor _systemIconDescriptor;
+        public IIconDescriptor SystemIconDescriptor
+        {
+            get => _systemIconDescriptor;
+            private set => Set(ref _systemIconDescriptor, value);
+        }
+
+        private IIconDescriptor _fileTypeIconDescriptor;
+        public IIconDescriptor FileTypeIconDescriptor
+        {
+            get => _fileTypeIconDescriptor;
+            private set => Set(ref _fileTypeIconDescriptor, value);
+        }
+
+        public CalameIconKey DefaultIconKey => FolderMode ? CalameIconKey.Folder : CalameIconKey.File;
+
         public PathControl()
         {
             InitializeComponent();
         }
 
-        private void OnButtonClicked(object sender, RoutedEventArgs e)
+        private void OnBrowseButtonClicked(object sender, RoutedEventArgs e)
         {
             if (FolderMode)
             {
@@ -178,6 +233,15 @@ namespace Calame.UserControls
                 path += separator;
 
             return path;
+        }
+
+        static private void OnIconDescriptorManagerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var propertyGrid = (PathControl)d;
+
+            propertyGrid.SystemIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<CalameIconKey>();
+            propertyGrid.FileTypeIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<FileType>();
+            propertyGrid.OnPropertyChanged(nameof(DefaultIconKey));
         }
 
         protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string propertyName = null)

@@ -34,14 +34,12 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:CustomPropertyItem">
-                        <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                            <userControls:CalameIcon DockPanel.Dock="Left" Width="24" IconSize="12"
-                                                     Target="{x:Static icons:CalameIconKey.File}"
-                                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                     IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
-                            <userControls:PathControl Height="24"
-                                                      UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}" />
-                        </DockPanel>
+                        <userControls:PathControl Height="24"
+                                                  UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}"
+                                                  ShowOpenPathButton="True"
+                                                  OpenPathCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                  IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                  IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"/>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -53,15 +51,13 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:CustomPropertyItem">
-                        <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                            <userControls:CalameIcon DockPanel.Dock="Left" Width="24" IconSize="12"
-                                                     Target="{x:Static icons:CalameIconKey.Folder}"
-                                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                     IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
-                            <userControls:PathControl Height="24"
-                                                      UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
-                                                      FolderMode="True" />
-                        </DockPanel>
+                        <userControls:PathControl Height="24"
+                                                  UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
+                                                  ShowOpenPathButton="True"
+                                                  OpenPathCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                  IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                  IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                  FolderMode="True" />
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -139,6 +135,8 @@
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           ItemSelected="OnItemSelected"
                                                           PropertyValueChanged="OnPropertyValueChanged"/>
                     </DataTemplate>
@@ -195,6 +193,8 @@
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           ItemSelected="OnItemSelected"
                                                           PropertyValueChanged="OnPropertyValueChanged"/>
                     </DataTemplate>

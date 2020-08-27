@@ -47,6 +47,11 @@ namespace Calame.PropertyGrid.Controls
         static public readonly DependencyProperty IconTargetSelectorProperty =
             DependencyProperty.Register(nameof(IconTargetSelector), typeof(IIconTargetSelector), typeof(InlineCollectionControl), new PropertyMetadata(null));
 
+        static public readonly DependencyProperty OpenFileCommandProperty =
+            DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(InlineCollectionControl), new PropertyMetadata(null));
+        static public readonly DependencyProperty OpenFolderCommandProperty =
+            DependencyProperty.Register(nameof(OpenFolderCommand), typeof(ICommand), typeof(InlineCollectionControl), new PropertyMetadata(null));
+
         public IEnumerable ItemsSource
         {
             get => (IEnumerable)GetValue(ItemsSourceProperty);
@@ -93,6 +98,18 @@ namespace Calame.PropertyGrid.Controls
         {
             get => (IIconTargetSelector)GetValue(IconTargetSelectorProperty);
             set => SetValue(IconTargetSelectorProperty, value);
+        }
+
+        public ICommand OpenFileCommand
+        {
+            get => (ICommand)GetValue(OpenFileCommandProperty);
+            set => SetValue(OpenFileCommandProperty, value);
+        }
+
+        public ICommand OpenFolderCommand
+        {
+            get => (ICommand)GetValue(OpenFolderCommandProperty);
+            set => SetValue(OpenFolderCommandProperty, value);
         }
 
         private IList _list;
@@ -275,6 +292,8 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.SetBinding(CalamePropertyGrid.NewItemTypeRegistryProperty, new Binding(nameof(NewItemTypeRegistry)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.IconDescriptorManagerProperty, new Binding(nameof(IconDescriptorManager)) { Source = this });
+            propertyGrid.SetBinding(CalamePropertyGrid.OpenFileCommandProperty, new Binding(nameof(OpenFileCommand)) { Source = this });
+            propertyGrid.SetBinding(CalamePropertyGrid.OpenFolderCommandProperty, new Binding(nameof(OpenFolderCommand)) { Source = this });
 
             popup.CanSelectItem = !propertyGrid.IsValueTypeObject;
 

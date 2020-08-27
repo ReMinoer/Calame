@@ -21,6 +21,7 @@
         Add,
         AddFromList,
         Delete,
-        Select
+        Select,
+        OpenWith
     }
 }

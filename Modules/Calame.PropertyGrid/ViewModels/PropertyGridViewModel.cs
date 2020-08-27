@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Calame.Icons;
 using Calame.PropertyGrid.Controls;
@@ -37,12 +39,14 @@ namespace Calame.PropertyGrid.ViewModels
 
         public AsyncCommand PreviousCommand { get; }
         public AsyncCommand NextCommand { get; }
+        public RelayCommand OpenFileCommand { get; }
+        public RelayCommand OpenFolderCommand { get; }
         public AsyncCommand DirtyDocumentCommand { get; }
         public RelayCommand SelectItemCommand { get; }
 
         [ImportingConstructor]
         public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, SelectionHistoryManager selectionHistoryManager,
-            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEditorProvider[] editorProviders)
             : base(shell, eventAggregator)
         {
             DisplayName = "Property Grid";
@@ -61,6 +65,9 @@ namespace Calame.PropertyGrid.ViewModels
             NextCommand = new AsyncCommand(
                 () => _selectionHistory?.SelectNextAsync(),
                 () => _selectionHistory?.HasNext ?? false);
+
+            OpenFolderCommand = new RelayCommand(path => Process.Start((string)path));
+            OpenFileCommand = new RelayCommand(async path => await shell.OpenFileAsync((string)path, editorProviders));
 
             DirtyDocumentCommand = new AsyncCommand(() => EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject)));
             SelectItemCommand = new RelayCommand(x =>

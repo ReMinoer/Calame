@@ -35,6 +35,7 @@ namespace Calame.Icons.Descriptors
                 case CalameIconKey.AddFromList: return new IconDescription(PackIconMaterialKind.PlaylistPlus, DefaultBrush);
                 case CalameIconKey.Delete: return new IconDescription(PackIconMaterialKind.CloseCircle, DefaultBrush);
                 case CalameIconKey.Select: return new IconDescription(PackIconMaterialKind.ArrowTopRight, DefaultBrush);
+                case CalameIconKey.OpenWith: return new IconDescription(PackIconMaterialKind.ApplicationImport, DefaultBrush);
 
                 default: return IconDescription.None; 
             }

@@ -18,7 +18,9 @@
                                      IconProvider="{Binding IconProvider}"
                                      IconDescriptorManager="{Binding IconDescriptorManager}"
                                      PreviousCommand="{Binding PreviousCommand}"
-                                     NextCommand="{Binding NextCommand}">
+                                     NextCommand="{Binding NextCommand}"
+                                     OpenFileCommand="{Binding OpenFileCommand}"
+                                     OpenFolderCommand="{Binding OpenFolderCommand}">
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="PropertyValueChanged">
                     <b:InvokeCommandAction Command="{Binding DirtyDocumentCommand}" />
