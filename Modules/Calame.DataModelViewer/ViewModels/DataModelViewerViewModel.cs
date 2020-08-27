@@ -110,6 +110,8 @@ namespace Calame.DataModelViewer.ViewModels
             
             Viewer.SelectedMode = Viewer.InteractiveModes.FirstOrDefault();
             await Viewer.Activate();
+
+            await EventAggregator.PublishAsync(new SelectionRequest<IGlyphData>(this, Editor.Data));
         }
 
         protected override void OnViewLoaded(object view)
