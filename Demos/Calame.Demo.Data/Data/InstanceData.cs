@@ -11,10 +11,12 @@ using Simulacra.IO.Binding;
 
 namespace Calame.Demo.Data.Data
 {
-    public interface IInstanceData<out T> : IGlyphCreator<T>, IPositionController
+    public interface IInstanceData<out T> : IGlyphCreator<T>, IPositionController, IRotationController, IScaleController
         where T : IGlyphComponent
     {
         Vector2 LocalPosition { get; set; }
+        float LocalRotation { get; set; }
+        float LocalScale { get; set; }
     }
 
     public abstract class InstanceDataBase<TData, T> : BindedData<TData, T>, IInstanceData<T>
@@ -22,16 +24,32 @@ namespace Calame.Demo.Data.Data
         where T : class, IInstanceObject
     {
         public Vector2 LocalPosition { get; set; }
+        public float LocalRotation { get; set; }
+        public float LocalScale { get; set; }
 
         static InstanceDataBase()
         {
             Bindings.From(x => x.LocalPosition).To(x => x.SceneNode.LocalPosition);
+            Bindings.From(x => x.LocalRotation).To(x => x.SceneNode.LocalRotation);
+            Bindings.From(x => x.LocalScale).To(x => x.SceneNode.LocalScale);
         }
 
         Vector2 IPositionController.Position
         {
             get => LocalPosition;
             set => LocalPosition = value;
+        }
+
+        float IRotationController.Rotation
+        {
+            get => LocalRotation;
+            set => LocalRotation = value;
+        }
+
+        float IScaleController.Scale
+        {
+            get => LocalScale;
+            set => LocalScale = value;
         }
     }
 
