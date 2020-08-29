@@ -25,7 +25,7 @@ namespace Calame.Demo.Data.Data
     {
         public Vector2 LocalPosition { get; set; }
         public float LocalRotation { get; set; }
-        public float LocalScale { get; set; }
+        public float LocalScale { get; set; } = 1;
 
         static InstanceDataBase()
         {
