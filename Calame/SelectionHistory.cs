@@ -63,10 +63,19 @@ namespace Calame
             if (CurrentSelection != null && message.Items.SetEquals(CurrentSelection.Items))
                 return;
 
-            // If current selection is null, replace it with new selection.
+            // If current selection is null, ...
             if (CurrentSelection != null && CurrentSelection.Item == null)
             {
-                _history[CurrentIndex] = message;
+                // If new selection is same as previous to null selection, just remove null selection.
+                if (CurrentIndex - 1 >= 0 && _history[CurrentIndex - 1].Items.SetEquals(message.Items))
+                {
+                    _history.UnregisterAt(CurrentIndex);
+                    CurrentIndex--;
+                }
+                else // Else, replace null selection with new selection.
+                {
+                    _history[CurrentIndex] = message;
+                }
             }
             else // Else, remove next selection in history and add new selection instead.
             {
