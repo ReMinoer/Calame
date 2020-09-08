@@ -15,8 +15,8 @@
             Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
         <DockPanel>
-            <DockPanel Height="22" DockPanel.Dock="Top">
-                <Button DockPanel.Dock="Right" Padding="0 0 3 0"
+            <DockPanel DockPanel.Dock="Top">
+                <Button DockPanel.Dock="Right" Height="22" Padding="0 0 3 0"
                         Visibility="{Binding CanRemoveItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
                         Click="OnDelete">
                     <StackPanel Orientation="Horizontal">
@@ -28,7 +28,8 @@
                         <TextBlock>Delete</TextBlock>
                     </StackPanel>
                 </Button>
-                <StackPanel Orientation="Horizontal"
+                <StackPanel Height="22"
+                            Orientation="Horizontal"
                             Visibility="{Binding CanSelectItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}">
                     <userControls:CalameIcon DockPanel.Dock="Left" IconSize="10" Margin="5"
                                              Target="{x:Static icons:CalameIconKey.Select}"

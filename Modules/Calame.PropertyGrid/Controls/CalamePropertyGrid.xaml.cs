@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using Calame.Icons;
 using Diese;
-using Gemini.Framework;
 using Glyph.Composition;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
@@ -16,14 +14,25 @@ namespace Calame.PropertyGrid.Controls
 {
     public partial class CalamePropertyGrid : INotifyPropertyChanged
     {
-        static public readonly DependencyProperty NewItemTypeRegistryProperty =
-            DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty SelectedObjectProperty =
             DependencyProperty.Register(nameof(SelectedObject), typeof(object), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnSelectedObjectChanged));
+        static public readonly DependencyProperty WrapValueTypeObjectProperty =
+            DependencyProperty.Register(nameof(WrapValueTypeObject), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false, OnSelectedObjectChanged));
+        static public readonly DependencyProperty IsReadOnlyProperty =
+            DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false));
+
+        static public readonly DependencyProperty NewItemTypeRegistryProperty =
+            DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+
         static public readonly DependencyProperty CompactModeProperty =
             DependencyProperty.Register(nameof(CompactMode), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false));
         static public readonly DependencyProperty ShowNavigationButtonsProperty =
             DependencyProperty.Register(nameof(ShowNavigationButtons), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(false));
+        static public readonly DependencyProperty ShowHeaderProperty =
+            DependencyProperty.Register(nameof(ShowHeader), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(true));
+        static public readonly DependencyProperty PopupsWidthProperty =
+            DependencyProperty.Register(nameof(PopupsWidth), typeof(double), typeof(CalamePropertyGrid), new PropertyMetadata(double.NaN));
+
         static public readonly DependencyProperty IconProviderProperty =
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty IconDescriptorManagerProperty =
@@ -37,12 +46,6 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty OpenFolderCommandProperty =
             DependencyProperty.Register(nameof(OpenFolderCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
-
-        public IList<Type> NewItemTypeRegistry
-        {
-            get => (IList<Type>)GetValue(NewItemTypeRegistryProperty);
-            set => SetValue(NewItemTypeRegistryProperty, value);
-        }
         
         public object SelectedObject
         {
@@ -95,6 +98,24 @@ namespace Calame.PropertyGrid.Controls
             }
         }
 
+        public bool IsReadOnly
+        {
+            get => (bool)GetValue(IsReadOnlyProperty);
+            set => SetValue(IsReadOnlyProperty, value);
+        }
+
+        public bool WrapValueTypeObject
+        {
+            get => (bool)GetValue(WrapValueTypeObjectProperty);
+            set => SetValue(WrapValueTypeObjectProperty, value);
+        }
+
+        public IList<Type> NewItemTypeRegistry
+        {
+            get => (IList<Type>)GetValue(NewItemTypeRegistryProperty);
+            set => SetValue(NewItemTypeRegistryProperty, value);
+        }
+
         public bool CompactMode
         {
             get => (bool)GetValue(CompactModeProperty);
@@ -105,6 +126,18 @@ namespace Calame.PropertyGrid.Controls
         {
             get => (bool)GetValue(ShowNavigationButtonsProperty);
             set => SetValue(ShowNavigationButtonsProperty, value);
+        }
+
+        public bool ShowHeader
+        {
+            get => (bool)GetValue(ShowHeaderProperty);
+            set => SetValue(ShowHeaderProperty, value);
+        }
+
+        public double PopupsWidth
+        {
+            get => (double)GetValue(PopupsWidthProperty);
+            set => SetValue(PopupsWidthProperty, value);
         }
 
         public IIconProvider IconProvider
@@ -208,7 +241,12 @@ namespace Calame.PropertyGrid.Controls
         private void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
         {
             if (IsValueTypeObject)
-                EditedValueTypeValue = _valueTypeObject.Value;
+            {
+                if (WrapValueTypeObject)
+                    EditedValueTypeValue = _valueTypeObject.Value;
+                else
+                    EditedValueTypeValue = SelectedObject;
+            }
 
             PropertyValueChanged?.Invoke(this, e);
         }
@@ -226,10 +264,10 @@ namespace Calame.PropertyGrid.Controls
         private void OnPropertyItemEditorChanged(object sender, EventArgs e)
         {
             // Workaround to provide imported types and editor definition to collection controls
-            if (((PropertyItem)sender).Editor is InlineCollectionControl inlineCollectionControl)
+            if (((PropertyItem)sender).Editor is PropertyGridPopupOwnerBase propertyGridPopupOwnerBase)
             {
-                inlineCollectionControl.NewItemTypeRegistry = NewItemTypeRegistry;
-                inlineCollectionControl.EditorDefinitions = PropertyGrid.EditorDefinitions;
+                propertyGridPopupOwnerBase.NewItemTypeRegistry = NewItemTypeRegistry;
+                propertyGridPopupOwnerBase.EditorDefinitions = PropertyGrid.EditorDefinitions;
             }
         }
 
@@ -240,7 +278,7 @@ namespace Calame.PropertyGrid.Controls
             Type selectedObjectType = propertyGrid.SelectedObject?.GetType();
             propertyGrid.IsValueTypeObject = selectedObjectType?.IsValueType ?? false;
 
-            if (propertyGrid.IsValueTypeObject)
+            if (propertyGrid.WrapValueTypeObject && propertyGrid.IsValueTypeObject)
             {
                 // Only instantiate a new ValueTypeObject when type is different to prevent property grid refresh and losing focus.
                 if (propertyGrid._valueType != selectedObjectType)

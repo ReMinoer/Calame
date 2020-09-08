@@ -1,0 +1,72 @@
+﻿<controls:PropertyGridPopupOwnerBase x:Class="Calame.PropertyGrid.Controls.InlineObjectControl"
+                                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                                     xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+                                     xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
+                                     xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
+                                     xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
+                                     mc:Ignorable="d"
+                                     d:DesignWidth="150">
+    <UserControl.Resources>
+        <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+        <converters:ObjectToBooleanConverter x:Key="ObjectToBooleanConverter" />
+        <converters:DisplayStringConverter x:Key="DisplayStringConverter" />
+    </UserControl.Resources>
+    <Button DataContext="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+            Command="{Binding ExpandObjectCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+            CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
+            IsEnabled="{Binding Value, Converter={StaticResource ObjectToBooleanConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}">
+        <DockPanel>
+            <DockPanel.Style>
+                <Style TargetType="DockPanel">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
+            </DockPanel.Style>
+            <userControls:CalameIcon DockPanel.Dock="Right"
+                                     IconSize="14"
+                                     Width="14"
+                                     Margin="5 0"
+                                     Target="{Binding AccessIconKey, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+                                     IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+                                     Visibility="{Binding Value, Converter={StaticResource ObjectToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"/>
+            <userControls:CalameIcon DockPanel.Dock="Left"
+                                     IconSize="14"
+                                     Width="14"
+                                     Margin="5 0"
+                                     Target="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+                                     IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}" />
+            <TextBlock Text="{Binding Value, Converter={StaticResource DisplayStringConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+                       TextTrimming="CharacterEllipsis"
+                       Margin="0 3"
+                       HorizontalAlignment="Stretch"/>
+        </DockPanel>
+        <Button.Style>
+            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}"
+                                    BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ContentPresenter />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Button.Style>
+    </Button>
+</controls:PropertyGridPopupOwnerBase>

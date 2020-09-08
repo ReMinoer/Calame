@@ -6,12 +6,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Calame.Icons;
-using Calame.Utils;
 using Diese.Collections;
 using Gemini.Framework;
 using Xceed.Wpf.Toolkit.PropertyGrid;
@@ -26,31 +23,10 @@ namespace Calame.PropertyGrid.Controls
         public ItemEventArgs(object item) { Item = item; }
     }
 
-    public partial class InlineCollectionControl : INotifyPropertyChanged
+    public partial class InlineCollectionControl : PropertyGridPopupOwnerBase, INotifyPropertyChanged
     {
         static public readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(InlineCollectionControl), new PropertyMetadata(null, OnItemsSourceChanged));
-        static public readonly DependencyProperty NewItemTypeRegistryProperty =
-            DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(InlineCollectionControl), new PropertyMetadata(null, OnNewItemTypeRegistryChanged));
-
-        static public readonly DependencyProperty EditorDefinitionsProperty =
-            DependencyProperty.Register(nameof(EditorDefinitions), typeof(EditorDefinitionCollection), typeof(InlineCollectionControl), new PropertyMetadata(null));
-
-        static public readonly DependencyProperty IconProviderProperty =
-            DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(InlineCollectionControl), new PropertyMetadata(null));
-        static public readonly DependencyProperty IconDescriptorProperty =
-            DependencyProperty.Register(nameof(IconDescriptor), typeof(IIconDescriptor), typeof(InlineCollectionControl), new PropertyMetadata(null));
-        static public readonly DependencyProperty IconDescriptorManagerProperty =
-            DependencyProperty.Register(nameof(IconDescriptorManager), typeof(IIconDescriptorManager), typeof(InlineCollectionControl), new PropertyMetadata(null));
-        static public readonly DependencyProperty SystemIconDescriptorProperty =
-            DependencyProperty.Register(nameof(SystemIconDescriptor), typeof(IIconDescriptor), typeof(InlineCollectionControl), new PropertyMetadata(null));
-        static public readonly DependencyProperty IconTargetSelectorProperty =
-            DependencyProperty.Register(nameof(IconTargetSelector), typeof(IIconTargetSelector), typeof(InlineCollectionControl), new PropertyMetadata(null));
-
-        static public readonly DependencyProperty OpenFileCommandProperty =
-            DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(InlineCollectionControl), new PropertyMetadata(null));
-        static public readonly DependencyProperty OpenFolderCommandProperty =
-            DependencyProperty.Register(nameof(OpenFolderCommand), typeof(ICommand), typeof(InlineCollectionControl), new PropertyMetadata(null));
 
         public IEnumerable ItemsSource
         {
@@ -58,64 +34,13 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(ItemsSourceProperty, value);
         }
 
-        public IList<Type> NewItemTypeRegistry
-        {
-            get => (IList<Type>)GetValue(NewItemTypeRegistryProperty);
-            set => SetValue(NewItemTypeRegistryProperty, value);
-        }
-
-        public EditorDefinitionCollection EditorDefinitions
-        {
-            get => (EditorDefinitionCollection)GetValue(EditorDefinitionsProperty);
-            set => SetValue(EditorDefinitionsProperty, value);
-        }
-
-        public IIconProvider IconProvider
-        {
-            get => (IIconProvider)GetValue(IconProviderProperty);
-            set => SetValue(IconProviderProperty, value);
-        }
-
-        public IIconDescriptorManager IconDescriptorManager
-        {
-            get => (IIconDescriptorManager)GetValue(IconDescriptorManagerProperty);
-            set => SetValue(IconDescriptorManagerProperty, value);
-        }
-
-        public IIconDescriptor IconDescriptor
-        {
-            get => (IIconDescriptor)GetValue(IconDescriptorProperty);
-            set => SetValue(IconDescriptorProperty, value);
-        }
-
-        public IIconDescriptor SystemIconDescriptor
-        {
-            get => (IIconDescriptor)GetValue(SystemIconDescriptorProperty);
-            set => SetValue(SystemIconDescriptorProperty, value);
-        }
-
-        public IIconTargetSelector IconTargetSelector
-        {
-            get => (IIconTargetSelector)GetValue(IconTargetSelectorProperty);
-            set => SetValue(IconTargetSelectorProperty, value);
-        }
-
-        public ICommand OpenFileCommand
-        {
-            get => (ICommand)GetValue(OpenFileCommandProperty);
-            set => SetValue(OpenFileCommandProperty, value);
-        }
-
-        public ICommand OpenFolderCommand
-        {
-            get => (ICommand)GetValue(OpenFolderCommandProperty);
-            set => SetValue(OpenFolderCommandProperty, value);
-        }
-
         private IList _list;
         private Array _array;
-        public bool IsItemsSourceResizable => _list != null && !_list.IsFixedSize;
+        public override bool IsItemsSourceResizable => _list != null && !_list.IsFixedSize;
         public bool IsItemsSourceEditable => _list != null && !_list.IsReadOnly;
+
+        private Type _propertyGridDisplayedType;
+        protected override Type PropertyGridDisplayedType => _propertyGridDisplayedType;
 
         private IList<Type> _newItemTypes;
         private IList<Type> NewItemTypes
@@ -134,7 +59,7 @@ namespace Calame.PropertyGrid.Controls
         }
 
         public CalameIconKey AddButtonIconKey => NewItemTypes != null && NewItemTypes.Count > 1 ? CalameIconKey.AddFromList : CalameIconKey.Add;
-        public bool AddButtonEnabled => NewItemTypes != null && NewItemTypes.Count > 0;
+        public bool AddButtonEnabled => !IsReadOnly && NewItemTypes != null && NewItemTypes.Count > 0;
         public string AddButtonTooltip
         {
             get
@@ -146,20 +71,21 @@ namespace Calame.PropertyGrid.Controls
         }
 
         private readonly RelayCommand _addItemCommand;
-        public ICommand ItemClickedCommand { get; }
-
-        public event ItemEventHandler ItemSelected;
-        public event PropertyValueChangedEventHandler PropertyValueChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        static InlineCollectionControl()
+        {
+            NewItemTypeRegistryProperty.OverrideMetadata(typeof(InlineCollectionControl), new PropertyMetadata(null, OnNewItemTypeRegistryChanged));
+            IsReadOnlyProperty.OverrideMetadata(typeof(InlineCollectionControl), new PropertyMetadata(false, IsReadOnlyChanged));
+        }
 
         public InlineCollectionControl()
         {
             InitializeComponent();
 
             _addItemCommand = new RelayCommand(OnAddItem);
-            ItemClickedCommand = new RelayCommand(OnItemClicked);
         }
 
         static private void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -177,6 +103,13 @@ namespace Calame.PropertyGrid.Controls
             RefreshNewItemTypes(control);
         }
 
+        static private void IsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (InlineCollectionControl)d;
+
+            control.OnPropertyChanged(nameof(AddButtonEnabled));
+        }
+
         static private void RefreshItemsSource(InlineCollectionControl control, IEnumerable itemsSource)
         {
             control._list = itemsSource as IList;
@@ -192,6 +125,7 @@ namespace Calame.PropertyGrid.Controls
             if (!control.IsItemsSourceResizable)
             {
                 control.NewItemTypes = null;
+                control._propertyGridDisplayedType = null;
                 return;
             }
 
@@ -199,10 +133,12 @@ namespace Calame.PropertyGrid.Controls
             if (!interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>), out Type collectionType))
             {
                 control.NewItemTypes = null;
+                control._propertyGridDisplayedType = null;
                 return;
             }
 
             Type itemType = collectionType.GenericTypeArguments[0];
+            control._propertyGridDisplayedType = itemType;
 
             IList<Type> newItemTypes = control.NewItemTypeRegistry?.Where(x => itemType.IsAssignableFrom(x)).ToList() ?? new List<Type>();
             if (!newItemTypes.Contains(itemType) && IsInstantiableWithoutParameter(itemType))
@@ -230,7 +166,7 @@ namespace Calame.PropertyGrid.Controls
 
         private void OnPropertyCollectionChanged()
         {
-            PropertyValueChanged?.Invoke(this, new PropertyValueChangedEventArgs(Xceed.Wpf.Toolkit.PropertyGrid.PropertyGrid.PropertyValueChangedEvent, this, ItemsSource, ItemsSource));
+            OnPropertyValueChanged(new PropertyValueChangedEventArgs(Xceed.Wpf.Toolkit.PropertyGrid.PropertyGrid.PropertyValueChangedEvent, this, ItemsSource, ItemsSource));
         }
 
         private void OnAddButtonClicked(object sender, RoutedEventArgs e)
@@ -268,68 +204,14 @@ namespace Calame.PropertyGrid.Controls
             _list.Add(item);
 
             OnPropertyCollectionChanged();
-            OnItemClicked(ItemsControl.ItemContainerGenerator.ContainerFromItem(item));
+            OnExpandObject(ItemsControl.ItemContainerGenerator.ContainerFromItem(item));
         }
 
-        private void OnItemClicked(object control)
+        protected override void OnItemRemoved(DependencyObject popupOwner)
         {
-            var frameworkElement = (FrameworkElement)control;
-            object itemModel = frameworkElement.DataContext;
-
-            var popup = new PropertyGridPopup
-            {
-                PlacementTarget = frameworkElement,
-                Width = 300,
-                StaysOpen = false
-            };
-
-            popup.SetBinding(PropertyGridPopup.CanRemoveItemProperty, new Binding(nameof(IsItemsSourceResizable)) { Source = this });
-            popup.SetBinding(PropertyGridPopup.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
-            popup.SetBinding(PropertyGridPopup.SystemIconDescriptorProperty, new Binding(nameof(SystemIconDescriptor)) { Source = this });
-
-            CalamePropertyGrid propertyGrid = popup.PropertyGrid;
-            propertyGrid.SetBinding(CalamePropertyGrid.SelectedObjectProperty, new Binding(nameof(DataContext)) { Source = control });
-            propertyGrid.SetBinding(CalamePropertyGrid.NewItemTypeRegistryProperty, new Binding(nameof(NewItemTypeRegistry)) { Source = this });
-            propertyGrid.SetBinding(CalamePropertyGrid.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
-            propertyGrid.SetBinding(CalamePropertyGrid.IconDescriptorManagerProperty, new Binding(nameof(IconDescriptorManager)) { Source = this });
-            propertyGrid.SetBinding(CalamePropertyGrid.OpenFileCommandProperty, new Binding(nameof(OpenFileCommand)) { Source = this });
-            propertyGrid.SetBinding(CalamePropertyGrid.OpenFolderCommandProperty, new Binding(nameof(OpenFolderCommand)) { Source = this });
-
-            popup.CanSelectItem = !propertyGrid.IsValueTypeObject;
-
-            int currentIndex = GetIndex(frameworkElement);
-            if (currentIndex == -1)
+            int itemIndex = GetIndex(popupOwner);
+            if (itemIndex == -1)
                 throw new InvalidOperationException();
-
-            popup.Removed += OnRemoved;
-            popup.Selected += OnSelected;
-            propertyGrid.PropertyValueChanged += OnPropertyValueChanged;
-
-            void OnRemoved(object sender, EventArgs e) => OnItemRemoved(popup, currentIndex);
-            void OnSelected(object sender, EventArgs e) => OnItemSelected(popup, itemModel);
-            void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e) => OnPopupPropertyValueChanged(propertyGrid, currentIndex, e);
-
-            popup.Closed += (sender, args) =>
-            {
-                propertyGrid.PropertyValueChanged -= OnPropertyValueChanged;
-                popup.Selected -= OnSelected;
-                popup.Removed -= OnRemoved;
-            };
-            
-            popup.IsOpen = true;
-
-            if (propertyGrid.IsValueTypeObject)
-            {
-                FrameworkElement editor = propertyGrid.Properties.First().Editor;
-                UIElement firstFocusableEditorElement = Tree.BreadthFirst<UIElement>(editor, x => x.GetVisualChildren().OfType<UIElement>()).FirstOrDefault(x => x.Focusable);
-
-                firstFocusableEditorElement?.Focus();
-            }
-        }
-
-        private void OnItemRemoved(Popup sender, int itemIndex)
-        {
-            sender.IsOpen = false;
 
             (_list[itemIndex] as IDisposable)?.Dispose();
 
@@ -337,18 +219,13 @@ namespace Calame.PropertyGrid.Controls
             OnPropertyCollectionChanged();
         }
 
-        private void OnItemSelected(Popup sender, object item)
+        protected override void RefreshValueType(DependencyObject popupOwner, object value)
         {
-            sender.IsOpen = false;
-            ItemSelected?.Invoke(this, new ItemEventArgs(item));
-        }
+            int currentIndex = GetIndex(popupOwner);
+            if (currentIndex == -1)
+                throw new InvalidOperationException();
 
-        private void OnPopupPropertyValueChanged(CalamePropertyGrid propertyGrid, int currentIndex, PropertyValueChangedEventArgs e)
-        {
-            if (propertyGrid.IsValueTypeObject)
-                _list[currentIndex] = propertyGrid.EditedValueTypeValue;
-
-            PropertyValueChanged?.Invoke(this, e);
+            _list[currentIndex] = value;
         }
 
         private FrameworkElement _dragSender;

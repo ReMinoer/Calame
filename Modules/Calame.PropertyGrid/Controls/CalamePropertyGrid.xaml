@@ -14,18 +14,153 @@
              xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:utils="clr-namespace:Simulacra.Utils;assembly=Simulacra"
+             xmlns:utils1="clr-namespace:Calame.Utils;assembly=Calame"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance controls:CalamePropertyGrid, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="300">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
-        <converters:ArrayToDisplayStringConverter x:Key="ArrayToDisplayStringConverter" />
-        <converters:FilePathToStringConverter x:Key="FilePathToStringConverter" />
-        <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
+                    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+                    <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
+                    <converters:ArrayToDisplayStringConverter x:Key="ArrayToDisplayStringConverter" />
+                    <converters:FilePathToStringConverter x:Key="FilePathToStringConverter" />
+                    <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
+                    <converters:EnumTypeToValuesConverter x:Key="EnumTypeToValuesConverter" />
+                    <converters:DisplayStringConverter x:Key="DisplayStringConverter" />
+                    <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+                    <converters:BooleanOrBooleanConverter x:Key="BooleanOrBooleanConverter" />
         <xctk:EditorDefinitionCollection x:Key="EditorDefinitions">
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
+                        <x:Type Type="system:Enum"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <xctk:PropertyGridEditorComboBox SelectedValue="{Binding Value, Mode=TwoWay}"
+                                                         ItemsSource="{Binding PropertyType, Converter={StaticResource EnumTypeToValuesConverter}}">
+                            <xctk:PropertyGridEditorComboBox.IsReadOnly>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </xctk:PropertyGridEditorComboBox.IsReadOnly>
+                        </xctk:PropertyGridEditorComboBox>
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
+                        <x:Type Type="system:Delegate"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:CustomPropertyItem">
+                        <xctk:PropertyGridEditorTextBlock Text="{Binding Value}" />
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
+                        <x:Type Type="system:Boolean"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <xctk:PropertyGridEditorCheckBox IsChecked="{Binding Value, Mode=TwoWay}">
+                            <xctk:PropertyGridEditorCheckBox.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </xctk:PropertyGridEditorCheckBox.IsEnabled>
+                        </xctk:PropertyGridEditorCheckBox>
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
+                        <x:Type Type="system:Int32"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <xctk:PropertyGridEditorIntegerUpDown Value="{Binding Value, Mode=TwoWay}">
+                            <xctk:PropertyGridEditorIntegerUpDown.IsReadOnly>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </xctk:PropertyGridEditorIntegerUpDown.IsReadOnly>
+                        </xctk:PropertyGridEditorIntegerUpDown>
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
+                        <x:Type Type="system:Single"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <xctk:PropertyGridEditorSingleUpDown Value="{Binding Value, Mode=TwoWay}">
+                            <xctk:PropertyGridEditorSingleUpDown.IsReadOnly>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </xctk:PropertyGridEditorSingleUpDown.IsReadOnly>
+                        </xctk:PropertyGridEditorSingleUpDown>
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
+                        <x:Type Type="system:Guid"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <xctk:PropertyGridEditorMaskedTextBox Mask="AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
+                                                              ValueDataType="system:Guid"
+                                                              Value="{Binding Value, Mode=TwoWay}">
+                            <xctk:PropertyGridEditorMaskedTextBox.IsReadOnly>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </xctk:PropertyGridEditorMaskedTextBox.IsReadOnly>
+                        </xctk:PropertyGridEditorMaskedTextBox>
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
             <xctk:EditorTemplateDefinition>
                 <xctk:EditorTemplateDefinition.TargetProperties>
                     <collections:ArrayList>
@@ -33,13 +168,24 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
+                    <DataTemplate DataType="xctk:PropertyItem">
                         <userControls:PathControl Height="24"
                                                   UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                  IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"/>
+                                                  IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}">
+                            <userControls:PathControl.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:PathControl.IsEnabled>
+                        </userControls:PathControl>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -50,14 +196,25 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
+                    <DataTemplate DataType="xctk:PropertyItem">
                         <userControls:PathControl Height="24"
                                                   UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                  FolderMode="True" />
+                                                  FolderMode="True">
+                            <userControls:PathControl.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:PathControl.IsEnabled>
+                        </userControls:PathControl>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -68,8 +225,19 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
-                        <userControls:Vector2Control Value="{Binding Value, Mode=TwoWay}"/>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <userControls:Vector2Control Value="{Binding Value, Mode=TwoWay}">
+                            <userControls:Vector2Control.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:Vector2Control.IsEnabled>
+                        </userControls:Vector2Control>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -80,8 +248,19 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
-                        <userControls:Vector3Control Value="{Binding Value, Mode=TwoWay}"/>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <userControls:Vector3Control Value="{Binding Value, Mode=TwoWay}">
+                            <userControls:Vector3Control.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:Vector3Control.IsEnabled>
+                        </userControls:Vector3Control>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -92,8 +271,19 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
-                        <userControls:Vector4Control Value="{Binding Value, Mode=TwoWay}"/>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <userControls:Vector4Control Value="{Binding Value, Mode=TwoWay}">
+                            <userControls:Vector4Control.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:Vector4Control.IsEnabled>
+                        </userControls:Vector4Control>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -104,8 +294,19 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
-                        <userControls:PointControl Value="{Binding Value, Mode=TwoWay}"/>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <userControls:PointControl Value="{Binding Value, Mode=TwoWay}">
+                            <userControls:PointControl.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:PointControl.IsEnabled>
+                        </userControls:PointControl>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -116,9 +317,20 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
+                    <DataTemplate DataType="xctk:PropertyItem">
                         <xctk:ColorPicker SelectedColor="{Binding Value, Converter={StaticResource MonoGameToWpfColorConverter}}"
-                                          ColorMode="ColorCanvas" />
+                                          ColorMode="ColorCanvas">
+                            <xctk:ColorPicker.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </xctk:ColorPicker.IsEnabled>
+                        </xctk:ColorPicker>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -129,8 +341,10 @@
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
+                    <DataTemplate DataType="xctk:PropertyItem">
                         <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
+                                                          IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          PopupWidth="{Binding PopupsWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
@@ -138,7 +352,7 @@
                                                           OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           ItemSelected="OnItemSelected"
-                                                          PropertyValueChanged="OnPropertyValueChanged"/>
+                                                          PropertyValueChanged="OnPropertyValueChanged" />
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -175,20 +389,35 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorTextBox Text="{Binding Value, Mode=TwoWay}" IsReadOnly="{Binding IsReadOnly}" />
+                        <xctk:PropertyGridEditorTextBox Text="{Binding Value, Mode=TwoWay}">
+                            <xctk:PropertyGridEditorTextBox.IsReadOnly>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </xctk:PropertyGridEditorTextBox.IsReadOnly>
+                        </xctk:PropertyGridEditorTextBox>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
             <xctk:EditorTemplateDefinition>
                 <xctk:EditorTemplateDefinition.TargetProperties>
                     <collections:ArrayList>
-                        <x:Type Type="utils:IOneDimensionArray"/>
-                        <x:Type Type="collections:IEnumerable"/>
+                        <x:Type Type="collections:ICollection"/>
+                        <utils1:ReadOnlyCollectionType>
+                            <x:Type Type="system:Object" />
+                        </utils1:ReadOnlyCollectionType>
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
-                    <DataTemplate DataType="xctk:CustomPropertyItem">
+                    <DataTemplate DataType="xctk:PropertyItem">
                         <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
+                                                          IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          PopupWidth="{Binding PopupsWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
@@ -196,25 +425,50 @@
                                                           OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           ItemSelected="OnItemSelected"
-                                                          PropertyValueChanged="OnPropertyValueChanged"/>
+                                                          PropertyValueChanged="OnPropertyValueChanged" />
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
+                        <x:Type Type="system:Object"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <controls:InlineObjectControl Value="{Binding Value, Mode=TwoWay}"
+                                                      IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      IsReadOnlyValue="{Binding IsReadOnly}"
+                                                      PopupWidth="{Binding PopupsWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      ShowHeader="False"
+                                                      ItemSelected="OnItemSelected"
+                                                      PropertyValueChanged="OnPropertyValueChanged" />
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
         </xctk:EditorDefinitionCollection>
     </UserControl.Resources>
     <StackPanel Orientation="Vertical">
-        <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                Visibility="{Binding ShowHeader, ElementName=This, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal"
                             Visibility="{Binding ShowNavigationButtons, ElementName=This, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Button Padding="3" Command="{Binding PreviousCommand}">
+                    <Button Padding="3" Command="{Binding PreviousCommand, ElementName=This}">
                         <userControls:CalameIcon IconSize="14"
                                                  Width="14"
                                                  Target="{x:Static icons:CalameIconKey.Previous}"
                                                  IconProvider="{Binding IconProvider, ElementName=This}"
                                                  IconDescriptor="{Binding IconDescriptor, ElementName=This}" />
                     </Button>
-                    <Button Padding="3" Command="{Binding NextCommand}">
+                    <Button Padding="3" Command="{Binding NextCommand, ElementName=This}">
                         <userControls:CalameIcon IconSize="14"
                                                  Width="14"
                                                  Target="{x:Static icons:CalameIconKey.Next}"
@@ -222,18 +476,22 @@
                                                  IconDescriptor="{Binding IconDescriptor, ElementName=This}" />
                     </Button>
                 </StackPanel>
-                <userControls:CalameIcon IconSize="16"
-                                         Width="16"
-                                         Margin="5 0"
-                                         Target="{Binding SelectedObject, ElementName=This}"
-                                         IconProvider="{Binding IconProvider, ElementName=This}"
-                                         IconDescriptor="{Binding IconDescriptor, ElementName=This}" />
-                <TextBlock Text="{Binding SelectedObject, ElementName=This}" Margin="0 3" />
+                <StackPanel Orientation="Horizontal"
+                            Visibility="{Binding SelectedObject, ElementName=This, Converter={StaticResource ObjectToVisibilityConverter}, ConverterParameter=True}">
+                    <userControls:CalameIcon IconSize="16"
+                                             Width="16"
+                                             Margin="5 0"
+                                             Target="{Binding SelectedObject, ElementName=This}"
+                                             IconProvider="{Binding IconProvider, ElementName=This}"
+                                             IconDescriptor="{Binding IconDescriptor, ElementName=This}" />
+                    <TextBlock Text="{Binding SelectedObject, Converter={StaticResource DisplayStringConverter}, ElementName=This}" Margin="0 3" />
+                </StackPanel>
             </StackPanel>
         </Border>
         <xctk:PropertyGrid Name="PropertyGrid"
                            EditorDefinitions="{StaticResource EditorDefinitions}"
                            SelectedObject="{Binding DisplayedObject, ElementName=This}"
+                           IsReadOnly="{Binding IsReadOnly, ElementName=This}"
                            ShowAdvancedOptions="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                            ShowDescriptionByTooltip="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"
                            ShowSearchBox="{Binding CompactMode, ElementName=This, Converter={StaticResource InverseBooleanConverter}}"

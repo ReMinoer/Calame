@@ -14,6 +14,7 @@
         <controls:CalamePropertyGrid SelectedObject="{Binding SelectedObject}"
                                      CompactMode="True"
                                      ShowNavigationButtons="True"
+                                     PopupsWidth="{Binding ActualWidth, RelativeSource={RelativeSource Self}}"
                                      NewItemTypeRegistry="{Binding NewItemTypeRegistry}"
                                      IconProvider="{Binding IconProvider}"
                                      IconDescriptorManager="{Binding IconDescriptorManager}"

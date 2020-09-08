@@ -22,6 +22,8 @@
         AddFromList,
         Delete,
         Select,
-        OpenWith
+        OpenWith,
+        ReadOnlyProperties,
+        EditableProperties
     }
 }
