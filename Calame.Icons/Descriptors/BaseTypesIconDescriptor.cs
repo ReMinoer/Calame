@@ -50,8 +50,11 @@ namespace Calame.Icons.Descriptors
                 case IntPtr _:
                 case UIntPtr _:
                     return new IconDescription(PackIconMaterialKind.TableArrowUp, DefaultBrush);
+
+                case null:
+                    return new IconDescription(PackIconMaterialKind.Null, DefaultBrush);
                 default:
-                    return IconDescription.None;
+                    return new IconDescription(PackIconMaterialKind.RhombusOutline, DefaultBrush);
             }
         }
     }
