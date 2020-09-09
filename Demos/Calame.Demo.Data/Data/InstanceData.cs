@@ -1,4 +1,6 @@
-﻿using Calame.Demo.Data.Engine;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Calame.Demo.Data.Engine;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core.Modelization;
@@ -25,6 +27,8 @@ namespace Calame.Demo.Data.Data
     {
         public Vector2 LocalPosition { get; set; }
         public float LocalRotation { get; set; }
+
+        [Range(0, float.MaxValue)]
         public float LocalScale { get; set; } = 1;
 
         static InstanceDataBase()
@@ -65,6 +69,8 @@ namespace Calame.Demo.Data.Data
 
     public class FileInstanceData : InstanceDataBase<FileInstanceData, InstanceObject>
     {
+        [FileType(".circle", ".rectangle", ".scene", DisplayName = "Data Files")]
+        [RootFolder(Environment.SpecialFolder.MyDocuments)]
         public FilePath FilePath { get; set; }
 
         static FileInstanceData()

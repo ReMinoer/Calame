@@ -21,15 +21,19 @@
              d:DesignWidth="300">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-                    <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-                    <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
-                    <converters:ArrayToDisplayStringConverter x:Key="ArrayToDisplayStringConverter" />
-                    <converters:FilePathToStringConverter x:Key="FilePathToStringConverter" />
-                    <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
-                    <converters:EnumTypeToValuesConverter x:Key="EnumTypeToValuesConverter" />
-                    <converters:DisplayStringConverter x:Key="DisplayStringConverter" />
-                    <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
-                    <converters:BooleanOrBooleanConverter x:Key="BooleanOrBooleanConverter" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:MonoGameToWpfColorConverter x:Key="MonoGameToWpfColorConverter" />
+        <converters:ArrayToDisplayStringConverter x:Key="ArrayToDisplayStringConverter" />
+        <converters:FilePathToStringConverter x:Key="FilePathToStringConverter" />
+        <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
+        <converters:EnumTypeToValuesConverter x:Key="EnumTypeToValuesConverter" />
+        <converters:DisplayStringConverter x:Key="DisplayStringConverter" />
+        <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+        <converters:BooleanOrBooleanConverter x:Key="BooleanOrBooleanConverter" />
+        <converters:AttributesToMinimumConverter x:Key="AttributesToMinimumConverter" />
+        <converters:AttributesToMaximumConverter x:Key="AttributesToMaximumConverter" />
+        <converters:AttributesToFileTypesConverter x:Key="AttributesToFileTypeConverter" />
+        <converters:AttributesToRootFolderConverter x:Key="AttributesToRootFolderConverter" />
         <xctk:EditorDefinitionCollection x:Key="EditorDefinitions">
             <xctk:EditorTemplateDefinition>
                 <xctk:EditorTemplateDefinition.TargetProperties>
@@ -98,7 +102,9 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorIntegerUpDown Value="{Binding Value, Mode=TwoWay}">
+                        <xctk:PropertyGridEditorIntegerUpDown Value="{Binding Value, Mode=TwoWay}"
+                                                              Minimum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMinimumConverter}}"
+                                                              Maximum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMaximumConverter}}">
                             <xctk:PropertyGridEditorIntegerUpDown.IsReadOnly>
                                 <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
                                     <Binding Path="IsReadOnly" />
@@ -121,7 +127,9 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorSingleUpDown Value="{Binding Value, Mode=TwoWay}">
+                        <xctk:PropertyGridEditorSingleUpDown Value="{Binding Value, Mode=TwoWay}"
+                                                             Minimum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMinimumConverter}}"
+                                                             Maximum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMaximumConverter}}">
                             <xctk:PropertyGridEditorSingleUpDown.IsReadOnly>
                                 <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
                                     <Binding Path="IsReadOnly" />
@@ -171,6 +179,8 @@
                     <DataTemplate DataType="xctk:PropertyItem">
                         <userControls:PathControl Height="24"
                                                   UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}"
+                                                  FileTypes="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToFileTypeConverter}}"
+                                                  Root="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToRootFolderConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
@@ -199,6 +209,7 @@
                     <DataTemplate DataType="xctk:PropertyItem">
                         <userControls:PathControl Height="24"
                                                   UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
+                                                  Root="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToRootFolderConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
