@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Calame.Icons;
-using Gemini.Framework;
 using Glyph.IO;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -171,7 +170,7 @@ namespace Calame.UserControls
             {
                 var dialog = new OpenFileDialog
                 {
-                    Filter = FileTypes != null ? string.Join("|", FileTypes.Select(x => $"{x.DisplayName}|*{x.Extensions}")) : string.Empty,
+                    Filter = FileTypes != null ? string.Join("|", FileTypes.Select(x => $"{x.DisplayName}|{string.Join(";", x.Extensions.Select(ext => "*" + ext))}")) : string.Empty,
                     DefaultExt = FileTypes?.FirstOrDefault().Extensions.First() ?? string.Empty
                 };
 
