@@ -8,6 +8,9 @@
     <PackageReference Include="NlogViewer" Version="0.6.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Calame\Calame.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

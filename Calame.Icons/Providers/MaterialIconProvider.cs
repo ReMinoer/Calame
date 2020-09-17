@@ -1,27 +1,13 @@
 ﻿using System.ComponentModel.Composition;
-using System.Windows.Controls;
+using Calame.Icons.Providers.Base;
 using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons.Providers
 {
     [Export(typeof(IIconProviderModule))]
-    public class MaterialIconProvider : IIconProviderModule
+    public class MaterialIconProvider : MahAppsIconProviderModuleBase<PackIconMaterialKind, PackIconMaterial>
     {
-        public bool Handle(IconDescription iconDescription)
-        {
-            return iconDescription.Key is PackIconMaterialKind;
-        }
-
-        public Control GetControl(IconDescription iconDescription, int size)
-        {
-            return new PackIconMaterial
-            {
-                Kind = (PackIconMaterialKind)iconDescription.Key,
-                Foreground = iconDescription.Brush,
-                Width = size,
-                Height = size,
-                Focusable = false
-            };
-        }
+        protected override void AssignKindToControl(PackIconMaterial control, PackIconMaterialKind kind) => control.Kind = kind;
+        protected override string GetGeometryPath(PackIconMaterialKind iconKind) => PackIconMaterialDataFactory.DataIndex.Value[iconKind];
     }
 }

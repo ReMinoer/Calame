@@ -1,36 +1,25 @@
 ﻿using System.ComponentModel.Composition;
-using System.Threading.Tasks;
+using Calame.Commands;
 using Calame.CompositionGraph.ViewModels;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
-using Gemini.Framework.Threading;
 
 namespace Calame.CompositionGraph.Commands
 {
     [CommandHandler]
-    public class CompositionGraphCommand : CommandHandlerBase<CompositionGraphCommand.Definition>
+    public class CompositionGraphCommand : OpenToolCommandBase<CompositionGraphCommand.Definition, CompositionGraphViewModel>
     {
         [CommandDefinition]
-        public class Definition : CommandDefinition
+        public class Definition : CalameCommandDefinitionBase
         {
-            public const string CommandName = "CompositionGraph.Open";
-            public override string Name => CommandName;
+            public override string Name => "CompositionGraph.Open";
             public override string Text => "_Composition Graph";
-            public override string ToolTip => "_Composition Graph";
         }
-
-        private readonly IShell _shell;
 
         [ImportingConstructor]
         public CompositionGraphCommand(IShell shell)
+            : base(shell)
         {
-            _shell = shell;
-        }
-
-        public override Task Run(Command command)
-        {
-            _shell.ShowTool<CompositionGraphViewModel>();
-            return TaskUtility.Completed;
         }
     }
 }
