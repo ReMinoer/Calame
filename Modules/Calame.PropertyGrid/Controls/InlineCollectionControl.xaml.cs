@@ -15,14 +15,6 @@ using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
 {
-    public delegate void ItemEventHandler(object sender, ItemEventArgs args);
-
-    public class ItemEventArgs : EventArgs
-    {
-        public object Item { get; }
-        public ItemEventArgs(object item) { Item = item; }
-    }
-
     public partial class InlineCollectionControl : PropertyGridPopupOwnerBase, INotifyPropertyChanged
     {
         static public readonly DependencyProperty ItemsSourceProperty =
