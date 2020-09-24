@@ -110,7 +110,7 @@ namespace Calame
                 }
             }
 
-            StopWatchingFilePath();
+            StopWatchingFilePath(filePath);
             await SaveDocumentAsync(filePath);
             StartWatchingFilePath(filePath);
 
@@ -137,7 +137,7 @@ namespace Calame
                 }
             }
 
-            StopWatchingFilePath();
+            StopWatchingFilePath(FilePath);
             await DisposeDocumentAsync();
             return true;
         }
@@ -147,10 +147,10 @@ namespace Calame
             FileWatcher.WatchFile(filePath, OnFileChanged);
         }
 
-        private void StopWatchingFilePath()
+        private void StopWatchingFilePath(string filePath)
         {
             if (!IsNew)
-                FileWatcher.Unwatch(OnFileChanged);
+                FileWatcher.Unwatch(filePath, OnFileChanged);
 
             ExternalFileChange = null;
         }
