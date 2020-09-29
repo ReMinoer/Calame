@@ -11,7 +11,7 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(IDefaultIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<IInteractive>))]
     [Export(typeof(IDefaultIconDescriptorModule<IInteractive>))]
-    public class InteractiveIconDescriptor : DefaultIconDescriptorModuleBase<IInteractive>
+    public class InteractiveIconDescriptor : HybridIconDescriptorModuleBase<IInteractive>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
         static public readonly Brush UiCategoryBrush = Brushes.OrangeRed;

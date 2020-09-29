@@ -5,12 +5,12 @@ using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons.Descriptors
 {
-    [Export(typeof(IDefaultIconDescriptorModule))]
-    public class BaseTypesIconDescriptor : IDefaultIconDescriptorModule
+    [Export(typeof(IBaseTypeIconDescriptorModule))]
+    public class BaseTypeIconDescriptor : IBaseTypeIconDescriptorModule
     {
         static public readonly Brush DefaultBrush = Brushes.Black;
 
-        public IconDescription GetDefaultIcon(object model)
+        public IconDescription GetBaseTypeIcon(object model)
         {
             switch (model)
             {

@@ -16,7 +16,7 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(IDefaultIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<IControl>))]
     [Export(typeof(IDefaultIconDescriptorModule<IControl>))]
-    public class ControlIconDescriptor : DefaultIconDescriptorModuleBase<IControl>
+    public class ControlIconDescriptor : HybridIconDescriptorModuleBase<IControl>
     {
         static private PackIconMaterialKind DefaultBoxIcon = PackIconMaterialKind.CheckboxBlank;
         static private PackIconMaterialKind DefaultCircleIcon = PackIconMaterialKind.Circle;

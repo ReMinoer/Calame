@@ -25,7 +25,7 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(IDefaultIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<IGlyphComponent>))]
     [Export(typeof(IDefaultIconDescriptorModule<IGlyphComponent>))]
-    public class ComponentIconDescriptor : DefaultIconDescriptorModuleBase<IGlyphComponent>
+    public class ComponentIconDescriptor : HybridIconDescriptorModuleBase<IGlyphComponent>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
         static public readonly Brush SceneGraphCategoryBrush = Brushes.RoyalBlue;
