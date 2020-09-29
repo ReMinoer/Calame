@@ -50,12 +50,12 @@ namespace Calame.DataModelTree.ViewModels
             DisplayName = "Data Model Tree";
 
             IconProvider = iconProvider;
-            IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+            IIconDescriptor<IGlyphData> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphData>();
 
             _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphCreator>()
                                .DisplayName(x => x.DisplayName, nameof(IGlyphCreator.DisplayName))
                                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphCreator.Children))
-                               .IconDescription(x => iconDescriptor.GetIcon(x.BindedObject));
+                               .IconDescription(x => iconDescriptor.GetIcon(x));
         }
         
         protected override Task OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
