@@ -58,6 +58,8 @@ namespace Calame.SceneViewer.ViewModels
         public IIconProvider IconProvider { get; }
         public IIconDescriptor CalameIconDescriptor { get; }
 
+        public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
+
         [ImportingConstructor]
         public SceneViewerViewModel(IEventAggregator eventAggregator, IShell shell,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
@@ -127,6 +129,7 @@ namespace Calame.SceneViewer.ViewModels
 
             FreeCameraAction();
             Viewer.EditorCamera.ShowTarget(context.UserRoot);
+            Viewer.EditorCamera.SaveAsDefault();
 
             _engine.Start();
 

@@ -18,6 +18,7 @@
                                      NewItemTypeRegistry="{Binding NewItemTypeRegistry}"
                                      IconProvider="{Binding IconProvider}"
                                      IconDescriptorManager="{Binding IconDescriptorManager}"
+                                     WorkingDirectory="{Binding WorkingDirectory}"
                                      PreviousCommand="{Binding PreviousCommand}"
                                      NextCommand="{Binding NextCommand}"
                                      OpenFileCommand="{Binding OpenFileCommand}"

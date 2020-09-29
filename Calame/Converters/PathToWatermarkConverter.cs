@@ -1,18 +1,19 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
-using Diese.Collections;
-using Glyph.IO;
 
 namespace Calame.Converters
 {
-    public class AttributesToRootFolderConverter : IValueConverter
+    public class PathToWatermarkConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var attributes = (AttributeCollection)value;
-            return attributes?.FirstOfTypeOrDefault<RootFolderAttribute>()?.Path;
+            switch ((string)value)
+            {
+                case null: return "None";
+                case "": return parameter ?? "Root folder";
+                default: return null;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

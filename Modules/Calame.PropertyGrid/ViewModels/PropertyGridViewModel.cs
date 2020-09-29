@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using Calame.Icons;
 using Calame.PropertyGrid.Controls;
 using Caliburn.Micro;
@@ -33,6 +31,13 @@ namespace Calame.PropertyGrid.ViewModels
         {
             get => _selectedObject;
             set => SetValue(ref _selectedObject, value);
+        }
+
+        private string _workingDirectory;
+        public string WorkingDirectory
+        {
+            get => _workingDirectory;
+            set => SetValue(ref _workingDirectory, value);
         }
 
         public IList<Type> NewItemTypeRegistry { get; }
@@ -66,8 +71,12 @@ namespace Calame.PropertyGrid.ViewModels
                 () => _selectionHistory?.SelectNextAsync(),
                 () => _selectionHistory?.HasNext ?? false);
 
-            OpenFolderCommand = new RelayCommand(path => Process.Start((string)path));
-            OpenFileCommand = new RelayCommand(async path => await shell.OpenFileAsync((string)path, editorProviders));
+            OpenFolderCommand = new RelayCommand(
+                path => Process.Start((string)path),
+                path => !string.IsNullOrWhiteSpace((string)path));
+            OpenFileCommand = new RelayCommand(
+                async path => await shell.OpenFileAsync((string)path, editorProviders, WorkingDirectory),
+                path => !string.IsNullOrWhiteSpace((string)path));
 
             DirtyDocumentCommand = new AsyncCommand(() => EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject)));
             SelectItemCommand = new RelayCommand(x =>
@@ -92,12 +101,14 @@ namespace Calame.PropertyGrid.ViewModels
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
         {
             SelectedObject = null;
+            WorkingDirectory = activeDocument.WorkingDirectory;
             return Task.CompletedTask;
         }
 
         protected override Task OnDocumentsCleaned()
         {
             SelectedObject = null;
+            WorkingDirectory = null;
             return Task.CompletedTask;
         }
 

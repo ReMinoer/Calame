@@ -26,10 +26,12 @@
         <converters:ArrayToDisplayStringConverter x:Key="ArrayToDisplayStringConverter" />
         <converters:FilePathToStringConverter x:Key="FilePathToStringConverter" />
         <converters:FolderPathToStringConverter x:Key="FolderPathToStringConverter" />
+        <converters:AssetPathToStringConverter x:Key="AssetPathToStringConverter" />
         <converters:EnumTypeToValuesConverter x:Key="EnumTypeToValuesConverter" />
         <converters:DisplayStringConverter x:Key="DisplayStringConverter" />
         <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
         <converters:BooleanOrBooleanConverter x:Key="BooleanOrBooleanConverter" />
+        <converters:NullCoalescingConverter x:Key="NullCoalescingConverter" />
         <converters:AttributesToMinimumConverter x:Key="AttributesToMinimumConverter" />
         <converters:AttributesToMaximumConverter x:Key="AttributesToMaximumConverter" />
         <converters:AttributesToFileTypesConverter x:Key="AttributesToFileTypeConverter" />
@@ -180,11 +182,20 @@
                         <userControls:PathControl Height="24"
                                                   UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}"
                                                   FileTypes="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToFileTypeConverter}}"
-                                                  Root="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToRootFolderConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}">
+                            <userControls:PathControl.RootFolder>
+                                <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
+                                    <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
+                                    <Binding Path="WorkingDirectory">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:PathControl.RootFolder>
                             <userControls:PathControl.IsEnabled>
                                 <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
                                     <Binding Path="IsReadOnly" />
@@ -202,6 +213,45 @@
             <xctk:EditorTemplateDefinition>
                 <xctk:EditorTemplateDefinition.TargetProperties>
                     <collections:ArrayList>
+                        <x:Type Type="io:AssetPath"/>
+                    </collections:ArrayList>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+                <xctk:EditorTemplateDefinition.EditingTemplate>
+                    <DataTemplate DataType="xctk:PropertyItem">
+                        <userControls:AssetPathControl Height="24"
+                                                       UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource AssetPathToStringConverter}}"
+                                                       FileTypes="{Binding PropertyDescriptor.Attributes, ConverterParameter=xnb, Converter={StaticResource AttributesToFileTypeConverter}}"
+                                                       ShowOpenPathButton="True"
+                                                       OpenPathCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                       IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                       IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}">
+                            <userControls:AssetPathControl.RootFolder>
+                                <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
+                                    <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
+                                    <Binding Path="WorkingDirectory">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:AssetPathControl.RootFolder>
+                            <userControls:AssetPathControl.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                    <Binding Path="IsReadOnly" />
+                                    <Binding Path="IsReadOnly">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:AssetPathControl.IsEnabled>
+                        </userControls:AssetPathControl>
+                    </DataTemplate>
+                </xctk:EditorTemplateDefinition.EditingTemplate>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <collections:ArrayList>
                         <x:Type Type="io:FolderPath"/>
                     </collections:ArrayList>
                 </xctk:EditorTemplateDefinition.TargetProperties>
@@ -209,12 +259,21 @@
                     <DataTemplate DataType="xctk:PropertyItem">
                         <userControls:PathControl Height="24"
                                                   UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
-                                                  Root="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToRootFolderConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   FolderMode="True">
+                            <userControls:PathControl.RootFolder>
+                                <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
+                                    <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
+                                    <Binding Path="WorkingDirectory">
+                                        <Binding.RelativeSource>
+                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                        </Binding.RelativeSource>
+                                    </Binding>
+                                </MultiBinding>
+                            </userControls:PathControl.RootFolder>
                             <userControls:PathControl.IsEnabled>
                                 <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
                                     <Binding Path="IsReadOnly" />
@@ -360,6 +419,7 @@
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          WorkingDirectory="{Binding WorkingDirectory, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           ItemSelected="OnItemSelected"
@@ -433,6 +493,7 @@
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          WorkingDirectory="{Binding WorkingDirectory, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           ItemSelected="OnItemSelected"
@@ -456,6 +517,7 @@
                                                       IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       SystemIconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      WorkingDirectory="{Binding WorkingDirectory, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       ShowHeader="False"

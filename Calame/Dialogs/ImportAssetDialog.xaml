@@ -1,0 +1,38 @@
+﻿<Window x:Class="Calame.Dialogs.ImportAssetDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Calame.Dialogs"
+        xmlns:userControls="clr-namespace:Calame.UserControls"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance local:ImportAssetDialog}"
+        Title="Import asset..."
+        SizeToContent="Height"
+        Width="400"
+        ResizeMode="NoResize">
+    <StackPanel Orientation="Vertical" Margin="10">
+        <Label>Targeted file:</Label>
+        <TextBox Text="{Binding TargetedFilePath}" IsEnabled="True" />
+        <Label>Asset name:</Label>
+        <TextBox Text="{Binding AssetName, Mode=TwoWay}" />
+        <Label>Import folder:</Label>
+        <userControls:PathControl UserPath="{Binding ImportFolderPath, Mode=TwoWay}"
+                                  RootFolder="{Binding ContentRootPath}"
+                                  RelativePathOnly="True"
+                                  IconProvider="{Binding IconProvider}"
+                                  IconDescriptorManager="{Binding IconDescriptorManager}"
+                                  FolderMode="True" />
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0 10 0 0">
+            <Button Content="Import"
+                    Padding="15 6"
+                    Margin="0 0 10 0"
+                    Click="OnImport" />
+            <Button Content="Cancel"
+                    IsCancel="True"
+                    Padding="15 6" />
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -45,6 +45,8 @@ namespace Calame.DataModelViewer.ViewModels
         public IIconProvider IconProvider { get; }
         public IIconDescriptor CalameIconDescriptor { get; }
 
+        public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
+
         [ImportingConstructor]
         public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IImportedTypeProvider importedTypeProvider,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
@@ -104,7 +106,10 @@ namespace Calame.DataModelViewer.ViewModels
             await _engine.LoadContentAsync();
 
             if (Editor.Data.BindedObject is IBoxedComponent boxedComponent)
+            {
                 Viewer.EditorCamera.ShowTarget(boxedComponent);
+                Viewer.EditorCamera.SaveAsDefault();
+            }
 
             _engine.Start();
             

@@ -20,8 +20,12 @@ namespace Calame.UserControls
 
         static public readonly DependencyProperty UserPathProperty =
             DependencyProperty.Register(nameof(UserPath), typeof(string), typeof(PathControl), new PropertyMetadata(null, OnUserPathChanged));
-        static public readonly DependencyProperty RootProperty =
-            DependencyProperty.Register(nameof(Root), typeof(string), typeof(PathControl), new PropertyMetadata(null, OnRootChanged), ValidateRoot);
+
+        static public readonly DependencyProperty RootFolderProperty =
+            DependencyProperty.Register(nameof(RootFolder), typeof(string), typeof(PathControl), new PropertyMetadata(null, OnRootChanged), ValidateRoot);
+        static public readonly DependencyProperty RelativePathOnlyProperty =
+            DependencyProperty.Register(nameof(RelativePathOnly), typeof(bool), typeof(PathControl), new PropertyMetadata(false));
+
         static public readonly DependencyProperty FolderModeProperty =
             DependencyProperty.Register(nameof(FolderMode), typeof(bool), typeof(PathControl), new PropertyMetadata(false));
         static public readonly DependencyProperty ShowOpenPathButtonProperty =
@@ -29,7 +33,8 @@ namespace Calame.UserControls
         static public readonly DependencyProperty OpenPathCommandProperty =
             DependencyProperty.Register(nameof(OpenPathCommand), typeof(ICommand), typeof(PathControl), new PropertyMetadata(null));
         static public readonly DependencyProperty FileTypesProperty =
-            DependencyProperty.Register(nameof(FileTypes), typeof(IEnumerable<FileType>), typeof(PathControl), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(FileTypes), typeof(IList<FileType>), typeof(PathControl), new PropertyMetadata(null));
+
         static public readonly DependencyProperty IconProviderProperty =
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(PathControl), new PropertyMetadata(null));
         static public readonly DependencyProperty IconDescriptorManagerProperty =
@@ -46,7 +51,7 @@ namespace Calame.UserControls
             PathControl pathControl = (PathControl)d;
             string newValue = (string)e.NewValue;
 
-            pathControl.DisplayedPath = pathControl.ConvertToRelativePathIfPossible(newValue);
+            pathControl.SetDisplayedPath(pathControl.ConvertToRelativePathIfPossible(newValue));
             pathControl.OnPropertyChanged(nameof(FullPath));
             pathControl.OnPropertyChanged(nameof(ShowOpenPathButton));
         }
@@ -57,20 +62,27 @@ namespace Calame.UserControls
             get => _displayedPath;
             set
             {
-                if (!Set(ref _displayedPath, value))
-                    return;
-
-                UserPath = ConvertToRelativePathIfPossible(_displayedPath);
+                if (value == string.Empty)
+                    value = null;
+                SetDisplayedPath(value);
             }
+        }
+
+        private void SetDisplayedPath(string value)
+        {
+            if (!Set(ref _displayedPath, value, nameof(DisplayedPath)))
+                return;
+
+            UserPath = ConvertToRelativePathIfPossible(_displayedPath);
         }
 
         public string FullPath => ConvertToFullPath(UserPath);
 
         private string _normalizedRoot;
-        public string Root
+        public string RootFolder
         {
-            get => (string)GetValue(RootProperty);
-            set => SetValue(RootProperty, value);
+            get => (string)GetValue(RootFolderProperty);
+            set => SetValue(RootFolderProperty, value);
         }
 
         static private bool ValidateRoot(object value) => value == null || Path.IsPathRooted((string)value);
@@ -80,7 +92,19 @@ namespace Calame.UserControls
             PathControl pathControl = (PathControl)d;
             string newValue = (string)e.NewValue;
 
+            string fullPath = pathControl.FullPath;
+
             pathControl._normalizedRoot = newValue != null ? pathControl.NormalizePath(newValue, asDirectory: true) : null;
+
+            pathControl.SetDisplayedPath(pathControl.ConvertToRelativePathIfPossible(fullPath));
+            pathControl.OnPropertyChanged(nameof(FullPath));
+            pathControl.OnPropertyChanged(nameof(ShowOpenPathButton));
+        }
+
+        public bool RelativePathOnly
+        {
+            get => (bool)GetValue(RelativePathOnlyProperty);
+            set => SetValue(RelativePathOnlyProperty, value);
         }
 
         public bool FolderMode
@@ -101,9 +125,9 @@ namespace Calame.UserControls
             set => SetValue(OpenPathCommandProperty, value);
         }
 
-        public IEnumerable<FileType> FileTypes
+        public IList<FileType> FileTypes
         {
-            get => (IEnumerable<FileType>)GetValue(FileTypesProperty);
+            get => (IList<FileType>)GetValue(FileTypesProperty);
             set => SetValue(FileTypesProperty, value);
         }
 
@@ -142,55 +166,88 @@ namespace Calame.UserControls
 
         private void OnBrowseButtonClicked(object sender, RoutedEventArgs e)
         {
-            if (FolderMode)
+            string path = UserPath;
+            while (true)
             {
-                var dialog = new CommonOpenFileDialog
-                {
-                    IsFolderPicker = true
-                };
+                path = FolderMode ? AskFolderPath(lastPath: path) : AskFilePath(lastPath: path);
+                if (path == null)
+                    return;
 
-                if (UserPath != null)
-                {
-                    string systemPath = ConvertToFullPath(UserPath);
-                    if (Directory.Exists(systemPath))
-                    {
-                        dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
-                        dialog.DefaultFileName = Path.GetFileName(systemPath);
-                    }
-                }
-                else
-                {
-                    dialog.InitialDirectory = _normalizedRoot;
-                }
+                path = NormalizePath(path);
+                bool? valid = ValidatePath(ref path);
+                if (valid == true)
+                    break;
+                if (valid == null)
+                    return;
+            }
 
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    DisplayedPath = ConvertToRelativePathIfPossible(dialog.FileName);
+            SetDisplayedPath(ConvertToRelativePathIfPossible(path));
+        }
+
+        protected virtual bool? ValidatePath(ref string path)
+        {
+            if (RelativePathOnly && _normalizedRoot != null && !path.StartsWith(_normalizedRoot))
+            {
+                MessageBox.Show($"Selected path is not part of {RootFolder}!", "Invalid path", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            return true;
+        }
+
+        private string AskFilePath(string lastPath)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = FileTypes != null ? string.Join("|", FileTypes.Select(x => $"{x.DisplayName}|{string.Join(";", x.Extensions.Select(ext => "*" + ext))}")) : string.Empty,
+                DefaultExt = FileTypes?.FirstOrDefault().Extensions.First() ?? string.Empty
+            };
+
+            if (lastPath != null)
+            {
+                string systemPath = ConvertToFullPath(lastPath);
+                if (File.Exists(systemPath))
+                {
+                    dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
+                    dialog.FileName = Path.GetFileName(systemPath);
+                }
             }
             else
             {
-                var dialog = new OpenFileDialog
-                {
-                    Filter = FileTypes != null ? string.Join("|", FileTypes.Select(x => $"{x.DisplayName}|{string.Join(";", x.Extensions.Select(ext => "*" + ext))}")) : string.Empty,
-                    DefaultExt = FileTypes?.FirstOrDefault().Extensions.First() ?? string.Empty
-                };
-
-                if (UserPath != null)
-                {
-                    string systemPath = ConvertToFullPath(UserPath);
-                    if (File.Exists(systemPath))
-                    {
-                        dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
-                        dialog.FileName = Path.GetFileName(systemPath);
-                    }
-                }
-                else
-                {
-                    dialog.InitialDirectory = _normalizedRoot;
-                }
-
-                if (dialog.ShowDialog() == true)
-                    DisplayedPath = ConvertToRelativePathIfPossible(dialog.FileName);
+                dialog.InitialDirectory = _normalizedRoot;
             }
+
+            if (dialog.ShowDialog(Window.GetWindow(this)) == true)
+                return dialog.FileName;
+
+            return null;
+        }
+
+        private string AskFolderPath(string lastPath)
+        {
+            var dialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true
+            };
+
+            if (lastPath != null)
+            {
+                string systemPath = ConvertToFullPath(lastPath);
+                if (Directory.Exists(systemPath))
+                {
+                    dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
+                    dialog.DefaultFileName = Path.GetFileName(systemPath);
+                }
+            }
+            else
+            {
+                dialog.InitialDirectory = _normalizedRoot;
+            }
+
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+                return dialog.FileName;
+
+            return null;
         }
 
         private string ConvertToRelativePathIfPossible(string path, bool? asDirectory = null)
@@ -200,7 +257,7 @@ namespace Calame.UserControls
 
             path = NormalizePath(path, asDirectory);
 
-            if (_normalizedRoot != null && Path.IsPathRooted(path) && path.StartsWith(_normalizedRoot))
+            if (HasValidRoot(path))
                 return path.Substring(_normalizedRoot.Length);
             
             return path;
@@ -219,6 +276,8 @@ namespace Calame.UserControls
             return path;
         }
 
+        protected bool HasValidRoot(string path) => _normalizedRoot != null && Path.IsPathRooted(path) && path.StartsWith(_normalizedRoot);
+
         private string NormalizePath(string path, bool? asDirectory = null)
         {
             // Use unique separator
@@ -228,7 +287,7 @@ namespace Calame.UserControls
             path = path.Replace(otherSeparator, separator);
 
             // Add end separator if directory
-            if ((asDirectory ?? FolderMode) && path[path.Length - 1] != separator)
+            if ((asDirectory ?? FolderMode) && path.Length > 0 && path[path.Length - 1] != separator)
                 path += separator;
 
             return path;

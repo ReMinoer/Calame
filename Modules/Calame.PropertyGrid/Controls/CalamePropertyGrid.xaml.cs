@@ -37,7 +37,10 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty IconDescriptorManagerProperty =
             DependencyProperty.Register(nameof(IconDescriptorManager), typeof(IIconDescriptorManager), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnIconDescriptorManagerChanged));
-        
+
+        static public readonly DependencyProperty WorkingDirectoryProperty =
+            DependencyProperty.Register(nameof(WorkingDirectory), typeof(string), typeof(CalamePropertyGrid), new PropertyMetadata(null, (o, args) => o.ToString()));
+
         static public readonly DependencyProperty PreviousCommandProperty =
             DependencyProperty.Register(nameof(PreviousCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty NextCommandProperty =
@@ -192,6 +195,12 @@ namespace Calame.PropertyGrid.Controls
                 _componentIconDescriptor = value;
                 OnPropertyChanged();
             }
+        }
+
+        public string WorkingDirectory
+        {
+            get => (string)GetValue(WorkingDirectoryProperty);
+            set => SetValue(WorkingDirectoryProperty, value);
         }
 
         public ICommand PreviousCommand

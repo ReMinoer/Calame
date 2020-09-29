@@ -4,7 +4,7 @@ using Glyph.IO;
 
 namespace Calame.DataModelViewer.Base
 {
-    public abstract class SerializingEditorSourceBase<T, TEditor> : EditorSourceBase<T>
+    public abstract class SerializingEditorSourceBase<T, TEditor> : EditorSourceBase
         where T : IGlyphCreator, new()
         where TEditor : SerializingViewerEditorBase<T>, new()
     {
@@ -23,7 +23,8 @@ namespace Calame.DataModelViewer.Base
             _importedTypeProvider = importedTypeProvider;
         }
 
-        public override IEditor CreateEditor()
+        public override sealed IEditor CreateEditor() => InstantiateEditor();
+        protected virtual TEditor InstantiateEditor()
         {
             return new TEditor
             {

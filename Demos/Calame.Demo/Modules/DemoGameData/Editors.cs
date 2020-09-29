@@ -1,17 +1,18 @@
 ﻿using System.ComponentModel.Composition;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Windows;
 using Calame.DataModelViewer;
 using Calame.DataModelViewer.Base;
 using Calame.Demo.Data.Data;
 using Calame.Demo.Data.Engine;
+using Calame.Dialogs;
+using Calame.Icons;
 using Glyph;
 using Glyph.Composition.Modelization;
 using Glyph.Content;
 using Glyph.IO;
 using Glyph.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using Niddle;
 
@@ -21,44 +22,64 @@ namespace Calame.Demo.Modules.DemoGameData
     public class SceneEditorSource : DemoEditorSource<SceneData, SceneDemoEditor>
     {
         [ImportingConstructor]
-        public SceneEditorSource(IImportedTypeProvider importedTypeProvider)
-            : base(importedTypeProvider, "Scene", ".scene") {}
+        public SceneEditorSource(IImportedTypeProvider importedTypeProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+            : base(importedTypeProvider, iconProvider, iconDescriptorManager, "Scene", ".scene") {}
     }
 
     [Export(typeof(IEditorSource))]
     public class RectangleEditorSource : DemoEditorSource<RectangleData, DemoEditor<RectangleData>>
     {
         [ImportingConstructor]
-        public RectangleEditorSource(IImportedTypeProvider importedTypeProvider)
-            : base(importedTypeProvider, "Rectangle", ".rectangle") {}
+        public RectangleEditorSource(IImportedTypeProvider importedTypeProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+            : base(importedTypeProvider, iconProvider, iconDescriptorManager, "Rectangle", ".rectangle") {}
     }
 
     [Export(typeof(IEditorSource))]
     public class CircleEditorSource : DemoEditorSource<CircleData, DemoEditor<CircleData>>
     {
         [ImportingConstructor]
-        public CircleEditorSource(IImportedTypeProvider importedTypeProvider)
-            : base(importedTypeProvider, "Circle", ".circle") {}
+        public CircleEditorSource(IImportedTypeProvider importedTypeProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+            : base(importedTypeProvider, iconProvider, iconDescriptorManager, "Circle", ".circle") {}
     }
 
     public class DemoEditorSource<T, TEditor> : SerializingEditorSourceBase<T, TEditor>
         where T : IGlyphCreator, new()
-        where TEditor : SerializingViewerEditorBase<T>, new()
+        where TEditor : DemoEditor<T>, new()
     {
         protected override ISerializationFormat SerializationFormat { get; } = new DataContractSerializationFormat();
+        protected readonly IIconProvider IconProvider;
+        protected readonly IIconDescriptorManager IconDescriptorManager;
 
-        public DemoEditorSource(IImportedTypeProvider importedTypeProvider, string displayName, string extension)
+        public DemoEditorSource(IImportedTypeProvider importedTypeProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, string displayName, string extension)
             : base(importedTypeProvider, displayName, extension)
         {
+            IconProvider = iconProvider;
+            IconDescriptorManager = iconDescriptorManager;
+        }
+
+        protected override TEditor InstantiateEditor()
+        {
+            TEditor editor = base.InstantiateEditor();
+            editor.IconProvider = IconProvider;
+            editor.IconDescriptorManager = IconDescriptorManager;
+            return editor;
         }
     }
 
     public class DemoEditor<T> : SerializingViewerEditorBase<T>
         where T : IGlyphCreator, new()
     {
+        protected RawContentLibrary ContentManager;
+        protected string ContentRootPath;
+
+        public IIconProvider IconProvider { get; set; }
+        public IIconDescriptorManager IconDescriptorManager { get; set; }
+
         public override IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService)
         {
-            return EditorContentLibrary.GetOrCreateInstance(graphicsDeviceService);
+            ContentManager = EditorContentLibrary.GetOrCreateInstance(graphicsDeviceService);
+            ContentRootPath = PathUtils.NormalizeFolder(ContentManager.RawRootPath);
+            return ContentManager;
         }
 
         public override void RegisterDependencies(IDependencyRegistry registry)
@@ -92,13 +113,15 @@ namespace Calame.Demo.Modules.DemoGameData
             {
                 foreach (string filePath in filePaths)
                 {
-                    string assetName = Path.GetFileNameWithoutExtension(filePath);
-                    string fileName = Path.GetFileName(filePath);
-                    string copyFilePath = Path.Combine(EditorContentLibrary.RawRootPath, fileName);
+                    string assetPath = PathUtils.CanBeRelative(filePath, ContentRootPath)
+                        ? Path.ChangeExtension(PathUtils.MakeRelative(filePath, ContentRootPath), null)
+                        : ImportAssetDialog.ShowDialog(filePath, ContentManager, IconProvider, IconDescriptorManager);
 
-                    await Task.Run(() => File.Copy(filePath, copyFilePath, overwrite: true));
+                    if (assetPath == null)
+                        continue;
 
-                    IAsset<object> asset = EditorContentLibrary.Instance.GetAsset<object>(assetName);
+                    IAsset<object> asset = EditorContentLibrary.Instance.GetAsset<object>(assetPath);
+                    asset.Handle();
 
                     object content;
                     try
@@ -119,7 +142,7 @@ namespace Calame.Demo.Modules.DemoGameData
                         case Texture2D _:
                             Creator.Instances.Add(new SpriteInstanceData
                             {
-                                AssetPath = assetName
+                                AssetPath = assetPath
                             });
                             break;
                         case null:

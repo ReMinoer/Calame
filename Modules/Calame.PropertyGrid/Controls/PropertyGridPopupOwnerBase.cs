@@ -52,6 +52,9 @@ namespace Calame.PropertyGrid.Controls
         static public readonly DependencyProperty IconTargetSelectorProperty =
             DependencyProperty.Register(nameof(IconTargetSelector), typeof(IIconTargetSelector), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
 
+        static public readonly DependencyProperty WorkingDirectoryProperty =
+            DependencyProperty.Register(nameof(WorkingDirectory), typeof(string), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
+
         static public readonly DependencyProperty OpenFileCommandProperty =
             DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
         static public readonly DependencyProperty OpenFolderCommandProperty =
@@ -123,6 +126,12 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(IconTargetSelectorProperty, value);
         }
 
+        public string WorkingDirectory
+        {
+            get => (string)GetValue(WorkingDirectoryProperty);
+            set => SetValue(WorkingDirectoryProperty, value);
+        }
+
         public ICommand OpenFileCommand
         {
             get => (ICommand)GetValue(OpenFileCommandProperty);
@@ -168,6 +177,7 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.SetBinding(CalamePropertyGrid.PopupsWidthProperty, new Binding(nameof(PopupWidth)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.IconDescriptorManagerProperty, new Binding(nameof(IconDescriptorManager)) { Source = this });
+            propertyGrid.SetBinding(CalamePropertyGrid.WorkingDirectoryProperty, new Binding(nameof(WorkingDirectory)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.OpenFileCommandProperty, new Binding(nameof(OpenFileCommand)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.OpenFolderCommandProperty, new Binding(nameof(OpenFolderCommand)) { Source = this });
 
@@ -190,6 +200,8 @@ namespace Calame.PropertyGrid.Controls
                 propertyGrid.PropertyValueChanged -= OnPropertyValueChanged;
                 popup.Selected -= OnSelected;
                 popup.Removed -= OnRemoved;
+
+                popup.DataContext = null;
             };
 
             popup.IsOpen = true;

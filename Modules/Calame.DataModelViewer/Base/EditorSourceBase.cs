@@ -2,7 +2,7 @@
 
 namespace Calame.DataModelViewer.Base
 {
-    public abstract class EditorSourceBase<T> : IEditorSource
+    public abstract class EditorSourceBase : IEditorSource
     {
         public string DisplayName { get; }
         public IEnumerable<string> FileExtensions { get; }

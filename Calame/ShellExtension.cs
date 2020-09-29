@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,11 +14,24 @@ namespace Calame
 {
     static public class ShellExtension
     {
-        static public async Task OpenFileAsync(this IShell shell, string filePath, IEnumerable<IEditorProvider> editorProviders)
+        static public async Task OpenFileAsync(this IShell shell, string filePath, IEnumerable<IEditorProvider> editorProviders, string workingDirectory = null)
         {
             IEditorProvider provider = editorProviders.FirstOrDefault(p => p.Handles(filePath));
             if (provider == null)
             {
+                if (!Path.HasExtension(filePath) && !File.Exists(filePath))
+                {
+                    string assetName = Path.GetFileName(filePath);
+                    string folderPath = Path.GetDirectoryName(filePath) ?? throw new ArgumentException();
+
+                    if (!Path.IsPathRooted(folderPath))
+                        folderPath = Path.Combine(workingDirectory ?? Environment.CurrentDirectory, folderPath);
+
+                    filePath = Directory.EnumerateFiles(folderPath, $"{assetName}.*").FirstOrDefault();
+                    if (filePath == null)
+                        return;
+                }
+                
                 Process.Start(filePath);
                 return;
             }
