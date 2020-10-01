@@ -176,23 +176,24 @@ namespace Calame.PropertyGrid.Controls
 
             foreach (Type newItemType in _newItemTypes)
             {
-                var item = new MenuItem
+                object item = Activator.CreateInstance(newItemType);
+
+                var menuItem = new MenuItem
                 {
                     Header = newItemType.Name,
                     Command = _addItemCommand,
-                    CommandParameter = newItemType
+                    CommandParameter = item,
+                    Icon = IconProvider.GetControl(IconDescriptor.GetIcon(item), 16)
                 };
 
-                contextMenu.Items.Add(item);
+                contextMenu.Items.Add(menuItem);
             }
 
             contextMenu.IsOpen = true;
         }
 
-        private void OnAddItem(object parameter) => OnAddItem((Type)parameter);
-        private void OnAddItem(Type itemType)
+        private void OnAddItem(object item)
         {
-            object item = Activator.CreateInstance(itemType);
             _list.Add(item);
 
             OnPropertyCollectionChanged();
