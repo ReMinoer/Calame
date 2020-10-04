@@ -5,9 +5,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Calame.ContentFileTypes;
 using Calame.Icons;
+using Calame.PropertyGrid.Utils;
 using Diese;
 using Glyph.Composition;
+using Glyph.Pipeline;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
@@ -39,7 +42,12 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(IconDescriptorManager), typeof(IIconDescriptorManager), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnIconDescriptorManagerChanged));
 
         static public readonly DependencyProperty WorkingDirectoryProperty =
-            DependencyProperty.Register(nameof(WorkingDirectory), typeof(string), typeof(CalamePropertyGrid), new PropertyMetadata(null, (o, args) => o.ToString()));
+            DependencyProperty.Register(nameof(WorkingDirectory), typeof(string), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+
+        static public readonly DependencyProperty ContentFileTypeResolverProperty =
+            DependencyProperty.Register(nameof(ContentFileTypeResolver), typeof(IContentFileTypeResolver), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnContentFileTypeResolverChanged));
+        static public readonly DependencyProperty RawContentLibraryProperty =
+            DependencyProperty.Register(nameof(RawContentLibrary), typeof(IRawContentLibrary), typeof(CalamePropertyGrid), new PropertyMetadata(null, OnRawContentLibraryChanged));
 
         static public readonly DependencyProperty PreviousCommandProperty =
             DependencyProperty.Register(nameof(PreviousCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
@@ -203,6 +211,20 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(WorkingDirectoryProperty, value);
         }
 
+        public PropertyGridContentFileTypeResolver PropertyGridContentFileTypeResolver { get; } = new PropertyGridContentFileTypeResolver();
+
+        public IContentFileTypeResolver ContentFileTypeResolver
+        {
+            get => (IContentFileTypeResolver)GetValue(ContentFileTypeResolverProperty);
+            set => SetValue(ContentFileTypeResolverProperty, value);
+        }
+
+        public IRawContentLibrary RawContentLibrary
+        {
+            get => (IRawContentLibrary)GetValue(RawContentLibraryProperty);
+            set => SetValue(RawContentLibraryProperty, value);
+        }
+
         public ICommand PreviousCommand
         {
             get => (ICommand)GetValue(PreviousCommandProperty);
@@ -317,6 +339,20 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.IconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor();
             propertyGrid.SystemIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<CalameIconKey>();
             propertyGrid.ComponentIconDescriptor = propertyGrid.IconDescriptorManager?.GetDescriptor<IGlyphComponent>();
+        }
+
+        static private void OnContentFileTypeResolverChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var propertyGrid = (CalamePropertyGrid)d;
+
+            propertyGrid.PropertyGridContentFileTypeResolver.DefaultResolver = propertyGrid.ContentFileTypeResolver;
+        }
+
+        static private void OnRawContentLibraryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var propertyGrid = (CalamePropertyGrid)d;
+
+            propertyGrid.PropertyGridContentFileTypeResolver.RawContentLibrary = propertyGrid.RawContentLibrary;
         }
 
         private void OnItemSelected(object sender, ItemEventArgs args)

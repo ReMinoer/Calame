@@ -19,6 +19,8 @@
                                      IconProvider="{Binding IconProvider}"
                                      IconDescriptorManager="{Binding IconDescriptorManager}"
                                      WorkingDirectory="{Binding WorkingDirectory}"
+                                     ContentFileTypeResolver="{Binding ContentFileTypeResolver}"
+                                     RawContentLibrary="{Binding RawContentLibrary}"
                                      PreviousCommand="{Binding PreviousCommand}"
                                      NextCommand="{Binding NextCommand}"
                                      OpenFileCommand="{Binding OpenFileCommand}"

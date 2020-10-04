@@ -10,6 +10,8 @@
     <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra.Injection\Simulacra.Injection.csproj" />
     <ProjectReference Include="..\..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj" />
+    <ProjectReference Include="..\..\External\Glyph\Glyph.Pipeline\Glyph.Pipeline.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj" />
   </ItemGroup>
   <ItemGroup>

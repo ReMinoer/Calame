@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Glyph.Composition.Modelization;
 using Glyph.IO;
 
@@ -12,13 +13,13 @@ namespace Calame.DataModelViewer.Base
         protected abstract ISerializationFormat SerializationFormat { get; }
 
         protected SerializingEditorSourceBase(IImportedTypeProvider importedTypeProvider, string displayName, IEnumerable<string> extensions)
-            : base(displayName, extensions)
+            : base(displayName, typeof(T), extensions)
         {
             _importedTypeProvider = importedTypeProvider;
         }
 
         protected SerializingEditorSourceBase(IImportedTypeProvider importedTypeProvider, string displayName, params string[] extensions)
-            : base(displayName, extensions)
+            : base(displayName, typeof(T), extensions)
         {
             _importedTypeProvider = importedTypeProvider;
         }

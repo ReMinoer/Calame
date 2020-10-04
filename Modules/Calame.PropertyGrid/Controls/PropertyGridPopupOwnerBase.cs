@@ -8,10 +8,12 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using Calame.ContentFileTypes;
 using Calame.Icons;
 using Calame.Utils;
 using Diese.Collections;
 using Gemini.Framework;
+using Glyph.Pipeline;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
@@ -54,6 +56,11 @@ namespace Calame.PropertyGrid.Controls
 
         static public readonly DependencyProperty WorkingDirectoryProperty =
             DependencyProperty.Register(nameof(WorkingDirectory), typeof(string), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
+
+        static public readonly DependencyProperty ContentFileTypeResolverProperty =
+            DependencyProperty.Register(nameof(ContentFileTypeResolver), typeof(IContentFileTypeResolver), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
+        static public readonly DependencyProperty RawContentLibraryProperty =
+            DependencyProperty.Register(nameof(RawContentLibrary), typeof(IRawContentLibrary), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
 
         static public readonly DependencyProperty OpenFileCommandProperty =
             DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
@@ -132,6 +139,18 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(WorkingDirectoryProperty, value);
         }
 
+        public IContentFileTypeResolver ContentFileTypeResolver
+        {
+            get => (IContentFileTypeResolver)GetValue(ContentFileTypeResolverProperty);
+            set => SetValue(ContentFileTypeResolverProperty, value);
+        }
+
+        public IRawContentLibrary RawContentLibrary
+        {
+            get => (IRawContentLibrary)GetValue(RawContentLibraryProperty);
+            set => SetValue(RawContentLibraryProperty, value);
+        }
+
         public ICommand OpenFileCommand
         {
             get => (ICommand)GetValue(OpenFileCommandProperty);
@@ -178,6 +197,8 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.SetBinding(CalamePropertyGrid.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.IconDescriptorManagerProperty, new Binding(nameof(IconDescriptorManager)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.WorkingDirectoryProperty, new Binding(nameof(WorkingDirectory)) { Source = this });
+            propertyGrid.SetBinding(CalamePropertyGrid.ContentFileTypeResolverProperty, new Binding(nameof(ContentFileTypeResolver)) { Source = this });
+            propertyGrid.SetBinding(CalamePropertyGrid.RawContentLibraryProperty, new Binding(nameof(RawContentLibrary)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.OpenFileCommandProperty, new Binding(nameof(OpenFileCommand)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.OpenFolderCommandProperty, new Binding(nameof(OpenFolderCommand)) { Source = this });
 

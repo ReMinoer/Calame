@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Calame.ContentFileTypes;
 using Calame.Icons;
 using Calame.PropertyGrid.Controls;
 using Caliburn.Micro;
@@ -12,6 +13,8 @@ using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
+using Glyph.Engine;
+using Glyph.Pipeline;
 
 namespace Calame.PropertyGrid.ViewModels
 {
@@ -40,6 +43,14 @@ namespace Calame.PropertyGrid.ViewModels
             set => SetValue(ref _workingDirectory, value);
         }
 
+        private IRawContentLibrary _rawContentLibrary;
+        public IRawContentLibrary RawContentLibrary
+        {
+            get => _rawContentLibrary;
+            set => SetValue(ref _rawContentLibrary, value);
+        }
+
+        public IContentFileTypeResolver ContentFileTypeResolver { get; }
         public IList<Type> NewItemTypeRegistry { get; }
 
         public AsyncCommand PreviousCommand { get; }
@@ -51,11 +62,12 @@ namespace Calame.PropertyGrid.ViewModels
 
         [ImportingConstructor]
         public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, SelectionHistoryManager selectionHistoryManager,
-            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEditorProvider[] editorProviders)
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEditorProvider[] editorProviders, IContentFileTypeResolver contentFileTypeResolver)
             : base(shell, eventAggregator)
         {
             DisplayName = "Property Grid";
 
+            ContentFileTypeResolver = contentFileTypeResolver;
             NewItemTypeRegistry = importedTypeProvider.Types.Where(t => t.GetConstructor(Type.EmptyTypes) != null).ToList();
 
             SelectionHistoryManager = selectionHistoryManager;
@@ -102,6 +114,8 @@ namespace Calame.PropertyGrid.ViewModels
         {
             SelectedObject = null;
             WorkingDirectory = activeDocument.WorkingDirectory;
+            RawContentLibrary = (activeDocument as IDocumentContext<GlyphEngine>)?.Context.ContentLibrary as IRawContentLibrary;
+
             return Task.CompletedTask;
         }
 
@@ -109,6 +123,8 @@ namespace Calame.PropertyGrid.ViewModels
         {
             SelectedObject = null;
             WorkingDirectory = null;
+            RawContentLibrary = null;
+
             return Task.CompletedTask;
         }
 
