@@ -200,7 +200,7 @@ namespace Calame.UserControls
             var dialog = new OpenFileDialog
             {
                 Filter = FileTypes != null ? string.Join("|", FileTypes.Select(x => $"{x.DisplayName}|{string.Join(";", x.Extensions.Select(ext => "*" + ext))}")) : string.Empty,
-                DefaultExt = FileTypes?.FirstOrDefault().Extensions.First() ?? string.Empty
+                DefaultExt = FileTypes?.FirstOrDefault().Extensions?.First() ?? string.Empty
             };
 
             if (lastPath != null)
