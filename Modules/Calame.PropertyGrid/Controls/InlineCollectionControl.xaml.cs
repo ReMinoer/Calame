@@ -165,7 +165,7 @@ namespace Calame.PropertyGrid.Controls
         {
             if (_newItemTypes.Count == 1)
             {
-                OnAddItem(_newItemTypes[0]);
+                OnAddItem(Activator.CreateInstance(_newItemTypes[0]));
                 return;
             }
 
