@@ -66,8 +66,5 @@ namespace Calame.Viewer.Modules
             Model.EditorModeRoot.RemoveAndDispose(_root);
             _root = null;
         }
-
-
-
     }
 }
