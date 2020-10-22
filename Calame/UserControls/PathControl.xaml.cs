@@ -10,6 +10,7 @@ using Calame.Icons;
 using Glyph.IO;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace Calame.UserControls
 {
@@ -200,21 +201,21 @@ namespace Calame.UserControls
             var dialog = new OpenFileDialog
             {
                 Filter = FileTypes != null ? string.Join("|", FileTypes.Select(x => $"{x.DisplayName}|{string.Join(";", x.Extensions.Select(ext => "*" + ext))}")) : string.Empty,
-                DefaultExt = FileTypes?.FirstOrDefault().Extensions?.First() ?? string.Empty
+                DefaultExt = FileTypes?.FirstOrDefault().Extensions?.First() ?? string.Empty,
+                InitialDirectory = _normalizedRoot
             };
+
+            if (!string.IsNullOrWhiteSpace(_normalizedRoot))
+                dialog.CustomPlaces.Add(new FileDialogCustomPlace(_normalizedRoot));
 
             if (lastPath != null)
             {
                 string systemPath = ConvertToFullPath(lastPath);
                 if (File.Exists(systemPath))
                 {
-                    dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
+                    dialog.InitialDirectory = Path.GetDirectoryName(systemPath) ?? _normalizedRoot;
                     dialog.FileName = Path.GetFileName(systemPath);
                 }
-            }
-            else
-            {
-                dialog.InitialDirectory = _normalizedRoot;
             }
 
             if (dialog.ShowDialog(Window.GetWindow(this)) == true)
@@ -227,21 +228,21 @@ namespace Calame.UserControls
         {
             var dialog = new CommonOpenFileDialog
             {
-                IsFolderPicker = true
+                IsFolderPicker = true,
+                InitialDirectory = _normalizedRoot
             };
+
+            if (!string.IsNullOrWhiteSpace(_normalizedRoot))
+                dialog.AddPlace(_normalizedRoot, FileDialogAddPlaceLocation.Top);
 
             if (lastPath != null)
             {
                 string systemPath = ConvertToFullPath(lastPath);
                 if (Directory.Exists(systemPath))
                 {
-                    dialog.InitialDirectory = Path.GetDirectoryName(_normalizedRoot) ?? _normalizedRoot;
+                    dialog.InitialDirectory = Path.GetDirectoryName(systemPath) ?? _normalizedRoot;
                     dialog.DefaultFileName = Path.GetFileName(systemPath);
                 }
-            }
-            else
-            {
-                dialog.InitialDirectory = _normalizedRoot;
             }
 
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
