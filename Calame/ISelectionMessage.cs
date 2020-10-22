@@ -3,9 +3,8 @@ using Glyph;
 
 namespace Calame
 {
-    public interface ISelectionMessage<out T> : INotifyDisposed
+    public interface ISelectionMessage<out T> : IDocumentMessage, INotifyDisposed
     {
-        IDocumentContext DocumentContext { get; }
         T Item { get; }
         IEnumerable<T> Items { get; }
     }
