@@ -31,13 +31,14 @@ namespace Calame.BrushPanel
         public IViewerModule CreateInstance() => new ViewerModule<IGlyphData, DataCursorBrushController>();
     }
 
-    public interface IBrushViewerModule : IViewerModule, IBrushController<object>
+    public interface IBrushViewerModule : IViewerModule, IViewerInteractiveMode, IBrushController<object>
     {
         IBrush Brush { get; set; }
         IPaint Paint { get; set; }
     }
 
-    public class ViewerModule<TCanvas, TBrushController> : ViewerModuleBase, IBrushViewerModule, IViewerInteractiveMode
+    public class ViewerModule<TCanvas, TBrushController> : ViewerModuleBase, IBrushViewerModule
+        where TCanvas : class
         where TBrushController : SimpleCursorBrushControllerBase<TCanvas, IPaint>
     {
         private GlyphObject _root;
@@ -47,20 +48,38 @@ namespace Calame.BrushPanel
 
         public TCanvas Canvas
         {
-            get => _brushController.Canvas;
-            set => _brushController.Canvas = value;
+            get => _brushController?.Canvas;
+            set
+            {
+                if (_brushController == null)
+                    return;
+
+                _brushController.Canvas = value;
+            }
         }
 
         public IBrush<TCanvas, ISpaceBrushArgs, IPaint> Brush
         {
-            get => _brushController.Brush;
-            set => _brushController.Brush = value;
+            get => _brushController?.Brush;
+            set
+            {
+                if (_brushController == null)
+                    return;
+
+                _brushController.Brush = value;
+            }
         }
         
         public IPaint Paint
         {
-            get => _brushController.Paint;
-            set => _brushController.Paint = value;
+            get => _brushController?.Paint;
+            set
+            {
+                if (_brushController == null)
+                    return;
+
+                _brushController.Paint = value;
+            }
         }
 
         object IBrushController<object>.Canvas
