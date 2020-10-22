@@ -1,4 +1,5 @@
 ﻿using System;
+using Calame.Viewer.ViewModels;
 
 namespace Calame.Viewer
 {

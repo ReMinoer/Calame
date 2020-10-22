@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Icons;
 using Calame.Viewer;
+using Calame.Viewer.Messages;
 using Calame.Viewer.Modules.Base;
+using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
 using Diese.Collections;
 using Fingear.Interactives;
@@ -83,7 +85,7 @@ namespace Calame.SceneViewer.ViewModels
             DefaultViewsCommand = new RelayCommand(x => DefaultViewsAction(), x => Runner?.Engine != null);
             NewViewerCommand = new RelayCommand(x => NewViewerAction(), x => Runner?.Engine != null);
             
-            SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Runner?.Engine != null);
+            SwitchModeCommand = new RelayCommand(OnSwitchMode, x => Runner?.Engine != null);
 
             _iconDescriptorManager = iconDescriptorManager;
             IconProvider = iconProvider;
@@ -132,9 +134,9 @@ namespace Calame.SceneViewer.ViewModels
             Viewer.EditorCamera.SaveAsDefault();
 
             _engine.Start();
-
-            Viewer.SelectedMode = SessionMode;
             await Viewer.Activate();
+
+            await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode));
         }
 
         protected override void OnViewLoaded(object view)
@@ -196,6 +198,11 @@ namespace Calame.SceneViewer.ViewModels
         private void NewViewerAction()
         {
             Task.Run(async () => await _shell.OpenDocumentAsync(new SceneViewerViewModel(this))).Wait();
+        }
+
+        private async void OnSwitchMode(object obj)
+        {
+            await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, (IViewerInteractiveMode)obj));
         }
 
         async Task IHandle<ISelectionRequest<IGlyphComponent>>.HandleAsync(ISelectionRequest<IGlyphComponent> message, CancellationToken cancellationToken)

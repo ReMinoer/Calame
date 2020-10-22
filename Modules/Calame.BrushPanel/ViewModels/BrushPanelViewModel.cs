@@ -10,6 +10,8 @@ using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
 using Calame.Viewer;
+using Calame.Viewer.Messages;
+using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
 using Diese.Collections;
 using Diese.Collections.Observables;
@@ -93,6 +95,7 @@ namespace Calame.BrushPanel.ViewModels
                 }
 
                 EventAggregator.PublishAsync(selectionRequest).Wait();
+                SwitchToBrushModeAsync().Wait();
             }
         }
 
@@ -142,8 +145,8 @@ namespace Calame.BrushPanel.ViewModels
                                         .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
                                         .IconDescription(x => iconDescriptor.GetIcon(x));
 
-            SelectBrushCommand = new RelayCommand(x => SelectedBrush = (IBrushViewModel)x);
-            SelectPaintCommand = new RelayCommand(x => SelectedPaint = (IPaintViewModel)x);
+            SelectBrushCommand = new RelayCommand(OnSelectBrush);
+            SelectPaintCommand = new RelayCommand(OnSelectPaint);
 
             _allEngineBrushes = allEngineBrushes;
             _allDataBrushes = allDataBrushes;
@@ -156,8 +159,6 @@ namespace Calame.BrushPanel.ViewModels
 
         protected override Task OnDocumentActivated(IDocumentContext<ViewerViewModel> activeDocument)
         {
-            _selectedCanvas = null;
-
             _engine = activeDocument.Context.Runner.Engine;
             _viewerModule = activeDocument.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
             _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
@@ -167,11 +168,10 @@ namespace Calame.BrushPanel.ViewModels
             else
                 Items = _engine.Root.Components;
             
-            _brushes.Clear();
             //IBrush previousBrush = _viewerModule.Brush;
             //IPaint previousPaint = _viewerModule.Paint;
 
-            SelectedCanvas = _viewerModule.Canvas;
+            HandleSelection(_viewerModule.Canvas);
             SelectedBrush = _brushes.FirstOrDefault();
 
             //TODO: Handle selection binding
@@ -185,15 +185,12 @@ namespace Calame.BrushPanel.ViewModels
 
         protected override Task OnDocumentsCleaned()
         {
-            _selectedCanvas = null;
+            HandleSelection(null);
+            Items = null;
 
             _engine = null;
             _viewerModule = null;
             _filteringContext = null;
-
-            Items = null;
-            SelectedCanvas = null;
-            _brushes.Clear();
 
             return Task.CompletedTask;
         }
@@ -279,6 +276,12 @@ namespace Calame.BrushPanel.ViewModels
             SelectedBrush = _brushes.FirstOrDefault();
         }
 
+        private void OnSelectBrush(object obj)
+        {
+            SelectedBrush = (IBrushViewModel)obj;
+            SwitchToBrushModeAsync().Wait();
+        }
+
         private void OnBrushChanged()
         {
             SelectedPaint = null;
@@ -287,9 +290,20 @@ namespace Calame.BrushPanel.ViewModels
             SelectedPaint = SelectedBrush?.Paints.FirstOrDefault();
         }
 
+        private void OnSelectPaint(object obj)
+        {
+            SelectedPaint = (IPaintViewModel)obj;
+            SwitchToBrushModeAsync().Wait();
+        }
+
         private void OnPaintChanged()
         {
             _viewerModule.Paint = SelectedPaint?.Paint;
+        }
+
+        private Task SwitchToBrushModeAsync()
+        {
+            return EventAggregator.PublishAsync(new SwitchViewerModeRequest<IBrushViewerModule>(CurrentDocument));
         }
     }
 }

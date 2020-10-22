@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Icons;
+using Calame.Viewer.Messages;
 using Calame.Viewer.Modules;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
@@ -23,16 +25,16 @@ using Glyph.Tools;
 using Glyph.UI;
 using Glyph.WpfInterop;
 
-namespace Calame.Viewer
+namespace Calame.Viewer.ViewModels
 {
-    public class ViewerViewModel : PropertyChangedBase, IDisposable
+    public class ViewerViewModel : PropertyChangedBase, IHandle<ISwitchViewerModeRequest>, IDisposable
     {
         private readonly IViewerViewModelOwner _owner;
         private readonly IEventAggregator _eventAggregator;
 
         private GlyphWpfRunner _runner;
         private readonly InteractiveToggle _viewerModeToggle;
-        private readonly ObservableList<IViewerInteractiveMode> _interactiveModes;
+        private readonly ObservableList<ViewerInteractiveModeViewModel> _interactiveModes;
         private readonly EditorModeModule _editorModeModule;
         private IInteractive _editorInteractive;
 
@@ -46,25 +48,16 @@ namespace Calame.Viewer
         public GlyphObject EditorModeRoot => _editorModeModule.Root;
 
         public ReadOnlyList<IViewerModule> Modules { get; }
-        public ReadOnlyObservableList<IViewerInteractiveMode> InteractiveModes { get; }
+        public ReadOnlyObservableList<ViewerInteractiveModeViewModel> InteractiveModes { get; }
 
         public ComponentFilter ComponentsFilter { get; }
         public ISelectionSpread<object> LastSelection { get; set; }
 
-        private IViewerInteractiveMode _selectedNode;
-
+        private IViewerInteractiveMode _selectedMode;
         public IViewerInteractiveMode SelectedMode
         {
-            get => _selectedNode;
-            set
-            {
-                if (!this.SetValue(ref _selectedNode, value))
-                    return;
-
-                _viewerModeToggle.SelectedInteractive = SelectedMode.Interactive;
-                Cursor = SelectedMode.Cursor;
-                EditorCamera.Enabled = SelectedMode.UseFreeCamera;
-            }
+            get => _selectedMode;
+            private set => this.SetValue(ref _selectedMode, value);
         }
 
         private Cursor _cursor;
@@ -144,11 +137,12 @@ namespace Calame.Viewer
         {
             _owner = owner;
             _eventAggregator = eventAggregator;
+            _eventAggregator.SubscribeOnUI(this);
 
             _viewerModeToggle = new InteractiveToggle { Name = "Viewer Modes" };
 
-            _interactiveModes = new ObservableList<IViewerInteractiveMode>();
-            InteractiveModes = new ReadOnlyObservableList<IViewerInteractiveMode>(_interactiveModes);
+            _interactiveModes = new ObservableList<ViewerInteractiveModeViewModel>();
+            InteractiveModes = new ReadOnlyObservableList<ViewerInteractiveModeViewModel>(_interactiveModes);
 
             _editorModeModule = new EditorModeModule();
             var componentSelectorModule = new BoxedComponentSelectorModule(_eventAggregator);
@@ -181,20 +175,42 @@ namespace Calame.Viewer
 
         public void AddInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
-            _interactiveModes.Add(interactiveMode);
+            _interactiveModes.Add(new ViewerInteractiveModeViewModel(interactiveMode));
             _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void InsertInteractiveMode(int index, IViewerInteractiveMode interactiveMode)
         {
-            _interactiveModes.Insert(index, interactiveMode);
+            _interactiveModes.Insert(index, new ViewerInteractiveModeViewModel(interactiveMode));
             _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void RemoveInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
             _viewerModeToggle.Remove(interactiveMode.Interactive);
-            _interactiveModes.Remove(interactiveMode);
+            _interactiveModes.Remove(_interactiveModes.First(x => x.InteractiveModel == interactiveMode));
+        }
+
+        public Task HandleAsync(ISwitchViewerModeRequest message, CancellationToken cancellationToken)
+        {
+            if (message.DocumentContext != _owner)
+                return Task.CompletedTask;
+
+            ViewerInteractiveModeViewModel modeViewModel = InteractiveModes.FirstOrDefault(x => message.Match(x.InteractiveModel));
+            if (modeViewModel == null)
+                return Task.CompletedTask;
+
+            IViewerInteractiveMode mode = modeViewModel.InteractiveModel;
+
+            SelectedMode = mode;
+            modeViewModel.IsActive = true;
+            _viewerModeToggle.SelectedInteractive = SelectedMode.Interactive;
+
+            Cursor = SelectedMode.Cursor;
+            EditorCamera.Enabled = SelectedMode.UseFreeCamera;
+
+            ISwitchViewerModeSpread messageSpread = message.Promoted(mode);
+            return _eventAggregator.PublishAsync(messageSpread, cancellationToken);
         }
 
         private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => Activate();

@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Calame.Viewer.Modules.Base;
+using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
 using Glyph.Composition;
 using Glyph.Core;

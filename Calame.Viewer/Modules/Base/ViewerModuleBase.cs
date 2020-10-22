@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using Calame.Viewer.ViewModels;
+using Caliburn.Micro;
 using Glyph.WpfInterop;
 
 namespace Calame.Viewer.Modules.Base

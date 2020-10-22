@@ -8,6 +8,8 @@ using System.Windows;
 using System.Windows.Input;
 using Calame.Icons;
 using Calame.Viewer;
+using Calame.Viewer.Messages;
+using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Glyph;
@@ -56,7 +58,7 @@ namespace Calame.DataModelViewer.ViewModels
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             
-            SwitchModeCommand = new RelayCommand(x => Viewer.SelectedMode = (IViewerInteractiveMode)x, x => Viewer.Runner?.Engine != null);
+            SwitchModeCommand = new RelayCommand(OnSwitchMode, x => Viewer.Runner?.Engine != null);
 
             DragOverCommand = new RelayCommand(x => Editor.OnDragOver((DragEventArgs)x));
             DropCommand = new RelayCommand(x => Editor.OnDrop((DragEventArgs)x));
@@ -112,11 +114,13 @@ namespace Calame.DataModelViewer.ViewModels
             }
 
             _engine.Start();
-            
-            Viewer.SelectedMode = Viewer.InteractiveModes.FirstOrDefault();
             await Viewer.Activate();
 
             await EventAggregator.PublishAsync(new SelectionRequest<IGlyphData>(this, Editor.Data));
+
+            IViewerInteractiveMode interactiveMode = Viewer.InteractiveModes.FirstOrDefault()?.InteractiveModel;
+            if (interactiveMode != null)
+                await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, interactiveMode));
         }
 
         protected override void OnViewLoaded(object view)
@@ -135,6 +139,11 @@ namespace Calame.DataModelViewer.ViewModels
             Viewer.Dispose();
 
             return Task.CompletedTask;
+        }
+
+        private async void OnSwitchMode(object obj)
+        {
+            await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, (IViewerInteractiveMode)obj));
         }
 
         async Task IHandle<ISelectionRequest<IGlyphData>>.HandleAsync(ISelectionRequest<IGlyphData> message, CancellationToken cancellationToken)
