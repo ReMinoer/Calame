@@ -13,7 +13,6 @@ using Glyph.Core.Inputs;
 using Glyph.Tools.Brushing;
 using Glyph.Tools.Brushing.Controllers;
 using Glyph.Tools.Brushing.Space;
-using MahApps.Metro.IconPacks;
 using MouseButton = Fingear.MonoGame.Inputs.MouseButton;
 
 namespace Calame.BrushPanel
