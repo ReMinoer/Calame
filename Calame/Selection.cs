@@ -95,6 +95,9 @@ namespace Calame
                         return;
 
                     _item = enumerator.Current;
+                    if (_item == null)
+                        return;
+
                     _item.Disposed += OnItemDisposed;
 
                     _others = enumerator.AsEnumerable().ToArray();
