@@ -15,14 +15,21 @@
     <UserControl.Resources>
         <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}" />
     </UserControl.Resources>
-    <StackPanel Orientation="Vertical" x:Name="BrushPanelRoot">
-        <StackPanel>
-            <userControls:CalameTreeView MinWidth="200"
-                                         Height="300"
-                                         TreeContext="{Binding}"
-                                         ItemsSource="{Binding Items}"
-                                         SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"
-                                         IconProvider="{Binding IconProvider}" />
+    <Grid x:Name="BrushPanelRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="3*" />
+        </Grid.RowDefinitions>
+        <userControls:CalameTreeView TreeContext="{Binding}"
+                                     ItemsSource="{Binding Items}"
+                                     SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"
+                                     IconProvider="{Binding IconProvider}"/>
+        <GridSplitter Grid.Row="0"
+                      VerticalAlignment="Bottom"
+                      HorizontalAlignment="Stretch"
+                      ShowsPreview="True"
+                      Height="5"/>
+        <StackPanel Grid.Row="1">
             <ItemsControl ItemsSource="{Binding Brushes}"
                           AlternationCount="{x:Static system:Int32.MaxValue}">
                 <ItemsControl.ItemsPanel>
@@ -100,5 +107,5 @@
                                          IconProvider="{Binding IconProvider}"
                                          IconDescriptorManager="{Binding IconDescriptorManager}" />
         </StackPanel>
-    </StackPanel>
+    </Grid>
 </UserControl>
