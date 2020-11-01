@@ -7,12 +7,19 @@ namespace Calame.UserControls.Base
     public abstract class VectorControlBase<TControl, TVector, TComponent> : UserControl
         where TControl : UpDownBase<TComponent>, new()
     {
-        static public readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(TVector), typeof(VectorControlBase<TControl, TVector, TComponent>), new PropertyMetadata(default(TVector), PropertyChangedCallback));
-        
+        static public readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(TVector), typeof(VectorControlBase<TControl, TVector, TComponent>), new PropertyMetadata(default(TVector), OnValueChanged));
+        static public readonly DependencyProperty UpdateValueOnEnterKeyProperty = DependencyProperty.Register(nameof(UpdateValueOnEnterKey), typeof(bool), typeof(VectorControlBase<TControl, TVector, TComponent>), new PropertyMetadata(false, OnUpdateValueOnEnterKeyChanged));
+
         public TVector Value
         {
             get => (TVector)GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
+        }
+
+        public bool UpdateValueOnEnterKey
+        {
+            get => (bool)GetValue(UpdateValueOnEnterKeyProperty);
+            set => SetValue(UpdateValueOnEnterKeyProperty, value);
         }
 
         private readonly TControl[] _controls;
@@ -24,7 +31,11 @@ namespace Calame.UserControls.Base
             _controls = new TControl[componentCount];
             for (int i = 0; i < componentCount; i++)
             {
-                var control = new TControl { TextAlignment = TextAlignment.Left };
+                var control = new TControl
+                {
+                    TextAlignment = TextAlignment.Left,
+                    UpdateValueOnEnterKey = UpdateValueOnEnterKey
+                };
                 control.ValueChanged += ControlOnValueChanged;
 
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -37,7 +48,7 @@ namespace Calame.UserControls.Base
             Content = grid;
         }
         
-        static private void PropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        static private void OnValueChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
         {
             var vectorControlBase = (VectorControlBase<TControl, TVector, TComponent>)dependencyObject;
 
@@ -48,8 +59,17 @@ namespace Calame.UserControls.Base
                 return;
             }
 
+            var vector = (TVector)e.NewValue;
             for (int i = 0; i < vectorControlBase._controls.Length; i++)
-                vectorControlBase._controls[i].Value = vectorControlBase.GetComponent((TVector)e.NewValue, i);
+                vectorControlBase._controls[i].Value = vectorControlBase.GetComponent(vector, i);
+        }
+
+        static private void OnUpdateValueOnEnterKeyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        {
+            var vectorControlBase = (VectorControlBase<TControl, TVector, TComponent>)dependencyObject;
+
+            foreach (TControl control in vectorControlBase._controls)
+                control.UpdateValueOnEnterKey = (bool)e.NewValue;
         }
 
         private void ControlOnValueChanged(object sender, RoutedPropertyChangedEventArgs<object> routedPropertyChangedEventArgs)
