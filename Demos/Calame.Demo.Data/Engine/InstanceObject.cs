@@ -7,10 +7,11 @@ namespace Calame.Demo.Data.Engine
     {
         public SceneNode SceneNode { get; }
 
+        private IGlyphComponent _component;
         public IGlyphComponent Component
         {
-            get => GetComponentProperty();
-            set => SetComponentProperty(value);
+            get => _component;
+            set => SetPropertyComponent(ref _component, value, disposeOnRemove: true);
         }
 
         public InstanceObject(GlyphResolveContext context)

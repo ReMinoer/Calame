@@ -7,6 +7,7 @@ using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Tools.Brushing;
 using Glyph.Tools.Brushing.Space;
+using Niddle;
 
 namespace Calame.BrushPanel.ViewModels
 {
@@ -34,11 +35,15 @@ namespace Calame.BrushPanel.ViewModels
         {
             return canvas is TCanvas;
         }
+
+        public IGlyphComponent CreateCursor(IDependencyResolver dependencyResolver) => Brush.CreateCursor(dependencyResolver);
     }
 
     public abstract class EngineBrushViewModelBase<TCanvas, TArgs, TPaint> : BrushViewModelBase<TCanvas, TArgs, TPaint>, IEngineBrushViewModel
         where TPaint : IPaint
     {
+        public void Update(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
+            => Brush.Update((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanStartApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
             => Brush.CanStartApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void StartApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
@@ -60,6 +65,8 @@ namespace Calame.BrushPanel.ViewModels
     public abstract class DataBrushViewModelBase<TCanvas, TArgs, TPaint> : BrushViewModelBase<TCanvas, TArgs, TPaint>, IDataBrushViewModel
         where TPaint : IPaint
     {
+        public void Update(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
+            => Brush.Update((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanStartApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
             => Brush.CanStartApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void StartApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
@@ -104,7 +111,9 @@ namespace Calame.BrushPanel.ViewModels
         {
             return canvas is TComponentCanvas || canvas is TDataCanvas;
         }
-        
+
+        public void Update(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
+            => ComponentBrush.Update((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanStartApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
             => ComponentBrush.CanStartApply((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void StartApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
@@ -121,7 +130,9 @@ namespace Calame.BrushPanel.ViewModels
             => ComponentBrush.OnCancellation((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void OnInvalidEnd(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
             => ComponentBrush.OnInvalidEnd((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
-        
+
+        public void Update(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
+            => DataBrush.Update((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanStartApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
             => DataBrush.CanStartApply((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void StartApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
@@ -138,5 +149,7 @@ namespace Calame.BrushPanel.ViewModels
             => DataBrush.OnCancellation((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void OnInvalidEnd(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
             => DataBrush.OnInvalidEnd((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
+
+        public IGlyphComponent CreateCursor(IDependencyResolver dependencyResolver) => ComponentBrush.CreateCursor(dependencyResolver);
     }
 }

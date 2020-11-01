@@ -39,7 +39,7 @@ namespace Calame.BrushPanel
 
     public class ViewerModule<TCanvas, TBrushController> : ViewerModuleBase, IBrushViewerModule
         where TCanvas : class
-        where TBrushController : SimpleCursorBrushControllerBase<TCanvas, IPaint>
+        where TBrushController : SimpleCursorBrushControllerBase<TCanvas, IBrush<TCanvas, ISpaceBrushArgs, IPaint>, IPaint>
     {
         private GlyphObject _root;
         private TBrushController _brushController;
