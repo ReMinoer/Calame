@@ -64,9 +64,6 @@ namespace Calame.PropertyGrid.Controls
 
         private readonly RelayCommand _addItemCommand;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
         static InlineCollectionControl()
         {
             NewItemTypeRegistryProperty.OverrideMetadata(typeof(InlineCollectionControl), new PropertyMetadata(null, OnNewItemTypeRegistryChanged));
@@ -165,7 +162,7 @@ namespace Calame.PropertyGrid.Controls
         {
             if (_newItemTypes.Count == 1)
             {
-                OnAddItem(Activator.CreateInstance(_newItemTypes[0]));
+                OnAddItem(_newItemTypes[0]);
                 return;
             }
 
@@ -174,16 +171,17 @@ namespace Calame.PropertyGrid.Controls
                 PlacementTarget = (UIElement)sender
             };
 
-            foreach (Type newItemType in _newItemTypes)
-            {
-                object item = Activator.CreateInstance(newItemType);
+            string[] typeNames = _newItemTypes.Select(x => x.Name).ToArray();
+            ReduceTypeNamePatterns(typeNames);
 
+            for (int i = 0; i < _newItemTypes.Count; i++)
+            {
                 var menuItem = new MenuItem
                 {
-                    Header = newItemType.Name,
+                    Header = typeNames[i],
                     Command = _addItemCommand,
-                    CommandParameter = item,
-                    Icon = IconProvider.GetControl(IconDescriptor.GetIcon(item), 16)
+                    CommandParameter = _newItemTypes[i],
+                    Icon = IconProvider.GetControl(IconDescriptor.GetTypeIcon(_newItemTypes[i]), 16)
                 };
 
                 contextMenu.Items.Add(menuItem);
@@ -192,8 +190,9 @@ namespace Calame.PropertyGrid.Controls
             contextMenu.IsOpen = true;
         }
 
-        private void OnAddItem(object item)
+        private void OnAddItem(object type)
         {
+            object item = Activator.CreateInstance((Type)type);
             _list.Add(item);
 
             OnPropertyCollectionChanged();
@@ -354,6 +353,46 @@ namespace Calame.PropertyGrid.Controls
                 Data = data;
                 Index = index;
             }
+        }
+
+        static private void ReduceTypeNamePatterns(string[] values)
+        {
+            while (true)
+            {
+                int upperIndex = values[0].Skip(1).IndexOf(char.IsUpper) + 1;
+                if (upperIndex <= 0)
+                    break;
+
+                string prefix = values[0].Substring(0, upperIndex);
+                if (!values.Skip(1).All(x => x.StartsWith(prefix)))
+                    break;
+
+                for (int i = 0; i < values.Length; i++)
+                    values[i] = values[i].Substring(prefix.Length);
+            }
+
+            while (true)
+            {
+                int upperIndex = LastIndexOf(values[0], char.IsUpper);
+                if (upperIndex == -1)
+                    break;
+
+                int suffixLength = values[0].Length - upperIndex;
+                string suffix = values[0].Substring(upperIndex, suffixLength);
+                if (!values.Skip(1).All(x => x.EndsWith(suffix)))
+                    break;
+
+                for (int i = 0; i < values.Length; i++)
+                    values[i] = values[i].Substring(0, values[i].Length - suffixLength);
+            }
+        }
+
+        static public int LastIndexOf(string value, Predicate<char> predicate)
+        {
+            for (int i = value.Length - 1; i >= 0; i--)
+                if (predicate(value[i]))
+                    return i;
+            return -1;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Calame.Icons.Base
 {
@@ -16,5 +17,41 @@ namespace Calame.Icons.Base
         protected abstract TTarget GetTarget(T model);
         public override IconDescription GetIcon(T model) => _modules.Select(x => x.GetIcon(GetTarget(model))).FirstOrDefault(x => x.Defined);
         public override IconDescription GetDefaultIcon(T model) => _defaultModule.GetDefaultIcon(GetTarget(model));
+    }
+
+    public abstract class TypeReTargetingHybridDescriptorModuleBase<T, TTarget> : ReTargetingHybridDescriptorModuleBase<T, TTarget>, ITypeIconDescriptorModule<T>, ITypeDefaultIconDescriptorModule<T>
+    {
+        private readonly ITypeIconDescriptorModule<TTarget>[] _typeModules;
+        private readonly ITypeDefaultIconDescriptorModule<TTarget> _typeDefaultModules;
+
+        protected TypeReTargetingHybridDescriptorModuleBase(IIconDescriptorModule<TTarget>[] modules, IDefaultIconDescriptorModule<TTarget> defaultModule,
+            ITypeIconDescriptorModule<TTarget>[] typeModules, ITypeDefaultIconDescriptorModule<TTarget> typeDefaultModules)
+            : base(modules, defaultModule)
+        {
+            _typeModules = typeModules;
+            _typeDefaultModules = typeDefaultModules;
+        }
+
+        protected abstract Type GetTypeTarget(Type type);
+        public IconDescription GetTypeIcon(Type type) => _typeModules.Select(x => x.GetTypeIcon(GetTypeTarget(type))).FirstOrDefault(x => x.Defined);
+        public IconDescription GetTypeDefaultIcon(Type type) => _typeDefaultModules.GetTypeDefaultIcon(GetTypeTarget(type));
+
+        public override IconDescription GetIcon(T model)
+        {
+            IconDescription result = base.GetIcon(model);
+            if (result.Defined)
+                return result;
+
+            return GetTypeIcon(model?.GetType());
+        }
+
+        public override IconDescription GetDefaultIcon(T model)
+        {
+            IconDescription result = base.GetDefaultIcon(model);
+            if (result.Defined)
+                return result;
+
+            return GetTypeDefaultIcon(model?.GetType());
+        }
     }
 }

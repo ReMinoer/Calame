@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Media;
 using Calame.Icons.Base;
+using Diese;
 using Diese.Collections;
 using Fingear.Controls;
 using Fingear.Inputs;
@@ -16,21 +17,57 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(IDefaultIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<IControl>))]
     [Export(typeof(IDefaultIconDescriptorModule<IControl>))]
-    public class ControlIconDescriptor : HybridIconDescriptorModuleBase<IControl>
+    [Export(typeof(ITypeIconDescriptorModule))]
+    [Export(typeof(ITypeDefaultIconDescriptorModule))]
+    [Export(typeof(ITypeIconDescriptorModule<IControl>))]
+    [Export(typeof(ITypeDefaultIconDescriptorModule<IControl>))]
+    public class ControlIconDescriptor : HybridIconDescriptorModuleBase<IControl>, ITypeIconDescriptorModule<IControl>, ITypeDefaultIconDescriptorModule<IControl>
     {
-        static private PackIconMaterialKind DefaultBoxIcon = PackIconMaterialKind.CheckboxBlank;
-        static private PackIconMaterialKind DefaultCircleIcon = PackIconMaterialKind.Circle;
+        static private PackIconMaterialKind DefaultButtonIcon = PackIconMaterialKind.CircleBox;
+        static private PackIconMaterialKind DefaultTriggerIcon = PackIconMaterialKind.CommaBox;
+        static private PackIconMaterialKind DefaultThumbstickIcon = PackIconMaterialKind.CircleMultiple;
 
         static public readonly Brush DefaultCategoryBrush = Brushes.DimGray;
 
         static public readonly Brush KeyboardCategoryBrush = Brushes.DarkMagenta;
         static public readonly Brush MouseCategoryBrush = Brushes.DeepPink;
+        static public readonly Brush GamePadCategoryBrush = Brushes.Salmon;
+
+        public IconDescription GetTypeDefaultIcon(Type type)
+        {
+            if (type.Is<IControl>())
+                return new IconDescription(PackIconMaterialKind.GestureTap, DefaultCategoryBrush);
+
+            return IconDescription.None;
+        }
+
+        public IconDescription GetTypeIcon(Type type)
+        {
+            if (type.Is<KeyInput>())
+                return new IconDescription(DefaultButtonIcon, KeyboardCategoryBrush);
+
+            if (type.Is<MouseButtonInput>())
+                return new IconDescription(DefaultButtonIcon, MouseCategoryBrush);
+            if (type.Is<MouseWheelInput>())
+                return new IconDescription(PackIconMaterialKind.ArrowUpDownBold, MouseCategoryBrush);
+            if (type.Is<MouseCursorInput>())
+                return new IconDescription(PackIconMaterialKind.Mouse, MouseCategoryBrush);
+
+            if (type.Is<GamePadButtonInput>())
+                return new IconDescription(DefaultButtonIcon, GamePadCategoryBrush);
+            if (type.Is<GamePadTriggerInput>())
+                return new IconDescription(DefaultTriggerIcon, GamePadCategoryBrush);
+            if (type.Is<GamePadThumbstickInput>())
+                return new IconDescription(DefaultThumbstickIcon, GamePadCategoryBrush);
+
+            return IconDescription.None;
+        }
 
         public override IconDescription GetDefaultIcon(IControl control)
         {
             if (IsHybrid(control))
                 return new IconDescription(PackIconMaterialKind.CheckboxMultipleBlankCircle, DefaultCategoryBrush);
-
+            
             return new IconDescription(PackIconMaterialKind.GestureTap, DefaultCategoryBrush);
         }
 
@@ -58,9 +95,9 @@ namespace Calame.Icons.Descriptors
                 case GamePadButtonInput input:
                     return GetGamepadButtonIconDescription(input.Button);
                 case GamePadTriggerInput input:
-                    return new IconDescription(GetGamepadTriggerIcon(input.Trigger), DefaultCategoryBrush);
+                    return new IconDescription(GetGamepadTriggerIcon(input.Trigger), GamePadCategoryBrush);
                 case GamePadThumbstickInput input:
-                    return new IconDescription(GetGamepadThumbstickIcon(input.Thumbstick), DefaultCategoryBrush);
+                    return new IconDescription(GetGamepadThumbstickIcon(input.Thumbstick), GamePadCategoryBrush);
 
                 default:
                     return IconDescription.None;
@@ -116,7 +153,7 @@ namespace Calame.Icons.Descriptors
                 case Keys.VolumeDown: return PackIconMaterialKind.VolumeMinus;
                 case Keys.VolumeMute: return PackIconMaterialKind.VolumeMute;
                 
-                default: return DefaultBoxIcon;
+                default: return DefaultButtonIcon;
             }
         }
         
@@ -127,7 +164,7 @@ namespace Calame.Icons.Descriptors
                 case MouseButton.Left: return PackIconMaterialKind.AlphaLBox;
                 case MouseButton.Right: return PackIconMaterialKind.AlphaRBox;
                 case MouseButton.Middle: return PackIconMaterialKind.AlphaMBox;
-                default: return DefaultBoxIcon;
+                default: return DefaultButtonIcon;
             }
         }
 
@@ -150,7 +187,7 @@ namespace Calame.Icons.Descriptors
                 case GamePadButton.Start: return new IconDescription(PackIconMaterialKind.MicrosoftXboxControllerMenu, DefaultCategoryBrush);
                 case GamePadButton.Back: return new IconDescription(PackIconMaterialKind.MicrosoftXboxControllerView, DefaultCategoryBrush);
                 case GamePadButton.BigButton: return new IconDescription(PackIconMaterialKind.MicrosoftXbox, DefaultCategoryBrush);
-                default: return new IconDescription(DefaultCircleIcon, DefaultCategoryBrush);
+                default: return new IconDescription(DefaultButtonIcon, GamePadCategoryBrush);
             }
         }
 
@@ -160,7 +197,7 @@ namespace Calame.Icons.Descriptors
             {
                 case GamePadTrigger.Left: return PackIconMaterialKind.AlphaLBoxOutline;
                 case GamePadTrigger.Right: return PackIconMaterialKind.AlphaRBoxOutline;
-                default: return DefaultBoxIcon;
+                default: return DefaultTriggerIcon;
             }
         }
 
@@ -170,7 +207,7 @@ namespace Calame.Icons.Descriptors
             {
                 case GamePadThumbstick.Left: return PackIconMaterialKind.AlphaLCircle;
                 case GamePadThumbstick.Right: return PackIconMaterialKind.AlphaRCircle;
-                default: return DefaultCircleIcon;
+                default: return DefaultThumbstickIcon;
             }
         }
 

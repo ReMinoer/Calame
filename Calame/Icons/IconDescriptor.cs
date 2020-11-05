@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Calame.Icons
 {
@@ -6,12 +7,18 @@ namespace Calame.Icons
     {
         private readonly IIconDescriptorModule[] _modules;
         private readonly IDefaultIconDescriptorModule[] _defaultModules;
+        private readonly ITypeIconDescriptorModule[] _typeModules;
+        private readonly ITypeDefaultIconDescriptorModule[] _typeDefaultModules;
         private readonly IBaseTypeIconDescriptorModule[] _baseTypeModules;
 
-        public IconDescriptor(IIconDescriptorModule[] modules, IDefaultIconDescriptorModule[] defaultModules, IBaseTypeIconDescriptorModule[] baseTypeModules)
+        public IconDescriptor(IIconDescriptorModule[] modules, IDefaultIconDescriptorModule[] defaultModules,
+            ITypeIconDescriptorModule[] typeModules, ITypeDefaultIconDescriptorModule[] typeDefaultModules,
+            IBaseTypeIconDescriptorModule[] baseTypeModules)
         {
             _modules = modules;
             _defaultModules = defaultModules;
+            _typeModules = typeModules;
+            _typeDefaultModules = typeDefaultModules;
             _baseTypeModules = baseTypeModules;
         }
 
@@ -27,17 +34,35 @@ namespace Calame.Icons
 
             return _baseTypeModules.Select(x => x.GetBaseTypeIcon(model)).FirstOrDefault(x => x.Defined);
         }
+
+        public IconDescription GetTypeIcon(Type type)
+        {
+            IconDescription icon = _typeModules.Select(x => x.GetTypeIcon(type)).FirstOrDefault(x => x.Defined);
+            if (icon.Defined)
+                return icon;
+
+            icon = _typeDefaultModules.Select(x => x.GetTypeDefaultIcon(type)).FirstOrDefault(x => x.Defined);
+            if (icon.Defined)
+                return icon;
+
+            return _baseTypeModules.Select(x => x.GetBaseTypeIcon(type)).FirstOrDefault(x => x.Defined);
+        }
     }
 
     public class IconDescriptor<T> : IIconDescriptor<T>
     {
         private readonly IIconDescriptorModule<T>[] _modules;
         private readonly IDefaultIconDescriptorModule<T>[] _defaultModules;
+        private readonly ITypeIconDescriptorModule<T>[] _typeModules;
+        private readonly ITypeDefaultIconDescriptorModule<T>[] _typeDefaultModules;
 
-        public IconDescriptor(IIconDescriptorModule<T>[] modules, IDefaultIconDescriptorModule<T>[] defaultModules)
+        public IconDescriptor(IIconDescriptorModule<T>[] modules, IDefaultIconDescriptorModule<T>[] defaultModules,
+            ITypeIconDescriptorModule<T>[] typeModules, ITypeDefaultIconDescriptorModule<T>[] typeDefaultModules)
         {
             _modules = modules;
             _defaultModules = defaultModules;
+            _typeModules = typeModules;
+            _typeDefaultModules = typeDefaultModules;
         }
 
         public IconDescription GetIcon(T model)
@@ -47,6 +72,15 @@ namespace Calame.Icons
                 return icon;
 
             return _defaultModules.Select(x => x.GetDefaultIcon(model)).FirstOrDefault(x => x.Defined);
+        }
+
+        public IconDescription GetTypeIcon(Type type)
+        {
+            IconDescription icon = _typeModules.Select(x => x.GetTypeIcon(type)).FirstOrDefault(x => x.Defined);
+            if (icon.Defined)
+                return icon;
+
+            return _typeDefaultModules.Select(x => x.GetTypeDefaultIcon(type)).FirstOrDefault(x => x.Defined);
         }
 
         IconDescription IIconDescriptor.GetIcon(object model) => model is T obj ? GetIcon(obj) : IconDescription.None;

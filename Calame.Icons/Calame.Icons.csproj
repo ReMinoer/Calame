@@ -23,7 +23,7 @@
     <ProjectReference Include="..\External\Glyph\Glyph\Glyph.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.2.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.8.0" />
     <PackageReference Include="MonoGame.Framework.Portable" Version="3.7.1.189" PrivateAssets="All" />
   </ItemGroup>
 </Project>

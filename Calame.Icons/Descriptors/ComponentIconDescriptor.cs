@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Media;
 using Calame.Icons.Base;
+using Diese;
 using Glyph;
 using Glyph.Animation;
 using Glyph.Animation.Motors.Base;
@@ -25,7 +27,11 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(IDefaultIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<IGlyphComponent>))]
     [Export(typeof(IDefaultIconDescriptorModule<IGlyphComponent>))]
-    public class ComponentIconDescriptor : HybridIconDescriptorModuleBase<IGlyphComponent>
+    [Export(typeof(ITypeIconDescriptorModule))]
+    [Export(typeof(ITypeDefaultIconDescriptorModule))]
+    [Export(typeof(ITypeIconDescriptorModule<IGlyphComponent>))]
+    [Export(typeof(ITypeDefaultIconDescriptorModule<IGlyphComponent>))]
+    public class ComponentIconDescriptor : TypeHybridIconDescriptorModuleBase<IGlyphComponent>
     {
         static public readonly Brush CoreCategoryBrush = Brushes.DimGray;
         static public readonly Brush SceneGraphCategoryBrush = Brushes.RoyalBlue;
@@ -37,99 +43,94 @@ namespace Calame.Icons.Descriptors
         static public readonly Brush ScriptingCategoryBrush = Brushes.DarkOrange;
         static public readonly Brush UiCategoryBrush = Brushes.Goldenrod;
         static public readonly Brush ToolCategoryBrush = Brushes.Black;
-        
-        public override IconDescription GetDefaultIcon(IGlyphComponent glyphComponent)
+
+        public override IconDescription GetTypeDefaultIcon(Type type)
         {
-            switch (glyphComponent)
-            {
-                case IGlyphContainer _:
-                    return new IconDescription(PackIconMaterialKind.HexagonMultiple, CoreCategoryBrush);
-                default:
-                    return new IconDescription(PackIconMaterialKind.Hexagon, CoreCategoryBrush);
-            }
+            if (type.Is<IGlyphContainer>())
+                return new IconDescription(PackIconMaterialKind.HexagonMultiple, CoreCategoryBrush);
+            if (type.Is<IGlyphComponent>())
+                return new IconDescription(PackIconMaterialKind.Hexagon, CoreCategoryBrush);
+
+            return IconDescription.None;
         }
 
-        public override IconDescription GetIcon(IGlyphComponent glyphComponent)
+        public override IconDescription GetTypeIcon(Type type)
         {
-            switch (glyphComponent)
-            {
-                case ISceneNode _:
-                    return new IconDescription(PackIconMaterialKind.AxisArrow, SceneGraphCategoryBrush);
-                case ICamera _:
-                    return new IconDescription(PackIconMaterialKind.Video, SceneGraphCategoryBrush);
-                case IView _:
-                    return new IconDescription(PackIconMaterialKind.Monitor, SceneGraphCategoryBrush);
-                    
-                case IAnimationPlayer _:
-                    return new IconDescription(PackIconMaterialKind.Animation, AnimationCategoryBrush);
-                case IAnimationGraph _:
-                    return new IconDescription(PackIconMaterialKind.LockPattern, AnimationCategoryBrush);
-                case Motion _:
-                    return new IconDescription(PackIconMaterialKind.RunFast, AnimationCategoryBrush);
-                case MotorBase _:
-                    return new IconDescription(PackIconMaterialKind.Engine, AnimationCategoryBrush);
+            if (type.Is<ISceneNode>())
+                return new IconDescription(PackIconMaterialKind.AxisArrow, SceneGraphCategoryBrush);
+            if (type.Is<ICamera>())
+                return new IconDescription(PackIconMaterialKind.Video, SceneGraphCategoryBrush);
+            if (type.Is<IView>())
+                return new IconDescription(PackIconMaterialKind.Monitor, SceneGraphCategoryBrush);
 
-                case ISpriteSheet _:
-                    return new IconDescription(PackIconMaterialKind.ImageMultiple, GraphicsCategoryBrush);
-                case ISpriteSource _:
-                    return new IconDescription(PackIconMaterialKind.Image, GraphicsCategoryBrush);
-                case SpriteTransformer _:
-                    return new IconDescription(PackIconMaterialKind.Compare, GraphicsCategoryBrush);
-                case FillingRectangle _:
-                    return new IconDescription(PackIconMaterialKind.CameraMeteringMatrix, GraphicsCategoryBrush);
-                case PrimitiveRenderer _:
-                    return new IconDescription(PackIconMaterialKind.Shape, GraphicsCategoryBrush);
-                case RendererBase _:
-                    return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);
+            if (type.Is<IAnimationPlayer>())
+                return new IconDescription(PackIconMaterialKind.Animation, AnimationCategoryBrush);
+            if (type.Is<IAnimationGraph>())
+                return new IconDescription(PackIconMaterialKind.LockPattern, AnimationCategoryBrush);
+            if (type.Is<Motion>())
+                return new IconDescription(PackIconMaterialKind.RunFast, AnimationCategoryBrush);
+            if (type.Is<MotorBase>())
+                return new IconDescription(PackIconMaterialKind.Engine, AnimationCategoryBrush);
 
-                case SongPlayer _:
-                    return new IconDescription(PackIconMaterialKind.Radio, AudioCategoryBrush);
-                case SoundLoader _:
-                    return new IconDescription(PackIconMaterialKind.MusicBox, AudioCategoryBrush);
-                case SoundEmitter _:
-                    return new IconDescription(PackIconMaterialKind.VolumeHigh, AudioCategoryBrush);
-                case SoundListener _:
-                    return new IconDescription(PackIconMaterialKind.Headphones, AudioCategoryBrush);
-                    
-                case RectangleCollider _:
-                    return new IconDescription(PackIconMaterialKind.VectorRectangle, PhysicsCategoryBrush);
-                case CircleCollider _:
-                    return new IconDescription(PackIconMaterialKind.VectorCircleVariant, PhysicsCategoryBrush);
-                case IGridCollider _:
-                    return new IconDescription(PackIconMaterialKind.ViewGridOutline, PhysicsCategoryBrush);
-                case ICollider _:
-                    return new IconDescription(PackIconMaterialKind.VectorPolygon, PhysicsCategoryBrush);
+            if (type.Is<ISpriteSheet>())
+                return new IconDescription(PackIconMaterialKind.ImageMultiple, GraphicsCategoryBrush);
+            if (type.Is<ISpriteSource>())
+                return new IconDescription(PackIconMaterialKind.Image, GraphicsCategoryBrush);
+            if (type.Is<SpriteTransformer>())
+                return new IconDescription(PackIconMaterialKind.Compare, GraphicsCategoryBrush);
+            if (type.Is<FillingRectangle>())
+                return new IconDescription(PackIconMaterialKind.CameraMeteringMatrix, GraphicsCategoryBrush);
+            if (type.Is<PrimitiveRenderer>())
+                return new IconDescription(PackIconMaterialKind.Shape, GraphicsCategoryBrush);
+            if (type.Is<RendererBase>())
+                return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);
 
-                case InteractiveRoot _:
-                    return new IconDescription(PackIconMaterialKind.Layers, InputCategoryBrush);
-                case Controls _:
-                    return new IconDescription(PackIconMaterialKind.GestureTap, InputCategoryBrush);
-                    
-                case Actor _:
-                    return new IconDescription(PackIconMaterialKind.AccountBox, ScriptingCategoryBrush);
-                case Trigger _:
-                    return new IconDescription(PackIconMaterialKind.AlertBoxOutline, ScriptingCategoryBrush);
-                    
-                case InterfaceRoot _:
-                    return new IconDescription(PackIconMaterialKind.ViewDashboardVariant, UiCategoryBrush);
-                case UserInterface _:
-                    return new IconDescription(PackIconMaterialKind.ViewDashboard, UiCategoryBrush);
-                    
-                case Flipper _:
-                    return new IconDescription(PackIconMaterialKind.FlipHorizontal, CoreCategoryBrush);
-                case ILayerRoot _:
-                    return new IconDescription(PackIconMaterialKind.Layers, CoreCategoryBrush);
-                case ILayerManager _:
-                    return new IconDescription(PackIconMaterialKind.LayersTriple, CoreCategoryBrush);
-                    
-                case FreeCamera _:
-                    return new IconDescription(PackIconMaterialKind.VideoSwitch, ToolCategoryBrush);
-                case TransformationEditor _:
-                    return new IconDescription(PackIconMaterialKind.AxisArrow, ToolCategoryBrush);
+            if (type.Is<SongPlayer>())
+                return new IconDescription(PackIconMaterialKind.Radio, AudioCategoryBrush);
+            if (type.Is<SoundLoader>())
+                return new IconDescription(PackIconMaterialKind.MusicBox, AudioCategoryBrush);
+            if (type.Is<SoundEmitter>())
+                return new IconDescription(PackIconMaterialKind.VolumeHigh, AudioCategoryBrush);
+            if (type.Is<SoundListener>())
+                return new IconDescription(PackIconMaterialKind.Headphones, AudioCategoryBrush);
 
-                default:
-                    return IconDescription.None;
-            }
+            if (type.Is<RectangleCollider>())
+                return new IconDescription(PackIconMaterialKind.VectorRectangle, PhysicsCategoryBrush);
+            if (type.Is<CircleCollider>())
+                return new IconDescription(PackIconMaterialKind.VectorCircleVariant, PhysicsCategoryBrush);
+            if (type.Is<IGridCollider>())
+                return new IconDescription(PackIconMaterialKind.ViewGridOutline, PhysicsCategoryBrush);
+            if (type.Is<ICollider>())
+                return new IconDescription(PackIconMaterialKind.VectorPolygon, PhysicsCategoryBrush);
+
+            if (type.Is<InteractiveRoot>())
+                return new IconDescription(PackIconMaterialKind.Layers, InputCategoryBrush);
+            if (type.Is<Controls>())
+                return new IconDescription(PackIconMaterialKind.GestureTap, InputCategoryBrush);
+
+            if (type.Is<Actor>())
+                return new IconDescription(PackIconMaterialKind.AccountBox, ScriptingCategoryBrush);
+            if (type.Is<Trigger>())
+                return new IconDescription(PackIconMaterialKind.AlertBoxOutline, ScriptingCategoryBrush);
+
+            if (type.Is<InterfaceRoot>())
+                return new IconDescription(PackIconMaterialKind.ViewDashboardVariant, UiCategoryBrush);
+            if (type.Is<UserInterface>())
+                return new IconDescription(PackIconMaterialKind.ViewDashboard, UiCategoryBrush);
+
+            if (type.Is<Flipper>())
+                return new IconDescription(PackIconMaterialKind.FlipHorizontal, CoreCategoryBrush);
+            if (type.Is<ILayerRoot>())
+                return new IconDescription(PackIconMaterialKind.Layers, CoreCategoryBrush);
+            if (type.Is<ILayerManager>())
+                return new IconDescription(PackIconMaterialKind.LayersTriple, CoreCategoryBrush);
+
+            if (type.Is<FreeCamera>())
+                return new IconDescription(PackIconMaterialKind.VideoSwitch, ToolCategoryBrush);
+            if (type.Is<TransformationEditor>())
+                return new IconDescription(PackIconMaterialKind.AxisArrow, ToolCategoryBrush);
+
+            return IconDescription.None;
         }
     }
 }

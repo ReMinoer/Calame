@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Media;
 using Calame.Demo.Data.Data;
 using Calame.Icons;
 using Calame.Icons.Base;
+using Diese;
 using Glyph.Composition.Modelization;
 using MahApps.Metro.IconPacks;
 
@@ -10,21 +12,26 @@ namespace Calame.Demo.Modules.DemoGameData
 {
     [Export(typeof(IIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<IGlyphData>))]
-    public class DataIconDescriptor : IconDescriptorModuleBase<IGlyphData>
+    [Export(typeof(ITypeIconDescriptorModule))]
+    [Export(typeof(ITypeIconDescriptorModule<IGlyphData>))]
+    public class DataIconDescriptor : TypeIconDescriptorModuleBase<IGlyphData>
     {
         static public readonly Brush DefaultBrush = Brushes.DimGray;
 
-        public override IconDescription GetIcon(IGlyphData model)
+        public override IconDescription GetTypeIcon(Type type)
         {
-            switch (model)
-            {
-                case SceneData _: return new IconDescription(PackIconMaterialKind.Group, DefaultBrush);
-                case RectangleData _: return new IconDescription(PackIconMaterialKind.VectorRectangle, DefaultBrush);
-                case CircleData _: return new IconDescription(PackIconMaterialKind.VectorCircleVariant, DefaultBrush);
-                case FileInstanceData _: return new IconDescription(PackIconMaterialKind.FileCode, DefaultBrush);
-                case SpriteInstanceData _: return new IconDescription(PackIconMaterialKind.Image, DefaultBrush);
-                default: return IconDescription.None;
-            }
+            if (type.Is<SceneData>())
+                return new IconDescription(PackIconMaterialKind.Group, DefaultBrush);
+            if (type.Is<RectangleData>())
+                return new IconDescription(PackIconMaterialKind.VectorRectangle, DefaultBrush);
+            if (type.Is<CircleData>())
+                return new IconDescription(PackIconMaterialKind.VectorCircleVariant, DefaultBrush);
+            if (type.Is<FileInstanceData>())
+                return new IconDescription(PackIconMaterialKind.FileCode, DefaultBrush);
+            if (type.Is<SpriteInstanceData>())
+                return new IconDescription(PackIconMaterialKind.Image, DefaultBrush);
+            
+            return IconDescription.None;
         }
     }
 }

@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Media;
+using Calame.Icons.Base;
+using Diese;
 using Glyph.IO;
 using Glyph.Math;
 using Glyph.Math.Shapes;
@@ -14,66 +17,62 @@ namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
     [Export(typeof(IDefaultIconDescriptorModule))]
-    public class GlyphTypesIconDescriptor : IIconDescriptorModule, IDefaultIconDescriptorModule
+    [Export(typeof(ITypeIconDescriptorModule))]
+    [Export(typeof(ITypeDefaultIconDescriptorModule))]
+    public class GlyphTypesIconDescriptor : TypeHybridIconDescriptorModuleBase
     {
         static public readonly Brush DefaultBrush = Brushes.Black;
 
-        public IconDescription GetIcon(object model)
+        public override IconDescription GetTypeIcon(Type type)
         {
-            switch (model)
-            {
-                case Vector2 _:
-                case Vector3 _:
-                case Vector4 _:
-                case Point _:
-                    return new IconDescription(PackIconMaterialKind.VectorLine, DefaultBrush);
+            if (type.Is<Vector2>()
+                || type.Is<Vector3>()
+                || type.Is<Vector4>()
+                || type.Is<Point>())
+                return new IconDescription(PackIconMaterialKind.VectorLine, DefaultBrush);
 
-                case Segment _:
-                    return new IconDescription(PackIconMaterialKind.VectorLine, DefaultBrush);
-                case Triangle _:
-                    return new IconDescription(PackIconMaterialKind.VectorTriangle, DefaultBrush);
-                case Rectangle _:
-                case TopLeftRectangle _:
-                case CenteredRectangle _:
-                case Quad _:
-                    return new IconDescription(PackIconMaterialKind.VectorRectangle, DefaultBrush);
-                case Circle _:
-                    return new IconDescription(PackIconMaterialKind.VectorCircleVariant, DefaultBrush);
+            if (type.Is<Segment>())
+                return new IconDescription(PackIconMaterialKind.VectorLine, DefaultBrush);
+            if (type.Is<Triangle>())
+                return new IconDescription(PackIconMaterialKind.VectorTriangle, DefaultBrush);
+            if (type.Is<Rectangle>()
+                || type.Is<TopLeftRectangle>()
+                || type.Is<CenteredRectangle>()
+                || type.Is<Quad>())
+                return new IconDescription(PackIconMaterialKind.VectorRectangle, DefaultBrush);
+            if (type.Is<Circle>())
+                return new IconDescription(PackIconMaterialKind.VectorCircleVariant, DefaultBrush);
 
-                case Matrix _:
-                case Matrix3X3 _:
-                    return new IconDescription(PackIconMaterialKind.Matrix, DefaultBrush);
-                case Quaternion _:
-                    return new IconDescription(PackIconMaterialKind.RotateOrbit, DefaultBrush);
+            if (type.Is<Matrix>()
+                || type.Is<Matrix3X3>())
+                return new IconDescription(PackIconMaterialKind.Matrix, DefaultBrush);
+            if (type.Is<Quaternion>())
+                return new IconDescription(PackIconMaterialKind.RotateOrbit, DefaultBrush);
 
-                case Color _:
-                    return new IconDescription(PackIconMaterialKind.Palette, DefaultBrush);
+            if (type.Is<Color>())
+                return new IconDescription(PackIconMaterialKind.Palette, DefaultBrush);
 
-                case FilePath _:
-                    return new IconDescription(PackIconMaterialKind.FileOutline, DefaultBrush);
-                case FolderPath _:
-                    return new IconDescription(PackIconMaterialKind.FolderOpen, DefaultBrush);
+            if (type.Is<FilePath>())
+                return new IconDescription(PackIconMaterialKind.FileOutline, DefaultBrush);
+            if (type.Is<FolderPath>())
+                return new IconDescription(PackIconMaterialKind.FolderOpen, DefaultBrush);
 
-                default: return IconDescription.None;
-            }
+            return IconDescription.None;
         }
 
-        public IconDescription GetDefaultIcon(object model)
+        public override IconDescription GetTypeDefaultIcon(Type type)
         {
-            switch (model)
-            {
-                case IArray _:
-                    return new IconDescription(PackIconMaterialKind.Grid, DefaultBrush);
-                case ISpace _:
-                    return new IconDescription(PackIconMaterialKind.ChartScatterPlot, DefaultBrush);
+            if (type.Is<IArray>())
+                return new IconDescription(PackIconMaterialKind.Grid, DefaultBrush);
+            if (type.Is<ISpace>())
+                return new IconDescription(PackIconMaterialKind.ChartScatterPlot, DefaultBrush);
 
-                case IShape _:
-                    return new IconDescription(PackIconMaterialKind.VectorPolygon, DefaultBrush);
-                case IArea _:
-                    return new IconDescription(PackIconMaterialKind.TextureBox, DefaultBrush);
+            if (type.Is<IShape>())
+                return new IconDescription(PackIconMaterialKind.VectorPolygon, DefaultBrush);
+            if (type.Is<IArea>())
+                return new IconDescription(PackIconMaterialKind.TextureBox, DefaultBrush);
 
-                default: return IconDescription.None;
-            }
+            return IconDescription.None;
         }
     }
 }
