@@ -4,7 +4,7 @@ using Caliburn.Micro;
 using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Graphics;
-using Glyph.Graphics.Primitives;
+using Glyph.Graphics.Meshes;
 using Glyph.Graphics.Renderer;
 using Glyph.Math.Shapes;
 using Glyph.Tools;
@@ -44,17 +44,17 @@ namespace Calame.Viewer.Modules
             _root = Model.EditorModeRoot.Add<GlyphObject>(Model.ComponentsFilter.ExcludedRoots.Add);
             _root.Add<SceneNode>();
 
-            var linePrimitive = new LinePrimitive(Color.Purple);
-            _root.Add<PrimitivesComponent>().Primitives.Add(linePrimitive);
-            var primitiveRenderer = _root.Add<PrimitiveRenderer>();
+            var lineMesh = new LineMesh(Color.Purple);
+            _root.Add<MeshesComponent>().Meshes.Add(lineMesh);
+            var meshRenderer = _root.Add<MeshRenderer>();
 
-            primitiveRenderer.DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera;
+            meshRenderer.DrawPredicate = drawer => ((Drawer)drawer).CurrentView.Camera.Parent is FreeCamera;
 
             _root.Schedulers.Update.Plan(_ =>
             {
                 TopLeftRectangle rect = boxedSelection.Area.BoundingBox;
                 Vector2[] vertices = { rect.Position, rect.P1, rect.P3, rect.P2, rect.Position };
-                linePrimitive.Points = vertices;
+                lineMesh.Points = vertices;
             });
         }
 

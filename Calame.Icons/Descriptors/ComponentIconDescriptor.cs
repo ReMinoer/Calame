@@ -80,7 +80,7 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.Compare, GraphicsCategoryBrush);
             if (type.Is<FillingRectangle>())
                 return new IconDescription(PackIconMaterialKind.CameraMeteringMatrix, GraphicsCategoryBrush);
-            if (type.Is<PrimitiveRenderer>())
+            if (type.Is<MeshRenderer>())
                 return new IconDescription(PackIconMaterialKind.Shape, GraphicsCategoryBrush);
             if (type.Is<RendererBase>())
                 return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);

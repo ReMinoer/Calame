@@ -8,7 +8,7 @@ namespace Calame.Demo.Data.Data.Base
 {
     public abstract class ShapeDataBase<TData, T> : BindedData<TData, T>, IShapeData<T>
         where TData : ShapeDataBase<TData, T>
-        where T : PrimitiveObjectBase
+        where T : ShapeMeshObjectBase
     {
         public Color Color { get; set; } = Color.White;
 

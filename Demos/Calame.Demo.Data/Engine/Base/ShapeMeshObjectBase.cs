@@ -4,10 +4,10 @@ using Microsoft.Xna.Framework;
 
 namespace Calame.Demo.Data.Engine.Base
 {
-    public abstract class PrimitiveObjectBase : GlyphObject
+    public abstract class ShapeMeshObjectBase : GlyphObject
     {
         private readonly SceneNode _sceneNode;
-        protected readonly PrimitiveRenderer PrimitiveRenderer;
+        protected readonly MeshRenderer MeshRenderer;
 
         public abstract Color Color { get; set; }
 
@@ -17,11 +17,11 @@ namespace Calame.Demo.Data.Engine.Base
             set => _sceneNode.Position = value;
         }
 
-        public PrimitiveObjectBase(GlyphResolveContext context)
+        public ShapeMeshObjectBase(GlyphResolveContext context)
             : base(context)
         {
             _sceneNode = Add<SceneNode>();
-            PrimitiveRenderer = Add<PrimitiveRenderer>();
+            MeshRenderer = Add<MeshRenderer>();
         }
     }
 }

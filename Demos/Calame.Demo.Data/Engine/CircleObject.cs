@@ -1,45 +1,45 @@
 ﻿using Calame.Demo.Data.Engine.Base;
 using Glyph.Core;
-using Glyph.Graphics.Primitives;
+using Glyph.Graphics.Meshes;
 using Microsoft.Xna.Framework;
 
 namespace Calame.Demo.Data.Engine
 {
-    public class CircleObject : PrimitiveObjectBase
+    public class CircleObject : ShapeMeshObjectBase
     {
-        private readonly EllipsePrimitive _primitive;
+        private readonly EllipseMesh _mesh;
 
         public override Color Color
         {
-            get => _primitive.CenterColors[0];
+            get => _mesh.CenterColors[0];
             set
             {
-                _primitive.CenterColors = new []{ value };
-                _primitive.BorderColors = new []{ value };
+                _mesh.CenterColors = new []{ value };
+                _mesh.BorderColors = new []{ value };
             }
         }
 
         public float Radius
         {
-            get => _primitive.Width;
+            get => _mesh.Width;
             set
             {
-                _primitive.Height = value;
-                _primitive.Width = value;
+                _mesh.Height = value;
+                _mesh.Width = value;
             }
         }
 
         public int Sampling
         {
-            get => _primitive.Sampling;
-            set => _primitive.Sampling = value;
+            get => _mesh.Sampling;
+            set => _mesh.Sampling = value;
         }
 
         public CircleObject(GlyphResolveContext context)
             : base(context)
         {
-            _primitive = new EllipsePrimitive(Color.White, Vector2.Zero, 50);
-            PrimitiveRenderer.PrimitiveProviders.Add(_primitive);
+            _mesh = new EllipseMesh(Color.White, Vector2.Zero, 50);
+            MeshRenderer.MeshProviders.Add(_mesh);
         }
     }
 }

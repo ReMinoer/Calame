@@ -1,20 +1,20 @@
 ﻿using Calame.Demo.Data.Engine.Base;
 using Glyph.Core;
-using Glyph.Graphics.Primitives;
+using Glyph.Graphics.Meshes;
 using Glyph.Math.Shapes;
 using Microsoft.Xna.Framework;
 
 namespace Calame.Demo.Data.Engine
 {
-    public class RectangleObject : PrimitiveObjectBase
+    public class RectangleObject : ShapeMeshObjectBase
     {
         private CenteredRectangle _rectangle;
-        private readonly TriangulableShapePrimitive<CenteredRectangle> _primitive;
+        private readonly TriangulableShapeMesh<CenteredRectangle> _mesh;
 
         public override Color Color
         {
-            get => _primitive.Color;
-            set => _primitive.Color = value;
+            get => _mesh.Color;
+            set => _mesh.Color = value;
         }
 
         public float Width
@@ -23,7 +23,7 @@ namespace Calame.Demo.Data.Engine
             set
             {
                 _rectangle.Width = value;
-                RefreshPrimitive();
+                RefreshMesh();
             }
         }
 
@@ -33,7 +33,7 @@ namespace Calame.Demo.Data.Engine
             set
             {
                 _rectangle.Height = value;
-                RefreshPrimitive();
+                RefreshMesh();
             }
         }
 
@@ -41,13 +41,13 @@ namespace Calame.Demo.Data.Engine
             : base(context)
         {
             _rectangle = new CenteredRectangle(Vector2.Zero, new Vector2(100, 100));
-            _primitive = _rectangle.ToPrimitive(Color.White);
-            PrimitiveRenderer.PrimitiveProviders.Add(_primitive);
+            _mesh = _rectangle.ToMesh(Color.White);
+            MeshRenderer.MeshProviders.Add(_mesh);
         }
 
-        private void RefreshPrimitive()
+        private void RefreshMesh()
         {
-            _primitive.Shape = _rectangle;
+            _mesh.Shape = _rectangle;
         }
     }
 }
