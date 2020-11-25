@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Calame.Commands;
+using Calame.Commands.Base;
 using Calame.DataModelTree.ViewModels;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
@@ -12,7 +13,6 @@ namespace Calame.DataModelTree.Commands
         [CommandDefinition]
         public class Definition : CalameCommandDefinitionBase
         {
-            public override string Name => "DataModelTree.Open";
             public override string Text => "_Data Model Tree";
         }
 

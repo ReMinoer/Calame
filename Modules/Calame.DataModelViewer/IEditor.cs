@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using Gemini.Framework.ToolBars;
 using Glyph;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
@@ -14,6 +15,7 @@ namespace Calame.DataModelViewer
     public interface IEditor : IDisposable
     {
         IGlyphData Data { get; }
+        ToolBarDefinition ToolBarDefinition { get; }
 
         Task NewDataAsync();
         Task LoadDataAsync(Stream stream);

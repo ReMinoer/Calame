@@ -30,9 +30,18 @@ namespace Calame.DataModelViewer.ViewModels
         private readonly IImportedTypeProvider _importedTypeProvider;
 
         private GlyphEngine _engine;
-        
         public ViewerViewModel Viewer { get; }
-        public IEditor Editor { get; set; }
+
+        private IEditor _editor;
+        public IEditor Editor
+        {
+            get => _editor;
+            set
+            {
+                _editor = value;
+                ToolBarDefinition = _editor?.ToolBarDefinition;
+            }
+        }
 
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;

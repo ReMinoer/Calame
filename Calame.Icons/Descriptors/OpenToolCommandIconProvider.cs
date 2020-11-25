@@ -1,18 +1,18 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Media;
-using Calame.Commands;
 using Calame.Icons.Base;
+using Gemini.Framework.Commands;
 using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
-    [Export(typeof(IIconDescriptorModule<ICommandDefinition>))]
-    public class OpenToolCommandIconProvider : IconDescriptorModuleBase<ICommandDefinition>
+    [Export(typeof(IIconDescriptorModule<CommandDefinition>))]
+    public class OpenToolCommandIconProvider : IconDescriptorModuleBase<CommandDefinition>
     {
         static public readonly Brush DefaultBrush = Brushes.DimGray;
 
-        public override IconDescription GetIcon(ICommandDefinition key)
+        public override IconDescription GetIcon(CommandDefinition key)
         {
             switch (key.Name)
             {

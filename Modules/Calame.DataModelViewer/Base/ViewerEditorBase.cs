@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using Gemini.Framework.ToolBars;
 using Glyph;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
@@ -18,10 +18,12 @@ namespace Calame.DataModelViewer.Base
         where T : IGlyphCreator
     {
         protected abstract ISaveLoadFormat<T> SaveLoadFormat { get; }
-        protected T Creator { get; private set; }
 
-        public IGlyphData Data => Creator;
-        
+        public T Creator { get; private set; }
+        IGlyphData IEditor.Data => Creator;
+
+        public ToolBarDefinition ToolBarDefinition { get; set; }
+
         public async Task NewDataAsync()
         {
             Creator = await NewAsync();

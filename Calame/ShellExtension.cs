@@ -14,6 +14,26 @@ namespace Calame
 {
     static public class ShellExtension
     {
+        static public Task NewAsync(this IShell shell, IEditorProvider editorProvider, string name)
+        {
+            IDocument document = editorProvider.Create();
+
+            var viewAware = (IViewAware)document;
+            viewAware.ViewAttached += (sender, e) =>
+            {
+                var view = (FrameworkElement)e.View;
+                view.Loaded += LoadedHandler;
+
+                async void LoadedHandler(object sender2, RoutedEventArgs e2)
+                {
+                    view.Loaded -= LoadedHandler;
+                    await editorProvider.New(document, name);
+                }
+            };
+
+            return shell.OpenDocumentAsync(document);
+        }
+
         static public async Task OpenFileAsync(this IShell shell, string filePath, IEnumerable<IEditorProvider> editorProviders, string workingDirectory = null)
         {
             IEditorProvider provider = editorProviders.FirstOrDefault(p => p.Handles(filePath));

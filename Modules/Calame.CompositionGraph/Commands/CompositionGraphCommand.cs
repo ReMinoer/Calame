@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Calame.Commands;
+using Calame.Commands.Base;
 using Calame.CompositionGraph.ViewModels;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
