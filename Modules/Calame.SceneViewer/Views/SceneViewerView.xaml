@@ -19,26 +19,6 @@
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
             <ToolBar>
-                <Button Command="{Binding PlayCommand}">
-                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Play}"
-                                             IconSize="14"
-                                             IconProvider="{Binding IconProvider}"
-                                             IconDescriptor="{Binding CalameIconDescriptor}" />
-                </Button>
-                <Button Command="{Binding PauseCommand}">
-                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Pause}"
-                                             IconSize="14"
-                                             IconProvider="{Binding IconProvider}"
-                                             IconDescriptor="{Binding CalameIconDescriptor}" />
-                </Button>
-                <Button Command="{Binding StopCommand}">
-                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.Stop}"
-                                             IconSize="14"
-                                             IconProvider="{Binding IconProvider}"
-                                             IconDescriptor="{Binding CalameIconDescriptor}" />
-                </Button>
-            </ToolBar>
-            <ToolBar>
                 <RadioButton Command="{Binding FreeCameraCommand}" IsChecked="True">
                     <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.FreeCamera}"
                                              IconSize="14"

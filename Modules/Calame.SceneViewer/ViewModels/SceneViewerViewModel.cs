@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Icons;
+using Calame.SceneViewer.Commands;
 using Calame.Viewer;
 using Calame.Viewer.Messages;
 using Calame.Viewer.Modules.Base;
@@ -16,6 +17,7 @@ using Fingear.Interactives;
 using Fingear.Interactives.Containers;
 using Gemini.Framework;
 using Gemini.Framework.Services;
+using Gemini.Framework.ToolBars;
 using Glyph;
 using Glyph.Composition;
 using Glyph.Core;
@@ -43,10 +45,6 @@ namespace Calame.SceneViewer.ViewModels
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
-
-        public ICommand PlayCommand { get; }
-        public ICommand PauseCommand { get; }
-        public ICommand StopCommand { get; }
 
         public ICommand FreeCameraCommand { get; }
         public ICommand DefaultViewsCommand { get; }
@@ -77,9 +75,7 @@ namespace Calame.SceneViewer.ViewModels
             SessionMode = new SessionModeModule();
             Viewer.InsertInteractiveMode(0, SessionMode);
 
-            PlayCommand = new RelayCommand(x => Runner.Engine.Start(), x => Runner?.Engine != null && !(Runner.Engine.IsStarted && !Runner.Engine.IsPaused));
-            PauseCommand = new RelayCommand(x => Runner.Engine.Pause(), x => Runner?.Engine != null && Runner.Engine.IsStarted && !Runner.Engine.IsPaused);
-            StopCommand = new RelayCommand(x => Runner.Engine.Stop(), x => Runner?.Engine?.IsStarted ?? false);
+            ToolBarDefinition = SceneToolBar;
 
             FreeCameraCommand = new RelayCommand(x => FreeCameraAction(), x => Runner?.Engine != null);
             DefaultViewsCommand = new RelayCommand(x => DefaultViewsAction(), x => Runner?.Engine != null);
@@ -91,7 +87,14 @@ namespace Calame.SceneViewer.ViewModels
             IconProvider = iconProvider;
             CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
         }
-        
+
+        [Export]
+        static public ToolBarDefinition SceneToolBar = new ToolBarDefinition(0, "Scene");
+        [Export]
+        static public ToolBarItemGroupDefinition EngineToolBarGroup = new ToolBarItemGroupDefinition(SceneToolBar, 0);
+        [Export]
+        static public ToolBarItemDefinition EnginePauseResumeToolBarItem = new CommandToolBarItemDefinition<EnginePauseResumeCommand>(EngineToolBarGroup, 0);
+
         public SceneViewerViewModel(SceneViewerViewModel viewModel)
             : this(viewModel.EventAggregator, viewModel._shell, viewModel.IconProvider, viewModel._iconDescriptorManager, Enumerable.Empty<IViewerModuleSource>())
         {
