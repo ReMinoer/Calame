@@ -41,7 +41,7 @@ namespace Calame.SceneViewer
 
         public Task New(IDocument document, string name)
         {
-            return New(document, Sessions.First(x => x.GetType().Name == name));
+            return New(document, Sessions.First());
         }
 
         public Task New<TSession>(IDocument document)
