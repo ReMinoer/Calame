@@ -9,7 +9,9 @@ namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<CommandDefinition>))]
-    public class OpenToolCommandIconProvider : TypeIconDescriptorModuleBase<CommandDefinition>
+    [Export(typeof(ITypeIconDescriptorModule))]
+    [Export(typeof(ITypeIconDescriptorModule<CommandDefinition>))]
+    public class OpenToolCommandIconDescriptor : TypeIconDescriptorModuleBase<CommandDefinition>
     {
         static public readonly Brush DefaultBrush = Brushes.DimGray;
 
