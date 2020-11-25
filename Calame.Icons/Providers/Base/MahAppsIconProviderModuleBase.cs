@@ -49,7 +49,11 @@ namespace Calame.Icons.Providers.Base
         {
             RuntimeIconsFolder.Create();
 
-            string filePath = Path.Combine(RuntimeIconsFolder.Path, Path.ChangeExtension(Path.GetRandomFileName(), "png"));
+            string hash = iconDescription.GetHashCode().ToString("X");
+            string filePath = Path.Combine(RuntimeIconsFolder.Path, Path.ChangeExtension(hash, "png"));
+            if (File.Exists(filePath))
+                return new Uri(filePath);
+
             using (FileStream fileStream = File.Create(filePath))
             {
                 WriteRenderToStream(fileStream, iconDescription, size);
