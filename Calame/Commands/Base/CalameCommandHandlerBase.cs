@@ -9,7 +9,7 @@ namespace Calame.Commands.Base
         public override sealed void Update(Command command)
         {
             command.Enabled = CanRun(command);
-            base.Update(command);
+            UpdateStatus(command);
         }
 
         public override sealed async Task Run(Command command)
@@ -18,6 +18,7 @@ namespace Calame.Commands.Base
                 await RunAsync(command);
         }
 
+        protected virtual void UpdateStatus(Command command) {}
         protected virtual bool CanRun(Command command) => true;
         protected abstract Task RunAsync(Command command);
     }
