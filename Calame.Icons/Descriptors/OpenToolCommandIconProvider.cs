@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Media;
 using Calame.Icons.Base;
 using Gemini.Framework.Commands;
@@ -8,27 +9,27 @@ namespace Calame.Icons.Descriptors
 {
     [Export(typeof(IIconDescriptorModule))]
     [Export(typeof(IIconDescriptorModule<CommandDefinition>))]
-    public class OpenToolCommandIconProvider : IconDescriptorModuleBase<CommandDefinition>
+    public class OpenToolCommandIconProvider : TypeIconDescriptorModuleBase<CommandDefinition>
     {
         static public readonly Brush DefaultBrush = Brushes.DimGray;
 
-        public override IconDescription GetIcon(CommandDefinition key)
+        public override IconDescription GetTypeIcon(Type type)
         {
-            switch (key.Name)
+            switch (type.Name)
             {
-                case "BrushPanel.Open":
+                case "BrushPanelCommand":
                     return new IconDescription(PackIconMaterialKind.Palette, DefaultBrush);
-                case "CompositionGraph.Open":
+                case "CompositionGraphCommand":
                     return new IconDescription(PackIconMaterialKind.HexagonMultiple, DefaultBrush);
-                case "DataModelTree.Open":
+                case "DataModelTreeCommand":
                     return new IconDescription(PackIconMaterialKind.HexagonMultipleOutline, DefaultBrush);
-                case "InteractionTree.Open":
+                case "InteractionTreeCommand":
                     return new IconDescription(PackIconMaterialKind.GestureTap, DefaultBrush);
-                case "LogConsole.Open":
+                case "LogConsoleCommand":
                     return new IconDescription(PackIconMaterialKind.Console, DefaultBrush);
-                case "PropertyGrid.Open":
+                case "PropertyGridCommand":
                     return new IconDescription(PackIconMaterialKind.FormatListBulletedType, DefaultBrush);
-                case "SceneGraph.Open":
+                case "SceneGraphCommand":
                     return new IconDescription(PackIconMaterialKind.AxisArrow, DefaultBrush);
                 default:
                     return IconDescription.None;

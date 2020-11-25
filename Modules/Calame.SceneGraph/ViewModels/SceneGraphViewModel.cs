@@ -77,9 +77,9 @@ namespace Calame.SceneGraph.ViewModels
             IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _treeItemBuilder = new TreeViewItemModelBuilder<ISceneNode>()
-                               .DisplayName(x => (x as IGlyphComponent)?.Parent.Name ?? x.ToString(), nameof(IGlyphComponent.Name), x => (x as IGlyphComponent)?.Parent as INotifyPropertyChanged)
+                               .DisplayName(x => (x as IGlyphComponent)?.Parent?.Name ?? x.ToString(), nameof(IGlyphComponent.Name), x => (x as IGlyphComponent)?.Parent as INotifyPropertyChanged)
                                .ChildrenSource(x => x.Children, nameof(ISceneNode.Children))
-                               .IconDescription(x => iconDescriptor.GetIcon((x as IGlyphComponent)?.Parent))
+                               .IconDescription(x => iconDescriptor.GetIcon((x as IGlyphComponent)?.Parent ?? x as IGlyphComponent))
                                .IsEnabled(x => _filteringContext?.Context.Filter(x as IGlyphComponent) ?? true);
 
             if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
