@@ -10,7 +10,7 @@ namespace Calame.SceneViewer.Commands.Base
         protected override bool CanRun(Command command, SceneViewerViewModel document)
         {
             return base.CanRun(command, document)
-                && document.Viewer.Runner?.Engine != null;
+                && (document.Viewer.Runner?.Engine?.IsStarted ?? false);
         }
     }
 }

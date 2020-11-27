@@ -5,9 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfInterop="clr-namespace:Glyph.WpfInterop;assembly=Glyph.WpfInterop"
              xmlns:viewModels="clr-namespace:Calame.SceneViewer.ViewModels"
-             xmlns:viewer="clr-namespace:Calame.Viewer;assembly=Calame.Viewer"
              xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
-             xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
              xmlns:views="clr-namespace:Calame.SceneViewer.Views"
              xmlns:viewerViewModels="clr-namespace:Calame.Viewer.ViewModels;assembly=Calame.Viewer"
              mc:Ignorable="d"
@@ -18,27 +16,6 @@
     </UserControl.Resources>
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
-            <ToolBar>
-                <RadioButton Command="{Binding FreeCameraCommand}" IsChecked="True">
-                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.FreeCamera}"
-                                             IconSize="14"
-                                             IconProvider="{Binding IconProvider}"
-                                             IconDescriptor="{Binding CalameIconDescriptor}" />
-                </RadioButton>
-                <RadioButton Command="{Binding DefaultViewsCommand}">
-                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.DefaultCamera}"
-                                             IconSize="14"
-                                             IconProvider="{Binding IconProvider}"
-                                             IconDescriptor="{Binding CalameIconDescriptor}" />
-                </RadioButton>
-                <Separator />
-                <Button Command="{Binding NewViewerCommand}">
-                    <userControls:CalameIcon Target="{x:Static icons:CalameIconKey.NewViewer}"
-                                             IconSize="14"
-                                             IconProvider="{Binding IconProvider}"
-                                             IconDescriptor="{Binding CalameIconDescriptor}" />
-                </Button>
-            </ToolBar>
             <ToolBar ItemsSource="{Binding Viewer.InteractiveModes}">
                 <ToolBar.ItemTemplate>
                     <DataTemplate DataType="{x:Type viewerViewModels:ViewerInteractiveModeViewModel}">

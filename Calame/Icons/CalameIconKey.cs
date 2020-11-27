@@ -2,6 +2,15 @@
 {
     public enum CalameIconKey
     {
+        // Tools
+        BrushPanel,
+        CompositionGraph,
+        DataModelTree,
+        InteractionTree,
+        LogConsole,
+        PropertyGrid,
+        SceneGraph,
+
         // Viewer
         Play,
         Pause,

@@ -10,13 +10,17 @@ namespace Calame.Commands.Base
         public override string ToolTip => Text;
         public override sealed string Name { get; }
         public override sealed Uri IconSource { get; }
+        public abstract object IconKey { get; }
 
         protected CalameCommandDefinitionBase()
         {
             Name = GetType().FullName;
 
-            IconDescription iconDescription = IoC.Get<IIconDescriptorManager>().GetDescriptor<CommandDefinition>().GetIcon(this);
-            IconSource = IoC.Get<IIconProvider>().GetUri(iconDescription, 16);
+            if (IconKey != null)
+            {
+                IconDescription iconDescription = IoC.Get<IIconDescriptorManager>().GetDescriptor().GetIcon(IconKey);
+                IconSource = IoC.Get<IIconProvider>().GetUri(iconDescription, 16);
+            }
         }
     }
 }

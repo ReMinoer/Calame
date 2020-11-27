@@ -9,12 +9,21 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(IIconDescriptorModule<CalameIconKey>))]
     public class CalameIconProvider : IconDescriptorModuleBase<CalameIconKey>
     {
+        static public readonly Brush ToolsBrush = Brushes.DimGray;
         static public readonly Brush DefaultBrush = Brushes.Black;
 
         public override IconDescription GetIcon(CalameIconKey key)
         {
             switch (key)
             {
+                case CalameIconKey.BrushPanel: return new IconDescription(PackIconMaterialKind.Palette, ToolsBrush);
+                case CalameIconKey.CompositionGraph: return new IconDescription(PackIconMaterialKind.HexagonMultiple, ToolsBrush);
+                case CalameIconKey.DataModelTree: return new IconDescription(PackIconMaterialKind.HexagonMultipleOutline, ToolsBrush);
+                case CalameIconKey.InteractionTree: return new IconDescription(PackIconMaterialKind.GestureTap, ToolsBrush);
+                case CalameIconKey.LogConsole: return new IconDescription(PackIconMaterialKind.Console, ToolsBrush);
+                case CalameIconKey.PropertyGrid: return new IconDescription(PackIconMaterialKind.FormatListBulletedType, ToolsBrush);
+                case CalameIconKey.SceneGraph: return new IconDescription(PackIconMaterialKind.AxisArrow, ToolsBrush);
+
                 case CalameIconKey.Play: return new IconDescription(PackIconMaterialKind.Play, Brushes.Green);
                 case CalameIconKey.Pause: return new IconDescription(PackIconMaterialKind.Pause, Brushes.CornflowerBlue);
                 case CalameIconKey.Stop: return new IconDescription(PackIconMaterialKind.Stop, Brushes.DarkRed);
