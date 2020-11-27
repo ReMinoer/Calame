@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Diese;
 
 namespace Calame.Icons.Base
 {
@@ -13,6 +14,8 @@ namespace Calame.Icons.Base
             _modules = modules;
             _defaultModule = defaultModule;
         }
+
+        public override bool Handle(object model) => model is T;
 
         protected abstract TTarget GetTarget(T model);
         public override IconDescription GetDefaultIcon(T model)
@@ -37,6 +40,8 @@ namespace Calame.Icons.Base
             _typeModules = typeModules;
             _typeDefaultModules = typeDefaultModules;
         }
+
+        public virtual bool Handle(Type type) => type.Is<T>();
 
         protected abstract Type GetTypeTarget(Type type);
         public IconDescription GetTypeDefaultIcon(Type type)

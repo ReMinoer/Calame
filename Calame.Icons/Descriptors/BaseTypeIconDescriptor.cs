@@ -11,6 +11,9 @@ namespace Calame.Icons.Descriptors
     {
         static public readonly Brush DefaultBrush = Brushes.Black;
 
+        public bool Handle(object model) => model == null || Handle(model.GetType());
+        public bool Handle(Type type) => type?.Namespace?.StartsWith(nameof(System)) ?? false;
+
         public IconDescription GetBaseTypeIcon(object model)
         {
             if (model is bool value)

@@ -33,12 +33,11 @@ namespace Calame.Icons.Descriptors
         static public readonly Brush MouseCategoryBrush = Brushes.DeepPink;
         static public readonly Brush GamePadCategoryBrush = Brushes.Salmon;
 
+        public bool Handle(Type type) => type.Is<IControl>();
+
         public IconDescription GetTypeDefaultIcon(Type type)
         {
-            if (type.Is<IControl>())
-                return new IconDescription(PackIconMaterialKind.GestureTap, DefaultCategoryBrush);
-
-            return IconDescription.None;
+            return new IconDescription(PackIconMaterialKind.GestureTap, DefaultCategoryBrush);
         }
 
         public IconDescription GetTypeIcon(Type type)

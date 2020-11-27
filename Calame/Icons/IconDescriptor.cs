@@ -24,28 +24,28 @@ namespace Calame.Icons
 
         public IconDescription GetIcon(object model)
         {
-            IconDescription icon = _modules.Select(x => x.GetIcon(model)).FirstOrDefault(x => x.Defined);
+            IconDescription icon = _modules.Where(x => x.Handle(model)).Select(x => x.GetIcon(model)).FirstOrDefault(x => x.Defined);
             if (icon.Defined)
                 return icon;
 
-            icon = _defaultModules.Select(x => x.GetDefaultIcon(model)).FirstOrDefault(x => x.Defined);
+            icon = _defaultModules.Where(x => x.Handle(model)).Select(x => x.GetDefaultIcon(model)).FirstOrDefault(x => x.Defined);
             if (icon.Defined)
                 return icon;
 
-            return _baseTypeModules.Select(x => x.GetBaseTypeIcon(model)).FirstOrDefault(x => x.Defined);
+            return _baseTypeModules.Where(x => x.Handle(model)).Select(x => x.GetBaseTypeIcon(model)).FirstOrDefault(x => x.Defined);
         }
 
         public IconDescription GetTypeIcon(Type type)
         {
-            IconDescription icon = _typeModules.Select(x => x.GetTypeIcon(type)).FirstOrDefault(x => x.Defined);
+            IconDescription icon = _typeModules.Where(x => x.Handle(type)).Select(x => x.GetTypeIcon(type)).FirstOrDefault(x => x.Defined);
             if (icon.Defined)
                 return icon;
 
-            icon = _typeDefaultModules.Select(x => x.GetTypeDefaultIcon(type)).FirstOrDefault(x => x.Defined);
+            icon = _typeDefaultModules.Where(x => x.Handle(type)).Select(x => x.GetTypeDefaultIcon(type)).FirstOrDefault(x => x.Defined);
             if (icon.Defined)
                 return icon;
 
-            return _baseTypeModules.Select(x => x.GetBaseTypeIcon(type)).FirstOrDefault(x => x.Defined);
+            return _baseTypeModules.Where(x => x.Handle(type)).Select(x => x.GetBaseTypeIcon(type)).FirstOrDefault(x => x.Defined);
         }
     }
 

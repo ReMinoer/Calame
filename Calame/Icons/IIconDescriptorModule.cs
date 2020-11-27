@@ -1,6 +1,6 @@
 ﻿namespace Calame.Icons
 {
-    public interface IIconDescriptorModule
+    public interface IIconDescriptorModule : IInstanceHandler
     {
         IconDescription GetIcon(object model);
     }

@@ -2,7 +2,7 @@
 
 namespace Calame.Icons
 {
-    public interface ITypeDefaultIconDescriptorModule
+    public interface ITypeDefaultIconDescriptorModule : ITypeHandler
     {
         IconDescription GetTypeDefaultIcon(Type type);
     }

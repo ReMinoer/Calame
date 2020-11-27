@@ -23,6 +23,17 @@ namespace Calame.Icons.Descriptors
     {
         static public readonly Brush DefaultBrush = Brushes.Black;
 
+        public override bool Handle(Type type)
+        {
+            string typeNamespace = type?.Namespace;
+            if (typeNamespace == null)
+                return false;
+
+            return typeNamespace.StartsWith(nameof(Microsoft.Xna.Framework))
+                || typeNamespace.StartsWith(nameof(Glyph))
+                || typeNamespace.StartsWith(nameof(Simulacra));
+        }
+
         public override IconDescription GetTypeIcon(Type type)
         {
             if (type.Is<Vector2>()
