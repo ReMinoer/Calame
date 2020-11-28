@@ -4,11 +4,11 @@
     <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GeminiWpf" Version="1.0.9-beta" />
     <PackageReference Include="NlogViewer" Version="0.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Calame\Calame.csproj" />
+    <ProjectReference Include="..\..\External\gemini\src\Gemini\Gemini.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="NLog.config">

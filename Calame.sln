@@ -115,6 +115,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simulacra.IO.Test", "Extern
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Pipeline", "External\Glyph\Glyph.Pipeline\Glyph.Pipeline.csproj", "{BD63C0F2-F582-4BE6-8E8E-BE565FBF3E01}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemini", "External\gemini\src\Gemini\Gemini.csproj", "{659541B0-C2A8-4F33-984F-EEB3729F8969}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -329,6 +331,10 @@ Global
 		{BD63C0F2-F582-4BE6-8E8E-BE565FBF3E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD63C0F2-F582-4BE6-8E8E-BE565FBF3E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD63C0F2-F582-4BE6-8E8E-BE565FBF3E01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{659541B0-C2A8-4F33-984F-EEB3729F8969}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{659541B0-C2A8-4F33-984F-EEB3729F8969}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{659541B0-C2A8-4F33-984F-EEB3729F8969}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{659541B0-C2A8-4F33-984F-EEB3729F8969}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -382,6 +388,7 @@ Global
 		{79183837-B508-4FF8-993D-F3731CD6B11F} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 		{4913D083-3CD0-4E27-A92D-378D350C5577} = {8172B44A-999B-4C86-BBB0-E03E9B1337D1}
 		{BD63C0F2-F582-4BE6-8E8E-BE565FBF3E01} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
+		{659541B0-C2A8-4F33-984F-EEB3729F8969} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51117004-2C3A-426A-86DF-7881F4FEF766}

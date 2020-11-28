@@ -5,14 +5,12 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Calame\Calame.csproj" />
+    <ProjectReference Include="..\..\External\gemini\src\Gemini\Gemini.csproj" />
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj" />
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj" />
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\External\Taskete\Diese %28Taskete%29\Diese %28Taskete%29.csproj" />
     <ProjectReference Include="..\..\External\Glyph\External\Fingear\Fingear\Fingear.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GeminiWpf" Version="1.0.9-beta" />
   </ItemGroup>
 </Project>

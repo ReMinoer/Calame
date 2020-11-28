@@ -2,3 +2,6 @@
 	path = External/Glyph
 	url = https://github.com/ReMinoer/Glyph.git
 	branch = master
+[submodule "External/gemini"]
+	path = External/gemini
+	url = https://github.com/ReMinoer/gemini
