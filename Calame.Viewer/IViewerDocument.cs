@@ -1,10 +1,11 @@
 ﻿using Calame.Viewer.ViewModels;
+using Gemini.Framework;
 using Glyph.Engine;
 
 namespace Calame.Viewer
 {
-    public interface IViewerDocument : IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>
+    public interface IViewerDocument : IDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>
     {
-        
+        ViewerViewModel Viewer { get; }
     }
 }

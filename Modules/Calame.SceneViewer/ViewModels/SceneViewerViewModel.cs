@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Icons;
-using Calame.SceneViewer.Commands;
 using Calame.Viewer;
 using Calame.Viewer.Messages;
 using Calame.Viewer.Modules.Base;
@@ -40,10 +39,7 @@ namespace Calame.SceneViewer.ViewModels
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
 
-        public ICommand SwitchModeCommand { get; }
         public bool FreeCameraEnabled { get; private set; }
-
-        private GlyphWpfRunner Runner => Viewer.Runner;
 
         public IIconProvider IconProvider { get; }
         public IIconDescriptor CalameIconDescriptor { get; }
@@ -63,9 +59,7 @@ namespace Calame.SceneViewer.ViewModels
             SessionMode = new SessionModeModule();
             Viewer.InsertInteractiveMode(0, SessionMode);
 
-            ToolBarDefinition = SessionToolBar.Definition;
-            
-            SwitchModeCommand = new RelayCommand(OnSwitchMode, x => Runner?.Engine != null);
+            ToolBarDefinition = ViewerToolBar.Definition;
 
             IconProvider = iconProvider;
             CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
@@ -167,11 +161,6 @@ namespace Calame.SceneViewer.ViewModels
                 view.DrawClientFilter.Items.Remove(Viewer.Client);
         }
 
-        private async void OnSwitchMode(object obj)
-        {
-            await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, (IViewerInteractiveMode)obj));
-        }
-
         async Task IHandle<ISelectionRequest<IGlyphComponent>>.HandleAsync(ISelectionRequest<IGlyphComponent> message, CancellationToken cancellationToken)
         {
             if (message.DocumentContext != this)
@@ -186,7 +175,7 @@ namespace Calame.SceneViewer.ViewModels
         public class SessionModeModule : ViewerModuleBase, IViewerInteractiveMode
         {
             public string Name => "Session";
-            public object IconKey => CalameIconKey.GameMode;
+            public object IconKey => CalameIconKey.SessionMode;
 
             public InteractiveComposite Interactive { get; } = new InteractiveComposite();
             IInteractive IViewerInteractiveMode.Interactive => Interactive;

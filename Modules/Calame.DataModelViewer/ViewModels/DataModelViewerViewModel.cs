@@ -48,8 +48,6 @@ namespace Calame.DataModelViewer.ViewModels
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
         IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
 
-        public ICommand SwitchModeCommand { get; }
-
         public ICommand DragOverCommand { get; }
         public ICommand DropCommand { get; }
 
@@ -66,8 +64,7 @@ namespace Calame.DataModelViewer.ViewModels
             _importedTypeProvider = importedTypeProvider;
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
-            
-            SwitchModeCommand = new RelayCommand(OnSwitchMode, x => Viewer.Runner?.Engine != null);
+            ToolBarDefinition = ViewerToolBar.Definition;
 
             DragOverCommand = new RelayCommand(x => Editor.OnDragOver((DragEventArgs)x));
             DropCommand = new RelayCommand(x => Editor.OnDrop((DragEventArgs)x));
@@ -127,7 +124,7 @@ namespace Calame.DataModelViewer.ViewModels
 
             await EventAggregator.PublishAsync(new SelectionRequest<IGlyphData>(this, Editor.Data));
 
-            IViewerInteractiveMode interactiveMode = Viewer.InteractiveModes.FirstOrDefault()?.InteractiveModel;
+            IViewerInteractiveMode interactiveMode = Viewer.InteractiveModes.FirstOrDefault();
             if (interactiveMode != null)
                 await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, interactiveMode));
         }
@@ -148,11 +145,6 @@ namespace Calame.DataModelViewer.ViewModels
             Viewer.Dispose();
 
             return Task.CompletedTask;
-        }
-
-        private async void OnSwitchMode(object obj)
-        {
-            await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, (IViewerInteractiveMode)obj));
         }
 
         async Task IHandle<ISelectionRequest<IGlyphData>>.HandleAsync(ISelectionRequest<IGlyphData> message, CancellationToken cancellationToken)

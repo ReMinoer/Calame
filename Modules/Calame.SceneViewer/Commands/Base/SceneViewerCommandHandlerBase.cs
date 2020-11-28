@@ -1,16 +1,11 @@
-﻿using Calame.Commands.Base;
-using Calame.SceneViewer.ViewModels;
+﻿using Calame.SceneViewer.ViewModels;
+using Calame.Viewer.Commands.Base;
 using Gemini.Framework.Commands;
 
 namespace Calame.SceneViewer.Commands.Base
 {
-    public abstract class SceneViewerCommandHandlerBase<TCommandDefinition> : DocumentCommandHandlerBase<SceneViewerViewModel, TCommandDefinition>
+    public abstract class SceneViewerCommandHandlerBase<TCommandDefinition> : ViewerDocumentCommandHandlerBase<SceneViewerViewModel, TCommandDefinition>
         where TCommandDefinition : CommandDefinition
     {
-        protected override bool CanRun(Command command, SceneViewerViewModel document)
-        {
-            return base.CanRun(command, document)
-                && (document.Viewer.Runner?.Engine?.IsStarted ?? false);
-        }
     }
 }

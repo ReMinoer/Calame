@@ -18,8 +18,8 @@
         DefaultCamera,
         FreeCamera,
         NewViewer,
-        GameMode,
-        CursorMode,
+        SessionMode,
+        EditorMode,
         BrushMode,
 
         // Property Grid

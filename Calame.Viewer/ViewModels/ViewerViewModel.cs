@@ -34,7 +34,7 @@ namespace Calame.Viewer.ViewModels
 
         private GlyphWpfRunner _runner;
         private readonly InteractiveToggle _viewerModeToggle;
-        private readonly ObservableList<ViewerInteractiveModeViewModel> _interactiveModes;
+        private readonly ObservableList<IViewerInteractiveMode> _interactiveModes;
         private readonly EditorModeModule _editorModeModule;
         private IInteractive _editorInteractive;
 
@@ -48,7 +48,7 @@ namespace Calame.Viewer.ViewModels
         public GlyphObject EditorModeRoot => _editorModeModule.Root;
 
         public ReadOnlyList<IViewerModule> Modules { get; }
-        public ReadOnlyObservableList<ViewerInteractiveModeViewModel> InteractiveModes { get; }
+        public ReadOnlyObservableList<IViewerInteractiveMode> InteractiveModes { get; }
 
         public ComponentFilter ComponentsFilter { get; }
         public ISelectionSpread<object> LastSelection { get; set; }
@@ -141,8 +141,8 @@ namespace Calame.Viewer.ViewModels
 
             _viewerModeToggle = new InteractiveToggle { Name = "Viewer Modes" };
 
-            _interactiveModes = new ObservableList<ViewerInteractiveModeViewModel>();
-            InteractiveModes = new ReadOnlyObservableList<ViewerInteractiveModeViewModel>(_interactiveModes);
+            _interactiveModes = new ObservableList<IViewerInteractiveMode>();
+            InteractiveModes = new ReadOnlyObservableList<IViewerInteractiveMode>(_interactiveModes);
 
             _editorModeModule = new EditorModeModule();
             var componentSelectorModule = new BoxedComponentSelectorModule(_eventAggregator);
@@ -175,20 +175,20 @@ namespace Calame.Viewer.ViewModels
 
         public void AddInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
-            _interactiveModes.Add(new ViewerInteractiveModeViewModel(interactiveMode));
+            _interactiveModes.Add(interactiveMode);
             _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void InsertInteractiveMode(int index, IViewerInteractiveMode interactiveMode)
         {
-            _interactiveModes.Insert(index, new ViewerInteractiveModeViewModel(interactiveMode));
+            _interactiveModes.Insert(index, interactiveMode);
             _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void RemoveInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
             _viewerModeToggle.Remove(interactiveMode.Interactive);
-            _interactiveModes.Remove(_interactiveModes.First(x => x.InteractiveModel == interactiveMode));
+            _interactiveModes.Remove(interactiveMode);
         }
 
         public Task HandleAsync(ISwitchViewerModeRequest message, CancellationToken cancellationToken)
@@ -196,14 +196,11 @@ namespace Calame.Viewer.ViewModels
             if (message.DocumentContext != _owner)
                 return Task.CompletedTask;
 
-            ViewerInteractiveModeViewModel modeViewModel = InteractiveModes.FirstOrDefault(x => message.Match(x.InteractiveModel));
-            if (modeViewModel == null)
+            IViewerInteractiveMode mode = InteractiveModes.FirstOrDefault(message.Match);
+            if (mode == null)
                 return Task.CompletedTask;
 
-            IViewerInteractiveMode mode = modeViewModel.InteractiveModel;
-
             SelectedMode = mode;
-            modeViewModel.IsActive = true;
             _viewerModeToggle.SelectedInteractive = SelectedMode.Interactive;
 
             Cursor = SelectedMode.Cursor;
@@ -252,7 +249,7 @@ namespace Calame.Viewer.ViewModels
             private InterfaceRoot _interfaceRoot;
 
             public string Name => "Editor";
-            public object IconKey => CalameIconKey.CursorMode;
+            public object IconKey => CalameIconKey.EditorMode;
             public Cursor Cursor => Cursors.Cross;
             public bool UseFreeCamera => true;
 

@@ -32,8 +32,8 @@ namespace Calame.Icons.Descriptors
                 case CalameIconKey.FreeCamera: return new IconDescription(PackIconMaterialKind.Video, DefaultBrush);
                 case CalameIconKey.NewViewer: return new IconDescription(PackIconMaterialKind.ShapeRectanglePlus, DefaultBrush);
 
-                case CalameIconKey.GameMode: return new IconDescription(PackIconMaterialKind.GamepadVariant, DefaultBrush);
-                case CalameIconKey.CursorMode: return new IconDescription(PackIconMaterialKind.CursorDefaultOutline, DefaultBrush);
+                case CalameIconKey.SessionMode: return new IconDescription(PackIconMaterialKind.GamepadVariant, DefaultBrush);
+                case CalameIconKey.EditorMode: return new IconDescription(PackIconMaterialKind.CursorDefaultOutline, DefaultBrush);
                 case CalameIconKey.BrushMode: return new IconDescription(PackIconMaterialKind.Brush, DefaultBrush);
 
                 case CalameIconKey.Previous: return new IconDescription(PackIconMaterialKind.ArrowLeftCircle, DefaultBrush);

@@ -5,42 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfInterop="clr-namespace:Glyph.WpfInterop;assembly=Glyph.WpfInterop"
              xmlns:viewModels="clr-namespace:Calame.SceneViewer.ViewModels"
-             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
-             xmlns:views="clr-namespace:Calame.SceneViewer.Views"
-             xmlns:viewerViewModels="clr-namespace:Calame.Viewer.ViewModels;assembly=Calame.Viewer"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:SceneViewerViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="180" d:DesignWidth="500">
-    <UserControl.Resources>
-        <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}" />
-    </UserControl.Resources>
     <DockPanel>
-        <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolbarDefaultBackground}">
-            <ToolBar ItemsSource="{Binding Viewer.InteractiveModes}">
-                <ToolBar.ItemTemplate>
-                    <DataTemplate DataType="{x:Type viewerViewModels:ViewerInteractiveModeViewModel}">
-                        <RadioButton ToolTip="{Binding InteractiveModel.Name}"
-                                     IsChecked="{Binding IsActive}"
-                                     GroupName="InteractiveModuleButtons"
-                                     Command="{Binding DataContext.SwitchModeCommand, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
-                                     CommandParameter="{Binding InteractiveModel}">
-                            <RadioButton.Content>
-                                <userControls:CalameIcon Target="{Binding InteractiveModel.IconKey}"
-                                                         IconSize="14"
-                                                         IconProvider="{Binding DataContext.IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:SceneViewerView}}}"
-                                                         IconDescriptor="{Binding DataContext.CalameIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:SceneViewerView}}}" />
-                            </RadioButton.Content>
-                            <RadioButton.Style>
-                                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}" />
-                            </RadioButton.Style>
-                        </RadioButton>
-                    </DataTemplate>
-                </ToolBar.ItemTemplate>
-            </ToolBar>
-        </ToolBarTray>
-        <ToolBarTray DockPanel.Dock="Right" Background="{DynamicResource ToolbarDefaultBackground}" />
-        <ToolBarTray DockPanel.Dock="Left" Background="{DynamicResource ToolbarDefaultBackground}" />
-        <ToolBarTray DockPanel.Dock="Bottom" Background="{DynamicResource ToolbarDefaultBackground}" />
         <wpfInterop:GlyphWpfViewer x:Name="GlyphWpfViewer"
                                    PreviewKeyDown="Viewer_OnPreviewKeyDown"
                                    PreviewKeyUp="Viewer_OnPreviewKeyUp"
