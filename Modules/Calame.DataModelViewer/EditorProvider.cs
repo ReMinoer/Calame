@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Calame.DataModelViewer.ViewModels;
+using Calame.Icons;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 
@@ -14,14 +15,19 @@ namespace Calame.DataModelViewer
     public class EditorProvider : IEditorProvider
     {
         private readonly CompositionContainer _compositionContainer;
+        private readonly IIconProvider _iconProvider;
+        private readonly IIconDescriptor<IEditorSource> _iconDescriptor;
 
         public List<IEditorSource> Editors { get; } = new List<IEditorSource>();
-        public IEnumerable<EditorFileType> FileTypes => Editors.SelectMany(x => x.FileExtensions.Select(e => new EditorFileType(x.DisplayName, e)));
+        public IEnumerable<EditorFileType> FileTypes => Editors.SelectMany(x => x.FileExtensions.Select(e => new EditorFileType(x.DisplayName, e, _iconProvider.GetUri(_iconDescriptor.GetIcon(x), 16))));
 
         [ImportingConstructor]
-        public EditorProvider(CompositionContainer compositionContainer, [ImportMany] IEnumerable<IEditorSource> editors)
+        public EditorProvider(CompositionContainer compositionContainer, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
+            [ImportMany] IEnumerable<IEditorSource> editors)
         {
             _compositionContainer = compositionContainer;
+            _iconProvider = iconProvider;
+            _iconDescriptor = iconDescriptorManager.GetDescriptor<IEditorSource>();
 
             if (editors != null)
                 Editors.AddRange(editors);

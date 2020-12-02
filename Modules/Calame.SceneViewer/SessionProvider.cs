@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Threading.Tasks;
+using Calame.Icons;
 using Calame.SceneViewer.ViewModels;
 using Gemini.Framework;
 using Gemini.Framework.Services;
@@ -15,15 +16,20 @@ namespace Calame.SceneViewer
     public class SessionProvider : IEditorProvider
     {
         private readonly CompositionContainer _compositionContainer;
-        
+        private readonly IIconProvider _iconProvider;
+        private readonly IIconDescriptor<ISession> _iconDescriptor;
+
         public ISession[] Sessions { get; }
         public IDataSession[] DataSessions { get; }
-        public IEnumerable<EditorFileType> FileTypes => Sessions.Select(x => new EditorFileType(x.DisplayName, null));
+        public IEnumerable<EditorFileType> FileTypes => Sessions.Select(x => new EditorFileType(x.DisplayName, null, _iconProvider.GetUri(_iconDescriptor.GetIcon(x), 16)));
 
         [ImportingConstructor]
-        public SessionProvider(CompositionContainer compositionContainer, [ImportMany] ISession[] sessions = null, [ImportMany] IDataSession[] dataSession = null)
+        public SessionProvider(CompositionContainer compositionContainer, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
+            [ImportMany] ISession[] sessions = null, [ImportMany] IDataSession[] dataSession = null)
         {
             _compositionContainer = compositionContainer;
+            _iconProvider = iconProvider;
+            _iconDescriptor = iconDescriptorManager.GetDescriptor<ISession>();
 
             Sessions = sessions;
             DataSessions = dataSession;
