@@ -18,6 +18,9 @@ namespace Calame.Viewer.Modules.Base
             _eventAggregator = eventAggregator;
         }
 
+        protected override void ConnectModel() {}
+        protected override void DisconnectModel() {}
+
         protected override void ConnectRunner()
         {
             _eventAggregator.SubscribeOnUI(this);

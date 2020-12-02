@@ -59,8 +59,6 @@ namespace Calame.SceneViewer.ViewModels
             SessionMode = new SessionModeModule();
             Viewer.InsertInteractiveMode(0, SessionMode);
 
-            ToolBarDefinition = ViewerToolBar.Definition;
-
             IconProvider = iconProvider;
             CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
         }
@@ -183,15 +181,10 @@ namespace Calame.SceneViewer.ViewModels
             public Cursor Cursor => Cursors.None;
             public bool UseFreeCamera => false;
 
-            protected override void ConnectRunner()
-            {
-                Model.AddInteractiveMode(this);
-            }
-
-            protected override void DisconnectRunner()
-            {
-                Model.RemoveInteractiveMode(this);
-            }
+            protected override void ConnectModel() => Model.AddInteractiveMode(this);
+            protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
+            protected override void ConnectRunner() {}
+            protected override void DisconnectRunner() {}
         }
     }
 }

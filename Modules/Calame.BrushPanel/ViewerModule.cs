@@ -111,13 +111,15 @@ namespace Calame.BrushPanel
         public object IconKey => CalameIconKey.BrushMode;
         Cursor IViewerInteractiveMode.Cursor => Cursors.Pen;
         bool IViewerInteractiveMode.UseFreeCamera => true;
-        
+
+        protected override void ConnectModel() => Model.AddInteractiveMode(this);
+        protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
+
         protected override void ConnectRunner()
         {
             _root = Model.EditorRoot.Add<GlyphObject>();
 
             Interactive = _root.Add<InteractiveRoot>().Interactive;
-            Model.AddInteractiveMode(this);
 
             _brushController = _root.Add<TBrushController>();
             _brushController.Input = InputSystem.Instance.Mouse[MouseButton.Left];
@@ -134,7 +136,6 @@ namespace Calame.BrushPanel
             _brushController.ApplyCancelled -= OnApplyCancelled;
             _brushController.ApplyStarted -= OnApplyStarted;
 
-            Model.RemoveInteractiveMode(this);
             Model.EditorRoot.RemoveAndDispose(_root);
 
             _brushController = null;

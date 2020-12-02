@@ -6,13 +6,30 @@ namespace Calame.Viewer.Modules.Base
 {
     public abstract class ViewerModuleBase : PropertyChangedBase, IViewerModule
     {
-        protected ViewerViewModel Model { get; private set; }
+        private ViewerViewModel _model;
+        public ViewerViewModel Model
+        {
+            get => _model;
+            set
+            {
+                if (_model == value)
+                    return;
+
+                if (_model != null)
+                    DisconnectModel();
+
+                _model = value;
+
+                if (_model != null)
+                    ConnectModel();
+            }
+        }
+
         protected GlyphWpfRunner Runner { get; private set; }
 
-        public void Connect(ViewerViewModel model)
+        public void Connect()
         {
-            Model = model;
-            Runner = model.Runner;
+            Runner = Model?.Runner;
             
             if (Runner != null)
                 ConnectRunner();
@@ -24,15 +41,16 @@ namespace Calame.Viewer.Modules.Base
                 DisconnectRunner();
 
             Runner = null;
-            Model = null;
         }
 
+        protected abstract void ConnectModel();
+        protected abstract void DisconnectModel();
         protected abstract void ConnectRunner();
         protected abstract void DisconnectRunner();
 
         public virtual void Dispose()
         {
-            if (Model != null)
+            if (Runner != null)
                 Disconnect();
         }
     }

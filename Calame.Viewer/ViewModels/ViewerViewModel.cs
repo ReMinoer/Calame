@@ -76,6 +76,8 @@ namespace Calame.Viewer.ViewModels
                 {
                     GlyphEngine engine = _runner.Engine;
 
+                    _viewerModeToggle.Clear();
+
                     foreach (IViewerModule module in Modules)
                         module.Disconnect();
 
@@ -83,6 +85,7 @@ namespace Calame.Viewer.ViewModels
                     
                     engine.InteractionManager.Root.Remove(_viewerModeToggle);
                     engine.InteractionManager.Root.Remove(_editorInteractive);
+
                     _runner.Engine.Root.RemoveAndDispose(Root);
                     
                     EditorView = null;
@@ -122,7 +125,10 @@ namespace Calame.Viewer.ViewModels
                     EditorCamera.View = EditorView;
 
                     foreach (IViewerModule module in Modules)
-                        module.Connect(this);
+                        module.Connect();
+
+                    foreach (IViewerInteractiveMode interactiveMode in InteractiveModes)
+                        _viewerModeToggle.Add(interactiveMode.Interactive);
                 }
                 else
                     ConnectRunner();
@@ -149,6 +155,10 @@ namespace Calame.Viewer.ViewModels
 
             var modules = new List<IViewerModule> { _editorModeModule, componentSelectorModule };
             modules.AddRange(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance()));
+
+            foreach (IViewerModule module in modules)
+                module.Model = this;
+
             Modules = new ReadOnlyList<IViewerModule>(modules);
 
             ComponentsFilter = new ComponentFilter();
@@ -176,18 +186,24 @@ namespace Calame.Viewer.ViewModels
         public void AddInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
             _interactiveModes.Add(interactiveMode);
-            _viewerModeToggle.Add(interactiveMode.Interactive);
+
+            if (Runner != null)
+                _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void InsertInteractiveMode(int index, IViewerInteractiveMode interactiveMode)
         {
             _interactiveModes.Insert(index, interactiveMode);
-            _viewerModeToggle.Add(interactiveMode.Interactive);
+
+            if (Runner != null)
+                _viewerModeToggle.Add(interactiveMode.Interactive);
         }
 
         public void RemoveInteractiveMode(IViewerInteractiveMode interactiveMode)
         {
-            _viewerModeToggle.Remove(interactiveMode.Interactive);
+            if (Runner != null)
+                _viewerModeToggle.Remove(interactiveMode.Interactive);
+
             _interactiveModes.Remove(interactiveMode);
         }
 
@@ -258,6 +274,9 @@ namespace Calame.Viewer.ViewModels
             public InteractiveInterfaceRoot Interactive => _interfaceRoot.Interactive;
             IInteractive IViewerInteractiveMode.Interactive => Interactive;
 
+            protected override void ConnectModel() => Model.AddInteractiveMode(this);
+            protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
+
             protected override void ConnectRunner()
             {
                 _interfaceRoot = Model.EditorRoot.Add<InterfaceRoot>();
@@ -266,14 +285,10 @@ namespace Calame.Viewer.ViewModels
                 Root = Model.EditorRoot.Add<GlyphObject>();
                 Root.Name = "Editor Mode Root";
                 Root.Add<UserInterface>();
-
-                Model.AddInteractiveMode(this);
             }
 
             protected override void DisconnectRunner()
             {
-                Model.RemoveInteractiveMode(this);
-                
                 Model.EditorRoot.RemoveAndDispose(Root);
                 Root = null;
 

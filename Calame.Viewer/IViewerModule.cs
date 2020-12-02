@@ -5,7 +5,8 @@ namespace Calame.Viewer
 {
     public interface IViewerModule : IDisposable
     {
-        void Connect(ViewerViewModel model);
+        ViewerViewModel Model { set; }
+        void Connect();
         void Disconnect();
     }
 }

@@ -33,7 +33,10 @@ namespace Calame.Viewer.Modules
         {
             _eventAggregator = eventAggregator;
         }
-        
+
+        protected override void ConnectModel() {}
+        protected override void DisconnectModel() {}
+
         protected override void ConnectRunner()
         {
             GlyphEngine engine = Model.Runner.Engine;
