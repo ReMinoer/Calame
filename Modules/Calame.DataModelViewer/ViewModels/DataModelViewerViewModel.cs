@@ -64,7 +64,6 @@ namespace Calame.DataModelViewer.ViewModels
             _importedTypeProvider = importedTypeProvider;
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
-            ToolBarDefinition = ViewerToolBar.Definition;
 
             DragOverCommand = new RelayCommand(x => Editor.OnDragOver((DragEventArgs)x));
             DropCommand = new RelayCommand(x => Editor.OnDrop((DragEventArgs)x));

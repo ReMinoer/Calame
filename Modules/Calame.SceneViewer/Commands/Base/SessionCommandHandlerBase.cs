@@ -8,13 +8,6 @@ namespace Calame.SceneViewer.Commands.Base
         where TSession : class, ISession
         where TCommandDefinition : CommandDefinition
     {
-        protected override sealed bool CanShow(Command command, SceneViewerViewModel document)
-        {
-            return base.CanShow(command, document)
-                && document.Session is TSession session
-                && CanShow(command, session);
-        }
-
         protected override sealed bool CanRun(Command command, SceneViewerViewModel document)
         {
             return base.CanRun(command, document)
@@ -30,7 +23,6 @@ namespace Calame.SceneViewer.Commands.Base
             return Task.CompletedTask;
         }
 
-        protected virtual bool CanShow(Command command, TSession session) => true;
         protected virtual bool CanRun(Command command, TSession session) => true;
         protected abstract Task RunAsync(Command command, TSession session);
     }

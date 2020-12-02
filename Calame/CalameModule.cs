@@ -8,7 +8,7 @@ namespace Calame
     {
         public override void Initialize()
         {
-            //Shell.ToolBars.Visible = true;
+            Shell.ToolBars.Visible = true;
         }
     }
 }

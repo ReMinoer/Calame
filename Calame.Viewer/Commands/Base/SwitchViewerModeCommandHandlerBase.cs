@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Calame.Viewer.Messages;
 using Caliburn.Micro;
 using Diese.Collections;
@@ -23,9 +22,9 @@ namespace Calame.Viewer.Commands.Base
             command.Checked = (Shell.ActiveItem as IViewerDocument)?.Viewer?.SelectedMode is TMode;
         }
 
-        protected override bool CanShow(Command command, IViewerDocument document)
+        protected override bool CanRun(Command command, IViewerDocument document)
         {
-            return (Shell.ActiveItem as IViewerDocument)?.Viewer?.InteractiveModes.AnyOfType<TMode>() ?? false;
+            return document?.Viewer?.InteractiveModes.AnyOfType<TMode>() ?? false;
         }
 
         protected override async Task RunAsync(Command command, IViewerDocument document)

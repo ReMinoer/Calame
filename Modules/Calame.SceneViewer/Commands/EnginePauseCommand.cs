@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Composition;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Calame.Commands.Base;
 using Calame.Icons;
 using Calame.SceneViewer.Commands.Base;
@@ -10,23 +9,15 @@ using Glyph.Engine;
 namespace Calame.SceneViewer.Commands
 {
     [CommandDefinition]
-    public class EnginePauseResumeCommand : CalameCommandDefinitionBase
+    public class EnginePauseCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Pause/Resume";
+        public override string Text => "Pause";
         public override object IconKey => CalameIconKey.Pause;
 
         [CommandHandler]
-        public class CommandHandler : SceneViewerCommandHandlerBase<EnginePauseResumeCommand>
+        public class CommandHandler : SceneViewerCommandHandlerBase<EnginePauseCommand>
         {
-            private readonly IIconProvider _iconProvider;
-            private readonly IIconDescriptor<CalameIconKey> _iconDescriptor;
-
-            [ImportingConstructor]
-            public CommandHandler(IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
-            {
-                _iconProvider = iconProvider;
-                _iconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
-            }
+            public override bool ShowOnlyIfEnabled => true;
 
             protected override void UpdateStatus(Command command)
             {
@@ -35,10 +26,7 @@ namespace Calame.SceneViewer.Commands
                     return;
 
                 command.Tag = isPaused;
-                command.Text = isPaused ? "Resume" : "Pause";
-
-                CalameIconKey iconKey = isPaused ? CalameIconKey.Play : CalameIconKey.Pause;
-                command.IconSource = _iconProvider.GetUri(_iconDescriptor.GetIcon(iconKey), 16);
+                command.Checked = isPaused;
             }
 
             protected override Task RunAsync(Command command, SceneViewerViewModel document)

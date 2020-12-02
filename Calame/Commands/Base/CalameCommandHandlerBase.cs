@@ -6,10 +6,15 @@ namespace Calame.Commands.Base
     public abstract class CalameCommandHandlerBase<TCommandDefinition> : CommandHandlerBase<TCommandDefinition>
         where TCommandDefinition : CommandDefinition
     {
+        public virtual bool ShowOnlyIfEnabled => false;
+
         public override sealed void Update(Command command)
         {
-            command.Visible = CanShow(command);
-            command.Enabled = command.Visible && CanRun(command);
+            command.Enabled = CanRun(command);
+
+            if (ShowOnlyIfEnabled)
+                command.Visible = command.Enabled;
+
             UpdateStatus(command);
         }
 
@@ -20,7 +25,6 @@ namespace Calame.Commands.Base
         }
 
         protected virtual void UpdateStatus(Command command) { }
-        protected virtual bool CanShow(Command command) => true;
         protected virtual bool CanRun(Command command) => true;
         protected abstract Task RunAsync(Command command);
     }

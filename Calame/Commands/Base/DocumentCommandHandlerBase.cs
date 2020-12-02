@@ -17,11 +17,6 @@ namespace Calame.Commands.Base
             Shell = IoC.Get<IShell>();
         }
 
-        protected override sealed bool CanShow(Command command)
-        {
-            return Shell.ActiveItem is TDocument document && CanShow(command, document);
-        }
-
         protected override sealed bool CanRun(Command command)
         {
             return Shell.ActiveItem is TDocument document && CanRun(command, document);
@@ -35,7 +30,6 @@ namespace Calame.Commands.Base
             return Task.CompletedTask;
         }
 
-        protected virtual bool CanShow(Command command, TDocument document) => true;
         protected virtual bool CanRun(Command command, TDocument document) => true;
         protected abstract Task RunAsync(Command command, TDocument document);
     }
