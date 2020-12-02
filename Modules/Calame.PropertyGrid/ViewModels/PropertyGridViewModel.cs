@@ -5,11 +5,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Calame.Commands;
 using Calame.ContentFileTypes;
 using Calame.Icons;
 using Calame.PropertyGrid.Controls;
 using Caliburn.Micro;
 using Gemini.Framework;
+using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
@@ -22,9 +24,6 @@ namespace Calame.PropertyGrid.ViewModels
     public sealed class PropertyGridViewModel : CalameTool<IDocumentContext>, IHandle<ISelectionSpread<object>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
-
-        private SelectionHistory _selectionHistory;
-        public SelectionHistoryManager SelectionHistoryManager { get; }
 
         public IIconProvider IconProvider { get; }
         public IIconDescriptorManager IconDescriptorManager { get; }
@@ -53,15 +52,15 @@ namespace Calame.PropertyGrid.ViewModels
         public IContentFileTypeResolver ContentFileTypeResolver { get; }
         public IList<Type> NewItemTypeRegistry { get; }
 
-        public AsyncCommand PreviousCommand { get; }
-        public AsyncCommand NextCommand { get; }
+        public TargetableCommand PreviousCommand { get; }
+        public TargetableCommand NextCommand { get; }
         public RelayCommand OpenFileCommand { get; }
         public RelayCommand OpenFolderCommand { get; }
         public AsyncCommand DirtyDocumentCommand { get; }
         public RelayCommand SelectItemCommand { get; }
 
         [ImportingConstructor]
-        public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, SelectionHistoryManager selectionHistoryManager,
+        public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, ICommandService commandService,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEditorProvider[] editorProviders, IContentFileTypeResolver contentFileTypeResolver)
             : base(shell, eventAggregator)
         {
@@ -70,18 +69,11 @@ namespace Calame.PropertyGrid.ViewModels
             ContentFileTypeResolver = contentFileTypeResolver;
             NewItemTypeRegistry = importedTypeProvider.Types.Where(t => t.GetConstructor(Type.EmptyTypes) != null).ToList();
 
-            SelectionHistoryManager = selectionHistoryManager;
-            SelectionHistoryManager.CurrentDocumentHistoryChanged += OnCurrentDocumentHistoryChanged;
-
             IconProvider = iconProvider;
             IconDescriptorManager = iconDescriptorManager;
 
-            PreviousCommand = new AsyncCommand(
-                () => _selectionHistory?.SelectPreviousAsync(),
-                () => _selectionHistory?.HasPrevious ?? false);
-            NextCommand = new AsyncCommand(
-                () => _selectionHistory?.SelectNextAsync(),
-                () => _selectionHistory?.HasNext ?? false);
+            PreviousCommand = commandService.GetTargetableCommand<PreviousSelectionCommand>();
+            NextCommand = commandService.GetTargetableCommand<NextSelectionCommand>();
 
             OpenFolderCommand = new RelayCommand(
                 path => Process.Start((string)path),
@@ -127,29 +119,6 @@ namespace Calame.PropertyGrid.ViewModels
 
             return Task.CompletedTask;
         }
-
-        private void OnCurrentDocumentHistoryChanged(object sender, EventArgs e)
-        {
-            if (_selectionHistory != null)
-            {
-                _selectionHistory.HasNextChanged -= OnHasNextSelectionChanged;
-                _selectionHistory.HasPreviousChanged -= OnHasPreviousSelectionChanged;
-            }
-
-            _selectionHistory = SelectionHistoryManager.CurrentDocumentHistory;
-
-            PreviousCommand.RaiseCanExecuteChanged();
-            NextCommand.RaiseCanExecuteChanged();
-
-            if (_selectionHistory != null)
-            {
-                _selectionHistory.HasPreviousChanged += OnHasPreviousSelectionChanged;
-                _selectionHistory.HasNextChanged += OnHasNextSelectionChanged;
-            }
-        }
-
-        private void OnHasPreviousSelectionChanged(object sender, EventArgs e) => PreviousCommand.RaiseCanExecuteChanged();
-        private void OnHasNextSelectionChanged(object sender, EventArgs e) => NextCommand.RaiseCanExecuteChanged();
 
         public Task HandleAsync(ISelectionSpread<object> message, CancellationToken cancellationToken)
         {
