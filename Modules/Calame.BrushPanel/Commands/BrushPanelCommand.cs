@@ -1,5 +1,4 @@
 ﻿using Calame.BrushPanel.ViewModels;
-using Calame.Commands;
 using Calame.Commands.Base;
 using Calame.Icons;
 using Gemini.Framework.Commands;

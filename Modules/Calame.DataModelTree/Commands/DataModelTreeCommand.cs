@@ -1,5 +1,4 @@
-﻿using Calame.Commands;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.DataModelTree.ViewModels;
 using Calame.Icons;
 using Gemini.Framework.Commands;

@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
 
-namespace Calame.Commands
+namespace Calame.Commands.Base
 {
     public abstract class OpenToolCommandBase<TDefinition, TTool> : CalameCommandHandlerBase<TDefinition>
         where TDefinition : CommandDefinition
