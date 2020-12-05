@@ -19,7 +19,7 @@ namespace Calame
         private readonly ConcurrentDictionary<IDocument, SelectionHistory> _documentHistories;
         public ReadOnlyDictionary<IDocument, SelectionHistory> DocumentHistories { get; }
 
-        public SelectionHistory CurrentDocumentHistory => DocumentHistories[_shell.ActiveItem];
+        public SelectionHistory CurrentDocumentHistory => GetHistory(_shell.ActiveItem);
 
         [ImportingConstructor]
         public SelectionHistoryManager(IShell shell, IEventAggregator eventAggregator)
@@ -32,9 +32,14 @@ namespace Calame
             DocumentHistories = new ReadOnlyDictionary<IDocument, SelectionHistory>(_documentHistories);
         }
 
+        private SelectionHistory GetHistory(IDocument document)
+        {
+            return _documentHistories.GetOrAdd(document, _ => new SelectionHistory(_eventAggregator));
+        }
+
         public Task HandleAsync(ISelectionSpread<object> message, CancellationToken cancellationToken)
         {
-            _documentHistories.GetOrAdd(message.DocumentContext.Document, _ => new SelectionHistory(_eventAggregator)).AddNewSelection(message);
+            GetHistory(message.DocumentContext.Document).AddNewSelection(message);
             return Task.CompletedTask;
         }
 
