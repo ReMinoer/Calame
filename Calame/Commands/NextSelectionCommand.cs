@@ -26,7 +26,7 @@ namespace Calame.Commands
 
             protected override bool CanRun(Command command, IDocument document)
             {
-                return _selectionHistoryManager.CurrentDocumentHistory.HasNext;
+                return _selectionHistoryManager.CurrentDocumentHistory?.HasNext ?? false;
             }
 
             protected override async Task RunAsync(Command command, IDocument document)

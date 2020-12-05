@@ -43,6 +43,7 @@ namespace Calame.DataModelViewer.ViewModels
             }
         }
 
+        IDocument IDocumentContext.Document => this;
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;

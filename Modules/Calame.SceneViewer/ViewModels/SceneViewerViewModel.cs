@@ -35,6 +35,7 @@ namespace Calame.SceneViewer.ViewModels
         public ISession Session { get; set; }
         public SessionModeModule SessionMode { get; }
 
+        IDocument IDocumentContext.Document => this;
         GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;

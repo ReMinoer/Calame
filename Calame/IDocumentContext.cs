@@ -1,7 +1,10 @@
-﻿namespace Calame
+﻿using Gemini.Framework;
+
+namespace Calame
 {
     public interface IDocumentContext
     {
+        IDocument Document { get; }
         string WorkingDirectory { get; }
     }
 
