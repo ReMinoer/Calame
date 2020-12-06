@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Glyph.Composition.Modelization;
 using Glyph.IO;
 
 namespace Calame.DataModelViewer.Base
 {
-    public abstract class SerializingEditorSourceBase<T, TEditor> : EditorSourceBase
+    public abstract class SerializingEditorSourceBase<T, TEditor> : EditorSourceBase<TEditor>
         where T : IGlyphCreator, new()
         where TEditor : SerializingViewerEditorBase<T>, new()
     {
@@ -24,8 +23,7 @@ namespace Calame.DataModelViewer.Base
             _importedTypeProvider = importedTypeProvider;
         }
 
-        public override sealed IEditor CreateEditor() => InstantiateEditor();
-        protected virtual TEditor InstantiateEditor()
+        public override TEditor CreateEditor()
         {
             return new TEditor
             {

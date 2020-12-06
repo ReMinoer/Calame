@@ -45,9 +45,11 @@ namespace Calame.CompositionGraph.ViewModels
             }
         }
 
+        protected override object IconKey => CalameIconKey.CompositionGraph;
+
         [ImportingConstructor]
         public CompositionGraphViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
-            : base(shell, eventAggregator)
+            : base(shell, eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Composition Graph";
             

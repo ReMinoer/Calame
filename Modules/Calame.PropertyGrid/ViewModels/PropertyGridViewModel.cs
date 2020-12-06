@@ -59,10 +59,12 @@ namespace Calame.PropertyGrid.ViewModels
         public AsyncCommand DirtyDocumentCommand { get; }
         public RelayCommand SelectItemCommand { get; }
 
+        protected override object IconKey => CalameIconKey.PropertyGrid;
+
         [ImportingConstructor]
         public PropertyGridViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider, ICommandService commandService,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEditorProvider[] editorProviders, IContentFileTypeResolver contentFileTypeResolver)
-            : base(shell, eventAggregator)
+            : base(shell, eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Property Grid";
 

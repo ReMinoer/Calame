@@ -16,7 +16,7 @@ namespace Calame.Demo.Modules.DemoGameData
     [Export(typeof(ITypeIconDescriptorModule<IGlyphData>))]
     public class DataIconDescriptor : TypeIconDescriptorModuleBase<IGlyphData>
     {
-        static public readonly Brush DefaultBrush = Brushes.DimGray;
+        static public readonly Brush DefaultBrush = IconBrushes.Default;
 
         public override IconDescription GetTypeIcon(Type type)
         {

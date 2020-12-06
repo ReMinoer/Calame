@@ -9,7 +9,7 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(IBaseTypeIconDescriptorModule))]
     public class BaseTypeIconDescriptor : IBaseTypeIconDescriptorModule
     {
-        static public readonly Brush DefaultBrush = Brushes.Black;
+        static public readonly Brush DefaultBrush = IconBrushes.Default;
 
         public bool Handle(object model) => model == null || Handle(model.GetType());
         public bool Handle(Type type) => type?.Namespace?.StartsWith(nameof(System)) ?? false;

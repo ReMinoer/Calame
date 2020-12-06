@@ -28,4 +28,10 @@ namespace Calame.DataModelViewer
         void OnDragOver(DragEventArgs dragEventArgs);
         void OnDrop(DragEventArgs dragEventArgs);
     }
+
+    public interface IEditor<out TData> : IEditor
+        where TData : IGlyphData
+    {
+        new TData Data { get; }
+    }
 }

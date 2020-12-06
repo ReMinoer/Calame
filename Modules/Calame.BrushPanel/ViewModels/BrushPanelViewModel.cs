@@ -125,9 +125,11 @@ namespace Calame.BrushPanel.ViewModels
         public ICommand SelectBrushCommand { get; }
         public ICommand SelectPaintCommand { get; }
 
+        protected override object IconKey => CalameIconKey.BrushPanel;
+
         [ImportingConstructor]
         public BrushPanelViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEngineBrushViewModel[] allEngineBrushes, [ImportMany] IDataBrushViewModel[] allDataBrushes)
-            : base(shell, eventAggregator)
+            : base(shell, eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Brush Panel";
 

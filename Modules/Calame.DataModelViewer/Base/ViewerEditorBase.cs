@@ -14,34 +14,34 @@ using Niddle;
 
 namespace Calame.DataModelViewer.Base
 {
-    public abstract class ViewerEditorBase<T> : IEditor
+    public abstract class ViewerEditorBase<T> : IEditor<T>
         where T : IGlyphCreator
     {
         protected abstract ISaveLoadFormat<T> SaveLoadFormat { get; }
 
-        public T Creator { get; private set; }
-        IGlyphData IEditor.Data => Creator;
+        public T Data { get; private set; }
+        IGlyphData IEditor.Data => Data;
 
         public ToolBarDefinition ToolBarDefinition { get; set; }
 
         public async Task NewDataAsync()
         {
-            Creator = await NewAsync();
+            Data = await NewAsync();
         }
 
         public async Task LoadDataAsync(Stream stream)
         {
-            Creator = await LoadAsync(stream);
+            Data = await LoadAsync(stream);
         }
         
         public Task SaveDataAsync(Stream stream)
         {
-            return SaveAsync(Creator, stream);
+            return SaveAsync(Data, stream);
         }
 
         protected abstract Task<T> NewAsync();
         protected virtual Task<T> LoadAsync(Stream stream) => Task.Run(() => SaveLoadFormat.Load(stream));
-        protected virtual Task SaveAsync(T data, Stream stream) => Task.Run(() => SaveLoadFormat.Save(Creator, stream));
+        protected virtual Task SaveAsync(T data, Stream stream) => Task.Run(() => SaveLoadFormat.Save(Data, stream));
 
         public abstract IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService);
         public abstract void RegisterDependencies(IDependencyRegistry registry);
@@ -61,8 +61,8 @@ namespace Calame.DataModelViewer.Base
             dataRoot.Name = "Data Root";
             dataRoot.Add<SceneNode>();
 
-            Creator.Instantiate();
-            dataRoot.Add(Creator.BindedObject);
+            Data.Instantiate();
+            dataRoot.Add(Data.BindedObject);
         }
 
         public virtual void OnDragOver(DragEventArgs dragEventArgs)
@@ -76,7 +76,7 @@ namespace Calame.DataModelViewer.Base
 
         public void Dispose()
         {
-            Creator?.Dispose();
+            Data?.Dispose();
         }
     }
 }

@@ -67,9 +67,11 @@ namespace Calame.SceneGraph.ViewModels
             }
         }
 
+        protected override object IconKey => CalameIconKey.SceneGraph;
+
         [ImportingConstructor]
         public SceneGraphViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
-            : base(shell, eventAggregator)
+            : base(shell, eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Scene Graph";
             

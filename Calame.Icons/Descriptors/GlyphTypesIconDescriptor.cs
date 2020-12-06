@@ -21,7 +21,7 @@ namespace Calame.Icons.Descriptors
     [Export(typeof(ITypeDefaultIconDescriptorModule))]
     public class GlyphTypesIconDescriptor : TypeHybridIconDescriptorModuleBase
     {
-        static public readonly Brush DefaultBrush = Brushes.Black;
+        static public readonly Brush DefaultBrush = IconBrushes.Default;
 
         public override bool Handle(Type type)
         {

@@ -10,4 +10,10 @@ namespace Calame.DataModelViewer
         IEnumerable<string> FileExtensions { get; }
         IEditor CreateEditor();
     }
+
+    public interface IEditorSource<out TEditor> : IEditorSource
+        where TEditor : IEditor
+    {
+        new TEditor CreateEditor();
+    }
 }

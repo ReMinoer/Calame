@@ -40,6 +40,7 @@ namespace Calame.DataModelViewer.ViewModels
             {
                 _editor = value;
                 ToolBarDefinition = _editor?.ToolBarDefinition;
+                RefreshIcon();
             }
         }
 
@@ -52,15 +53,12 @@ namespace Calame.DataModelViewer.ViewModels
         public ICommand DragOverCommand { get; }
         public ICommand DropCommand { get; }
 
-        public IIconProvider IconProvider { get; }
-        public IIconDescriptor CalameIconDescriptor { get; }
-
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
         [ImportingConstructor]
         public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IImportedTypeProvider importedTypeProvider,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
-            : base(eventAggregator, fileWatcher)
+            : base(eventAggregator, fileWatcher, iconProvider, iconDescriptorManager)
         {
             _importedTypeProvider = importedTypeProvider;
 
@@ -68,9 +66,6 @@ namespace Calame.DataModelViewer.ViewModels
 
             DragOverCommand = new RelayCommand(x => Editor.OnDragOver((DragEventArgs)x));
             DropCommand = new RelayCommand(x => Editor.OnDrop((DragEventArgs)x));
-
-            IconProvider = iconProvider;
-            CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
         }
 
         protected override async Task NewDocumentAsync()

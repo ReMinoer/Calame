@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace Calame.DataModelViewer.Base
 {
-    public abstract class EditorSourceBase : IEditorSource
+    public abstract class EditorSourceBase<TEditor> : IEditorSource<TEditor>
+        where TEditor : IEditor
     {
         public string DisplayName { get; }
         public Type DataType { get; }
@@ -23,6 +24,7 @@ namespace Calame.DataModelViewer.Base
             FileExtensions = extensions;
         }
 
-        public abstract IEditor CreateEditor();
+        public abstract TEditor CreateEditor();
+        IEditor IEditorSource.CreateEditor() => CreateEditor();
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework;
 using NLog.Extensions.Logging;
@@ -67,8 +68,8 @@ namespace Calame
             }
         }
 
-        public CalamePersistedDocumentBase(IEventAggregator eventAggregator, PathWatcher fileWatcher)
-            : base(eventAggregator)
+        public CalamePersistedDocumentBase(IEventAggregator eventAggregator, PathWatcher fileWatcher, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+            : base(eventAggregator, iconProvider, iconDescriptorManager)
         {
             FileWatcher = fileWatcher;
             FileWatcher.Logger = LoggerProvider.CreateLogger(GetType().FullName);

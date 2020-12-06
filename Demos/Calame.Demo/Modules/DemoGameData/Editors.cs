@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using Calame.DataModelViewer;
 using Calame.DataModelViewer.Base;
@@ -57,9 +56,9 @@ namespace Calame.Demo.Modules.DemoGameData
             IconDescriptorManager = iconDescriptorManager;
         }
 
-        protected override TEditor InstantiateEditor()
+        public override TEditor CreateEditor()
         {
-            TEditor editor = base.InstantiateEditor();
+            TEditor editor = base.CreateEditor();
             editor.IconProvider = IconProvider;
             editor.IconDescriptorManager = IconDescriptorManager;
             return editor;
@@ -140,13 +139,13 @@ namespace Calame.Demo.Modules.DemoGameData
                     switch (content)
                     {
                         case Texture2D _:
-                            Creator.Instances.Add(new SpriteInstanceData
+                            Data.Instances.Add(new SpriteInstanceData
                             {
                                 AssetPath = assetPath
                             });
                             break;
                         case null:
-                            Creator.Instances.Add(new FileInstanceData
+                            Data.Instances.Add(new FileInstanceData
                             {
                                 FilePath = filePath
                             });

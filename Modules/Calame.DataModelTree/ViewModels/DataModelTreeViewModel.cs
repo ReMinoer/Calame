@@ -43,9 +43,11 @@ namespace Calame.DataModelTree.ViewModels
             }
         }
 
+        protected override object IconKey => CalameIconKey.DataModelTree;
+
         [ImportingConstructor]
         public DataModelTreeViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
-            : base(shell, eventAggregator)
+            : base(shell, eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Data Model Tree";
 

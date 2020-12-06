@@ -5,24 +5,23 @@ using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons.Descriptors
 {
-    [Export(typeof(IIconDescriptorModule))]
-    [Export(typeof(IIconDescriptorModule<CalameIconKey>))]
-    public class CalameIconProvider : IconDescriptorModuleBase<CalameIconKey>
+    [Export(typeof(IDefaultIconDescriptorModule))]
+    [Export(typeof(IDefaultIconDescriptorModule<CalameIconKey>))]
+    public class CalameIconDescriptor : DefaultIconDescriptorModuleBase<CalameIconKey>
     {
-        static public readonly Brush ToolsBrush = Brushes.DimGray;
-        static public readonly Brush DefaultBrush = Brushes.Black;
+        static public readonly Brush DefaultBrush = IconBrushes.Default;
 
-        public override IconDescription GetIcon(CalameIconKey key)
+        public override IconDescription GetDefaultIcon(CalameIconKey key)
         {
             switch (key)
             {
-                case CalameIconKey.BrushPanel: return new IconDescription(PackIconMaterialKind.Palette, ToolsBrush);
-                case CalameIconKey.CompositionGraph: return new IconDescription(PackIconMaterialKind.HexagonMultiple, ToolsBrush);
-                case CalameIconKey.DataModelTree: return new IconDescription(PackIconMaterialKind.HexagonMultipleOutline, ToolsBrush);
-                case CalameIconKey.InteractionTree: return new IconDescription(PackIconMaterialKind.GestureTap, ToolsBrush);
-                case CalameIconKey.LogConsole: return new IconDescription(PackIconMaterialKind.Console, ToolsBrush);
-                case CalameIconKey.PropertyGrid: return new IconDescription(PackIconMaterialKind.FormatListBulletedType, ToolsBrush);
-                case CalameIconKey.SceneGraph: return new IconDescription(PackIconMaterialKind.AxisArrow, ToolsBrush);
+                case CalameIconKey.BrushPanel: return new IconDescription(PackIconMaterialKind.Palette, DefaultBrush);
+                case CalameIconKey.CompositionGraph: return new IconDescription(PackIconMaterialKind.HexagonMultiple, DefaultBrush);
+                case CalameIconKey.DataModelTree: return new IconDescription(PackIconMaterialKind.HexagonMultipleOutline, DefaultBrush);
+                case CalameIconKey.InteractionTree: return new IconDescription(PackIconMaterialKind.GestureTap, DefaultBrush);
+                case CalameIconKey.LogConsole: return new IconDescription(PackIconMaterialKind.Console, DefaultBrush);
+                case CalameIconKey.PropertyGrid: return new IconDescription(PackIconMaterialKind.FormatListBulletedType, DefaultBrush);
+                case CalameIconKey.SceneGraph: return new IconDescription(PackIconMaterialKind.AxisArrow, DefaultBrush);
 
                 case CalameIconKey.Play: return new IconDescription(PackIconMaterialKind.Play, Brushes.Green);
                 case CalameIconKey.Pause: return new IconDescription(PackIconMaterialKind.Pause, Brushes.CornflowerBlue);

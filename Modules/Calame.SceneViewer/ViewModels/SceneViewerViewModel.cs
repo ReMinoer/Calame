@@ -30,9 +30,19 @@ namespace Calame.SceneViewer.ViewModels
     {
         private GlyphEngine _engine;
         private MessagingTracker<IView> _viewTracker;
+        private ISession _session;
+
+        public ISession Session
+        {
+            get => _session;
+            set
+            {
+                _session = value;
+                RefreshIcon();
+            }
+        }
 
         public ViewerViewModel Viewer { get; }
-        public ISession Session { get; set; }
         public SessionModeModule SessionMode { get; }
 
         IDocument IDocumentContext.Document => this;
@@ -42,15 +52,12 @@ namespace Calame.SceneViewer.ViewModels
 
         public bool FreeCameraEnabled { get; private set; }
 
-        public IIconProvider IconProvider { get; }
-        public IIconDescriptor CalameIconDescriptor { get; }
-
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
         [ImportingConstructor]
         public SceneViewerViewModel(IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
             [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
-            : base(eventAggregator)
+            : base(eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Scene Viewer";
 
@@ -59,9 +66,6 @@ namespace Calame.SceneViewer.ViewModels
 
             SessionMode = new SessionModeModule();
             Viewer.InsertInteractiveMode(0, SessionMode);
-
-            IconProvider = iconProvider;
-            CalameIconDescriptor = iconDescriptorManager.GetDescriptor<CalameIconKey>();
         }
 
         public async Task InitializeSession()

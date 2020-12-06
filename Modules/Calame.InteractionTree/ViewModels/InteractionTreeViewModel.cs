@@ -31,9 +31,11 @@ namespace Calame.InteractionTree.ViewModels
             private set => SetValue(ref _engine, value);
         }
 
+        protected override object IconKey => CalameIconKey.InteractionTree;
+
         [ImportingConstructor]
         public InteractionTreeViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
-            : base(shell, eventAggregator)
+            : base(shell, eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Interaction Tree";
 

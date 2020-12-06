@@ -16,7 +16,18 @@ namespace Calame.Icons.Base
         public override bool Handle(object model) => model is T;
 
         protected abstract TTarget GetTarget(T model);
-        public override IconDescription GetIcon(T model) => _modules.Select(x => x.GetIcon(GetTarget(model))).FirstOrDefault(x => x.Defined);
+        protected virtual IconDescription TransformIcon(IconDescription iconDescription) => iconDescription;
+
+        public override IconDescription GetIcon(T model)
+        {
+            IconDescription result = _modules.Select(x => x.GetIcon(GetTarget(model))).FirstOrDefault(x => x.Defined);
+            if (result.Defined)
+                return TransformIcon(result);
+
+            return GetNotTargetedIcon(model);
+        }
+
+        protected virtual IconDescription GetNotTargetedIcon(T model) => IconDescription.None;
     }
 
     public abstract class TypeReTargetingDescriptorModuleBase<T, TTarget> : ReTargetingDescriptorModuleBase<T, TTarget>, ITypeIconDescriptorModule<T>
@@ -29,10 +40,19 @@ namespace Calame.Icons.Base
             _typeModules = typeModules;
         }
 
+        protected override sealed IconDescription GetNotTargetedIcon(T model) => GetTypeIcon(model?.GetType());
+
         public virtual bool Handle(Type type) => type.Is<T>();
 
         protected abstract Type GetTypeTarget(Type type);
-        public IconDescription GetTypeIcon(Type type) => _typeModules.Select(x => x.GetTypeIcon(GetTypeTarget(type))).FirstOrDefault(x => x.Defined);
+        public IconDescription GetTypeIcon(Type type)
+        {
+            IconDescription result = _typeModules.Select(x => x.GetTypeIcon(GetTypeTarget(type))).FirstOrDefault(x => x.Defined);
+            if (result.Defined)
+                return TransformIcon(result);
+
+            return GetNotTargetedTypeIcon(type);
+        }
 
         public override IconDescription GetIcon(T model)
         {
@@ -42,5 +62,7 @@ namespace Calame.Icons.Base
 
             return GetTypeIcon(model?.GetType());
         }
+
+        protected virtual IconDescription GetNotTargetedTypeIcon(Type type) => IconDescription.None;
     }
 }

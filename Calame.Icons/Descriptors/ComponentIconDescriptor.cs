@@ -42,7 +42,7 @@ namespace Calame.Icons.Descriptors
         static public readonly Brush InputCategoryBrush = Brushes.DeepPink;
         static public readonly Brush ScriptingCategoryBrush = Brushes.DarkOrange;
         static public readonly Brush UiCategoryBrush = Brushes.Goldenrod;
-        static public readonly Brush ToolCategoryBrush = Brushes.Black;
+        static public readonly Brush ToolCategoryBrush = IconBrushes.Default;
 
         public override IconDescription GetTypeDefaultIcon(Type type)
         {
