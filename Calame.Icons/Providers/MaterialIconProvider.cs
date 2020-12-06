@@ -5,6 +5,7 @@ using MahApps.Metro.IconPacks;
 namespace Calame.Icons.Providers
 {
     [Export(typeof(IIconProviderModule))]
+    [Export(typeof(IIconProviderModule<PackIconMaterialKind>))]
     public class MaterialIconProvider : MahAppsIconProviderModuleBase<PackIconMaterialKind, PackIconMaterial>
     {
         protected override void AssignKindToControl(PackIconMaterial control, PackIconMaterialKind kind) => control.Kind = kind;

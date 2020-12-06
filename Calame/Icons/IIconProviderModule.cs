@@ -4,4 +4,8 @@
     {
         bool Handle(IconDescription iconDescription);
     }
+
+    public interface IIconProviderModule<TKey> : IIconProviderModule
+    {
+    }
 }

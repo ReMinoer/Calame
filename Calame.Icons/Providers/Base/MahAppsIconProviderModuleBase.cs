@@ -9,7 +9,7 @@ using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons.Providers.Base
 {
-    public abstract class MahAppsIconProviderModuleBase<TKind, TControl> : IIconProviderModule
+    public abstract class MahAppsIconProviderModuleBase<TKind, TControl> : IIconProviderModule<TKind>
         where TControl : PackIconControlBase, new()
     {
         static MahAppsIconProviderModuleBase()

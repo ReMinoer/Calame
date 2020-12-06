@@ -8,8 +8,8 @@ namespace Calame.SceneViewer.Icons
 {
     [Export(typeof(IDefaultIconDescriptorModule))]
     [Export(typeof(IDefaultIconDescriptorModule<IDocument>))]
-    public class SceneViewerIconDescriptor : ReTargetingDefaultDescriptorModuleBase<IDocument, IDataSession>
+    public class SceneViewerIconDescriptor : ReTargetingDefaultDescriptorModuleBase<IDocument, ISession>
     {
-        protected override IDataSession GetTarget(IDocument model) => (model as SceneViewerViewModel)?.Session as IDataSession;
+        protected override ISession GetTarget(IDocument model) => (model as SceneViewerViewModel)?.Session;
     }
 }
