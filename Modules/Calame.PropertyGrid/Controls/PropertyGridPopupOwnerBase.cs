@@ -210,15 +210,18 @@ namespace Calame.PropertyGrid.Controls
 
             popup.Removed += OnRemoved;
             popup.Selected += OnSelected;
+            propertyGrid.ItemSelected += OnPropertyGridItemSelected;
             propertyGrid.PropertyValueChanged += OnPropertyValueChanged;
 
             void OnRemoved(object sender, EventArgs e) => OnItemRemoved(popup, popupOwner);
             void OnSelected(object sender, EventArgs e) => OnItemSelected(popup, itemModel);
+            void OnPropertyGridItemSelected(object sender, ItemEventArgs e) => OnItemSelectedPropertyGrid(popup, e);
             void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e) => OnPopupPropertyValueChanged(propertyGrid, popupOwner, e);
 
             popup.Closed += (sender, args) =>
             {
                 propertyGrid.PropertyValueChanged -= OnPropertyValueChanged;
+                propertyGrid.ItemSelected -= OnPropertyGridItemSelected;
                 popup.Selected -= OnSelected;
                 popup.Removed -= OnRemoved;
 
@@ -251,10 +254,16 @@ namespace Calame.PropertyGrid.Controls
             OnItemRemoved(popupOwner);
         }
 
-        private void OnItemSelected(Popup sender, object item)
+        private void OnItemSelected(Popup popup, object item)
         {
-            sender.IsOpen = false;
+            popup.IsOpen = false;
             ItemSelected?.Invoke(this, new ItemEventArgs(item));
+        }
+
+        private void OnItemSelectedPropertyGrid(Popup popup, ItemEventArgs itemEventArgs)
+        {
+            popup.IsOpen = false;
+            ItemSelected?.Invoke(this, itemEventArgs);
         }
 
         private void OnPopupPropertyValueChanged(CalamePropertyGrid propertyGrid, DependencyObject popupOwner, PropertyValueChangedEventArgs e)
