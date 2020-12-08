@@ -10,6 +10,6 @@ namespace Calame.SceneViewer
     public interface IDataSession<TData> : IDataSession
         where TData : IGlyphData
     {
-        TData Data { get; set; }
+        new TData Data { get; set; }
     }
 }
