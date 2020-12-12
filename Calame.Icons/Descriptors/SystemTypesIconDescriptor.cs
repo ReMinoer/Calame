@@ -1,28 +1,29 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Windows.Media;
+using Calame.Icons.Base;
 using Diese;
 using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons.Descriptors
 {
-    [Export(typeof(IBaseTypeIconDescriptorModule))]
-    public class BaseTypeIconDescriptor : IBaseTypeIconDescriptorModule
+    [Export(typeof(IDefaultIconDescriptorModule))]
+    [Export(typeof(ITypeDefaultIconDescriptorModule))]
+    public class SystemTypesIconDescriptor : TypeDefaultIconDescriptorModuleBase
     {
         static public readonly Brush DefaultBrush = IconBrushes.Default;
 
-        public bool Handle(object model) => model == null || Handle(model.GetType());
-        public bool Handle(Type type) => type?.Namespace?.StartsWith(nameof(System)) ?? false;
+        public override bool Handle(Type type) => type?.Namespace?.StartsWith(nameof(System)) ?? false;
 
-        public IconDescription GetBaseTypeIcon(object model)
+        public override IconDescription GetDefaultIcon(object model)
         {
             if (model is bool value)
                 return new IconDescription(value ? PackIconMaterialKind.AlphaTCircle : PackIconMaterialKind.AlphaFCircleOutline, DefaultBrush);
 
-            return GetBaseTypeIcon(model?.GetType());
+            return base.GetDefaultIcon(model);
         }
 
-        public IconDescription GetBaseTypeIcon(Type type)
+        public override IconDescription GetTypeDefaultIcon(Type type)
         {
             if (type.Is<bool>())
                 return new IconDescription(PackIconMaterialKind.AlphaBCircleOutline, DefaultBrush);
@@ -40,9 +41,9 @@ namespace Calame.Icons.Descriptors
                 || type.Is<decimal>()
                 || type.Is<Enum>())
                 return new IconDescription(PackIconMaterialKind.Pound, DefaultBrush);
-            if (type.Is<string>())
-                if (type.Is<Uri>())
-                    return new IconDescription(PackIconMaterialKind.CodeString, DefaultBrush);
+            if (type.Is<string>()
+                || type.Is<Uri>())
+                return new IconDescription(PackIconMaterialKind.CodeString, DefaultBrush);
             if (type.Is<Array>())
                 return new IconDescription(PackIconMaterialKind.CodeArray, DefaultBrush);
             if (type.Is<Type>())
@@ -57,14 +58,11 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.Clock, DefaultBrush);
             if (type.Is<Guid>())
                 return new IconDescription(PackIconMaterialKind.Identifier, DefaultBrush);
-            if (type.Is<IntPtr>())
-                if (type.Is<UIntPtr>())
-                    return new IconDescription(PackIconMaterialKind.TableArrowUp, DefaultBrush);
+            if (type.Is<IntPtr>()
+                || type.Is<UIntPtr>())
+                return new IconDescription(PackIconMaterialKind.TableArrowUp, DefaultBrush);
 
-            if (type == null)
-                return new IconDescription(PackIconMaterialKind.Null, DefaultBrush);
-
-            return new IconDescription(PackIconMaterialKind.RhombusOutline, DefaultBrush);
+            return IconDescription.None;
         }
     }
 }

@@ -9,17 +9,17 @@ namespace Calame.Icons
         private readonly IDefaultIconDescriptorModule[] _defaultModules;
         private readonly ITypeIconDescriptorModule[] _typeModules;
         private readonly ITypeDefaultIconDescriptorModule[] _typeDefaultModules;
-        private readonly IBaseTypeIconDescriptorModule[] _baseTypeModules;
+        private readonly IFallbackIconDescriptorModule[] _fallbackModules;
 
         public IconDescriptor(IIconDescriptorModule[] modules, IDefaultIconDescriptorModule[] defaultModules,
             ITypeIconDescriptorModule[] typeModules, ITypeDefaultIconDescriptorModule[] typeDefaultModules,
-            IBaseTypeIconDescriptorModule[] baseTypeModules)
+            IFallbackIconDescriptorModule[] fallbackModules)
         {
             _modules = modules;
             _defaultModules = defaultModules;
             _typeModules = typeModules;
             _typeDefaultModules = typeDefaultModules;
-            _baseTypeModules = baseTypeModules;
+            _fallbackModules = fallbackModules;
         }
 
         public IconDescription GetIcon(object model)
@@ -32,7 +32,7 @@ namespace Calame.Icons
             if (icon.Defined)
                 return icon;
 
-            return _baseTypeModules.Where(x => x.Handle(model)).Select(x => x.GetBaseTypeIcon(model)).FirstOrDefault(x => x.Defined);
+            return _fallbackModules.Where(x => x.Handle(model)).Select(x => x.GetBaseTypeIcon(model)).FirstOrDefault(x => x.Defined);
         }
 
         public IconDescription GetTypeIcon(Type type)
@@ -45,7 +45,7 @@ namespace Calame.Icons
             if (icon.Defined)
                 return icon;
 
-            return _baseTypeModules.Where(x => x.Handle(type)).Select(x => x.GetBaseTypeIcon(type)).FirstOrDefault(x => x.Defined);
+            return _fallbackModules.Where(x => x.Handle(type)).Select(x => x.GetBaseTypeIcon(type)).FirstOrDefault(x => x.Defined);
         }
     }
 
@@ -67,20 +67,20 @@ namespace Calame.Icons
 
         public IconDescription GetIcon(T model)
         {
-            IconDescription icon = _modules.Select(x => x.GetIcon(model)).FirstOrDefault(x => x.Defined);
+            IconDescription icon = _modules.Where(x => x.Handle(model)).Select(x => x.GetIcon(model)).FirstOrDefault(x => x.Defined);
             if (icon.Defined)
                 return icon;
 
-            return _defaultModules.Select(x => x.GetDefaultIcon(model)).FirstOrDefault(x => x.Defined);
+            return _defaultModules.Where(x => x.Handle(model)).Select(x => x.GetDefaultIcon(model)).FirstOrDefault(x => x.Defined);
         }
 
         public IconDescription GetTypeIcon(Type type)
         {
-            IconDescription icon = _typeModules.Select(x => x.GetTypeIcon(type)).FirstOrDefault(x => x.Defined);
+            IconDescription icon = _typeModules.Where(x => x.Handle(type)).Select(x => x.GetTypeIcon(type)).FirstOrDefault(x => x.Defined);
             if (icon.Defined)
                 return icon;
 
-            return _typeDefaultModules.Select(x => x.GetTypeDefaultIcon(type)).FirstOrDefault(x => x.Defined);
+            return _typeDefaultModules.Where(x => x.Handle(type)).Select(x => x.GetTypeDefaultIcon(type)).FirstOrDefault(x => x.Defined);
         }
 
         IconDescription IIconDescriptor.GetIcon(object model) => model is T obj ? GetIcon(obj) : IconDescription.None;

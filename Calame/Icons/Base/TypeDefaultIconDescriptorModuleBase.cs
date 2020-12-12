@@ -6,10 +6,10 @@ namespace Calame.Icons.Base
     public abstract class TypeDefaultIconDescriptorModuleBase : IDefaultIconDescriptorModule, ITypeDefaultIconDescriptorModule
     {
         public abstract bool Handle(Type type);
-        public bool Handle(object model) => model is Type type ? Handle(type) : Handle(model?.GetType());
+        public virtual bool Handle(object model) => model is Type type ? Handle(type) : Handle(model?.GetType());
 
         public abstract IconDescription GetTypeDefaultIcon(Type type);
-        public IconDescription GetDefaultIcon(object model) => model is Type type ? GetTypeDefaultIcon(type) : GetTypeDefaultIcon(model?.GetType());
+        public virtual IconDescription GetDefaultIcon(object model) => model is Type type ? GetTypeDefaultIcon(type) : GetTypeDefaultIcon(model?.GetType());
     }
 
     public abstract class TypeDefaultIconDescriptorModuleBase<T> : DefaultIconDescriptorModuleBase<T>, ITypeDefaultIconDescriptorModule<T>

@@ -6,7 +6,7 @@ namespace Calame.Icons.Base
     public abstract class TypeHybridIconDescriptorModuleBase : TypeIconDescriptorModuleBase, IDefaultIconDescriptorModule, ITypeDefaultIconDescriptorModule
     {
         public abstract IconDescription GetTypeDefaultIcon(Type type);
-        public IconDescription GetDefaultIcon(object model) => model is Type type ? GetTypeDefaultIcon(type) : GetTypeDefaultIcon(model?.GetType());
+        public virtual IconDescription GetDefaultIcon(object model) => model is Type type ? GetTypeDefaultIcon(type) : GetTypeDefaultIcon(model?.GetType());
     }
 
     public abstract class TypeHybridIconDescriptorModuleBase<T> : HybridIconDescriptorModuleBase<T>, ITypeIconDescriptorModule<T>, ITypeDefaultIconDescriptorModule<T>

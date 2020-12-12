@@ -2,7 +2,7 @@
 
 namespace Calame.Icons
 {
-    public interface IBaseTypeIconDescriptorModule : IInstanceHandler, ITypeHandler
+    public interface IFallbackIconDescriptorModule : IInstanceHandler, ITypeHandler
     {
         IconDescription GetBaseTypeIcon(object model);
         IconDescription GetBaseTypeIcon(Type type);
