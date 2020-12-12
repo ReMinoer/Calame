@@ -32,7 +32,8 @@
         Delete,
         Select,
         OpenWith,
-        ReadOnlyProperties,
-        EditableProperties
+        EditableItem,
+        EditableProperties,
+        ReadOnlyProperties
     }
 }

@@ -41,8 +41,9 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.Delete: return PackIconMaterialKind.CloseCircle;
                 case CalameIconKey.Select: return PackIconMaterialKind.ArrowTopRight;
                 case CalameIconKey.OpenWith: return PackIconMaterialKind.ApplicationImport;
-                case CalameIconKey.ReadOnlyProperties: return PackIconMaterialKind.Eye;
+                case CalameIconKey.EditableItem: return PackIconMaterialKind.Pencil;
                 case CalameIconKey.EditableProperties: return PackIconMaterialKind.PlaylistEdit;
+                case CalameIconKey.ReadOnlyProperties: return PackIconMaterialKind.Eye;
 
                 default: return default(PackIconMaterialKind);
             }

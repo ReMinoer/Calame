@@ -10,8 +10,10 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(Value), typeof(object), typeof(InlineObjectControl),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged));
 
-        static public readonly DependencyProperty NewItemTypeProperty =
-            DependencyProperty.Register(nameof(NewItemType), typeof(Type), typeof(InlineObjectControl), new PropertyMetadata(null, OnNewItemTypeChanged));
+        static public readonly DependencyProperty BaseTypeProperty =
+            DependencyProperty.Register(nameof(BaseType), typeof(Type), typeof(InlineObjectControl), new PropertyMetadata(null, OnBaseTypeChanged));
+        static public readonly DependencyProperty NewItemBaseTypeProperty =
+            DependencyProperty.Register(nameof(NewItemBaseType), typeof(Type), typeof(InlineObjectControl), new PropertyMetadata(null, OnNewItemBaseTypeChanged));
 
         public object Value
         {
@@ -19,57 +21,36 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(ValueProperty, value);
         }
 
-        public Type NewItemType
+        public Type BaseType
         {
-            get => (Type)GetValue(NewItemTypeProperty);
-            set => SetValue(NewItemTypeProperty, value);
+            get => (Type)GetValue(BaseTypeProperty);
+            set => SetValue(BaseTypeProperty, value);
         }
 
-        private object _accessIconKey = CalameIconKey.EditableProperties;
+        public Type NewItemBaseType
+        {
+            get => (Type)GetValue(NewItemBaseTypeProperty);
+            set => SetValue(NewItemBaseTypeProperty, value);
+        }
+
+        private object _accessIconKey = CalameIconKey.EditableItem;
         public object AccessIconKey
         {
             get => _accessIconKey;
-            private set
-            {
-                if (_accessIconKey == value)
-                    return;
-
-                _accessIconKey = value;
-                OnPropertyChanged();
-            }
+            private set => Set(ref _accessIconKey, value);
         }
 
-        public override bool CanAddItem => !IsReadOnly && Value == GetDefaultItemValue();
-        public override bool CanRemoveItem => !IsReadOnly && Value != GetDefaultItemValue();
+        private bool _canAddItem;
+        public override bool CanAddItem => _canAddItem;
+        private void SetCanAddItem(bool value) => Set(ref _canAddItem, value, nameof(CanAddItem));
 
-        static private void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private bool _canRemoveItem;
+        public override bool CanRemoveItem => _canRemoveItem;
+        private void SetCanRemoveItem(bool value) => Set(ref _canRemoveItem, value, nameof(CanRemoveItem));
+
+        static InlineObjectControl()
         {
-            var control = (InlineObjectControl)d;
-
-            if (control.NewItemType == null)
-                control.RefreshNewItemTypes();
-
-            control.RefreshAccessIcon();
-            control.OnPropertyChanged(nameof(CanAddItem));
-            control.OnPropertyChanged(nameof(CanRemoveItem));
-        }
-
-        static private void OnNewItemTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = (InlineObjectControl)d;
-            control.RefreshNewItemTypes();
-        }
-
-        protected override void OnIsReadOnlyChanged(DependencyPropertyChangedEventArgs e)
-        {
-            RefreshAccessIcon();
-            OnPropertyChanged(nameof(CanAddItem));
-            OnPropertyChanged(nameof(CanRemoveItem));
-        }
-
-        private void RefreshAccessIcon()
-        {
-            AccessIconKey = IsPropertyGridReadOnly ? CalameIconKey.ReadOnlyProperties : CalameIconKey.EditableProperties;
+            IsReadOnlyValueProperty.OverrideMetadata(typeof(InlineObjectControl), new PropertyMetadata(false, OnIsReadOnlyValueChanged));
         }
 
         public InlineObjectControl()
@@ -77,40 +58,98 @@ namespace Calame.PropertyGrid.Controls
             InitializeComponent();
         }
 
-        protected override Type GetNewItemType()
+        static private void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            return NewItemType ?? Value?.GetType();
+            var control = (InlineObjectControl)d;
+
+            if (control.BaseType == null && control.NewItemBaseType == null)
+                control.RefreshNewItemTypes();
+
+            control.RefreshCanAddItem();
+            control.RefreshCanRemoveItem();
+            control.RefreshAccessIcon();
         }
 
-        private object GetDefaultItemValue()
+        static private void OnBaseTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Type itemType = GetNewItemType();
-            if (itemType == null)
-                return null;
+            var control = (InlineObjectControl)d;
 
-            return itemType.IsValueType ? Activator.CreateInstance(itemType) : null;
+            if (control.NewItemBaseType == null)
+                control.RefreshNewItemTypes();
+
+            control.RefreshCanAddItem();
+            control.RefreshCanRemoveItem();
+            control.RefreshAccessIcon();
         }
+
+        static private void OnNewItemBaseTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (InlineObjectControl)d;
+
+            control.RefreshNewItemTypes();
+            control.RefreshCanAddItem();
+            control.RefreshCanRemoveItem();
+            control.RefreshAccessIcon();
+        }
+
+        protected override void OnIsReadOnlyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            base.OnIsReadOnlyChanged(e);
+
+            RefreshCanAddItem();
+            RefreshCanRemoveItem();
+            RefreshAccessIcon();
+        }
+
+        static private void OnIsReadOnlyValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (InlineObjectControl)d;
+
+            control.RefreshCanAddItem();
+            control.RefreshCanRemoveItem();
+            control.RefreshAccessIcon();
+        }
+
+        protected override Type GetNewItemType() => NewItemBaseType ?? GetItemType();
+        private Type GetItemType() => BaseType ?? Value?.GetType();
 
         protected override void OnAddItem(object type)
         {
             Value = Activator.CreateInstance((Type)type);
-
             OnExpandObject(ObjectButton);
-            OnPropertyChanged(nameof(CanAddItem));
-            OnPropertyChanged(nameof(CanRemoveItem));
         }
 
         protected override void OnItemRemoved(DependencyObject popupOwner)
         {
-            Value = GetDefaultItemValue();
-
-            OnPropertyChanged(nameof(CanAddItem));
-            OnPropertyChanged(nameof(CanRemoveItem));
+            Type itemType = GetNewItemType();
+            Value = itemType.IsValueType ? Activator.CreateInstance(itemType) : null;
         }
 
         protected override void RefreshValueType(DependencyObject popupOwner, object value)
         {
             Value = value;
+        }
+
+        private void RefreshCanAddItem()
+        {
+            bool value = !IsReadOnlyValue && Value == null;
+            SetCanAddItem(value);
+        }
+
+        private void RefreshCanRemoveItem()
+        {
+            bool value = !IsReadOnlyValue && (!GetItemType()?.IsValueType ?? false) && Value != null;
+            SetCanRemoveItem(value);
+        }
+
+        private void RefreshAccessIcon()
+        {
+            if (IsPropertyGridReadOnly)
+                AccessIconKey = CalameIconKey.ReadOnlyProperties;
+            else if (IsReadOnlyValue)
+                AccessIconKey = CalameIconKey.EditableProperties;
+            else
+                AccessIconKey = CalameIconKey.EditableItem;
         }
     }
 }
