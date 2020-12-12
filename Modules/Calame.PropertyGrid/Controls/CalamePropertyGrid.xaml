@@ -538,6 +538,7 @@
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
                         <controls:InlineObjectControl Value="{Binding Value, Mode=TwoWay}"
+                                                      NewItemType="{Binding PropertyType}"
                                                       IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       IsReadOnlyValue="{Binding IsReadOnly}"
                                                       PopupWidth="{Binding PopupsWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"

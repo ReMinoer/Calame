@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Calame.Icons;
 using Diese.Collections;
-using Gemini.Framework;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
 {
-    public partial class InlineCollectionControl : PropertyGridPopupOwnerBase, INotifyPropertyChanged
+    public partial class InlineCollectionControl : PropertyGridPopupOwnerBase
     {
         static public readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(InlineCollectionControl), new PropertyMetadata(null, OnItemsSourceChanged));
@@ -28,53 +23,13 @@ namespace Calame.PropertyGrid.Controls
 
         private IList _list;
         private Array _array;
-        public override bool IsItemsSourceResizable => _list != null && !_list.IsFixedSize;
-        public bool IsItemsSourceEditable => _list != null && !_list.IsReadOnly;
-
-        private Type _propertyGridDisplayedType;
-        protected override Type PropertyGridDisplayedType => _propertyGridDisplayedType;
-
-        private IList<Type> _newItemTypes;
-        private IList<Type> NewItemTypes
-        {
-            get => _newItemTypes;
-            set
-            {
-                if (_newItemTypes == value)
-                    return;
-
-                _newItemTypes = value;
-                OnPropertyChanged(nameof(AddButtonIconKey));
-                OnPropertyChanged(nameof(AddButtonEnabled));
-                OnPropertyChanged(nameof(AddButtonTooltip));
-            }
-        }
-
-        public CalameIconKey AddButtonIconKey => NewItemTypes != null && NewItemTypes.Count > 1 ? CalameIconKey.AddFromList : CalameIconKey.Add;
-        public bool AddButtonEnabled => !IsReadOnly && NewItemTypes != null && NewItemTypes.Count > 0;
-        public string AddButtonTooltip
-        {
-            get
-            {
-                if (NewItemTypes == null || NewItemTypes.Count == 0)
-                    return "No types to add found";
-                return NewItemTypes.Count == 1 ? $"Add {NewItemTypes[0].Name}" : "Add item...";
-            }
-        }
-
-        private readonly RelayCommand _addItemCommand;
-
-        static InlineCollectionControl()
-        {
-            NewItemTypeRegistryProperty.OverrideMetadata(typeof(InlineCollectionControl), new PropertyMetadata(null, OnNewItemTypeRegistryChanged));
-            IsReadOnlyProperty.OverrideMetadata(typeof(InlineCollectionControl), new PropertyMetadata(false, IsReadOnlyChanged));
-        }
+        public override bool CanAddItem => _list != null && !_list.IsFixedSize;
+        public override bool CanRemoveItem => CanAddItem;
+        public bool CanEditItem => _list != null && !_list.IsReadOnly;
 
         public InlineCollectionControl()
         {
             InitializeComponent();
-
-            _addItemCommand = new RelayCommand(OnAddItem);
         }
 
         static private void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -82,115 +37,33 @@ namespace Calame.PropertyGrid.Controls
             var control = (InlineCollectionControl)d;
 
             RefreshItemsSource(control, (IEnumerable)e.NewValue);
-            RefreshNewItemTypes(control);
-        }
-
-        static private void OnNewItemTypeRegistryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = (InlineCollectionControl)d;
-
-            RefreshNewItemTypes(control);
-        }
-
-        static private void IsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = (InlineCollectionControl)d;
-
-            control.OnPropertyChanged(nameof(AddButtonEnabled));
+            control.RefreshNewItemTypes();
         }
 
         static private void RefreshItemsSource(InlineCollectionControl control, IEnumerable itemsSource)
         {
             control._list = itemsSource as IList;
-            if (!control.IsItemsSourceResizable)
+            if (!control.CanAddItem)
                 control._array = itemsSource as Array;
 
-            control.OnPropertyChanged(nameof(IsItemsSourceResizable));
-            control.OnPropertyChanged(nameof(IsItemsSourceEditable));
+            control.OnPropertyChanged(nameof(CanAddItem));
+            control.OnPropertyChanged(nameof(CanRemoveItem));
+            control.OnPropertyChanged(nameof(CanEditItem));
         }
 
-        static private void RefreshNewItemTypes(InlineCollectionControl control)
+        protected override Type GetNewItemType()
         {
-            if (!control.IsItemsSourceResizable)
-            {
-                control.NewItemTypes = null;
-                control._propertyGridDisplayedType = null;
-                return;
-            }
+            if (!CanAddItem)
+                return null;
 
-            Type[] interfaces = control.ItemsSource.GetType().GetInterfaces();
+            Type[] interfaces = ItemsSource.GetType().GetInterfaces();
             if (!interfaces.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>), out Type collectionType))
-            {
-                control.NewItemTypes = null;
-                control._propertyGridDisplayedType = null;
-                return;
-            }
+                return null;
 
-            Type itemType = collectionType.GenericTypeArguments[0];
-            control._propertyGridDisplayedType = itemType;
-
-            IList<Type> newItemTypes = control.NewItemTypeRegistry?.Where(x => itemType.IsAssignableFrom(x)).ToList() ?? new List<Type>();
-            if (!newItemTypes.Contains(itemType) && IsInstantiableWithoutParameter(itemType))
-                newItemTypes.Insert(0, itemType);
-
-            control.NewItemTypes = newItemTypes;
+            return collectionType.GenericTypeArguments[0];
         }
 
-        static private bool IsInstantiableWithoutParameter(Type type)
-        {
-            if (type.IsValueType)
-                return true;
-
-            if (type.IsInterface)
-                return false;
-            if (type.IsAbstract)
-                return false;
-            if (type.IsGenericType)
-                return false;
-            if (type.GetConstructor(Type.EmptyTypes) == null)
-                return false;
-
-            return true;
-        }
-
-        private void OnPropertyCollectionChanged()
-        {
-            OnPropertyValueChanged(new PropertyValueChangedEventArgs(Xceed.Wpf.Toolkit.PropertyGrid.PropertyGrid.PropertyValueChangedEvent, this, ItemsSource, ItemsSource));
-        }
-
-        private void OnAddButtonClicked(object sender, RoutedEventArgs e)
-        {
-            if (_newItemTypes.Count == 1)
-            {
-                OnAddItem(_newItemTypes[0]);
-                return;
-            }
-
-            var contextMenu = new ContextMenu
-            {
-                PlacementTarget = (UIElement)sender
-            };
-
-            string[] typeNames = _newItemTypes.Select(x => x.Name).ToArray();
-            ReduceTypeNamePatterns(typeNames);
-
-            for (int i = 0; i < _newItemTypes.Count; i++)
-            {
-                var menuItem = new MenuItem
-                {
-                    Header = typeNames[i],
-                    Command = _addItemCommand,
-                    CommandParameter = _newItemTypes[i],
-                    Icon = IconProvider.GetControl(IconDescriptor.GetTypeIcon(_newItemTypes[i]), 16)
-                };
-
-                contextMenu.Items.Add(menuItem);
-            }
-
-            contextMenu.IsOpen = true;
-        }
-
-        private void OnAddItem(object type)
+        protected override void OnAddItem(object type)
         {
             object item = Activator.CreateInstance((Type)type);
             _list.Add(item);
@@ -209,6 +82,11 @@ namespace Calame.PropertyGrid.Controls
 
             _list.RemoveAt(itemIndex);
             OnPropertyCollectionChanged();
+        }
+
+        private void OnPropertyCollectionChanged()
+        {
+            OnPropertyValueChanged(new PropertyValueChangedEventArgs(Xceed.Wpf.Toolkit.PropertyGrid.PropertyGrid.PropertyValueChangedEvent, this, ItemsSource, ItemsSource));
         }
 
         protected override void RefreshValueType(DependencyObject popupOwner, object value)
@@ -237,7 +115,7 @@ namespace Calame.PropertyGrid.Controls
         {
             if (e.LeftButton != MouseButtonState.Pressed)
                 return;
-            if (!IsItemsSourceEditable)
+            if (!CanEditItem)
                 return;
             if (_dragStartPosition == null)
                 return;
@@ -284,7 +162,7 @@ namespace Calame.PropertyGrid.Controls
             if (newIndex == draggedItem.Index)
                 return;
 
-            if (IsItemsSourceResizable)
+            if (CanAddItem)
             {
                 _list.RemoveAt(draggedItem.Index);
                 _list.Insert(newIndex, draggedItem.Data);
@@ -353,46 +231,6 @@ namespace Calame.PropertyGrid.Controls
                 Data = data;
                 Index = index;
             }
-        }
-
-        static private void ReduceTypeNamePatterns(string[] values)
-        {
-            while (true)
-            {
-                int upperIndex = values[0].Skip(1).IndexOf(char.IsUpper) + 1;
-                if (upperIndex <= 0)
-                    break;
-
-                string prefix = values[0].Substring(0, upperIndex);
-                if (!values.Skip(1).All(x => x.StartsWith(prefix)))
-                    break;
-
-                for (int i = 0; i < values.Length; i++)
-                    values[i] = values[i].Substring(prefix.Length);
-            }
-
-            while (true)
-            {
-                int upperIndex = LastIndexOf(values[0], char.IsUpper);
-                if (upperIndex == -1)
-                    break;
-
-                int suffixLength = values[0].Length - upperIndex;
-                string suffix = values[0].Substring(upperIndex, suffixLength);
-                if (!values.Skip(1).All(x => x.EndsWith(suffix)))
-                    break;
-
-                for (int i = 0; i < values.Length; i++)
-                    values[i] = values[i].Substring(0, values[i].Length - suffixLength);
-            }
-        }
-
-        static public int LastIndexOf(string value, Predicate<char> predicate)
-        {
-            for (int i = value.Length - 1; i >= 0; i--)
-                if (predicate(value[i]))
-                    return i;
-            return -1;
         }
     }
 }

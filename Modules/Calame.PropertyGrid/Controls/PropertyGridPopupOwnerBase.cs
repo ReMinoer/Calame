@@ -29,14 +29,14 @@ namespace Calame.PropertyGrid.Controls
     public abstract class PropertyGridPopupOwnerBase : UserControl, INotifyPropertyChanged
     {
         static public readonly DependencyProperty IsReadOnlyProperty =
-            DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(false));
+            DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(false, OnIsReadOnlyChanged));
         static public readonly DependencyProperty IsReadOnlyValueProperty =
             DependencyProperty.Register(nameof(IsReadOnlyValue), typeof(bool), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(false));
 
         static public readonly DependencyProperty EditorDefinitionsProperty =
             DependencyProperty.Register(nameof(EditorDefinitions), typeof(EditorDefinitionCollection), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
         static public readonly DependencyProperty NewItemTypeRegistryProperty =
-            DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null, OnNewItemTypeRegistryChanged));
 
         static public readonly DependencyProperty ShowHeaderProperty =
             DependencyProperty.Register(nameof(ShowHeader), typeof(bool), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(true));
@@ -164,7 +164,38 @@ namespace Calame.PropertyGrid.Controls
         }
 
         public bool IsPropertyGridReadOnly => IsReadOnly || (IsReadOnlyValue && (PropertyGridDisplayedType?.IsValueType ?? false));
+        protected Type PropertyGridDisplayedType { get; private set; }
         public ICommand ExpandObjectCommand { get; }
+
+        private IList<Type> _newItemTypes;
+        private IList<Type> NewItemTypes
+        {
+            get => _newItemTypes;
+            set
+            {
+                if (_newItemTypes == value)
+                    return;
+
+                _newItemTypes = value;
+                OnPropertyChanged(nameof(AddButtonIconKey));
+                OnPropertyChanged(nameof(AddButtonEnabled));
+                OnPropertyChanged(nameof(AddButtonTooltip));
+            }
+        }
+
+        public CalameIconKey AddButtonIconKey => NewItemTypes != null && NewItemTypes.Count > 1 ? CalameIconKey.AddFromList : CalameIconKey.Add;
+        public bool AddButtonEnabled => !IsReadOnly && NewItemTypes != null && NewItemTypes.Count > 0;
+        public string AddButtonTooltip
+        {
+            get
+            {
+                if (NewItemTypes == null || NewItemTypes.Count == 0)
+                    return "No types to add found";
+                return NewItemTypes.Count == 1 ? $"Add {NewItemTypes[0].Name}" : "Add item...";
+            }
+        }
+
+        private readonly RelayCommand _addItemCommand;
 
         public event ItemEventHandler ItemSelected;
         public event PropertyValueChangedEventHandler PropertyValueChanged;
@@ -172,6 +203,95 @@ namespace Calame.PropertyGrid.Controls
         protected PropertyGridPopupOwnerBase()
         {
             ExpandObjectCommand = new RelayCommand(OnExpandObject);
+            _addItemCommand = new RelayCommand(OnAddItem);
+        }
+
+        static private void OnIsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (PropertyGridPopupOwnerBase)d;
+            control.OnPropertyChanged(nameof(AddButtonEnabled));
+            control.OnIsReadOnlyChanged(e);
+        }
+
+        static private void OnNewItemTypeRegistryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (PropertyGridPopupOwnerBase)d;
+            control.RefreshNewItemTypes();
+            control.OnNewItemTypeRegistryChanged(e);
+        }
+
+        protected virtual void OnIsReadOnlyChanged(DependencyPropertyChangedEventArgs e) {}
+        protected virtual void OnNewItemTypeRegistryChanged(DependencyPropertyChangedEventArgs e) {}
+
+        protected void RefreshNewItemTypes()
+        {
+            Type itemType = GetNewItemType();
+            PropertyGridDisplayedType = itemType;
+
+            if (itemType == null)
+                return;
+
+            IList<Type> newItemTypes = NewItemTypeRegistry?.Where(x => itemType.IsAssignableFrom(x)).ToList() ?? new List<Type>();
+            if (!newItemTypes.Contains(itemType) && IsInstantiableWithoutParameter(itemType))
+                newItemTypes.Insert(0, itemType);
+
+            NewItemTypes = newItemTypes;
+        }
+
+        public abstract bool CanAddItem { get; }
+        public abstract bool CanRemoveItem { get; }
+        protected abstract void OnAddItem(object type);
+        protected abstract void OnItemRemoved(DependencyObject popupOwner);
+        protected abstract void RefreshValueType(DependencyObject popupOwner, object value);
+        protected abstract Type GetNewItemType();
+
+        static private bool IsInstantiableWithoutParameter(Type type)
+        {
+            if (type.IsValueType)
+                return true;
+
+            if (type.IsInterface)
+                return false;
+            if (type.IsAbstract)
+                return false;
+            if (type.IsGenericType)
+                return false;
+            if (type.GetConstructor(Type.EmptyTypes) == null)
+                return false;
+
+            return true;
+        }
+
+        protected void OnAddButtonClicked(object sender, RoutedEventArgs e)
+        {
+            if (_newItemTypes.Count == 1)
+            {
+                OnAddItem(_newItemTypes[0]);
+                return;
+            }
+
+            var contextMenu = new ContextMenu
+            {
+                PlacementTarget = (UIElement)sender
+            };
+
+            string[] typeNames = _newItemTypes.Select(x => x.Name).ToArray();
+            ReduceTypeNamePatterns(typeNames);
+
+            for (int i = 0; i < _newItemTypes.Count; i++)
+            {
+                var menuItem = new MenuItem
+                {
+                    Header = typeNames[i],
+                    Command = _addItemCommand,
+                    CommandParameter = _newItemTypes[i],
+                    Icon = IconProvider.GetControl(IconDescriptor.GetTypeIcon(_newItemTypes[i]), 16)
+                };
+
+                contextMenu.Items.Add(menuItem);
+            }
+
+            contextMenu.IsOpen = true;
         }
 
         protected void OnExpandObject(object control)
@@ -186,7 +306,7 @@ namespace Calame.PropertyGrid.Controls
             };
 
             popup.SetBinding(PropertyGridPopup.WidthProperty, new Binding(nameof(PopupWidth)) { Source = this });
-            popup.SetBinding(PropertyGridPopup.CanRemoveItemProperty, new Binding(nameof(IsItemsSourceResizable)) { Source = this });
+            popup.SetBinding(PropertyGridPopup.CanRemoveItemProperty, new Binding(nameof(CanRemoveItem)) { Source = this });
             popup.SetBinding(PropertyGridPopup.IconProviderProperty, new Binding(nameof(IconProvider)) { Source = this });
             popup.SetBinding(PropertyGridPopup.SystemIconDescriptorProperty, new Binding(nameof(SystemIconDescriptor)) { Source = this });
 
@@ -279,12 +399,50 @@ namespace Calame.PropertyGrid.Controls
             PropertyValueChanged?.Invoke(this, e);
         }
 
-        public abstract bool IsItemsSourceResizable { get; }
-        protected abstract Type PropertyGridDisplayedType { get; }
-        protected abstract void OnItemRemoved(DependencyObject popupOwner);
-        protected abstract void RefreshValueType(DependencyObject popupOwner, object value);
-
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)); }
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        static private void ReduceTypeNamePatterns(string[] values)
+        {
+            while (true)
+            {
+                int upperIndex = values[0].Skip(1).IndexOf(char.IsUpper) + 1;
+                if (upperIndex <= 0)
+                    break;
+
+                string prefix = values[0].Substring(0, upperIndex);
+                if (!values.Skip(1).All(x => x.StartsWith(prefix)))
+                    break;
+
+                for (int i = 0; i < values.Length; i++)
+                    values[i] = values[i].Substring(prefix.Length);
+            }
+
+            while (true)
+            {
+                int upperIndex = LastIndexOf(values[0], char.IsUpper);
+                if (upperIndex == -1)
+                    break;
+
+                int suffixLength = values[0].Length - upperIndex;
+                string suffix = values[0].Substring(upperIndex, suffixLength);
+                if (!values.Skip(1).All(x => x.EndsWith(suffix)))
+                    break;
+
+                for (int i = 0; i < values.Length; i++)
+                    values[i] = values[i].Substring(0, values[i].Length - suffixLength);
+            }
+        }
+
+        static public int LastIndexOf(string value, Predicate<char> predicate)
+        {
+            for (int i = value.Length - 1; i >= 0; i--)
+                if (predicate(value[i]))
+                    return i;
+            return -1;
+        }
     }
 }

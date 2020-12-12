@@ -13,7 +13,7 @@
     </UserControl.Resources>
     <DockPanel MinHeight="24">
         <Button DockPanel.Dock="Right" Width="30"
-                Visibility="{Binding IsItemsSourceResizable, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                Visibility="{Binding CanAddItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                 IsEnabled="{Binding AddButtonEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                 ToolTip="{Binding AddButtonTooltip, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                 Click="OnAddButtonClicked">
