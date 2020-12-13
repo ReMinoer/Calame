@@ -3,12 +3,19 @@ using System.ComponentModel.Composition;
 using System.Windows.Media;
 using Calame.Icons.Base;
 using Diese;
+using Glyph.Animation;
+using Glyph.Core.Scheduler;
+using Glyph.Graphics;
 using Glyph.IO;
 using Glyph.Math;
 using Glyph.Math.Shapes;
+using Glyph.Messaging;
 using Glyph.Space;
 using MahApps.Metro.IconPacks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using Simulacra.Utils;
 using Color = Microsoft.Xna.Framework.Color;
 using Matrix = Microsoft.Xna.Framework.Matrix;
@@ -29,7 +36,7 @@ namespace Calame.Icons.Descriptors
             if (typeNamespace == null)
                 return false;
 
-            return typeNamespace.StartsWith(nameof(Microsoft.Xna.Framework))
+            return typeNamespace.StartsWith("Microsoft.Xna.Framework")
                 || typeNamespace.StartsWith(nameof(Glyph))
                 || typeNamespace.StartsWith(nameof(Simulacra));
         }
@@ -59,6 +66,8 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.Matrix, DefaultBrush);
             if (type.Is<Quaternion>())
                 return new IconDescription(PackIconMaterialKind.RotateOrbit, DefaultBrush);
+            if (type.Is<Transformation>())
+                return new IconDescription(PackIconMaterialKind.AxisArrow, DefaultBrush);
 
             if (type.Is<Color>())
                 return new IconDescription(PackIconMaterialKind.Palette, DefaultBrush);
@@ -67,6 +76,13 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.FileOutline, DefaultBrush);
             if (type.Is<FolderPath>())
                 return new IconDescription(PackIconMaterialKind.FolderOpen, DefaultBrush);
+
+            if (type.Is<Texture2D>())
+                return new IconDescription(PackIconMaterialKind.FileImage, DefaultBrush);
+            if (type.Is<SoundEffect>())
+                return new IconDescription(PackIconMaterialKind.FileMusic, DefaultBrush);
+            if (type.Is<Song>())
+                return new IconDescription(PackIconMaterialKind.BookMusic, DefaultBrush);
 
             return IconDescription.None;
         }
@@ -82,6 +98,17 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.VectorPolygon, DefaultBrush);
             if (type.Is<IArea>())
                 return new IconDescription(PackIconMaterialKind.TextureBox, DefaultBrush);
+
+            if (type.Is<ISpriteSheetCarver>())
+                return new IconDescription(PackIconMaterialKind.ScissorsCutting, DefaultBrush);
+
+            if (type.Is<IAnimation>())
+                return new IconDescription(PackIconMaterialKind.Animation, DefaultBrush);
+
+            if (type.Is<IGlyphSchedulerAssigner>())
+                return new IconDescription(PackIconMaterialKind.CalendarRefresh, DefaultBrush);
+            if (type.Is<IRouter>())
+                return new IconDescription(PackIconMaterialKind.RouterNetwork, DefaultBrush);
 
             return IconDescription.None;
         }
