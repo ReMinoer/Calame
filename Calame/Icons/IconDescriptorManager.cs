@@ -6,6 +6,8 @@ namespace Calame.Icons
     [Export(typeof(IIconDescriptorManager))]
     public class IconDescriptorManager : IIconDescriptorManager
     {
+        private IIconDescriptor _iconDescriptor;
+
         private readonly IIconDescriptorModule[] _modules;
         private readonly IDefaultIconDescriptorModule[] _defaultModules;
         private readonly ITypeIconDescriptorModule[] _typeModules;
@@ -26,7 +28,7 @@ namespace Calame.Icons
 
         public IIconDescriptor GetDescriptor()
         {
-            return new IconDescriptor(_modules, _defaultModules, _typeModules, _typeDefaultModules, _fallbackModules);
+            return _iconDescriptor ?? (_iconDescriptor = new IconDescriptor(_modules, _defaultModules, _typeModules, _typeDefaultModules, _fallbackModules));
         }
 
         public IIconDescriptor<T> GetDescriptor<T>()

@@ -14,6 +14,7 @@ namespace Calame.DataModelViewer.Icons
     {
         protected override IGlyphData GetTarget(IEditor model) => model?.Data;
         protected override Type GetTypeTarget(Type type) => type?.GetProperty(nameof(IEditor.Data))?.PropertyType;
+
         protected override IconDescription TransformIcon(IconDescription iconDescription) => new IconDescription(iconDescription.Key, IconBrushes.Default);
     }
 }

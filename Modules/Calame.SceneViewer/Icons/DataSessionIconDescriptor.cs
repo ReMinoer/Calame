@@ -14,8 +14,8 @@ namespace Calame.SceneViewer.Icons
     {
         protected override IGlyphData GetTarget(ISession model) => (model as IDataSession)?.Data;
         protected override Type GetTypeTarget(Type type) => type?.GetProperty(nameof(IDataSession.Data))?.PropertyType;
-        protected override IconDescription TransformIcon(IconDescription iconDescription) => new IconDescription(iconDescription.Key, IconBrushes.Default);
 
+        protected override IconDescription TransformIcon(IconDescription iconDescription) => new IconDescription(iconDescription.Key, IconBrushes.Default);
         protected override IconDescription GetNotTargetedTypeDefaultIcon(Type type) => new IconDescription(CalameIconKey.SessionMode, IconBrushes.Default);
     }
 }
