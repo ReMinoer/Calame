@@ -203,7 +203,7 @@ namespace Calame.PropertyGrid.Controls
         protected PropertyGridPopupOwnerBase()
         {
             ExpandObjectCommand = new RelayCommand(OnExpandObject);
-            _addItemCommand = new RelayCommand(OnAddItem);
+            _addItemCommand = new RelayCommand(x => AddItem(CreateItem((Type)x)));
         }
 
         static private void OnIsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -240,8 +240,8 @@ namespace Calame.PropertyGrid.Controls
 
         public abstract bool CanAddItem { get; }
         public abstract bool CanRemoveItem { get; }
-        protected abstract void OnAddItem(object type);
-        protected abstract void OnItemRemoved(DependencyObject popupOwner);
+        protected abstract void AddItem(object item);
+        protected abstract void RemoveItem(DependencyObject popupOwner);
         protected abstract void RefreshValueType(DependencyObject popupOwner, object value);
         protected abstract Type GetNewItemType();
 
@@ -254,7 +254,7 @@ namespace Calame.PropertyGrid.Controls
                 return false;
             if (type.IsAbstract)
                 return false;
-            if (type.IsGenericType)
+            if (type.IsGenericType && type.GetConstructor(type.GenericTypeArguments) != null)
                 return false;
             if (type.GetConstructor(Type.EmptyTypes) == null)
                 return false;
@@ -262,11 +262,19 @@ namespace Calame.PropertyGrid.Controls
             return true;
         }
 
+        protected virtual object CreateItem(Type type)
+        {
+            if (type.IsGenericType && type.GetConstructor(type.GenericTypeArguments) != null)
+                return Activator.CreateInstance(type, type.GenericTypeArguments.Select(Activator.CreateInstance).ToArray());
+
+            return Activator.CreateInstance(type);
+        }
+
         protected void OnAddButtonClicked(object sender, RoutedEventArgs e)
         {
             if (_newItemTypes.Count == 1)
             {
-                OnAddItem(_newItemTypes[0]);
+                AddItem(CreateItem(_newItemTypes[0]));
                 return;
             }
 
@@ -371,7 +379,7 @@ namespace Calame.PropertyGrid.Controls
         private void OnItemRemoved(Popup sender, DependencyObject popupOwner)
         {
             sender.IsOpen = false;
-            OnItemRemoved(popupOwner);
+            RemoveItem(popupOwner);
         }
 
         private void OnItemSelected(Popup popup, object item)

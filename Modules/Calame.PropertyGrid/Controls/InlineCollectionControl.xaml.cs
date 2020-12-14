@@ -63,16 +63,15 @@ namespace Calame.PropertyGrid.Controls
             return collectionType.GenericTypeArguments[0];
         }
 
-        protected override void OnAddItem(object type)
+        protected override void AddItem(object item)
         {
-            object item = Activator.CreateInstance((Type)type);
             _list.Add(item);
 
             OnPropertyCollectionChanged();
             OnExpandObject(ItemsControl.ItemContainerGenerator.ContainerFromItem(item));
         }
 
-        protected override void OnItemRemoved(DependencyObject popupOwner)
+        protected override void RemoveItem(DependencyObject popupOwner)
         {
             int itemIndex = GetIndex(popupOwner);
             if (itemIndex == -1)

@@ -1,5 +1,4 @@
 ﻿using System;
-using Caliburn.Micro;
 using Diese;
 
 namespace Calame.Icons.Base
@@ -20,6 +19,26 @@ namespace Calame.Icons.Base
         protected abstract TTarget GetTarget(T model);
         protected virtual IconDescription TransformIcon(IconDescription iconDescription) => iconDescription;
         protected virtual IconDescription GetNotTargetedIcon(T model) => IconDescription.None;
+    }
+
+    public abstract class TypeReTargetingDescriptorModuleBase : IIconDescriptorModule, ITypeIconDescriptorModule
+    {
+        public virtual bool Handle(object model) => Handle(model?.GetType());
+        public abstract bool Handle(Type type);
+
+        public IconDescription GetIcon(object model) => GetTypeIcon(model?.GetType());
+        public IconDescription GetTypeIcon(Type type)
+        {
+            IconDescription result = ReTargetIconDescriptorManager.Instance.GetDescriptor().GetTypeIcon(GetTypeTarget(type));
+            if (result.Defined)
+                return TransformIcon(result);
+
+            return GetNotTargetedTypeIcon(type);
+        }
+
+        protected abstract Type GetTypeTarget(Type type);
+        protected virtual IconDescription TransformIcon(IconDescription iconDescription) => iconDescription;
+        protected virtual IconDescription GetNotTargetedTypeIcon(Type type) => IconDescription.None;
     }
 
     public abstract class TypeReTargetingDescriptorModuleBase<T, TTarget> : ReTargetingDescriptorModuleBase<T, TTarget>, ITypeIconDescriptorModule<T>

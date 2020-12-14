@@ -113,13 +113,13 @@ namespace Calame.PropertyGrid.Controls
         protected override Type GetNewItemType() => NewItemBaseType ?? GetItemType();
         private Type GetItemType() => BaseType ?? Value?.GetType();
 
-        protected override void OnAddItem(object type)
+        protected override void AddItem(object item)
         {
-            Value = Activator.CreateInstance((Type)type);
+            Value = item;
             OnExpandObject(ObjectButton);
         }
 
-        protected override void OnItemRemoved(DependencyObject popupOwner)
+        protected override void RemoveItem(DependencyObject popupOwner)
         {
             Type itemType = GetNewItemType();
             Value = itemType.IsValueType ? Activator.CreateInstance(itemType) : null;
@@ -138,8 +138,21 @@ namespace Calame.PropertyGrid.Controls
 
         private void RefreshCanRemoveItem()
         {
-            bool value = !IsReadOnlyValue && (!GetItemType()?.IsValueType ?? false) && Value != null;
-            SetCanRemoveItem(value);
+            bool ComputeValue()
+            {
+                if (IsReadOnlyValue)
+                    return false;
+
+                Type itemType = GetItemType();
+                if (itemType == null)
+                    return false;
+                if (itemType.IsValueType && !(itemType.IsGenericType && itemType.GetGenericTypeDefinition() == typeof(Nullable<>)))
+                    return false;
+
+                return Value != null;
+            }
+
+            SetCanRemoveItem(ComputeValue());
         }
 
         private void RefreshAccessIcon()
