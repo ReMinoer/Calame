@@ -562,8 +562,13 @@
             </xctk:EditorTemplateDefinition>
         </xctk:EditorDefinitionCollection>
     </UserControl.Resources>
-    <StackPanel Orientation="Vertical">
-        <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0"
+                Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
                 Visibility="{Binding ShowHeader, ElementName=This, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Horizontal"
@@ -595,7 +600,8 @@
                 </StackPanel>
             </StackPanel>
         </Border>
-        <xctk:PropertyGrid Name="PropertyGrid"
+        <xctk:PropertyGrid Grid.Row="1"
+                           Name="PropertyGrid"
                            EditorDefinitions="{StaticResource EditorDefinitions}"
                            SelectedObject="{Binding DisplayedObject, ElementName=This}"
                            IsReadOnly="{Binding IsReadOnly, ElementName=This}"
@@ -610,5 +616,5 @@
                            ClearPropertyItem="OnClearPropertyItem"
                            PropertyValueChanged="OnPropertyValueChanged">
         </xctk:PropertyGrid>
-    </StackPanel>
+    </Grid>
 </UserControl>
