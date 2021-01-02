@@ -3,13 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:nlogviewer="clr-namespace:NlogViewer;assembly=NlogViewer"
              xmlns:viewModels="clr-namespace:Calame.LogConsole.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:LogConsoleViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
-             d:DesignWidth="300">
-    <Grid>
-        <nlogviewer:NlogViewer TimeWidth="auto" LoggerNameWidth="0" LevelWidth="auto" ExceptionWidth="auto" MessageWidth="auto" />
-    </Grid>
+             d:DesignWidth="800">
+    <ListView ItemsSource="{Binding LogEntries}">
+        <ListView.View>
+            <GridView>
+                <GridView.Columns>
+                    <GridViewColumn Header="Timestamp" DisplayMemberBinding="{Binding TimeStamp, StringFormat=G}" />
+                    <GridViewColumn Header="Level" DisplayMemberBinding="{Binding Level}" />
+                    <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Message}" />
+                </GridView.Columns>
+            </GridView>
+        </ListView.View>
+    </ListView>
 </UserControl>

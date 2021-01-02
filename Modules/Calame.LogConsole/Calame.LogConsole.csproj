@@ -4,7 +4,7 @@
     <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NlogViewer" Version="0.6.0" />
+    <PackageReference Include="NLog" Version="4.7.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Calame\Calame.csproj" />

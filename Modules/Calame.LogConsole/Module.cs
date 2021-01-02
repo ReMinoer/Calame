@@ -14,11 +14,6 @@ namespace Calame.LogConsole
     {
         [Export]
         static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<LogConsoleCommand>(MenuDefinitions.ViewToolsMenuGroup, 3);
-
-        public Module()
-        {
-            NLog.LogManager.CreateNullLogger();
-        }
         
         public override IEnumerable<Type> DefaultTools
         {
