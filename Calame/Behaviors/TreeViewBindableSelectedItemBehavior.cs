@@ -2,10 +2,11 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Xaml.Behaviors;
+using VirtualizingStackPanel = Calame.Utils.VirtualizingStackPanel;
 
-namespace Calame.Utils
+namespace Calame.Behaviors
 {
-    public class BindableSelectedItemBehavior : Behavior<TreeView>
+    public class TreeViewBindableSelectedItemBehavior : Behavior<TreeView>
     {
         public object SelectedItem
         {
@@ -14,11 +15,11 @@ namespace Calame.Utils
         }
 
         static public readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(BindableSelectedItemBehavior), new UIPropertyMetadata(null, OnSelectedItemChanged));
+            DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(TreeViewBindableSelectedItemBehavior), new UIPropertyMetadata(null, OnSelectedItemChanged));
 
         static private void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            TreeView treeView = (sender as BindableSelectedItemBehavior)?.AssociatedObject;
+            TreeView treeView = (sender as TreeViewBindableSelectedItemBehavior)?.AssociatedObject;
             
             TreeViewItem item = GetTreeViewItem(treeView, e.NewValue);
             if (item == null)

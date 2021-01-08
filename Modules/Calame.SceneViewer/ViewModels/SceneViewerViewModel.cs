@@ -20,6 +20,7 @@ using Glyph.Core.Tracking;
 using Glyph.Engine;
 using Glyph.Graphics;
 using Glyph.WpfInterop;
+using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Calame.SceneViewer.ViewModels
@@ -55,9 +56,9 @@ namespace Calame.SceneViewer.ViewModels
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
         [ImportingConstructor]
-        public SceneViewerViewModel(IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
+        public SceneViewerViewModel(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
             [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
-            : base(eventAggregator, iconProvider, iconDescriptorManager)
+            : base(eventAggregator, loggerProvider, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Scene Viewer";
 
@@ -74,9 +75,9 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker = null;
 
             IGraphicsDeviceService graphicsDeviceService = WpfGraphicsDeviceService.Instance;
-            IContentLibrary contentLibrary = Session.CreateContentLibrary(graphicsDeviceService);
+            IContentLibrary contentLibrary = Session.CreateContentLibrary(graphicsDeviceService, Logger);
 
-            _engine = new GlyphEngine(graphicsDeviceService, contentLibrary);
+            _engine = new GlyphEngine(graphicsDeviceService, contentLibrary, Logger);
 
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();

@@ -18,6 +18,7 @@ using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
 using Glyph.WpfInterop;
+using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
 using Simulacra.IO.Watching;
 
@@ -56,9 +57,9 @@ namespace Calame.DataModelViewer.ViewModels
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
         [ImportingConstructor]
-        public DataModelViewerViewModel(IEventAggregator eventAggregator, PathWatcher fileWatcher, IImportedTypeProvider importedTypeProvider,
+        public DataModelViewerViewModel(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, PathWatcher fileWatcher, IImportedTypeProvider importedTypeProvider,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
-            : base(eventAggregator, fileWatcher, iconProvider, iconDescriptorManager)
+            : base(eventAggregator, loggerProvider, fileWatcher, iconProvider, iconDescriptorManager)
         {
             _importedTypeProvider = importedTypeProvider;
 
@@ -90,9 +91,9 @@ namespace Calame.DataModelViewer.ViewModels
         private async Task InitializeEngineAsync()
         {
             IGraphicsDeviceService graphicsDeviceService = WpfGraphicsDeviceService.Instance;
-            IContentLibrary contentLibrary = Editor.CreateContentLibrary(graphicsDeviceService);
+            IContentLibrary contentLibrary = Editor.CreateContentLibrary(graphicsDeviceService, Logger);
 
-            _engine = new GlyphEngine(graphicsDeviceService, contentLibrary);
+            _engine = new GlyphEngine(graphicsDeviceService, contentLibrary, Logger);
 
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();

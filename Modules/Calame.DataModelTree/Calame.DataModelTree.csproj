@@ -15,7 +15,4 @@
     <ProjectReference Include="..\..\External\Glyph\Glyph.Engine\Glyph.Engine.csproj" />
     <ProjectReference Include="..\..\External\Glyph\Glyph\Glyph.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.6.3" />
-  </ItemGroup>
 </Project>

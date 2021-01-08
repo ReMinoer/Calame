@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Gemini;
+using Microsoft.Extensions.Logging;
 using Simulacra.IO.Watching;
 
 namespace Calame

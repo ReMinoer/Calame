@@ -4,19 +4,49 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Calame.LogConsole.ViewModels"
+             xmlns:logConsole="clr-namespace:Calame.LogConsole"
+             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:Calame.Behaviors;assembly=Calame"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:LogConsoleViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="800">
-    <ListView ItemsSource="{Binding LogEntries}">
-        <ListView.View>
-            <GridView>
-                <GridView.Columns>
-                    <GridViewColumn Header="Timestamp" DisplayMemberBinding="{Binding TimeStamp, StringFormat=G}" />
-                    <GridViewColumn Header="Level" DisplayMemberBinding="{Binding Level}" />
-                    <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Message}" />
-                </GridView.Columns>
-            </GridView>
-        </ListView.View>
+    <ListView x:Name="ListView"
+              ItemsSource="{Binding CurrentDocumentLogEntries}">
+        <b:Interaction.Behaviors>
+            <behaviors:ListViewBindableSelectedItemsBehavior SelectedItems="{Binding SelectedLogEntries}" />
+            <behaviors:ListViewScrollToNewLastItemBehavior OnlyIfAlreadyScrolledToEnd="True" />
+        </b:Interaction.Behaviors>
+        <ListView.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Copy Selected Log"
+                          Command="{Binding CopySelectedLogCommand}" />
+                <MenuItem Header="Copy All Log"
+                          Command="{Binding CopyAllLogCommand}" />
+            </ContextMenu>
+        </ListView.ContextMenu>
+        <ListView.ItemTemplate>
+            <DataTemplate DataType="{x:Type logConsole:LogEntry}">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left"
+                               Margin="0 0 5 0"
+                               VerticalAlignment="Top"
+                               Text="{Binding TimeStamp, StringFormat=HH:mm:ss.ffff}"
+                               FontFamily="Consolas" />
+                    <userControls:CalameIcon DockPanel.Dock="Left"
+                                             VerticalAlignment="Top"
+                                             Margin="0 0 5 0"
+                                             Target="{Binding Level}"
+                                             ToolTip="{Binding Level}"
+                                             IconSize="14"
+                                             IconDescriptor="{Binding DataContext.LogLevelIconDescriptor, ElementName=ListView}"
+                                             IconProvider="{Binding DataContext.IconProvider, ElementName=ListView}"/>
+                    <TextBlock VerticalAlignment="Top"
+                               Text="{Binding Message}"
+                               FontFamily="Consolas" />
+                </DockPanel>
+            </DataTemplate>
+        </ListView.ItemTemplate>
     </ListView>
 </UserControl>

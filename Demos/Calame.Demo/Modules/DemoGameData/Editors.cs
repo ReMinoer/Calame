@@ -12,6 +12,7 @@ using Glyph.Composition.Modelization;
 using Glyph.Content;
 using Glyph.IO;
 using Glyph.Pipeline;
+using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
 using Niddle;
 
@@ -74,9 +75,9 @@ namespace Calame.Demo.Modules.DemoGameData
         public IIconProvider IconProvider { get; set; }
         public IIconDescriptorManager IconDescriptorManager { get; set; }
 
-        public override IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService)
+        public override IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService, ILogger logger)
         {
-            ContentManager = EditorContentLibrary.GetOrCreateInstance(graphicsDeviceService);
+            ContentManager = EditorContentLibrary.GetOrCreateInstance(graphicsDeviceService, logger);
             ContentRootPath = PathUtils.NormalizeFolder(ContentManager.RawRootPath);
             return ContentManager;
         }
@@ -165,7 +166,7 @@ namespace Calame.Demo.Modules.DemoGameData
         static public string RawRootPath;
 
         static public RawContentLibrary Instance { get; private set; }
-        static public RawContentLibrary GetOrCreateInstance(IGraphicsDeviceService graphicsDeviceService)
+        static public RawContentLibrary GetOrCreateInstance(IGraphicsDeviceService graphicsDeviceService, ILogger logger)
         {
             if (Instance != null)
                 return Instance;
@@ -186,7 +187,7 @@ namespace Calame.Demo.Modules.DemoGameData
                 Directory.CreateDirectory(folderPath);
             }
 
-            Instance = new RawContentLibrary(graphicsDeviceService, RawRootPath, cacheRootPath);
+            Instance = new RawContentLibrary(graphicsDeviceService, logger, RawRootPath, cacheRootPath);
             return Instance;
         }
     }

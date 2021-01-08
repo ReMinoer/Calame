@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Cache;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -7,12 +6,14 @@ using System.Windows.Media.Imaging;
 using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Calame
 {
     public abstract class CalameDocumentBase : Document
     {
         protected readonly IEventAggregator EventAggregator;
+        protected readonly ILogger Logger;
         private readonly IIconProvider _iconProvider;
         private readonly IIconDescriptor _iconDescriptor;
 
@@ -20,10 +21,12 @@ namespace Calame
         public override sealed ImageSource IconSource => _bitmapImage;
         protected virtual object IconKey { get; }
 
-        public CalameDocumentBase(IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+        public CalameDocumentBase(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
         {
             EventAggregator = eventAggregator;
             EventAggregator.SubscribeOnUI(this);
+
+            Logger = loggerProvider.CreateLogger(Id.ToString());
 
             _iconProvider = iconProvider;
             _iconDescriptor = iconDescriptorManager.GetDescriptor();

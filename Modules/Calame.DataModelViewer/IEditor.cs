@@ -7,6 +7,7 @@ using Glyph;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
+using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
 using Niddle;
 
@@ -21,7 +22,7 @@ namespace Calame.DataModelViewer
         Task LoadDataAsync(Stream stream);
         Task SaveDataAsync(Stream stream);
 
-        IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService);
+        IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService, ILogger logger);
         void RegisterDependencies(IDependencyRegistry registry);
         void PrepareEditor(GlyphEngine engine, GlyphObject editorRoot);
 

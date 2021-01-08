@@ -7,14 +7,13 @@ using System.Windows;
 using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework;
-using NLog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Simulacra.IO.Watching;
 
 namespace Calame
 {
     public abstract class CalamePersistedDocumentBase : CalameDocumentBase, IPersistedDocument, IHandle<IDirtyMessage>
     {
-        static private readonly NLogLoggerProvider LoggerProvider = new NLogLoggerProvider();
         protected readonly PathWatcher FileWatcher;
 
         private bool _isNew;
@@ -68,11 +67,11 @@ namespace Calame
             }
         }
 
-        public CalamePersistedDocumentBase(IEventAggregator eventAggregator, PathWatcher fileWatcher, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
-            : base(eventAggregator, iconProvider, iconDescriptorManager)
+        public CalamePersistedDocumentBase(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, PathWatcher fileWatcher, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+            : base(eventAggregator, loggerProvider, iconProvider, iconDescriptorManager)
         {
             FileWatcher = fileWatcher;
-            FileWatcher.Logger = LoggerProvider.CreateLogger(GetType().FullName);
+            FileWatcher.Logger = Logger;
         }
 
         protected abstract Task NewDocumentAsync();

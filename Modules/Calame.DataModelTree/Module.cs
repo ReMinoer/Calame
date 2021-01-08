@@ -7,7 +7,7 @@ using Calame.DataModelTree.ViewModels;
 using Gemini.Framework;
 using Gemini.Framework.Menus;
 using Gemini.Modules.MainMenu;
-using NLog.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Simulacra.IO.Binding;
 
 namespace Calame.DataModelTree
@@ -26,10 +26,18 @@ namespace Calame.DataModelTree
             }
         }
 
+        private readonly ILoggerProvider _loggerProvider;
+
+        [ImportingConstructor]
+        public Module(ILoggerProvider loggerProvider)
+        {
+            _loggerProvider = loggerProvider;
+        }
+
         public override void PreInitialize()
         {
             PathBindingModule.DefaultSynchronizationContext = SynchronizationContext.Current;
-            PathBindingModule.Watcher.Logger = new NLogLoggerProvider().CreateLogger(GetType().FullName);
+            PathBindingModule.Watcher.Logger = _loggerProvider.CreateLogger(nameof(PathBindingModule));
             base.PreInitialize();
         }
     }

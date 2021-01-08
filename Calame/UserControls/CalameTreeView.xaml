@@ -6,13 +6,14 @@
              xmlns:utils="clr-namespace:Calame.Utils"
              xmlns:userControls="clr-namespace:Calame.UserControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:Calame.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="200">
     <DockPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
         <TextBox DockPanel.Dock="Top" Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <TreeView ItemsSource="{Binding TreeItems}">
             <b:Interaction.Behaviors>
-                <utils:BindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}" />
+                <behaviors:TreeViewBindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
             <TreeView.ItemsPanel>
                 <ItemsPanelTemplate>
