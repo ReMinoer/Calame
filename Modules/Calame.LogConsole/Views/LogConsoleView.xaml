@@ -8,10 +8,14 @@
              xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:Calame.Behaviors;assembly=Calame"
+             xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:LogConsoleViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+    </UserControl.Resources>
     <ListView x:Name="ListView"
               ItemsSource="{Binding CurrentDocumentLogEntries}">
         <b:Interaction.Behaviors>
@@ -34,7 +38,8 @@
                                VerticalAlignment="Top"
                                Text="{Binding TimeStamp, StringFormat=HH:mm:ss.ffff}"
                                FontFamily="Consolas" />
-                    <userControls:CalameIcon DockPanel.Dock="Left"
+                    <userControls:CalameIcon x:Name="Icon"
+                                             DockPanel.Dock="Left"
                                              VerticalAlignment="Top"
                                              Margin="0 0 5 0"
                                              Target="{Binding Level}"
@@ -42,6 +47,19 @@
                                              IconSize="14"
                                              IconDescriptor="{Binding DataContext.LogLevelIconDescriptor, ElementName=ListView}"
                                              IconProvider="{Binding DataContext.IconProvider, ElementName=ListView}"/>
+                    <Border Background="DimGray"
+                            Margin="0 0 5 0"
+                            CornerRadius="2"
+                            Padding="5 1"
+                            Visibility="{Binding Category, Converter={StaticResource ObjectToVisibilityConverter}}">
+                        <TextBlock VerticalAlignment="Top"
+                                   TextTrimming="CharacterEllipsis"
+                                   Text="{Binding Category}"
+                                   ToolTip="{Binding Category}"
+                                   FontSize="10"
+                                   Foreground="White"
+                                   FontFamily="Consolas" />
+                    </Border>
                     <TextBlock VerticalAlignment="Top"
                                Text="{Binding Message}"
                                FontFamily="Consolas" />

@@ -8,6 +8,7 @@ namespace Calame.LogConsole
         public DateTime TimeStamp { get; set; }
         public string Source { get; set; }
         public LogLevel Level { get; set; }
+        public string Category { get; set; }
         public string Message { get; set; }
     }
 }

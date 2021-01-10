@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NLog;
 using NLog.Targets;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -6,22 +7,24 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 namespace Calame.LogConsole
 {
     [Target(nameof(Calame))]
-    public class CalameTarget : Target
+    public class CalameTarget : TargetWithContext
     {
         public event EventHandler<LogEntry> MessageLogged;
 
         protected override void Write(LogEventInfo logEvent)
         {
+            IDictionary<string, object> context = GetContextMdlc(logEvent);
             MessageLogged?.Invoke(this, new LogEntry
             {
                 TimeStamp = logEvent.TimeStamp,
                 Source = logEvent.LoggerName,
                 Level = ConvertLogLevel(logEvent.Level),
-                Message = logEvent.FormattedMessage,
+                Category = context != null && context.TryGetValue("Category", out object obj) ? obj?.ToString() : null,
+                Message = logEvent.FormattedMessage
             });
         }
 
-        private LogLevel ConvertLogLevel(NLog.LogLevel level)
+        static private LogLevel ConvertLogLevel(NLog.LogLevel level)
         {
             if (level == NLog.LogLevel.Trace)
                 return LogLevel.Trace;
