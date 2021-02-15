@@ -4,6 +4,7 @@ using System.Windows.Media;
 using Calame.Icons.Base;
 using Diese;
 using Glyph.Animation;
+using Glyph.Core;
 using Glyph.Core.Scheduler;
 using Glyph.Graphics;
 using Glyph.IO;
@@ -105,7 +106,7 @@ namespace Calame.Icons.Descriptors
             if (type.Is<IAnimation>())
                 return new IconDescription(PackIconMaterialKind.Animation, DefaultBrush);
 
-            if (type.Is<IGlyphSchedulerAssigner>())
+            if (type.Is<IGlyphScheduler>() || type.Is<SchedulerHandler>())
                 return new IconDescription(PackIconMaterialKind.CalendarRefresh, DefaultBrush);
             if (type.Is<IRouter>())
                 return new IconDescription(PackIconMaterialKind.RouterNetwork, DefaultBrush);
