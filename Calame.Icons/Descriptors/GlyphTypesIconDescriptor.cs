@@ -5,6 +5,7 @@ using Calame.Icons.Base;
 using Diese;
 using Glyph.Animation;
 using Glyph.Core;
+using Glyph.Core.Schedulers;
 using Glyph.Graphics;
 using Glyph.IO;
 using Glyph.Math;
@@ -106,7 +107,7 @@ namespace Calame.Icons.Descriptors
             if (type.Is<IAnimation>())
                 return new IconDescription(PackIconMaterialKind.Animation, DefaultBrush);
 
-            if (type.Is<IGlyphScheduler>() || type.Is<SchedulerHandler>())
+            if (type.Is<IGlyphScheduler>() || type.Is<ComponentSchedulerHandler>())
                 return new IconDescription(PackIconMaterialKind.CalendarRefresh, DefaultBrush);
             if (type.Is<IRouter>())
                 return new IconDescription(PackIconMaterialKind.RouterNetwork, DefaultBrush);
