@@ -8,6 +8,7 @@ using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
 using Glyph.IO;
+using Glyph.Scheduling;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -52,11 +53,10 @@ namespace Calame.DataModelViewer.Base
             var pixel = new Texture2D(engine.Resolver.Resolve<Func<GraphicsDevice>>()(), 1, 1);
             pixel.SetData(new[] { Color.White });
 
-            editorRoot.Schedulers.Draw.Plan(drawer =>
-            {
-                if (drawer.DrawPredicate(engine.RootView.Camera.GetSceneNode()))
-                    drawer.SpriteBatchStack.Current.Draw(pixel, drawer.DisplayedRectangle.BoundingBox.ToIntegers(), Color.CornflowerBlue);
-            }).AtStart();
+            RenderScheduler renderScheduler = engine.RootView.RenderScheduler;
+
+            renderScheduler.Plan(drawer => drawer.SpriteBatchStack.Current.Draw(pixel, drawer.DisplayedRectangle.BoundingBox.ToIntegers(), Color.CornflowerBlue))
+                .Before(renderScheduler.RenderViewTask);
 
             var dataRoot = editorRoot.Add<GlyphObject>();
             dataRoot.Name = "Data Root";
