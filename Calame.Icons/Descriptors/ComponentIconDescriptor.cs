@@ -80,10 +80,14 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.Compare, GraphicsCategoryBrush);
             if (type.Is<FillingRectangle>())
                 return new IconDescription(PackIconMaterialKind.CameraMeteringMatrix, GraphicsCategoryBrush);
+            if (type.Is<MeshesComponent>())
+                return new IconDescription(PackIconMaterialKind.ShapeOutline, GraphicsCategoryBrush);
             if (type.Is<MeshRenderer>())
                 return new IconDescription(PackIconMaterialKind.Shape, GraphicsCategoryBrush);
             if (type.Is<RendererBase>())
                 return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);
+            if (type.Is<EffectLoader>())
+                return new IconDescription(PackIconMaterialKind.Gradient, GraphicsCategoryBrush);
 
             if (type.Is<SongPlayer>())
                 return new IconDescription(PackIconMaterialKind.Radio, AudioCategoryBrush);
