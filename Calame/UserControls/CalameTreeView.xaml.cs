@@ -16,11 +16,11 @@ namespace Calame.UserControls
 {
     public interface ITreeContext
     {
-        ITreeViewItemModel CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer);
-        bool BaseFilter(object data);
+        ITreeViewItemModel CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration);
+        bool IsMatchingBaseFilter(object data);
     }
 
-    public partial class CalameTreeView : INotifyPropertyChanged
+    public partial class CalameTreeView : INotifyPropertyChanged, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>
     {
         static public readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(CalameTreeView), new PropertyMetadata(default(IEnumerable), OnItemsSourceChanged));
 
@@ -39,27 +39,26 @@ namespace Calame.UserControls
 
             if (!Synchronizers.TryGetValue(treeView, out ObservableListSynchronizer<object, ITreeViewItemModel> synchronizer))
             {
-                synchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(x => SynchronizerConverter(treeView, x), x => x.Data, x => SynchronizerDisposer(treeView, x));
+                synchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(treeView);
+                
                 synchronizer.Subscribe(treeView._treeItems);
                 Synchronizers.Add(treeView, synchronizer);
             }
             
             synchronizer.Reference = itemsSource != null ? new EnumerableReadOnlyObservableList(itemsSource) : null;
-            treeView.UpdateFilter();
+            treeView.UpdateFilter(forceExpand: true);
         }
 
-        static private ITreeViewItemModel SynchronizerConverter(CalameTreeView treeView, object data)
-        {
-            ITreeViewItemModel item = treeView.TreeContext.CreateTreeItemModel(data, x => SynchronizerConverter(treeView, x), x => SynchronizerDisposer(treeView, x));
-            item.Children.CollectionChanged += treeView.OnItemChanged;
-            return item;
-        }
-
-        static private void SynchronizerDisposer(CalameTreeView treeView, ITreeViewItemModel item)
-        {
-            item.Children.CollectionChanged -= treeView.OnItemChanged;
-            item.Dispose();
-        }
+        ITreeViewItemModel ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.CreateItem(object referenceItem)
+            => TreeContext.CreateTreeItemModel(referenceItem, this);
+        object ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.GetReference(ITreeViewItemModel collectedItem)
+            => collectedItem.Data;
+        void ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.SubscribeItem(ITreeViewItemModel collectedItem)
+            => collectedItem.Children.CollectionChanged += OnItemChanged;
+        void ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.UnsubscribeItem(ITreeViewItemModel collectedItem)
+            => collectedItem.Children.CollectionChanged -= OnItemChanged;
+        void ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.DisposeItem(ITreeViewItemModel collectedItem)
+            => collectedItem.Dispose();
 
         static public readonly DependencyProperty TreeContextProperty
             = DependencyProperty.Register(nameof(TreeContext), typeof(ITreeContext), typeof(CalameTreeView), new PropertyMetadata(default(ITreeContext)));
@@ -125,7 +124,7 @@ namespace Calame.UserControls
                     return;
 
                 _filterText = value;
-                UpdateFilter();
+                UpdateFilter(forceExpand: true);
                 NotifyPropertyChanged();
             }
         }
@@ -171,7 +170,7 @@ namespace Calame.UserControls
             }
         }
 
-        private void UpdateFilter()
+        private void UpdateFilter(bool forceExpand)
         {
             // If the selected tree item is filtered, it will be unselect
             // during the full filter refresh and change the content of an enumerable.
@@ -179,62 +178,70 @@ namespace Calame.UserControls
             // TODO: Try to keep selection
             if (SelectedTreeItem != null)
             {
-                UpdateFilter(SelectedTreeItem);
+                UpdateFilter(SelectedTreeItem, forceExpand);
                 if (!SelectedTreeItem.VisibleForFilter)
                     SelectedTreeItem = null;
             }
 
             foreach (ITreeViewItemModel treeItem in TreeItems)
-                UpdateFilter(treeItem);
+                UpdateFilter(treeItem, forceExpand);
         }
 
-        private void UpdateFilter(ITreeViewItemModel item)
+        private void UpdateFilter(ITreeViewItemModel item, bool forceExpand)
         {
             foreach (ITreeViewItemModel child in item.Children)
-                UpdateFilter(child);
+                UpdateFilter(child, forceExpand);
 
-            ApplyFilterOnItem(item);
+            ApplyFilterOnItem(item, forceExpand);
         }
 
         private void UpdateFilterOnItemAdded(ITreeViewItemModel newItem)
         {
             // Update filter on new item and its children
-            UpdateFilter(newItem);
+            UpdateFilter(newItem, forceExpand: false);
 
             // Re-apply filter on parents
             foreach (ITreeViewItemModel parent in Sequence.AggregateExclusive(newItem, x => x.Parent))
-                ApplyFilterOnItem(parent);
+                ApplyFilterOnItem(parent, forceExpand: false);
         }
 
         private void UpdateFilterOnItemRemoved(ITreeViewItemModel oldItem)
         {
             // Re-apply filter on parents
             foreach (ITreeViewItemModel parent in Sequence.AggregateExclusive(oldItem, x => x.Parent))
-                ApplyFilterOnItem(parent);
+                ApplyFilterOnItem(parent, forceExpand: false);
         }
 
-        private void ApplyFilterOnItem(ITreeViewItemModel item)
+        private void ApplyFilterOnItem(ITreeViewItemModel item, bool forceExpand)
         {
-            bool baseFilter = TreeContext.BaseFilter(item.Data);
+            item.MatchingBaseFilter = TreeContext.IsMatchingBaseFilter(item.Data);
+            item.MatchingUserFilter = item.MatchingBaseFilter && IsMatchingUserFilter(item);
 
-            if (string.IsNullOrWhiteSpace(FilterText))
+            bool isMatchingActiveFilter = IsFilteredByUser
+                ? item.MatchingUserFilter
+                : item.MatchingBaseFilter;
+
+            bool hasChildVisibleForFilter = item.Children.Any(x => x.VisibleForFilter);
+
+            item.VisibleForFilter = isMatchingActiveFilter || hasChildVisibleForFilter;
+            item.VisibleAsParent = !isMatchingActiveFilter && hasChildVisibleForFilter;
+            
+            if (forceExpand)
             {
-                item.MatchingFilter = false;
-                item.VisibleForFilter = baseFilter || item.Children.Any(x => x.VisibleForFilter);
-                item.VisibleAsParent = item.VisibleForFilter && !baseFilter;
-                item.IsExpanded = item.VisibleAsParent || item.Children.Any(x => x.IsExpanded) || item.Children.Contains(SelectedTreeItem);
-                return;
+                item.IsExpanded = IsFilteredByUser && hasChildVisibleForFilter;
             }
-
-            item.MatchingFilter = baseFilter && FilterByText(item);
-            item.VisibleForFilter = item.MatchingFilter || item.Children.Any(x => x.VisibleForFilter);
-            item.VisibleAsParent = item.VisibleForFilter && !item.MatchingFilter;
-            item.IsExpanded = item.Children.Any(x => x.MatchingFilter) || item.Children.Any(x => x.IsExpanded);
+            else
+            {
+                if (IsFilteredByUser && hasChildVisibleForFilter)
+                    item.IsExpanded = true;
+            }
         }
 
-        private bool FilterByText(ITreeViewItemModel item)
+        private bool IsFilteredByUser => !string.IsNullOrWhiteSpace(FilterText);
+        private bool IsMatchingUserFilter(ITreeViewItemModel item)
         {
-            return item.DisplayName.IndexOf(FilterText, StringComparison.OrdinalIgnoreCase) >= 0;
+            return !string.IsNullOrWhiteSpace(FilterText)
+                && item.DisplayName.IndexOf(FilterText, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)

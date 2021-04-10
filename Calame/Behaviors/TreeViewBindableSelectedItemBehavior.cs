@@ -137,13 +137,16 @@ namespace Calame.Behaviors
 
                     if (subContainer != null)
                     {
+                        // Store expand state
+                        bool previouslyExpanded = subContainer.IsExpanded;
+
                         // Search the next level for the object.
                         TreeViewItem resultContainer = GetTreeViewItem(subContainer, item);
                         if (resultContainer != null)
                             return resultContainer;
 
-                        // The object is not under this TreeViewItem so collapse it.
-                        subContainer.IsExpanded = false;
+                        // The object is not under this TreeViewItem so restore expand state.
+                        subContainer.IsExpanded = previouslyExpanded;
                     }
                 }
             }

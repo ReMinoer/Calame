@@ -1,14 +1,13 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
+using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
 using Gemini.Framework.Services;
-using Glyph.Composition;
 using Glyph.Composition.Modelization;
 
 namespace Calame.DataModelTree.ViewModels
@@ -82,11 +81,11 @@ namespace Calame.DataModelTree.ViewModels
             return Task.CompletedTask;
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
-            return _treeItemBuilder.Build((IGlyphCreator)data, dataConverter, itemDisposer);
+            return _treeItemBuilder.Build((IGlyphCreator)data, synchronizerConfiguration);
         }
 
-        bool ITreeContext.BaseFilter(object data) => true;
+        bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }

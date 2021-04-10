@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using Calame.Icons;
+using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
 using Simulacra.Binding;
 
@@ -69,9 +70,9 @@ namespace Calame.Utils
             return observableFunc?.Invoke(data).Select(x => getter(data)).StartWith(getter(data)) ?? Observable.Return(getter(data));
         }
 
-        public ITreeViewItemModel Build(T data, Func<object, ITreeViewItemModel> childConverter, Action<ITreeViewItemModel> childDisposer)
+        public ITreeViewItemModel Build(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
-            return new TreeViewItemModel(data, _bindingModulesFunc.Select(x => x(data)), childConverter, childDisposer);
+            return new TreeViewItemModel(data, _bindingModulesFunc.Select(x => x(data)), synchronizerConfiguration);
         }
 
         private class TreeViewItemModel : TreeViewItemModel<T>
@@ -81,9 +82,8 @@ namespace Calame.Utils
             public TreeViewItemModel(
                 T data,
                 IEnumerable<IBindingModule<TreeViewItemModel>> bindingModules,
-                Func<object, ITreeViewItemModel> childConverter,
-                Action<ITreeViewItemModel> childDisposer
-            ) : base(data, childConverter, childDisposer)
+                ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration
+            ) : base(data, synchronizerConfiguration)
             {
                 _bindingManager = new BindingManager<TreeViewItemModel>();
                 _bindingManager.Modules.AddRange(bindingModules);

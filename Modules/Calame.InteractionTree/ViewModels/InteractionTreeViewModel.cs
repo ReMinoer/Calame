@@ -6,6 +6,7 @@ using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
+using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
 using Fingear.Controls;
 using Fingear.Interactives;
@@ -72,19 +73,19 @@ namespace Calame.InteractionTree.ViewModels
             return Task.CompletedTask;
         }
 
-        public ITreeViewItemModel CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
+        public ITreeViewItemModel CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
             switch (data)
             {
                 case IInteractive interactive:
-                    return _interactiveTreeItemBuilder.Build(interactive, dataConverter, itemDisposer);
+                    return _interactiveTreeItemBuilder.Build(interactive, synchronizerConfiguration);
                 case IControl control:
-                    return _controlTreeItemBuilder.Build(control, dataConverter, itemDisposer);
+                    return _controlTreeItemBuilder.Build(control, synchronizerConfiguration);
                 default:
                     throw new NotSupportedException();
             }
         }
 
-        bool ITreeContext.BaseFilter(object data) => true;
+        bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }

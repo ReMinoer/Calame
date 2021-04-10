@@ -6,11 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Calame.BrushPanel.Commands;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
-using Calame.Viewer;
 using Calame.Viewer.Messages;
 using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
@@ -203,20 +201,20 @@ namespace Calame.BrushPanel.ViewModels
             EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedCanvas)).Wait();
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
             switch (model)
             {
                 case IGlyphData data:
-                    return _dataTreeItemBuilder.Build(data, dataConverter, itemDisposer);
+                    return _dataTreeItemBuilder.Build(data, synchronizerConfiguration);
                 case IGlyphComponent component:
-                    return _componentTreeItemBuilder.Build(component, dataConverter, itemDisposer);
+                    return _componentTreeItemBuilder.Build(component, synchronizerConfiguration);
                 default:
                     throw new NotSupportedException();
             }
         }
 
-        bool ITreeContext.BaseFilter(object model)
+        bool ITreeContext.IsMatchingBaseFilter(object model)
         {
             IGlyphComponent componentToFilter;
             switch (model)

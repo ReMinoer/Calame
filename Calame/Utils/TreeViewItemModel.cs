@@ -27,7 +27,8 @@ namespace Calame.Utils
 
         bool IsTriggered { get; }
 
-        bool MatchingFilter { get; set; }
+        bool MatchingBaseFilter { get; set; }
+        bool MatchingUserFilter { get; set; }
         bool VisibleForFilter { get; set; }
         bool VisibleAsParent { get; set; }
     }
@@ -95,11 +96,18 @@ namespace Calame.Utils
             set => Set(ref _isTriggered, value);
         }
 
-        private bool _matchingFilter;
-        public bool MatchingFilter
+        private bool _matchingBaseFilter;
+        public bool MatchingBaseFilter
         {
-            get => _matchingFilter;
-            set => Set(ref _matchingFilter, value);
+            get => _matchingBaseFilter;
+            set => Set(ref _matchingBaseFilter, value);
+        }
+
+        private bool _matchingUserFilter;
+        public bool MatchingUserFilter
+        {
+            get => _matchingUserFilter;
+            set => Set(ref _matchingUserFilter, value);
         }
         
         private bool _visibleForFilter = true;
@@ -131,12 +139,12 @@ namespace Calame.Utils
             }
         }
 
-        public TreeViewItemModel(T data, Func<object, ITreeViewItemModel> childConverter, Action<ITreeViewItemModel> childDisposer)
+        public TreeViewItemModel(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
             Data = data;
 
             Children = new ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel>(this);
-            ChildrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(childConverter, x => x.Data, childDisposer);
+            ChildrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(synchronizerConfiguration);
             ChildrenSynchronizer.Subscribe(Children);
         }
 

@@ -7,6 +7,7 @@ using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
 using Caliburn.Micro;
+using Diese.Collections.Observables;
 using Gemini.Framework.Services;
 using Glyph;
 using Glyph.Composition;
@@ -128,11 +129,11 @@ namespace Calame.SceneGraph.ViewModels
             SetValue(ref _selectionNode, component?.GetSceneNode(), nameof(SelectionNode));
         }
 
-        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, Func<object, ITreeViewItemModel> dataConverter, Action<ITreeViewItemModel> itemDisposer)
+        ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
-            return _treeItemBuilder.Build((ISceneNode)data, dataConverter, itemDisposer);
+            return _treeItemBuilder.Build((ISceneNode)data, synchronizerConfiguration);
         }
 
-        bool ITreeContext.BaseFilter(object data) => true;
+        bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }
