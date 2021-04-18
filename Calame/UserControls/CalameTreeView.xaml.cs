@@ -6,11 +6,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Input;
 using Calame.Icons;
 using Calame.Utils;
 using Diese.Collections;
 using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
+using Gemini.Framework;
 
 namespace Calame.UserControls
 {
@@ -95,6 +97,15 @@ namespace Calame.UserControls
             set => SetValue(IconProviderProperty, value);
         }
 
+        static public readonly DependencyProperty IconDescriptorProperty =
+            DependencyProperty.Register(nameof(IconDescriptor), typeof(IIconDescriptor), typeof(CalameTreeView), new PropertyMetadata());
+
+        public IIconDescriptor IconDescriptor
+        {
+            get => (IIconDescriptor)GetValue(IconDescriptorProperty);
+            set => SetValue(IconDescriptorProperty, value);
+        }
+
         private readonly ObservableList<ITreeViewItemModel> _treeItems;
         public IReadOnlyObservableList<ITreeViewItemModel> TreeItems { get; }
 
@@ -123,11 +134,18 @@ namespace Calame.UserControls
                 if (_filterText == value)
                     return;
 
+                if (string.IsNullOrEmpty(_filterText))
+                    SelectedItem = null;
+
                 _filterText = value;
                 UpdateFilter(forceExpand: true);
                 NotifyPropertyChanged();
             }
         }
+
+        public ICommand CollapseAllCommand { get; }
+        public ICommand ExpandAllCommand { get; }
+        public ICommand FocusSelectionCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -136,9 +154,57 @@ namespace Calame.UserControls
             _treeItems = new ObservableList<ITreeViewItemModel>();
             TreeItems = new ReadOnlyObservableList<ITreeViewItemModel>(_treeItems);
 
+            CollapseAllCommand = new RelayCommand(OnCollapseAll);
+            ExpandAllCommand = new RelayCommand(OnExpandAll);
+            FocusSelectionCommand = new RelayCommand(OnFocusSelection, CanFocusSelection);
+
             _treeItems.CollectionChanged += OnItemChanged;
 
             InitializeComponent();
+        }
+
+        private void OnCollapseAll(object _)
+        {
+            SelectedItem = null;
+
+            foreach (ITreeViewItemModel treeItem in TreeItems)
+                UpdateAllExpand(treeItem, false);
+        }
+
+        private void OnExpandAll(object _)
+        {
+            foreach (ITreeViewItemModel treeItem in TreeItems)
+                UpdateAllExpand(treeItem, true);
+        }
+
+        private bool CanFocusSelection(object _) => SelectedTreeItem != null;
+        private void OnFocusSelection(object _)
+        {
+            object selectedItem = SelectedItem;
+
+            FilterText = null;
+            SelectedItem = selectedItem;
+            FocusTreeView();
+        }
+
+        public bool IsTreeViewFocused { get; private set; }
+
+        public void FocusTreeView()
+        {
+            IsTreeViewFocused = false;
+            NotifyPropertyChanged(nameof(IsTreeViewFocused));
+            IsTreeViewFocused = true;
+            NotifyPropertyChanged(nameof(IsTreeViewFocused));
+            IsTreeViewFocused = false;
+            NotifyPropertyChanged(nameof(IsTreeViewFocused));
+        }
+
+        private void UpdateAllExpand(ITreeViewItemModel treeItem, bool value)
+        {
+            treeItem.IsExpanded = value;
+
+            foreach (ITreeViewItemModel child in treeItem.Children)
+                UpdateAllExpand(child, value);
         }
 
         private void OnItemChanged(object sender, NotifyCollectionChangedEventArgs e)

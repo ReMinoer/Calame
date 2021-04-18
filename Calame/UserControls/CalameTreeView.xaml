@@ -1,20 +1,63 @@
 ﻿<UserControl x:Class="Calame.UserControls.CalameTreeView"
+             x:Name="This"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:utils="clr-namespace:Calame.Utils"
              xmlns:userControls="clr-namespace:Calame.UserControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:attachedProperties="clr-namespace:Calame.AttachedProperties"
              xmlns:behaviors="clr-namespace:Calame.Behaviors"
+             xmlns:icons="clr-namespace:Calame.Icons"
+             xmlns:converters="clr-namespace:Calame.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="200">
+    <UserControl.Resources>
+        <converters:FilteredTextInlinesConverter x:Key="FilteredTextInlinesConverter" />
+    </UserControl.Resources>
     <DockPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
-        <TextBox DockPanel.Dock="Top" Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <TreeView ItemsSource="{Binding TreeItems}">
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Left"
+                        Orientation="Horizontal">
+                <Button Padding="4" Command="{Binding CollapseAllCommand}">
+                    <userControls:CalameIcon IconSize="12"
+                                             Width="12"
+                                             Target="{x:Static icons:CalameIconKey.CollapseAll}"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding IconDescriptor}" />
+                </Button>
+                <Button Padding="4" Command="{Binding ExpandAllCommand}">
+                    <userControls:CalameIcon IconSize="12"
+                                             Width="12"
+                                             Target="{x:Static icons:CalameIconKey.ExpandAll}"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding IconDescriptor}" />
+                </Button>
+                <Button Padding="4" Command="{Binding FocusSelectionCommand}">
+                    <userControls:CalameIcon IconSize="12"
+                                             Width="12"
+                                             Target="{x:Static icons:CalameIconKey.ShowSelection}"
+                                             IconProvider="{Binding IconProvider}"
+                                             IconDescriptor="{Binding IconDescriptor}" />
+                </Button>
+            </StackPanel>
+            <userControls:FilterTextBox Text="{Binding FilterText, Mode=TwoWay}"
+                                        IconProvider="{Binding IconProvider}"
+                                        IconDescriptor="{Binding IconDescriptor}" />
+        </DockPanel>
+        <TreeView ItemsSource="{Binding TreeItems}"
+                  Background="White"
+                  attachedProperties:Focus.IsFocused="{Binding IsTreeViewFocused}">
             <b:Interaction.Behaviors>
                 <behaviors:TreeViewBindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
+            <TreeView.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#C4D5FF" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
+            </TreeView.Resources>
             <TreeView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <utils:VirtualizingStackPanel/>
@@ -30,53 +73,63 @@
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
+                    <Style.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="Grid.ColumnSpan" Value="2" />
+                        </Style>
+                    </Style.Resources>
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type utils:ITreeViewItemModel}">
-                    <DockPanel>
-                        <userControls:CalameIcon DockPanel.Dock="Left"
-                                                 IconDescription="{Binding IconDescription}"
-                                                 IconSize="14"
-                                                 IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
-                                                 Margin="0 0 2 0"
-                                                 VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding DisplayName}" Background="Transparent">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-                                    <Setter Property="Background" Value="Transparent" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
-                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsDisabledByParent}" Value="True">
-                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=IsTriggered}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                    <Border Padding="2">
+                        <DockPanel>
+                            <userControls:CalameIcon DockPanel.Dock="Left"
+                                                     Margin="0 0 3 0"
+                                                     IconDescription="{Binding IconDescription}"
+                                                     IconSize="14"
+                                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
+                                                     VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding DisplayName}" Background="Transparent">
+                                <b:Interaction.Behaviors>
+                                    <behaviors:TextBlockHighlightFilteredBehavior FilterText="{Binding FilterText, ElementName=This}" />
+                                </b:Interaction.Behaviors>
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsDisabledByParent}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Path=IsTriggered}" Value="True">
+                                                <DataTrigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
                                                                         To="#FF008000"
                                                                         Duration="0:0:0" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.EnterActions>
-                                            <DataTrigger.ExitActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.EnterActions>
+                                                <DataTrigger.ExitActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
                                                                         From="#FF008000" To="#00008000"
                                                                         Duration="0:0:0.5" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </DataTrigger.ExitActions>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </DockPanel>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </DataTrigger.ExitActions>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DockPanel>
+                    </Border>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

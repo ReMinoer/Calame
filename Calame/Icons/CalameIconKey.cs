@@ -34,6 +34,11 @@
         OpenWith,
         EditableItem,
         EditableProperties,
-        ReadOnlyProperties
+        ReadOnlyProperties,
+
+        // Tree View
+        CollapseAll,
+        ExpandAll,
+        ShowSelection
     }
 }

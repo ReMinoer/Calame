@@ -24,7 +24,6 @@ namespace Calame.Utils
         bool IsDisabledByParent { get; set; }
         
         bool IsExpanded { get; set; }
-
         bool IsTriggered { get; }
 
         bool MatchingBaseFilter { get; set; }

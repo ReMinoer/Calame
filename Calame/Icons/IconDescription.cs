@@ -7,8 +7,8 @@ namespace Calame.Icons
     {
         static public IconDescription None => new IconDescription();
 
-        public object Key { get; }
-        public Brush Brush { get; }
+        public object Key { get; set; }
+        public Brush Brush { get; set; }
 
         public bool Defined => Key != null;
 

@@ -30,6 +30,7 @@ namespace Calame.BrushPanel.ViewModels
 
         public IIconProvider IconProvider { get; }
         public IIconDescriptorManager IconDescriptorManager { get; }
+        public IIconDescriptor IconDescriptor { get; }
 
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataTreeItemBuilder;
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _componentTreeItemBuilder;
@@ -133,6 +134,7 @@ namespace Calame.BrushPanel.ViewModels
 
             IconProvider = iconProvider;
             IconDescriptorManager = iconDescriptorManager;
+            IconDescriptor = iconDescriptorManager.GetDescriptor();
 
             IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 

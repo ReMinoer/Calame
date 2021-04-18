@@ -12,5 +12,6 @@
     <userControls:CalameTreeView TreeContext="{Binding}"
                                  ItemsSource="{Binding Engine.ProjectionManager.SceneRoots}"
                                  SelectedItem="{Binding SelectionNode, Mode=TwoWay}"
-                                 IconProvider="{Binding IconProvider}" />
+                                 IconProvider="{Binding IconProvider}"
+                                 IconDescriptor="{Binding IconDescriptor}" />
 </UserControl>

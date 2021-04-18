@@ -23,7 +23,8 @@
         <userControls:CalameTreeView TreeContext="{Binding}"
                                      ItemsSource="{Binding Items}"
                                      SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"
-                                     IconProvider="{Binding IconProvider}"/>
+                                     IconProvider="{Binding IconProvider}"
+                                     IconDescriptor="{Binding IconDescriptor}" />
         <GridSplitter Grid.Row="0"
                       VerticalAlignment="Bottom"
                       HorizontalAlignment="Stretch"

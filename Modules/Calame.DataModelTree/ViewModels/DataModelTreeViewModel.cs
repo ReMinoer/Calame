@@ -18,6 +18,7 @@ namespace Calame.DataModelTree.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
+        public IIconDescriptor IconDescriptor { get; }
 
         private IGlyphData _root;
         private IGlyphData _selection;
@@ -51,6 +52,8 @@ namespace Calame.DataModelTree.ViewModels
             DisplayName = "Data Model Tree";
 
             IconProvider = iconProvider;
+            IconDescriptor = iconDescriptorManager.GetDescriptor();
+
             IIconDescriptor<IGlyphData> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphData>();
 
             _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphCreator>()

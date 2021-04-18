@@ -45,6 +45,10 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.EditableProperties: return PackIconMaterialKind.PlaylistEdit;
                 case CalameIconKey.ReadOnlyProperties: return PackIconMaterialKind.Eye;
 
+                case CalameIconKey.CollapseAll: return PackIconMaterialKind.CollapseAllOutline;
+                case CalameIconKey.ExpandAll: return PackIconMaterialKind.ExpandAllOutline;
+                case CalameIconKey.ShowSelection: return PackIconMaterialKind.CrosshairsGps;
+
                 default: return default(PackIconMaterialKind);
             }
         }

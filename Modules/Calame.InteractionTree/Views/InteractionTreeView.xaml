@@ -16,5 +16,6 @@
     <userControls:CalameTreeView MinWidth="200"
                                  TreeContext="{Binding}"
                                  ItemsSource="{Binding Engine.InteractionManager.Root, Converter={StaticResource ObjectToEnumerableConverter}}"
-                                 IconProvider="{Binding IconProvider}" />
+                                 IconProvider="{Binding IconProvider}"
+                                 IconDescriptor="{Binding IconDescriptor}" />
 </UserControl>

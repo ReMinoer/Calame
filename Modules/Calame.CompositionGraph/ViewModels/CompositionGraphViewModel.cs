@@ -20,6 +20,7 @@ namespace Calame.CompositionGraph.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
         
         public IIconProvider IconProvider { get; }
+        public IIconDescriptor IconDescriptor { get; }
 
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _treeItemBuilder;
         private IDocumentContext<IComponentFilter> _filteringContext;
@@ -54,6 +55,8 @@ namespace Calame.CompositionGraph.ViewModels
             DisplayName = "Composition Graph";
             
             IconProvider = iconProvider;
+            IconDescriptor = iconDescriptorManager.GetDescriptor();
+
             IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()

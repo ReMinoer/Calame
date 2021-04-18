@@ -21,6 +21,7 @@ namespace Calame.InteractionTree.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
+        public IIconDescriptor IconDescriptor { get; }
 
         private GlyphEngine _engine;
         private readonly TreeViewItemModelBuilder<IInteractive> _interactiveTreeItemBuilder;
@@ -41,6 +42,8 @@ namespace Calame.InteractionTree.ViewModels
             DisplayName = "Interaction Tree";
 
             IconProvider = iconProvider;
+            IconDescriptor = iconDescriptorManager.GetDescriptor();
+
             IIconDescriptor<IInteractive> interactiveIconDescriptor = iconDescriptorManager.GetDescriptor<IInteractive>();
             IIconDescriptor<IControl> controlIconDescriptor = iconDescriptorManager.GetDescriptor<IControl>();
 

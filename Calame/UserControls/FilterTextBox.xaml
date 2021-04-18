@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="Calame.UserControls.FilterTextBox"
+             x:Name="This"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:local="clr-namespace:Calame.UserControls"
+             xmlns:icons="clr-namespace:Calame.Icons"
+             xmlns:converters="clr-namespace:Calame.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="25" d:DesignWidth="200">
+    <UserControl.Resources>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <xctk:WatermarkTextBox Text="{Binding Text, ElementName=This, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                               AutoSelectBehavior="OnFocus"
+                               Watermark="Search" />
+        <Button HorizontalAlignment="Right"
+                Visibility="{Binding Text, ElementName=This, Converter={StaticResource StringToVisibilityConverter}}"
+                Command="{Binding ClearFilterCommand, ElementName=This}">
+            <local:CalameIcon IconSize="12"
+                              Width="12"
+                              Target="{x:Static icons:CalameIconKey.Delete}"
+                              IconProvider="{Binding IconProvider, ElementName=This}"
+                              IconDescriptor="{Binding IconDescriptor, ElementName=This}" />
+        </Button>
+    </Grid>
+</UserControl>

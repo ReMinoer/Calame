@@ -23,6 +23,7 @@ namespace Calame.SceneGraph.ViewModels
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
+        public IIconDescriptor IconDescriptor { get; }
 
         private GlyphEngine _engine;
         private IDocumentContext<IComponentFilter> _filteringContext;
@@ -77,6 +78,8 @@ namespace Calame.SceneGraph.ViewModels
             DisplayName = "Scene Graph";
             
             IconProvider = iconProvider;
+            IconDescriptor = iconDescriptorManager.GetDescriptor();
+
             IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _treeItemBuilder = new TreeViewItemModelBuilder<ISceneNode>()
