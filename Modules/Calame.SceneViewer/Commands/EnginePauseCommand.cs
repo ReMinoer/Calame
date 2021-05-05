@@ -11,7 +11,7 @@ namespace Calame.SceneViewer.Commands
     [CommandDefinition]
     public class EnginePauseCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Pause";
+        public override string Text => "_Pause";
         public override object IconKey => CalameIconKey.Pause;
 
         [CommandHandler]

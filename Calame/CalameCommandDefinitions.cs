@@ -10,6 +10,9 @@ namespace Calame
     public class CalameMenu
     {
         [Export]
+        static public MenuItemGroupDefinition ToolsSubMenuGroup = new MenuItemGroupDefinition(MenuDefinitions.ToolsMenu, 0);
+
+        [Export]
         static public MenuItemGroupDefinition SelectionHistoryGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 10);
         [Export]
         static public MenuItemDefinition PreviousSelection = new CommandMenuItemDefinition<PreviousSelectionCommand>(SelectionHistoryGroup, 0);

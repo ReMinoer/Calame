@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="Calame.LogConsole.Views.LogConsoleView"
+             x:Name="This"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,6 +10,9 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:Calame.Behaviors;assembly=Calame"
              xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
+             xmlns:utils="clr-namespace:Calame.Utils;assembly=Calame"
+             xmlns:attachedProperties="clr-namespace:Calame.AttachedProperties;assembly=Calame"
+             xmlns:commands="clr-namespace:Calame.LogConsole.Commands"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:LogConsoleViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -16,55 +20,102 @@
     <UserControl.Resources>
         <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
     </UserControl.Resources>
-    <ListView x:Name="ListView"
-              ItemsSource="{Binding CurrentDocumentLogEntries}">
-        <b:Interaction.Behaviors>
-            <behaviors:ListViewBindableSelectedItemsBehavior SelectedItems="{Binding SelectedLogEntries}" />
-            <behaviors:ListViewScrollToNewLastItemBehavior OnlyIfAlreadyScrolledToEnd="True" />
-        </b:Interaction.Behaviors>
-        <ListView.ContextMenu>
-            <ContextMenu>
-                <MenuItem Header="Copy Selected Log"
-                          Command="{Binding CopySelectedLogCommand}" />
-                <MenuItem Header="Copy All Log"
-                          Command="{Binding CopyAllLogCommand}" />
-            </ContextMenu>
-        </ListView.ContextMenu>
-        <ListView.ItemTemplate>
-            <DataTemplate DataType="{x:Type logConsole:LogEntry}">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Left"
-                               Margin="0 0 5 0"
-                               VerticalAlignment="Top"
-                               Text="{Binding TimeStamp, StringFormat=HH:mm:ss.ffff}"
-                               FontFamily="Consolas" />
-                    <userControls:CalameIcon x:Name="Icon"
-                                             DockPanel.Dock="Left"
-                                             VerticalAlignment="Top"
-                                             Margin="0 0 5 0"
-                                             Target="{Binding Level}"
-                                             ToolTip="{Binding Level}"
-                                             IconSize="14"
-                                             IconDescriptor="{Binding DataContext.LogLevelIconDescriptor, ElementName=ListView}"
-                                             IconProvider="{Binding DataContext.IconProvider, ElementName=ListView}"/>
-                    <Border Background="DimGray"
-                            Margin="0 0 5 0"
-                            CornerRadius="2"
-                            Padding="5 1"
-                            Visibility="{Binding Category, Converter={StaticResource ObjectToVisibilityConverter}}">
-                        <TextBlock VerticalAlignment="Top"
-                                   TextTrimming="CharacterEllipsis"
-                                   Text="{Binding Category}"
-                                   ToolTip="{Binding Category}"
-                                   FontSize="10"
-                                   Foreground="White"
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <userControls:FilterTextBox DockPanel.Dock="Right"
+                                        Width="200"
+                                        Text="{Binding FilterText, Mode=TwoWay}"
+                                        IconProvider="{Binding IconProvider}"
+                                        IconDescriptor="{Binding IconDescriptor}" />
+            <ToolBarTray>
+                <ToolBar ToolBarTray.IsLocked="True">
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:AutoScrollLogCommand}" />
+                    <Separator/>
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:ClearLogCommand}"
+                                                IconAndText="True"/>
+                    <Separator/>
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:ScrollLogToEndCommand}"
+                                                IconAndText="True"/>
+                </ToolBar>
+            </ToolBarTray>
+        </DockPanel>
+        <ListView ItemsSource="{Binding CurrentDocumentLogEntries}"
+                  attachedProperties:ScrollToEnd.ScrollToEndRequested="{Binding ScrollToEndRequested}">
+            <b:Interaction.Behaviors>
+                <behaviors:ListViewBindableSelectedItemsBehavior SelectedItems="{Binding SelectedLogEntries}" />
+                <behaviors:ListViewScrollToNewLastItemBehavior IsEnabled="{Binding AutoScroll}" OnlyIfAlreadyScrolledToEnd="True" />
+            </b:Interaction.Behaviors>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <utils:VirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Selected Log"
+                              Command="{Binding CopySelectedLogCommand}" />
+                    <MenuItem Header="Copy All Log"
+                              Command="{Binding CopyAllLogCommand}" />
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding VisibleForFilter}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type logConsole:LogEntry}">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left"
+                                   Margin="0 0 5 0"
+                                   VerticalAlignment="Top"
+                                   Text="{Binding TimeStamp, StringFormat=HH:mm:ss.ffff}"
                                    FontFamily="Consolas" />
-                    </Border>
-                    <TextBlock VerticalAlignment="Top"
-                               Text="{Binding Message}"
-                               FontFamily="Consolas" />
-                </DockPanel>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
+                        <userControls:CalameIcon x:Name="Icon"
+                                                 DockPanel.Dock="Left"
+                                                 VerticalAlignment="Top"
+                                                 Margin="0 0 5 0"
+                                                 Target="{Binding Level}"
+                                                 ToolTip="{Binding Level}"
+                                                 IconSize="14"
+                                                 IconDescriptor="{Binding DataContext.LogLevelIconDescriptor, ElementName=This}"
+                                                 IconProvider="{Binding DataContext.IconProvider, ElementName=This}"/>
+                        <Border Background="DimGray"
+                                Margin="0 0 5 0"
+                                CornerRadius="2"
+                                Padding="5 1"
+                                Visibility="{Binding Category, Converter={StaticResource ObjectToVisibilityConverter}}">
+                            <TextBlock VerticalAlignment="Top"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{Binding Category}"
+                                       ToolTip="{Binding Category}"
+                                       FontSize="10"
+                                       Foreground="White"
+                                       FontFamily="Consolas">
+                                <b:Interaction.Behaviors>
+                                    <behaviors:TextBlockHighlightFilteredBehavior ItemText="{Binding Category}"
+                                                                                  FilterText="{Binding DataContext.FilterText, ElementName=This}"
+                                                                                  HighlightForeground="Gold"/>
+                                </b:Interaction.Behaviors>
+                            </TextBlock>
+                        </Border>
+                        <TextBlock VerticalAlignment="Top"
+                                   Text="{Binding Message}"
+                                   FontFamily="Consolas">
+                            <b:Interaction.Behaviors>
+                                <behaviors:TextBlockHighlightFilteredBehavior ItemText="{Binding Message}"
+                                                                              FilterText="{Binding DataContext.FilterText, ElementName=This}"
+                                                                              HighlightBackground="Gold"/>
+                            </b:Interaction.Behaviors>
+                        </TextBlock>
+                    </DockPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </DockPanel>
 </UserControl>

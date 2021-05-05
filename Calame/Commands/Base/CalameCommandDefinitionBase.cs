@@ -7,7 +7,7 @@ namespace Calame.Commands.Base
 {
     public abstract class CalameCommandDefinitionBase : CommandDefinition
     {
-        public override string ToolTip => Text;
+        public override string ToolTip => Text.Replace("_", "");
         public override sealed string Name { get; }
         public override sealed Uri IconSource { get; }
         public abstract object IconKey { get; }

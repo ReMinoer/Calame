@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Calame.Utils;
 using Microsoft.Xaml.Behaviors;
 
 namespace Calame.Behaviors
@@ -59,7 +60,15 @@ namespace Calame.Behaviors
                     return;
             }
 
-            object lastItem = AssociatedObject.Items[AssociatedObject.Items.Count - 1];
+            int lastIndex = AssociatedObject.Items.Count - 1;
+            if (lastIndex == -1)
+                return;
+
+            var lastControlItem = AssociatedObject.GetGeneratedItemContainer<FrameworkElement>(lastIndex);
+            if (!lastControlItem.IsVisible)
+                return;
+
+            object lastItem = AssociatedObject.Items[lastIndex];
             AssociatedObject.ScrollIntoView(lastItem);
         }
     }

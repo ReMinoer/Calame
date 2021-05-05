@@ -39,6 +39,11 @@
         // Tree View
         CollapseAll,
         ExpandAll,
-        ShowSelection
+        ShowSelection,
+
+        // Log Console
+        Clear,
+        AutoScroll,
+        ScrollToEnd
     }
 }

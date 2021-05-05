@@ -49,6 +49,10 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.ExpandAll: return PackIconMaterialKind.ExpandAllOutline;
                 case CalameIconKey.ShowSelection: return PackIconMaterialKind.CrosshairsGps;
 
+                case CalameIconKey.Clear: return PackIconMaterialKind.PlaylistRemove;
+                case CalameIconKey.ScrollToEnd: return PackIconMaterialKind.ArchiveArrowDownOutline;
+                case CalameIconKey.AutoScroll: return PackIconMaterialKind.AutoDownload;
+
                 default: return default(PackIconMaterialKind);
             }
         }
