@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,9 +11,11 @@ using Calame.Viewer.Modules.Base;
 using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
 using Diese.Collections;
+using Fingear.Inputs;
 using Fingear.Interactives;
 using Fingear.Interactives.Containers;
 using Gemini.Framework;
+using Gemini.Framework.Services;
 using Glyph;
 using Glyph.Composition;
 using Glyph.Core;
@@ -29,6 +32,8 @@ namespace Calame.SceneViewer.ViewModels
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public sealed class SceneViewerViewModel : CalameDocumentBase, IViewerDocument, IHandle<ISelectionRequest<IGlyphComponent>>
     {
+        private readonly IShell _shell;
+
         private GlyphEngine _engine;
         private MessagingTracker<IView> _viewTracker;
         private ISession _session;
@@ -56,10 +61,12 @@ namespace Calame.SceneViewer.ViewModels
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
         [ImportingConstructor]
-        public SceneViewerViewModel(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
+        public SceneViewerViewModel(IShell shell, IEventAggregator eventAggregator, ILoggerProvider loggerProvider,
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
             [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator, loggerProvider, iconProvider, iconDescriptorManager)
         {
+            _shell = shell;
             DisplayName = "Scene Viewer";
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
@@ -67,6 +74,8 @@ namespace Calame.SceneViewer.ViewModels
 
             SessionMode = new SessionModeModule();
             Viewer.InsertInteractiveMode(0, SessionMode);
+
+            Fingear.Inputs.InputManager.Instance.InputSourcesUsed += OnInputSourcesUsed;
         }
 
         public async Task InitializeSession()
@@ -105,6 +114,20 @@ namespace Calame.SceneViewer.ViewModels
             await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode));
         }
 
+        private void OnInputSourcesUsed(IReadOnlyCollection<IInputSource> usedInputSources)
+        {
+            if (_shell.ActiveItem != this)
+                return;
+            if (Viewer.SelectedMode == SessionMode)
+                return;
+
+            if (usedInputSources.Any(x => x.Type == InputSourceType.GamePad))
+            {
+                EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode)).Wait();
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
         protected override void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
@@ -122,6 +145,7 @@ namespace Calame.SceneViewer.ViewModels
 
         protected override Task DisposeDocumentAsync()
         {
+            Fingear.Inputs.InputManager.Instance.InputSourcesUsed -= OnInputSourcesUsed;
             Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
 
             _engine.Stop();
