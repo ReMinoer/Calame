@@ -4,19 +4,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:utils="clr-namespace:Calame.Utils"
              xmlns:userControls="clr-namespace:Calame.UserControls"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:attachedProperties="clr-namespace:Calame.AttachedProperties"
              xmlns:behaviors="clr-namespace:Calame.Behaviors"
              xmlns:icons="clr-namespace:Calame.Icons"
-             xmlns:converters="clr-namespace:Calame.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="200">
-    <UserControl.Resources>
-        <converters:FilteredTextInlinesConverter x:Key="FilteredTextInlinesConverter" />
-    </UserControl.Resources>
     <DockPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
         <DockPanel DockPanel.Dock="Top">
             <StackPanel DockPanel.Dock="Left"
@@ -72,6 +67,26 @@
                         <DataTrigger Binding="{Binding VisibleForFilter}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=IsTriggered}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                        To="#B5E5B0"
+                                                        Duration="0:0:0" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                        From="#B5E5B0" To="#00B5E5B0"
+                                                        Duration="0:0:0.5" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
                     </Style.Triggers>
                     <Style.Resources>
                         <Style TargetType="Border">
@@ -92,7 +107,9 @@
                                                      VerticalAlignment="Center" />
                             <TextBlock Text="{Binding DisplayName}" Background="Transparent">
                                 <b:Interaction.Behaviors>
-                                    <behaviors:TextBlockHighlightFilteredBehavior FilterText="{Binding FilterText, ElementName=This}" />
+                                    <behaviors:TextBlockHighlightFilteredBehavior ItemText="{Binding DisplayName}"
+                                                                                  FilterText="{Binding FilterText, ElementName=This}"
+                                                                                  HighlightBackground="Gold"/>
                                 </b:Interaction.Behaviors>
                                 <TextBlock.Style>
                                     <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
@@ -103,26 +120,6 @@
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsDisabledByParent}" Value="True">
                                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Path=IsTriggered}" Value="True">
-                                                <DataTrigger.EnterActions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
-                                                                        To="#FF008000"
-                                                                        Duration="0:0:0" />
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </DataTrigger.EnterActions>
-                                                <DataTrigger.ExitActions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
-                                                                        From="#FF008000" To="#00008000"
-                                                                        Duration="0:0:0.5" />
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </DataTrigger.ExitActions>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>

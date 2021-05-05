@@ -183,6 +183,8 @@ namespace Calame.UserControls
             object selectedItem = SelectedItem;
 
             FilterText = null;
+            OnCollapseAll(_);
+
             SelectedItem = selectedItem;
             FocusTreeView();
         }
