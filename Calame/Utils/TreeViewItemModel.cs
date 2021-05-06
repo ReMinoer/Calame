@@ -69,7 +69,7 @@ namespace Calame.Utils
                 if (!Set(ref _isEnabled, value))
                     return;
 
-                foreach (ITreeViewItemModel item in Tree.DepthFirst<ITreeViewItemModel, ITreeViewItemModel>(this, x => x.Children))
+                foreach (ITreeViewItemModel item in Tree.DepthFirst<ITreeViewItemModel>(this, x => x.Children))
                     item.IsDisabledByParent = Sequence.Aggregate(item, x => x.Parent).Any(x => !x.IsEnabled);
             }
         }

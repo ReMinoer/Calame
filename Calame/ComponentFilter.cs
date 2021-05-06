@@ -11,7 +11,7 @@ namespace Calame
 
         public bool Filter(IGlyphComponent component)
         {
-            return !ExcludedRoots.Any(x => x == component || x.ChildrenQueue().Contains(component));
+            return !ExcludedRoots.Any(x => x.AndAllChildren().Contains(component));
         }
     }
 }

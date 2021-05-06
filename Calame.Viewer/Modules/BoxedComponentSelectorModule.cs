@@ -1,8 +1,10 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Calame.Viewer.Modules.Base;
 using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
+using Diese.Collections;
 using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Resolvers;
@@ -10,6 +12,7 @@ using Glyph.Engine;
 using Glyph.Messaging;
 using Glyph.Tools;
 using Niddle;
+using Stave;
 
 namespace Calame.Viewer.Modules
 {
@@ -73,7 +76,7 @@ namespace Calame.Viewer.Modules
             if (Model.Runner.Engine.FocusedClient != Model.Client)
                 return;
 
-            SelectedComponent = boxedComponent;
+            SelectedComponent = boxedComponent?.AllParents().OfType<IBoxedComponent>().First(x => x.Components.AnyOfType<ISceneNodeComponent>());
             await _eventAggregator.PublishAsync(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
         }
 
