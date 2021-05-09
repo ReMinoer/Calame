@@ -41,6 +41,8 @@ namespace Calame.DataModelViewer.Base
             return SaveAsync(Data, stream);
         }
 
+        public virtual Type RunCommandDefinitionType => null;
+
         protected abstract Task<T> NewAsync();
         protected virtual Task<T> LoadAsync(Stream stream) => Task.Run(() => SaveLoadFormat.Load(stream));
         protected virtual Task SaveAsync(T data, Stream stream) => Task.Run(() => SaveLoadFormat.Save(Data, stream));

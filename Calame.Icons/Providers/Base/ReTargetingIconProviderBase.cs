@@ -23,7 +23,7 @@ namespace Calame.Icons.Providers.Base
         public Uri GetUri(IconDescription iconDescription, int size) => GetValidProviders(iconDescription).Select(x => x.GetUri(GetTargetDescription(iconDescription), size)).FirstOrDefault();
 
         private IEnumerable<IIconProviderModule<TTarget>> GetValidProviders(IconDescription iconDescription) => _iconProviders.Where(x => x.Handle(GetTargetDescription(iconDescription)));
-        private IconDescription GetTargetDescription(IconDescription iconDescription) => new IconDescription(GetTargetKey((TKey)iconDescription.Key), iconDescription.Brush);
+        private IconDescription GetTargetDescription(IconDescription iconDescription) => new IconDescription(GetTargetKey((TKey)iconDescription.Key), iconDescription.Brush, iconDescription.Margin);
         protected abstract TTarget GetTargetKey(TKey key);
     }
 }

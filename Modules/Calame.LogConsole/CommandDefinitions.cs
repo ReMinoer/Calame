@@ -7,7 +7,7 @@ namespace Calame.LogConsole
     static public class SessionMenu
     {
         [Export]
-        static public MenuItemDefinition LogConsoleMenu = new TextMenuItemDefinition(CalameMenu.ToolsSubMenuGroup, 0, "_Log Console");
+        static public MenuItemDefinition LogConsoleMenu = new TextMenuItemDefinition(CalameMenus.ToolsSubMenuGroup, 0, "_Log Console");
         [Export]
         static public MenuItemGroupDefinition LogConsoleGroup = new MenuItemGroupDefinition(LogConsoleMenu, 0);
 

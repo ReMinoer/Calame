@@ -7,5 +7,6 @@ namespace Calame.Viewer
     public interface IViewerDocument : IDocument, IViewerViewModelOwner, IDocumentContext<GlyphEngine>, IDocumentContext<ViewerViewModel>, IDocumentContext<IComponentFilter>
     {
         ViewerViewModel Viewer { get; }
+        void EnableFreeCamera();
     }
 }

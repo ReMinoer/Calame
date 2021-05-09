@@ -17,6 +17,7 @@ namespace Calame.DataModelViewer
     {
         IGlyphData Data { get; }
         ToolBarDefinition ToolBarDefinition { get; }
+        Type RunCommandDefinitionType { get; }
 
         Task NewDataAsync();
         Task LoadDataAsync(Stream stream);

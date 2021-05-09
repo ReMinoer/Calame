@@ -9,7 +9,7 @@ namespace Calame.Viewer.Commands
     [CommandDefinition]
     public class EditorModeCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Editor Mode";
+        public override string Text => "_Editor Mode";
         public override object IconKey => CalameIconKey.EditorMode;
 
         [CommandHandler]

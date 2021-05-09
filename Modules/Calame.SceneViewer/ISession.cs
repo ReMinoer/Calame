@@ -1,4 +1,5 @@
-﻿using Glyph;
+﻿using System.Threading.Tasks;
+using Glyph;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,6 +9,7 @@ namespace Calame.SceneViewer
     {
         string DisplayName { get; }
         IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService, ILogger logger);
-        void PrepareSession(ISessionContext context);
+        Task PrepareSessionAsync(ISessionContext sessionContext);
+        Task ResetSessionAsync(ISessionContext sessionContext);
     }
 }

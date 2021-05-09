@@ -17,14 +17,15 @@ namespace Calame.Viewer.Commands.Base
             _eventAggregator = IoC.Get<IEventAggregator>();
         }
 
-        protected override void UpdateStatus(Command command)
-        {
-            command.Checked = (Shell.ActiveItem as IViewerDocument)?.Viewer?.SelectedMode is TMode;
-        }
-
         protected override bool CanRun(Command command, IViewerDocument document)
         {
             return document?.Viewer?.InteractiveModes.AnyOfType<TMode>() ?? false;
+        }
+
+        protected override void UpdateStatus(Command command, IViewerDocument document)
+        {
+            base.UpdateStatus(command, document);
+            command.Checked = document?.Viewer?.SelectedMode is TMode;
         }
 
         protected override async Task RunAsync(Command command, IViewerDocument document)

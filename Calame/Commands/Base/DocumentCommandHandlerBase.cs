@@ -12,7 +12,7 @@ namespace Calame.Commands.Base
         where TCommandDefinition : CommandDefinition
     {
         protected readonly IShell Shell;
-        private TDocument _document;
+        protected TDocument Document;
 
         protected DocumentCommandHandlerBase()
         {
@@ -20,34 +20,41 @@ namespace Calame.Commands.Base
             Shell.ActiveDocumentChanged += OnActiveDocumentChanged;
         }
 
-        private void OnActiveDocumentChanged(object sender, EventArgs e)
+        protected virtual void OnActiveDocumentChanged(object sender, EventArgs e)
         {
-            _document = Shell.ActiveItem as TDocument;
+            Document = Shell.ActiveItem as TDocument;
         }
 
-        protected override void UpdateStatus(Command command)
+        protected override sealed void RefreshContext(Command command)
         {
-            base.UpdateStatus(command);
-            UpdateStatus(command, _document);
+            base.RefreshContext(command);
+            RefreshContext(command, Document);
         }
 
         protected override sealed bool CanRun(Command command)
         {
             return base.CanRun(command)
-                && _document != null
-                && CanRun(command, _document);
+                && Document != null
+                && CanRun(command, Document);
+        }
+
+        protected override sealed void UpdateStatus(Command command)
+        {
+            base.UpdateStatus(command);
+            UpdateStatus(command, Document);
         }
 
         protected override sealed Task RunAsync(Command command)
         {
-            if (_document != null)
-                return RunAsync(command, _document);
+            if (Document != null)
+                return RunAsync(command, Document);
 
             return Task.CompletedTask;
         }
 
-        protected virtual void UpdateStatus(Command command, TDocument document) { }
+        protected virtual void RefreshContext(Command command, TDocument document) { }
         protected virtual bool CanRun(Command command, TDocument document) => true;
+        protected virtual void UpdateStatus(Command command, TDocument document) { }
         protected abstract Task RunAsync(Command command, TDocument document);
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Calame.Icons;
+using Calame.SceneViewer.Commands;
 using Calame.Viewer;
 using Calame.Viewer.Messages;
 using Calame.Viewer.Modules.Base;
@@ -30,13 +32,14 @@ namespace Calame.SceneViewer.ViewModels
 {
     [Export(typeof(SceneViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public sealed class SceneViewerViewModel : CalameDocumentBase, IViewerDocument, IHandle<ISelectionRequest<IGlyphComponent>>
+    public sealed class SceneViewerViewModel : CalameDocumentBase, IViewerDocument, IRunnableDocument, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IShell _shell;
 
         private GlyphEngine _engine;
         private MessagingTracker<IView> _viewTracker;
         private ISession _session;
+        private SessionContext _sessionContext;
 
         public ISession Session
         {
@@ -57,6 +60,7 @@ namespace Calame.SceneViewer.ViewModels
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
 
         public bool FreeCameraEnabled { get; private set; }
+        public Type RunCommandDefinitionType { get; } = typeof(ResetSessionCommand);
 
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
@@ -98,20 +102,64 @@ namespace Calame.SceneViewer.ViewModels
 
             Viewer.Runner = new GlyphWpfRunner { Engine = _engine };
 
-            var context = new SessionContext(Viewer, sessionView, SessionMode.Interactive);
-            Session.PrepareSession(context);
+            _sessionContext = new SessionContext(Viewer, sessionView, SessionMode.Interactive);
+            await Session.PrepareSessionAsync(_sessionContext);
+            await Session.ResetSessionAsync(_sessionContext);
 
             _engine.Initialize();
             await _engine.LoadContentAsync();
 
             EnableFreeCamera();
-            Viewer.EditorCamera.ShowTarget(context.UserRoot);
-            Viewer.EditorCamera.SaveAsDefault();
+            Viewer.EditorCamera.ShowTarget(_sessionContext.UserRoot);
 
             _engine.Start();
             await Viewer.Activate();
 
             await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode));
+        }
+
+        public async Task ResetSession()
+        {
+            await EventAggregator.PublishAsync(SelectionRequest<IGlyphComponent>.Empty(this));
+
+            await Session.ResetSessionAsync(_sessionContext);
+
+            if (FreeCameraEnabled)
+                EnableFreeCamera();
+            else
+                EnableDefaultCamera();
+        }
+
+        protected override void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            if (view == null)
+                return;
+
+            Viewer.ConnectView((IViewerView)view);
+            EnableFreeCamera();
+
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
+        {
+            EnableFreeCamera();
+        }
+
+        protected override Task DisposeDocumentAsync()
+        {
+            Fingear.Inputs.InputManager.Instance.InputSourcesUsed -= OnInputSourcesUsed;
+            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
+
+            _engine.Stop();
+
+            _viewTracker?.Dispose();
+            _viewTracker = null;
+
+            Viewer.Dispose();
+
+            return Task.CompletedTask;
         }
 
         private void OnInputSourcesUsed(IReadOnlyCollection<IInputSource> usedInputSources)
@@ -126,34 +174,6 @@ namespace Calame.SceneViewer.ViewModels
                 EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode)).Wait();
                 CommandManager.InvalidateRequerySuggested();
             }
-        }
-
-        protected override void OnViewLoaded(object view)
-        {
-            base.OnViewLoaded(view);
-            if (view == null)
-                return;
-            
-            Viewer.ConnectView((IViewerView)view);
-            EnableFreeCamera();
-        }
-
-        private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
-        {
-            EnableFreeCamera();
-        }
-
-        protected override Task DisposeDocumentAsync()
-        {
-            Fingear.Inputs.InputManager.Instance.InputSourcesUsed -= OnInputSourcesUsed;
-            Viewer.RunnerChanged -= ViewerViewModelOnRunnerChanged;
-
-            _engine.Stop();
-            _viewTracker?.Dispose();
-
-            Viewer.Dispose();
-
-            return Task.CompletedTask;
         }
 
         public void EnableFreeCamera()

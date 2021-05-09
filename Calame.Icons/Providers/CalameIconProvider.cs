@@ -23,9 +23,13 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.Play: return PackIconMaterialKind.Play;
                 case CalameIconKey.Pause: return PackIconMaterialKind.Pause;
                 case CalameIconKey.Stop: return PackIconMaterialKind.Stop;
+                case CalameIconKey.NextFrame: return PackIconMaterialKind.SkipNext;
+                case CalameIconKey.ResetSession: return PackIconMaterialKind.RotateLeft;
 
                 case CalameIconKey.DefaultCamera: return PackIconMaterialKind.AppleAirplay;
                 case CalameIconKey.FreeCamera: return PackIconMaterialKind.Video;
+                case CalameIconKey.ResetCamera: return PackIconMaterialKind.CameraMeteringMatrix;
+                case CalameIconKey.FocusCamera: return PackIconMaterialKind.CameraMeteringCenter;
                 case CalameIconKey.NewViewer: return PackIconMaterialKind.ShapeRectanglePlus;
 
                 case CalameIconKey.SessionMode: return PackIconMaterialKind.GamepadVariant;

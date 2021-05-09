@@ -22,7 +22,7 @@ namespace Calame.Viewer
     public class ViewerMenu
     {
         [Export]
-        static public MenuDefinition Definition = new MenuDefinition(MenuDefinitions.MainMenuBar, 100, "Viewer");
+        static public MenuDefinition Definition = new MenuDefinition(MenuDefinitions.MainMenuBar, 8, "Viewer");
 
         [Export]
         static public MenuItemGroupDefinition ModesGroup = new MenuItemGroupDefinition(Definition, 0);

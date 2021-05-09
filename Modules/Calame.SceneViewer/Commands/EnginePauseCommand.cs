@@ -17,16 +17,10 @@ namespace Calame.SceneViewer.Commands
         [CommandHandler]
         public class CommandHandler : SceneViewerCommandHandlerBase<EnginePauseCommand>
         {
-            public override bool ShowOnlyIfEnabled => true;
-
-            protected override void UpdateStatus(Command command)
+            protected override void UpdateStatus(Command command, SceneViewerViewModel document)
             {
-                bool isPaused = (Shell.ActiveItem as SceneViewerViewModel)?.Viewer?.Runner?.Engine?.IsPaused == true;
-                if ((bool?)command.Tag == isPaused)
-                    return;
-
-                command.Tag = isPaused;
-                command.Checked = isPaused;
+                base.UpdateStatus(command, document);
+                command.Checked = document?.Viewer?.Runner?.Engine?.IsPaused == true;
             }
 
             protected override Task RunAsync(Command command, SceneViewerViewModel document)

@@ -15,7 +15,6 @@ namespace Calame.SceneViewer.Commands
         [CommandHandler]
         public class CommandHandler : SwitchViewerModeCommandHandlerBase<SceneViewerViewModel.SessionModeModule, SessionModeCommand>
         {
-            public override bool ShowOnlyIfEnabled => true;
         }
     }
 }

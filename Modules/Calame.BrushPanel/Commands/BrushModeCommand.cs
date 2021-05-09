@@ -8,7 +8,7 @@ namespace Calame.BrushPanel.Commands
     [CommandDefinition]
     public class BrushModeCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Brush Mode";
+        public override string Text => "_Brush Mode";
         public override object IconKey => CalameIconKey.BrushMode;
 
         [CommandHandler]

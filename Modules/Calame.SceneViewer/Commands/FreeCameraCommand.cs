@@ -16,11 +16,10 @@ namespace Calame.SceneViewer.Commands
         [CommandHandler]
         public class CommandHandler : SceneViewerCommandHandlerBase<FreeCameraCommand>
         {
-            public override bool ShowOnlyIfEnabled => true;
-
-            protected override void UpdateStatus(Command command)
+            protected override void UpdateStatus(Command command, SceneViewerViewModel document)
             {
-                command.Checked = (Shell.ActiveItem as SceneViewerViewModel)?.FreeCameraEnabled == true;
+                base.UpdateStatus(command, document);
+                command.Checked = document?.FreeCameraEnabled == true;
             }
 
             protected override Task RunAsync(Command command, SceneViewerViewModel document)

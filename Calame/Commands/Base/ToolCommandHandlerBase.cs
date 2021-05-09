@@ -19,19 +19,26 @@ namespace Calame.Commands.Base
             Shell = IoC.Get<IShell>();
         }
 
-        protected override sealed void UpdateStatus(Command command)
+        protected override sealed void RefreshContext(Command command)
         {
-            base.UpdateStatus(command);
-            UpdateStatus(command, Tool);
+            base.RefreshContext(command);
+
+            if (Tool == null)
+                Tool = Shell.Tools.OfType<TTool>().FirstOrDefault();
+
+            RefreshContext(command, Tool);
         }
 
         protected override sealed bool CanRun(Command command)
         {
-            if (Tool == null)
-                Tool = Shell.Tools.OfType<TTool>().FirstOrDefault();
-
             return base.CanRun(command)
                 && CanRun(command, Tool);
+        }
+
+        protected override sealed void UpdateStatus(Command command)
+        {
+            base.UpdateStatus(command);
+            UpdateStatus(command, Tool);
         }
 
         protected override sealed Task RunAsync(Command command)
@@ -40,8 +47,9 @@ namespace Calame.Commands.Base
             return RunAsync(command, Tool);
         }
 
-        protected virtual void UpdateStatus(Command command, TTool tool) {}
+        protected virtual void RefreshContext(Command command, TTool tool) { }
         protected virtual bool CanRun(Command command, TTool tool) => true;
+        protected virtual void UpdateStatus(Command command, TTool tool) { }
         protected abstract Task RunAsync(Command command, TTool tool);
     }
 }

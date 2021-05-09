@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
+    public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IRunnableDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IImportedTypeProvider _importedTypeProvider;
 
@@ -50,6 +51,9 @@ namespace Calame.DataModelViewer.ViewModels
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
         IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
         IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
+        
+        void IViewerDocument.EnableFreeCamera() {}
+        Type IRunnableDocument.RunCommandDefinitionType => Editor?.RunCommandDefinitionType;
 
         public ICommand DragOverCommand { get; }
         public ICommand DropCommand { get; }
@@ -110,10 +114,7 @@ namespace Calame.DataModelViewer.ViewModels
             await _engine.LoadContentAsync();
 
             if (Editor.Data.BindedObject is IBoxedComponent boxedComponent)
-            {
                 Viewer.EditorCamera.ShowTarget(boxedComponent);
-                Viewer.EditorCamera.SaveAsDefault();
-            }
 
             _engine.Start();
             await Viewer.Activate();
@@ -129,6 +130,8 @@ namespace Calame.DataModelViewer.ViewModels
         {
             base.OnViewLoaded(view);
             Viewer.ConnectView((IViewerView)view);
+
+            CommandManager.InvalidateRequerySuggested();
         }
 
         protected override Task DisposeDocumentAsync()

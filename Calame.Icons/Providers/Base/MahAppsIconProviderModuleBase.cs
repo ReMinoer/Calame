@@ -27,8 +27,8 @@ namespace Calame.Icons.Providers.Base
             var control = new TControl
             {
                 Foreground = iconDescription.Brush,
-                Width = size,
-                Height = size,
+                Width = size - iconDescription.Margin * 2,
+                Height = size - iconDescription.Margin * 2,
                 Focusable = false
             };
 
@@ -73,7 +73,10 @@ namespace Calame.Icons.Providers.Base
                 Brush = iconDescription.Brush
             };
 
-            double geometryRescale = size / Math.Max(geometry.Bounds.Width, geometry.Bounds.Height);
+            double geometryOriginalSize = Math.Max(geometry.Bounds.Width, geometry.Bounds.Height);
+            double geometryDesiredSize = size - iconDescription.Margin * 2;
+
+            double geometryRescale = geometryDesiredSize / geometryOriginalSize;
             var scaleTransform = new ScaleTransform(geometryRescale, geometryRescale);
 
             var drawingGroup = new DrawingGroup
