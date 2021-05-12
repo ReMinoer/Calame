@@ -65,6 +65,8 @@ namespace Calame.SceneViewer.ViewModels
 
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
+        private IGlyphComponent DefaultSelection => Viewer.UserRoot.Components.FirstOrDefault() ?? Viewer.UserRoot;
+
         [ImportingConstructor]
         public SceneViewerViewModel(IShell shell, IEventAggregator eventAggregator,
             ILoggerProvider loggerProvider, SelectionHistoryManager selectionHistoryManager,
@@ -118,8 +120,11 @@ namespace Calame.SceneViewer.ViewModels
 
             _engine.Start();
             await Viewer.Activate();
-
+            
+            await EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, DefaultSelection));
             await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode));
+
+            CommandManager.InvalidateRequerySuggested();
         }
 
         public async Task ResetSession()
@@ -134,6 +139,8 @@ namespace Calame.SceneViewer.ViewModels
                 EnableFreeCamera();
             else
                 EnableDefaultCamera();
+            
+            await EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, DefaultSelection));
         }
 
         protected override void OnViewLoaded(object view)
@@ -144,8 +151,6 @@ namespace Calame.SceneViewer.ViewModels
 
             Viewer.ConnectView((IViewerView)view);
             EnableFreeCamera();
-
-            CommandManager.InvalidateRequerySuggested();
         }
 
         private void ViewerViewModelOnRunnerChanged(object sender, GlyphWpfRunner e)
