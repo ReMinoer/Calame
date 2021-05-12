@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
@@ -45,6 +46,8 @@ namespace Calame.LogConsole.ViewModels
             }
         }
 
+        public ObservableCollection<LogLevel> HiddenLogLevels { get; } = new ObservableCollection<LogLevel>();
+
         private bool _autoScroll = true;
         public bool AutoScroll
         {
@@ -86,7 +89,9 @@ namespace Calame.LogConsole.ViewModels
             CalameTarget logTarget = LogManager.Configuration.AllTargets.OfType<CalameTarget>().FirstOrDefault();
             if (logTarget != null)
                 logTarget.MessageLogged += OnMessageLogged;
-            
+
+            HiddenLogLevels.CollectionChanged += OnHiddenLogLevelsChanged;
+
             ClearLogCommand = commandService.GetTargetableCommand<ClearLogCommand>();
             AutoScrollLogCommand = commandService.GetTargetableCommand<AutoScrollLogCommand>();
             ScrollLogToEndCommand = commandService.GetTargetableCommand<ScrollLogToEndCommand>();
@@ -160,23 +165,39 @@ namespace Calame.LogConsole.ViewModels
         private ObservableCollection<LogEntry> GetLog(string source) => _logBySource.GetOrAdd(source, _ => new ObservableCollection<LogEntry>());
         private readonly ConcurrentDictionary<string, ObservableCollection<LogEntry>> _logBySource = new ConcurrentDictionary<string, ObservableCollection<LogEntry>>();
 
+        private void OnHiddenLogLevelsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateFilter();
+        }
+
         private void UpdateFilter()
         {
+            if (CurrentDocumentLogEntries == null)
+                return;
+
             foreach (LogEntry logEntry in CurrentDocumentLogEntries)
                 UpdateFilter(logEntry);
         }
 
         private void UpdateFilter(LogEntry logEntry)
         {
-            if (_filterTextKeywords.Length == 0)
-            {
-                logEntry.VisibleForFilter = true;
-                return;
-            }
+            logEntry.VisibleForFilter = MatchLogLevelFilter(logEntry.Level) && MatchTextFilter(logEntry);
+        }
 
-            logEntry.VisibleForFilter = _filterTextKeywords.Any(keyword =>
-                (logEntry.Message != null && logEntry.Message.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (logEntry.Category != null && logEntry.Category.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0));
+        private bool MatchTextFilter(LogEntry logEntry)
+        {
+            return _filterTextKeywords.Length == 0
+                || _filterTextKeywords.Any(x => MatchKeyword(logEntry.Message, x) || MatchKeyword(logEntry.Category, x));
+        }
+
+        private bool MatchKeyword(string text, string keyword)
+        {
+            return text != null && text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private bool MatchLogLevelFilter(LogLevel logLevel)
+        {
+            return HiddenLogLevels.Count == 0 || !HiddenLogLevels.Contains(logLevel);
         }
     }
 }

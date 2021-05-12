@@ -27,6 +27,16 @@
                                         Text="{Binding FilterText, Mode=TwoWay}"
                                         IconProvider="{Binding IconProvider}"
                                         IconDescriptor="{Binding IconDescriptor}" />
+            <ToolBarTray DockPanel.Dock="Right">
+                <ToolBar ToolBarTray.IsLocked="True">
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:FilterLogTraceCommand}" />
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:FilterLogDebugCommand}" />
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:FilterLogInformationCommand}" />
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:FilterLogWarningCommand}" />
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:FilterLogErrorCommand}" />
+                    <userControls:CommandButton CommandDefinitionType="{x:Type commands:FilterLogCriticalCommand}" />
+                </ToolBar>
+            </ToolBarTray>
             <ToolBarTray>
                 <ToolBar ToolBarTray.IsLocked="True">
                     <userControls:CommandButton CommandDefinitionType="{x:Type commands:AutoScrollLogCommand}" />
