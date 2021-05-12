@@ -88,6 +88,14 @@ namespace Calame
             OnHistoryChanged();
         }
 
+        public void Clear()
+        {
+            CurrentIndex = -1;
+            _history.Clear();
+
+            OnHistoryChanged();
+        }
+
         private void OnSelectionItemDisposed(object sender, ItemDisposedEventArgs e)
         {
             bool currentIndexChanged = false;

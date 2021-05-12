@@ -30,6 +30,7 @@ namespace Calame.DataModelViewer.ViewModels
     public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IRunnableDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IImportedTypeProvider _importedTypeProvider;
+        private readonly SelectionHistoryManager _selectionHistoryManager;
 
         private GlyphEngine _engine;
         public ViewerViewModel Viewer { get; }
@@ -61,11 +62,14 @@ namespace Calame.DataModelViewer.ViewModels
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
         [ImportingConstructor]
-        public DataModelViewerViewModel(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, PathWatcher fileWatcher, IImportedTypeProvider importedTypeProvider,
-            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager, [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
+        public DataModelViewerViewModel(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, PathWatcher fileWatcher,
+            IImportedTypeProvider importedTypeProvider, SelectionHistoryManager selectionHistoryManager,
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
+            [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator, loggerProvider, fileWatcher, iconProvider, iconDescriptorManager)
         {
             _importedTypeProvider = importedTypeProvider;
+            _selectionHistoryManager = selectionHistoryManager;
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
 
@@ -142,6 +146,8 @@ namespace Calame.DataModelViewer.ViewModels
 
             Editor.Dispose();
             Viewer.Dispose();
+
+            _selectionHistoryManager.RemoveHistory(this);
 
             return Task.CompletedTask;
         }

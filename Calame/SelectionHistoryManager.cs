@@ -32,9 +32,14 @@ namespace Calame
             DocumentHistories = new ReadOnlyDictionary<IDocument, SelectionHistory>(_documentHistories);
         }
 
-        private SelectionHistory GetHistory(IDocument document)
+        public SelectionHistory GetHistory(IDocument document)
         {
             return _documentHistories.GetOrAdd(document, _ => new SelectionHistory(_eventAggregator));
+        }
+
+        public void RemoveHistory(IDocument document)
+        {
+            _documentHistories.TryRemove(document, out _);
         }
 
         public Task HandleAsync(ISelectionSpread<object> message, CancellationToken cancellationToken)

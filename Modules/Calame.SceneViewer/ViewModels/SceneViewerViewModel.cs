@@ -35,6 +35,7 @@ namespace Calame.SceneViewer.ViewModels
     public sealed class SceneViewerViewModel : CalameDocumentBase, IViewerDocument, IRunnableDocument, IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IShell _shell;
+        private readonly SelectionHistoryManager _selectionHistoryManager;
 
         private GlyphEngine _engine;
         private MessagingTracker<IView> _viewTracker;
@@ -65,12 +66,15 @@ namespace Calame.SceneViewer.ViewModels
         public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
 
         [ImportingConstructor]
-        public SceneViewerViewModel(IShell shell, IEventAggregator eventAggregator, ILoggerProvider loggerProvider,
+        public SceneViewerViewModel(IShell shell, IEventAggregator eventAggregator,
+            ILoggerProvider loggerProvider, SelectionHistoryManager selectionHistoryManager,
             IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
             [ImportMany] IEnumerable<IViewerModuleSource> viewerModuleSources)
             : base(eventAggregator, loggerProvider, iconProvider, iconDescriptorManager)
         {
             _shell = shell;
+            _selectionHistoryManager = selectionHistoryManager;
+
             DisplayName = "Scene Viewer";
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
@@ -121,6 +125,8 @@ namespace Calame.SceneViewer.ViewModels
         public async Task ResetSession()
         {
             await EventAggregator.PublishAsync(SelectionRequest<IGlyphComponent>.Empty(this));
+            Viewer.ComponentsFilter.ExcludedRoots.Clear();
+            _selectionHistoryManager.GetHistory(this).Clear();
 
             await Session.ResetSessionAsync(_sessionContext);
 
@@ -158,6 +164,8 @@ namespace Calame.SceneViewer.ViewModels
             _viewTracker = null;
 
             Viewer.Dispose();
+
+            _selectionHistoryManager.RemoveHistory(this);
 
             return Task.CompletedTask;
         }
