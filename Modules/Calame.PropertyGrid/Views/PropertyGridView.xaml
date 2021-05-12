@@ -24,13 +24,11 @@
                                      PreviousCommand="{Binding PreviousCommand}"
                                      NextCommand="{Binding NextCommand}"
                                      OpenFileCommand="{Binding OpenFileCommand}"
-                                     OpenFolderCommand="{Binding OpenFolderCommand}">
+                                     OpenFolderCommand="{Binding OpenFolderCommand}"
+                                     SelectItemCommand="{Binding SelectItemCommand}">
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="PropertyValueChanged">
                     <b:InvokeCommandAction Command="{Binding DirtyDocumentCommand}" />
-                </b:EventTrigger>
-                <b:EventTrigger EventName="ItemSelected">
-                    <b:InvokeCommandAction Command="{Binding SelectItemCommand}" PassEventArgsToCommand="True" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
         </controls:CalamePropertyGrid>

@@ -43,7 +43,7 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.Add: return PackIconMaterialKind.PlusCircle;
                 case CalameIconKey.AddFromList: return PackIconMaterialKind.PlaylistPlus;
                 case CalameIconKey.Delete: return PackIconMaterialKind.CloseCircle;
-                case CalameIconKey.Select: return PackIconMaterialKind.ArrowTopRight;
+                case CalameIconKey.Select: return PackIconMaterialKind.ArrowTopRightThick;
                 case CalameIconKey.OpenWith: return PackIconMaterialKind.ApplicationImport;
                 case CalameIconKey.EditableItem: return PackIconMaterialKind.Pencil;
                 case CalameIconKey.EditableProperties: return PackIconMaterialKind.PlaylistEdit;

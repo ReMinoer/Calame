@@ -57,7 +57,9 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
         static public readonly DependencyProperty OpenFolderCommandProperty =
             DependencyProperty.Register(nameof(OpenFolderCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
-        
+        static public readonly DependencyProperty SelectItemCommandProperty =
+            DependencyProperty.Register(nameof(SelectItemCommand), typeof(ICommand), typeof(CalamePropertyGrid), new PropertyMetadata(null));
+
         public object SelectedObject
         {
             get => GetValue(SelectedObjectProperty);
@@ -249,6 +251,12 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(OpenFolderCommandProperty, value);
         }
 
+        public ICommand SelectItemCommand
+        {
+            get => (ICommand)GetValue(SelectItemCommandProperty);
+            set => SetValue(SelectItemCommandProperty, value);
+        }
+
         public IEnumerable<PropertyItemBase> Properties => PropertyGrid.Properties.Cast<PropertyItemBase>();
 
         static private readonly DependencyPropertyDescriptor EditorPropertyDescriptor;
@@ -257,7 +265,6 @@ namespace Calame.PropertyGrid.Controls
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public event PropertyValueChangedEventHandler PropertyValueChanged;
-        public event ItemEventHandler ItemSelected;
 
         static CalamePropertyGrid()
         {
@@ -353,11 +360,6 @@ namespace Calame.PropertyGrid.Controls
             var propertyGrid = (CalamePropertyGrid)d;
 
             propertyGrid.PropertyGridContentFileTypeResolver.RawContentLibrary = propertyGrid.RawContentLibrary;
-        }
-
-        private void OnItemSelected(object sender, ItemEventArgs args)
-        {
-            ItemSelected?.Invoke(this, args);
         }
 
         public interface IValueTypeObject

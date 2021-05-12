@@ -27,7 +27,7 @@
         </Button>
         <Button x:Name="ObjectButton"
                 DataContext="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
-                Command="{Binding ExpandObjectCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
+                Command="{Binding SelectOrExpandItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}"
                 CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
                 IsEnabled="{Binding Value, Converter={StaticResource ObjectToBooleanConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineObjectControl}}}">
             <DockPanel>

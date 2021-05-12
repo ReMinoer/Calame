@@ -40,6 +40,7 @@ namespace Calame.Icons.Descriptors
                 case CalameIconKey.NextFrame:
                 case CalameIconKey.Pause:
                 case CalameIconKey.Stop:
+                case CalameIconKey.Select:
                     return 2;
                 case CalameIconKey.ResetSession:
                     return 1;

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using Calame.Icons;
 
 namespace Calame.PropertyGrid.Controls
@@ -7,12 +9,15 @@ namespace Calame.PropertyGrid.Controls
     /// <summary>
     /// Interaction logic for PropertyGridPopup.xaml
     /// </summary>
-    public partial class PropertyGridPopup
+    public partial class PropertyGridPopup : INotifyPropertyChanged
     {
         static public readonly DependencyProperty CanRemoveItemProperty =
             DependencyProperty.Register(nameof(CanRemoveItem), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(true));
         static public readonly DependencyProperty CanSelectItemProperty =
-            DependencyProperty.Register(nameof(CanSelectItem), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(true));
+            DependencyProperty.Register(nameof(CanSelectItem), typeof(bool), typeof(PropertyGridPopup), new PropertyMetadata(false));
+        static public readonly DependencyProperty SelectItemCommandProperty =
+            DependencyProperty.Register(nameof(SelectItemCommand), typeof(ICommand), typeof(PropertyGridPopup), new PropertyMetadata(null));
+
         static public readonly DependencyProperty IconProviderProperty =
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(PropertyGridPopup), new PropertyMetadata(null));
         static public readonly DependencyProperty SystemIconDescriptorProperty =
@@ -30,6 +35,12 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(CanSelectItemProperty, value);
         }
 
+        public ICommand SelectItemCommand
+        {
+            get => (ICommand)GetValue(SelectItemCommandProperty);
+            set => SetValue(SelectItemCommandProperty, value);
+        }
+
         public IIconProvider IconProvider
         {
             get => (IIconProvider)GetValue(IconProviderProperty);
@@ -43,7 +54,7 @@ namespace Calame.PropertyGrid.Controls
         }
 
         public event EventHandler Removed;
-        public event EventHandler Selected;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public PropertyGridPopup()
         {
@@ -51,6 +62,5 @@ namespace Calame.PropertyGrid.Controls
         }
 
         private void OnDelete(object sender, RoutedEventArgs e) => Removed?.Invoke(this, EventArgs.Empty);
-        private void OnSelect(object sender, RoutedEventArgs e) => Selected?.Invoke(this, EventArgs.Empty);
     }
 }

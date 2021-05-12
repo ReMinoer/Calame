@@ -66,6 +66,8 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(OpenFileCommand), typeof(ICommand), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
         static public readonly DependencyProperty OpenFolderCommandProperty =
             DependencyProperty.Register(nameof(OpenFolderCommand), typeof(ICommand), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
+        static public readonly DependencyProperty SelectItemCommandProperty =
+            DependencyProperty.Register(nameof(SelectItemCommand), typeof(ICommand), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
 
         public bool IsReadOnly
         {
@@ -163,9 +165,17 @@ namespace Calame.PropertyGrid.Controls
             set => SetValue(OpenFolderCommandProperty, value);
         }
 
+        public ICommand SelectItemCommand
+        {
+            get => (ICommand)GetValue(SelectItemCommandProperty);
+            set => SetValue(SelectItemCommandProperty, value);
+        }
+
         public bool IsPropertyGridReadOnly => IsReadOnly || (IsReadOnlyValue && (PropertyGridDisplayedType?.IsValueType ?? false));
         protected Type PropertyGridDisplayedType { get; private set; }
+
         public ICommand ExpandObjectCommand { get; }
+        public ICommand SelectOrExpandItemCommand { get; }
 
         private IList<Type> _newItemTypes;
         private IList<Type> NewItemTypes
@@ -197,12 +207,12 @@ namespace Calame.PropertyGrid.Controls
 
         private readonly RelayCommand _addItemCommand;
 
-        public event ItemEventHandler ItemSelected;
         public event PropertyValueChangedEventHandler PropertyValueChanged;
 
         protected PropertyGridPopupOwnerBase()
         {
             ExpandObjectCommand = new RelayCommand(OnExpandObject);
+            SelectOrExpandItemCommand = new RelayCommand(OnSelectOrExpandItem);
             _addItemCommand = new RelayCommand(x => AddItem(CreateItem((Type)x)));
         }
 
@@ -301,11 +311,21 @@ namespace Calame.PropertyGrid.Controls
 
             contextMenu.IsOpen = true;
         }
+        
+        protected void OnSelectOrExpandItem(object control)
+        {
+            var popupOwner = (FrameworkElement)control;
+
+            if (Keyboard.Modifiers != ModifierKeys.Control
+                && SelectItemCommand != null && SelectItemCommand.CanExecute(popupOwner.DataContext))
+                SelectItemCommand.Execute(popupOwner.DataContext);
+            else
+                ExpandObjectCommand.Execute(popupOwner);
+        }
 
         protected void OnExpandObject(object control)
         {
             var popupOwner = (FrameworkElement)control;
-            object itemModel = popupOwner.DataContext;
 
             var popup = new PropertyGridPopup
             {
@@ -334,23 +354,28 @@ namespace Calame.PropertyGrid.Controls
             propertyGrid.SetBinding(CalamePropertyGrid.SelectedObjectProperty, new Binding(nameof(DataContext)) { Source = control });
 
             propertyGrid.IsReadOnly = IsPropertyGridReadOnly;
-            popup.CanSelectItem = !propertyGrid.IsValueTypeObject;
+
+            var selectItemCommand = new RelayCommand(OnSelectItem, CanSelectItem);
+            propertyGrid.SelectItemCommand = selectItemCommand;
+            popup.SelectItemCommand = selectItemCommand;
+            popup.CanSelectItem = selectItemCommand.CanExecute(propertyGrid.SelectedObject);
 
             popup.Removed += OnRemoved;
-            popup.Selected += OnSelected;
-            propertyGrid.ItemSelected += OnPropertyGridItemSelected;
             propertyGrid.PropertyValueChanged += OnPropertyValueChanged;
 
+            bool CanSelectItem(object item) => SelectItemCommand?.CanExecute(item) ?? false;
+            void OnSelectItem(object item)
+            {
+                popup.IsOpen = false;
+                SelectItemCommand?.Execute(item);
+            }
+
             void OnRemoved(object sender, EventArgs e) => OnItemRemoved(popup, popupOwner);
-            void OnSelected(object sender, EventArgs e) => OnItemSelected(popup, itemModel);
-            void OnPropertyGridItemSelected(object sender, ItemEventArgs e) => OnItemSelectedPropertyGrid(popup, e);
             void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e) => OnPopupPropertyValueChanged(propertyGrid, popupOwner, e);
 
             popup.Closed += (sender, args) =>
             {
                 propertyGrid.PropertyValueChanged -= OnPropertyValueChanged;
-                propertyGrid.ItemSelected -= OnPropertyGridItemSelected;
-                popup.Selected -= OnSelected;
                 popup.Removed -= OnRemoved;
 
                 popup.DataContext = null;
@@ -380,18 +405,6 @@ namespace Calame.PropertyGrid.Controls
         {
             sender.IsOpen = false;
             RemoveItem(popupOwner);
-        }
-
-        private void OnItemSelected(Popup popup, object item)
-        {
-            popup.IsOpen = false;
-            ItemSelected?.Invoke(this, new ItemEventArgs(item));
-        }
-
-        private void OnItemSelectedPropertyGrid(Popup popup, ItemEventArgs itemEventArgs)
-        {
-            popup.IsOpen = false;
-            ItemSelected?.Invoke(this, itemEventArgs);
         }
 
         private void OnPopupPropertyValueChanged(CalamePropertyGrid propertyGrid, DependencyObject popupOwner, PropertyValueChangedEventArgs e)

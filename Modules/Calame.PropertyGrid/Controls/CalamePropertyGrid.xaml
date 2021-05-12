@@ -450,7 +450,7 @@
                                                           RawContentLibrary="{Binding RawContentLibrary, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                          ItemSelected="OnItemSelected"
+                                                          SelectItemCommand="{Binding SelectItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           PropertyValueChanged="OnPropertyValueChanged" />
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
@@ -526,7 +526,7 @@
                                                           RawContentLibrary="{Binding RawContentLibrary, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
-                                                          ItemSelected="OnItemSelected"
+                                                          SelectItemCommand="{Binding SelectItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           PropertyValueChanged="OnPropertyValueChanged" />
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
@@ -554,8 +554,8 @@
                                                       RawContentLibrary="{Binding RawContentLibrary, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       OpenFileCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       OpenFolderCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      SelectItemCommand="{Binding SelectItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       ShowHeader="False"
-                                                      ItemSelected="OnItemSelected"
                                                       PropertyValueChanged="OnPropertyValueChanged" />
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>

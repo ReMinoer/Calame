@@ -25,6 +25,7 @@ namespace Calame.PropertyGrid.ViewModels
     {
         public override PaneLocation PreferredLocation => PaneLocation.Right;
 
+        private readonly IEditorProvider[] _editorProviders;
         public IIconProvider IconProvider { get; }
         public IIconDescriptorManager IconDescriptorManager { get; }
 
@@ -77,31 +78,57 @@ namespace Calame.PropertyGrid.ViewModels
             PreviousCommand = commandService.GetTargetableCommand<PreviousSelectionCommand>();
             NextCommand = commandService.GetTargetableCommand<NextSelectionCommand>();
 
-            OpenFolderCommand = new RelayCommand(
-                path => Process.Start((string)path),
-                path => !string.IsNullOrWhiteSpace((string)path));
-            OpenFileCommand = new RelayCommand(
-                async path => await shell.OpenFileAsync((string)path, editorProviders, WorkingDirectory),
-                path => !string.IsNullOrWhiteSpace((string)path));
+            _editorProviders = editorProviders;
+            OpenFolderCommand = new RelayCommand(OnOpenFolder, CanOpenFolder);
+            OpenFileCommand = new RelayCommand(OnOpenFile, CanOpenFile);
 
-            DirtyDocumentCommand = new AsyncCommand(() => EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject)));
-            SelectItemCommand = new RelayCommand(x =>
-                {
-                    ISelectionRequest<object> selectionRequest;
-                    switch (((ItemEventArgs)x).Item)
-                    {
-                        case IGlyphData data:
-                            selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, data);
-                            break;
-                        case IGlyphComponent component:
-                            selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, component);
-                            break;
-                        default:
-                            throw new NotSupportedException();
-                    }
-                    EventAggregator.PublishAsync(selectionRequest).Wait();
-                }
-            );
+            DirtyDocumentCommand = new AsyncCommand(OnDirtyDocument);
+            SelectItemCommand = new RelayCommand(OnSelectItem, CanSelectItem);
+        }
+
+        private bool CanOpenFolder(object path) => !string.IsNullOrWhiteSpace((string)path);
+        private void OnOpenFolder(object path)
+        {
+            Process.Start((string)path);
+        }
+
+        private bool CanOpenFile(object path) => !string.IsNullOrWhiteSpace((string)path);
+        private async void OnOpenFile(object path)
+        {
+            await Shell.OpenFileAsync((string)path, _editorProviders, WorkingDirectory);
+        }
+
+        private Task OnDirtyDocument()
+        {
+            return EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject));
+        }
+
+        private bool CanSelectItem(object item)
+        {
+            switch (item)
+            {
+                case IGlyphData _:
+                case IGlyphComponent _:
+                    return !item.GetType().IsValueType;
+                default:
+                    return false;
+            }
+        }
+
+        private void OnSelectItem(object item)
+        {
+            ISelectionRequest<object> selectionRequest;
+            switch (item)
+            {
+                case IGlyphData data:
+                    selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, data);
+                    break;
+                case IGlyphComponent component:
+                    selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, component);
+                    break;
+                default: throw new NotSupportedException();
+            }
+            EventAggregator.PublishAsync(selectionRequest).Wait();
         }
 
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)

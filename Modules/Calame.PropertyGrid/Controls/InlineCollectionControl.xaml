@@ -34,9 +34,10 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Button Width="24" Height="24"
-                            Command="{Binding ExpandObjectCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
+                            Command="{Binding SelectOrExpandItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:InlineCollectionControl}}}"
                             CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
                             ToolTip="{Binding}"
+                            Cursor="Hand"
                             PreviewMouseDown="OnItemPreviewMouseDown"
                             PreviewMouseMove="OnItemPreviewMouseMove"
                             AllowDrop="True"

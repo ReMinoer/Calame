@@ -51,6 +51,7 @@ namespace Calame.PropertyGrid.Controls
         static InlineObjectControl()
         {
             IsReadOnlyValueProperty.OverrideMetadata(typeof(InlineObjectControl), new PropertyMetadata(false, OnIsReadOnlyValueChanged));
+            SelectItemCommandProperty.OverrideMetadata(typeof(InlineObjectControl), new PropertyMetadata(null, OnSelectItemCommandChanged));
         }
 
         public InlineObjectControl()
@@ -110,6 +111,13 @@ namespace Calame.PropertyGrid.Controls
             control.RefreshAccessIcon();
         }
 
+        static private void OnSelectItemCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (InlineObjectControl)d;
+
+            control.RefreshAccessIcon();
+        }
+
         protected override Type GetNewItemType() => NewItemBaseType ?? GetItemType();
         private Type GetItemType() => BaseType ?? Value?.GetType();
 
@@ -157,7 +165,9 @@ namespace Calame.PropertyGrid.Controls
 
         private void RefreshAccessIcon()
         {
-            if (IsPropertyGridReadOnly)
+            if (SelectItemCommand != null && SelectItemCommand.CanExecute(Value))
+                AccessIconKey = CalameIconKey.Select;
+            else if (IsPropertyGridReadOnly)
                 AccessIconKey = CalameIconKey.ReadOnlyProperties;
             else if (IsReadOnlyValue)
                 AccessIconKey = CalameIconKey.EditableProperties;

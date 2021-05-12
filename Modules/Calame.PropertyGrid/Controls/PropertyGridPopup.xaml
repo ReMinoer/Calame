@@ -21,22 +21,25 @@
                         Click="OnDelete">
                     <StackPanel Orientation="Horizontal">
                         <userControls:CalameIcon IconSize="12"
-                                                     Width="22"
-                                                     Target="{x:Static icons:CalameIconKey.Delete}"
-                                                     IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
-                                                     IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
+                                                 Width="22"
+                                                 Target="{x:Static icons:CalameIconKey.Delete}"
+                                                 IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
+                                                 IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
                         <TextBlock>Delete</TextBlock>
                     </StackPanel>
                 </Button>
                 <StackPanel Height="22"
                             Orientation="Horizontal"
                             Visibility="{Binding CanSelectItem, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}">
-                    <userControls:CalameIcon DockPanel.Dock="Left" IconSize="10" Margin="5"
+                    <userControls:CalameIcon DockPanel.Dock="Left" IconSize="14" Margin="5 0"
                                              Target="{x:Static icons:CalameIconKey.Select}"
                                              IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
                                              IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}" />
                     <TextBlock VerticalAlignment="Center">           
-                        <Hyperlink Click="OnSelect">Select item</Hyperlink>
+                        <Hyperlink Command="{Binding SelectItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PropertyGridPopup}}}"
+                                   CommandParameter="{Binding SelectedObject, ElementName=PropertyGrid}">
+                            Select item
+                        </Hyperlink>
                     </TextBlock>
                 </StackPanel>
             </DockPanel>
