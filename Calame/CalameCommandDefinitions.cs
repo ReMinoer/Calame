@@ -44,8 +44,12 @@ namespace Calame
         static public CommandKeyboardShortcut RunSession = new CommandKeyboardShortcut<RunDocumentCommand>(new KeyGesture(Key.F5));
 
         [Export]
-        static public CommandKeyboardShortcut PreviousSelection = new CommandKeyboardShortcut<PreviousSelectionCommand>(new KeyGesture(Key.Back, ModifierKeys.Alt));
+        static public CommandKeyboardShortcut PreviousSelection = new CommandKeyboardShortcut<PreviousSelectionCommand>(new KeyGesture(Key.PageUp, ModifierKeys.Control));
         [Export]
-        static public CommandKeyboardShortcut NextSelection = new CommandKeyboardShortcut<NextSelectionCommand>(new KeyGesture(Key.Back, ModifierKeys.Alt | ModifierKeys.Shift));
+        static public CommandKeyboardShortcut PreviousSelectionBrowser = new CommandKeyboardShortcut<PreviousSelectionCommand>(new KeyGesture(Key.BrowserBack));
+        [Export]
+        static public CommandKeyboardShortcut NextSelection = new CommandKeyboardShortcut<NextSelectionCommand>(new KeyGesture(Key.PageDown, ModifierKeys.Control));
+        [Export]
+        static public CommandKeyboardShortcut NextSelectionBrowser = new CommandKeyboardShortcut<NextSelectionCommand>(new KeyGesture(Key.BrowserForward));
     }
 }
