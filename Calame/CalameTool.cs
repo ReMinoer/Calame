@@ -35,6 +35,12 @@ namespace Calame
             _iconProvider = iconProvider;
             _iconDescriptor = iconDescriptorManager.GetDescriptor();
 
+            if (shell.ActiveItem is THandledDocument document)
+            {
+                CurrentDocument = document;
+                OnDocumentActivated(CurrentDocument);
+            }
+
             Shell.ActiveDocumentChanged += ShellOnActiveDocumentChanged;
             EventAggregator.SubscribeOnUI(this);
 
@@ -68,8 +74,8 @@ namespace Calame
             if (Shell.ActiveItem != null)
                 return;
 
-            CurrentDocument = null;
             OnDocumentsCleaned();
+            CurrentDocument = null;
         }
 
         public async Task HandleAsync(IDocumentContext message, CancellationToken cancellationToken)

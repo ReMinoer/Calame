@@ -10,7 +10,7 @@
              d:DesignHeight="300"
              d:DesignWidth="300">
     <userControls:CalameTreeView TreeContext="{Binding}"
-                                 ItemsSource="{Binding Root.Components}"
+                                 ItemsSource="{Binding RootComponentsContext.RootComponents}"
                                  SelectedItem="{Binding Selection, Mode=TwoWay}"
                                  IconProvider="{Binding IconProvider}"
                                  IconDescriptor="{Binding IconDescriptor}" />

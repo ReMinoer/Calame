@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
+    <UseWPF>True</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\External\Glyph\External\Fingear\Fingear\Fingear.csproj" />
+    <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
+    <ProjectReference Include="..\External\Glyph\Glyph\Glyph.csproj" />
+  </ItemGroup>
+</Project>

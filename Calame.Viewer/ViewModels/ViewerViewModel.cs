@@ -17,6 +17,7 @@ using Fingear.Interactives;
 using Fingear.Interactives.Containers;
 using Fingear.Interactives.Interfaces;
 using Glyph;
+using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Inputs;
 using Glyph.Engine;
@@ -49,8 +50,8 @@ namespace Calame.Viewer.ViewModels
 
         public ReadOnlyList<IViewerModule> Modules { get; }
         public ReadOnlyObservableList<IViewerInteractiveMode> InteractiveModes { get; }
-
-        public ComponentFilter ComponentsFilter { get; }
+        
+        public ObservableCollection<IGlyphComponent> NotSelectableComponents { get; }
         public ISelectionSpread<object> LastSelection { get; set; }
 
         private IViewerInteractiveMode _selectedMode;
@@ -80,9 +81,9 @@ namespace Calame.Viewer.ViewModels
 
                     foreach (IViewerModule module in Modules)
                         module.Disconnect();
-
-                    ComponentsFilter.ExcludedRoots.Clear();
                     
+                    NotSelectableComponents.Clear();
+
                     engine.InteractionManager.Root.Remove(_viewerModeToggle);
                     engine.InteractionManager.Root.Remove(_editorInteractive);
 
@@ -160,8 +161,8 @@ namespace Calame.Viewer.ViewModels
                 module.Model = this;
 
             Modules = new ReadOnlyList<IViewerModule>(modules);
-
-            ComponentsFilter = new ComponentFilter();
+            
+            NotSelectableComponents = new ObservableCollection<IGlyphComponent>();
 
             _owner.Activated += OnActivated;
             _owner.Deactivated += OnDeactivated;
@@ -268,6 +269,7 @@ namespace Calame.Viewer.ViewModels
             public object IconKey => CalameIconKey.EditorMode;
             public Cursor Cursor => Cursors.Cross;
             public bool UseFreeCamera => true;
+            bool IViewerInteractiveMode.IsUserMode => false;
 
             public GlyphObject Root { get; private set; }
 

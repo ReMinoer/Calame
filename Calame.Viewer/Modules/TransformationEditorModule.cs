@@ -38,7 +38,7 @@ namespace Calame.Viewer.Modules
             if (sceneNode == null)
                 return;
 
-            var transformationEditor = Model.EditorModeRoot.Add<MultiModeTransformationEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
+            var transformationEditor = Model.EditorModeRoot.Add<MultiModeTransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
             transformationEditor.EditedObject = new MultiModeTransformationController(sceneNode);
             transformationEditor.RaycastClient = Model.Client;
 
@@ -51,7 +51,7 @@ namespace Calame.Viewer.Modules
             if (controller.Anchor == null)
                 return;
 
-            var transformationEditor = Model.EditorModeRoot.Add<TransformationEditor>(beforeAdding: Model.ComponentsFilter.ExcludedRoots.Add);
+            var transformationEditor = Model.EditorModeRoot.Add<TransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
             transformationEditor.EditedObject = controller;
             transformationEditor.RaycastClient = Model.Client;
 

@@ -21,7 +21,7 @@
             <RowDefinition Height="3*" />
         </Grid.RowDefinitions>
         <userControls:CalameTreeView TreeContext="{Binding}"
-                                     ItemsSource="{Binding Items}"
+                                     ItemsSource="{Binding RootsContext.Roots}"
                                      SelectedItem="{Binding SelectedCanvas, Mode=TwoWay}"
                                      IconProvider="{Binding IconProvider}"
                                      IconDescriptor="{Binding IconDescriptor}" />

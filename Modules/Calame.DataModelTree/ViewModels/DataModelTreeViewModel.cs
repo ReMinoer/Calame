@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using Calame.Icons;
@@ -89,6 +90,8 @@ namespace Calame.DataModelTree.ViewModels
             return _treeItemBuilder.Build((IGlyphCreator)data, synchronizerConfiguration);
         }
 
+        public bool DisableChildrenIfParentDisabled => false;
+        event EventHandler ITreeContext.BaseFilterChanged { add { } remove { } }
         bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }

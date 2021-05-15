@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -18,6 +17,8 @@ namespace Calame.UserControls
 {
     public interface ITreeContext
     {
+        bool DisableChildrenIfParentDisabled { get; }
+        event EventHandler BaseFilterChanged;
         ITreeViewItemModel CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration);
         bool IsMatchingBaseFilter(object data);
     }
@@ -32,22 +33,12 @@ namespace Calame.UserControls
             set => SetValue(ItemsSourceProperty, value);
         }
 
-        static private readonly Dictionary<CalameTreeView, ObservableListSynchronizer<object, ITreeViewItemModel>> Synchronizers = new Dictionary<CalameTreeView, ObservableListSynchronizer<object, ITreeViewItemModel>>();
-
         static private void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var treeView = (CalameTreeView)d;
             var itemsSource = (IEnumerable)e.NewValue;
 
-            if (!Synchronizers.TryGetValue(treeView, out ObservableListSynchronizer<object, ITreeViewItemModel> synchronizer))
-            {
-                synchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(treeView);
-                
-                synchronizer.Subscribe(treeView._treeItems);
-                Synchronizers.Add(treeView, synchronizer);
-            }
-            
-            synchronizer.Reference = itemsSource != null ? new EnumerableReadOnlyObservableList(itemsSource) : null;
+            treeView._synchronizer.Reference = itemsSource != null ? new EnumerableReadOnlyObservableList(itemsSource) : null;
             treeView.UpdateFilter(forceExpand: true);
         }
 
@@ -63,12 +54,34 @@ namespace Calame.UserControls
             => collectedItem.Dispose();
 
         static public readonly DependencyProperty TreeContextProperty
-            = DependencyProperty.Register(nameof(TreeContext), typeof(ITreeContext), typeof(CalameTreeView), new PropertyMetadata(default(ITreeContext)));
+            = DependencyProperty.Register(nameof(TreeContext), typeof(ITreeContext), typeof(CalameTreeView), new PropertyMetadata(default(ITreeContext), OnTreeContextChanged));
 
         public ITreeContext TreeContext
         {
             get => (ITreeContext)GetValue(TreeContextProperty);
             set => SetValue(TreeContextProperty, value);
+        }
+
+        static private void OnTreeContextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var treeView = (CalameTreeView)d;
+            var oldValue = (ITreeContext)e.OldValue;
+            var newValue = (ITreeContext)e.NewValue;
+
+            if (oldValue != null)
+            {
+                oldValue.BaseFilterChanged -= treeView.OnBaseFilterChanged;
+
+                treeView._synchronizer.Unsubscribe(treeView._treeItems);
+            }
+
+            if (newValue != null)
+            {
+                treeView._synchronizer.Subscribe(treeView._treeItems);
+                treeView.UpdateFilter(forceExpand: true);
+
+                newValue.BaseFilterChanged += treeView.OnBaseFilterChanged;
+            }
         }
 
         static public readonly DependencyProperty SelectedItemProperty
@@ -105,8 +118,9 @@ namespace Calame.UserControls
             get => (IIconDescriptor)GetValue(IconDescriptorProperty);
             set => SetValue(IconDescriptorProperty, value);
         }
-
-        private readonly ObservableList<ITreeViewItemModel> _treeItems;
+        
+        private readonly ObservableListSynchronizer<object, ITreeViewItemModel> _synchronizer;
+        private ObservableList<ITreeViewItemModel> _treeItems;
         public IReadOnlyObservableList<ITreeViewItemModel> TreeItems { get; }
 
         private ITreeViewItemModel _selectedTreeItem;
@@ -153,6 +167,8 @@ namespace Calame.UserControls
         {
             _treeItems = new ObservableList<ITreeViewItemModel>();
             TreeItems = new ReadOnlyObservableList<ITreeViewItemModel>(_treeItems);
+
+            _synchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(this);
 
             CollapseAllCommand = new RelayCommand(OnCollapseAll);
             ExpandAllCommand = new RelayCommand(OnExpandAll);
@@ -238,6 +254,7 @@ namespace Calame.UserControls
             }
         }
 
+        private void OnBaseFilterChanged(object sender, EventArgs eventArgs) => UpdateFilter(forceExpand: true);
         private void UpdateFilter(bool forceExpand)
         {
             // If the selected tree item is filtered, it will be unselect

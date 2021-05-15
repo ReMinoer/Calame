@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -10,26 +12,27 @@ using Diese.Collections.Observables.ReadOnly;
 using Gemini.Framework.Services;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
-using Glyph.Engine;
 
 namespace Calame.CompositionGraph.ViewModels
 {
     [Export(typeof(CompositionGraphViewModel))]
-    public sealed class CompositionGraphViewModel : CalameTool<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
+    public sealed class CompositionGraphViewModel : CalameTool<IDocumentContext<IRootComponentsContext>>, ITreeContext,
+        IHandle<ISelectionSpread<IGlyphComponent>>,
+        IHandle<ISelectionSpread<IGlyphData>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Left;
         
         public IIconProvider IconProvider { get; }
         public IIconDescriptor IconDescriptor { get; }
-
+        
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _treeItemBuilder;
-        private IDocumentContext<IComponentFilter> _filteringContext;
+        private ISelectionCommandContext _selectionCommandContext;
 
-        private IGlyphComponent _root;
-        public IGlyphComponent Root
+        private IRootComponentsContext _rootComponentsContext;
+        public IRootComponentsContext RootComponentsContext
         {
-            get => _root;
-            private set => SetValue(ref _root, value);
+            get => _rootComponentsContext;
+            private set => SetValue(ref _rootComponentsContext, value);
         }
         
         private IGlyphComponent _selection;
@@ -41,8 +44,7 @@ namespace Calame.CompositionGraph.ViewModels
                 if (!SetValue(ref _selection, value))
                     return;
 
-                var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
-                EventAggregator.PublishAsync(selectionRequest).Wait();
+                _selectionCommandContext?.SelectAsync(_selection).Wait();
             }
         }
 
@@ -63,15 +65,15 @@ namespace Calame.CompositionGraph.ViewModels
                                .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
                                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
                                .IconDescription(x => iconDescriptor.GetIcon(x))
-                               .IsEnabled(x => _filteringContext?.Context.Filter(x) ?? true);
+                               .IsEnabled(_ => _selectionCommandContext?.SelectCommand);
         }
 
-        protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<IRootComponentsContext> activeDocument)
         {
             _selection = null;
 
-            Root = activeDocument.Context.Root;
-            _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+            _selectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
+            RootComponentsContext = activeDocument.Context;
 
             return Task.CompletedTask;
         }
@@ -80,8 +82,8 @@ namespace Calame.CompositionGraph.ViewModels
         {
             _selection = null;
 
-            Root = null;
-            _filteringContext = null;
+            RootComponentsContext = null;
+            _selectionCommandContext = null;
 
             return Task.CompletedTask;
         }
@@ -105,6 +107,8 @@ namespace Calame.CompositionGraph.ViewModels
             return _treeItemBuilder.Build((IGlyphComponent)data, synchronizerConfiguration);
         }
 
+        public bool DisableChildrenIfParentDisabled => true;
+        event EventHandler ITreeContext.BaseFilterChanged { add { } remove { } }
         bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }

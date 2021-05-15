@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -13,30 +14,29 @@ using Glyph;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
-using Glyph.Engine;
 
 namespace Calame.SceneGraph.ViewModels
 {
     [Export(typeof(SceneGraphViewModel))]
-    public sealed class SceneGraphViewModel : CalameTool<IDocumentContext<GlyphEngine>>, IHandle<ISelectionSpread<IGlyphComponent>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
+    public sealed class SceneGraphViewModel : CalameTool<IDocumentContext<IRootScenesContext>>, ITreeContext,
+        IHandle<ISelectionSpread<IGlyphComponent>>,
+        IHandle<ISelectionSpread<IGlyphData>>
     {
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
         public IIconDescriptor IconDescriptor { get; }
 
-        private GlyphEngine _engine;
-        private IDocumentContext<IComponentFilter> _filteringContext;
-        private IGlyphComponent _selection;
-        private SceneNode _selectionNode;
-        private readonly TreeViewItemModelBuilder<ISceneNode> _treeItemBuilder;
-
-        public GlyphEngine Engine
+        private IRootScenesContext _rootScenesContext;
+        public IRootScenesContext RootScenesContext
         {
-            get => _engine;
-            private set => SetValue(ref _engine, value);
+            get => _rootScenesContext;
+            set => Set(ref _rootScenesContext, value);
         }
 
+        private ISelectionCommandContext _selectionCommandContext;
+
+        private IGlyphComponent _selection;
         public IGlyphComponent Selection
         {
             get => _selection;
@@ -48,11 +48,11 @@ namespace Calame.SceneGraph.ViewModels
                 _selectionNode = _selection?.GetSceneNode();
                 NotifyOfPropertyChange(nameof(SelectionNode));
 
-                var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
-                EventAggregator.PublishAsync(selectionRequest).Wait();
+                _selectionCommandContext?.SelectAsync(_selection).Wait();
             }
         }
 
+        private SceneNode _selectionNode;
         public SceneNode SelectionNode
         {
             get => _selectionNode;
@@ -63,11 +63,12 @@ namespace Calame.SceneGraph.ViewModels
 
                 _selection = _selectionNode?.Parent;
                 NotifyOfPropertyChange(nameof(Selection));
-                
-                var selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, _selection);
-                EventAggregator.PublishAsync(selectionRequest).Wait();
+
+                _selectionCommandContext?.SelectAsync(_selection).Wait();
             }
         }
+
+        private readonly TreeViewItemModelBuilder<ISceneNode> _treeItemBuilder;
 
         protected override object IconKey => CalameIconKey.SceneGraph;
 
@@ -86,30 +87,33 @@ namespace Calame.SceneGraph.ViewModels
                                .DisplayName(x => (x as IGlyphComponent)?.Parent?.Name ?? x.ToString(), nameof(IGlyphComponent.Name), x => (x as IGlyphComponent)?.Parent as INotifyPropertyChanged)
                                .ChildrenSource(x => x.Children, nameof(ISceneNode.Children))
                                .IconDescription(x => iconDescriptor.GetIcon((x as IGlyphComponent)?.Parent ?? x as IGlyphComponent))
-                               .IsEnabled(x => _filteringContext?.Context.Filter(x as IGlyphComponent) ?? true);
-
-            if (shell.ActiveItem is IDocumentContext<GlyphEngine> documentContext)
-                Engine = documentContext.Context;
+                               .IsEnabled(x => _selectionCommandContext?.SelectCommand, x => (x as IGlyphComponent)?.Parent);
         }
 
-        protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<IRootScenesContext> activeDocument)
         {
             _selection = null;
             _selectionNode = null;
 
-            Engine = activeDocument.Context;
-            _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+            _selectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
+            RootScenesContext = activeDocument.Context;
+
+            if (_selectionCommandContext != null)
+                _selectionCommandContext.CanSelectChanged += OnCanSelectChanged;
 
             return Task.CompletedTask;
         }
 
         protected override Task OnDocumentsCleaned()
         {
+            if (_selectionCommandContext != null)
+                _selectionCommandContext.CanSelectChanged -= OnCanSelectChanged;
+
             _selection = null;
             _selectionNode = null;
 
-            Engine = null;
-            _filteringContext = null;
+            RootScenesContext = null;
+            _selectionCommandContext = null;
 
             return Task.CompletedTask;
         }
@@ -132,11 +136,28 @@ namespace Calame.SceneGraph.ViewModels
             SetValue(ref _selectionNode, component?.GetSceneNode(), nameof(SelectionNode));
         }
 
+        public bool DisableChildrenIfParentDisabled => false;
+
+        bool ITreeContext.IsMatchingBaseFilter(object data)
+        {
+            return _selectionCommandContext == null || _selectionCommandContext.CanSelect((data as IGlyphComponent)?.Parent);
+        }
+
+        private event EventHandler BaseFilterChanged;
+        event EventHandler ITreeContext.BaseFilterChanged
+        {
+            add => BaseFilterChanged += value;
+            remove => BaseFilterChanged -= value;
+        }
+
+        private void OnCanSelectChanged(object sender, EventArgs e)
+        {
+            BaseFilterChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
             return _treeItemBuilder.Build((ISceneNode)data, synchronizerConfiguration);
         }
-
-        bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }

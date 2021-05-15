@@ -10,5 +10,6 @@ namespace Calame.Viewer
         IInteractive Interactive { get; }
         Cursor Cursor { get; }
         bool UseFreeCamera { get; }
+        bool IsUserMode { get; }
     }
 }

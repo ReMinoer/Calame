@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.Viewer;
 using Calame.Viewer.Messages;
@@ -27,7 +29,10 @@ namespace Calame.DataModelViewer.ViewModels
 {
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IRunnableDocument, IDocumentContext<IGlyphData>, IHandle<ISelectionRequest<IGlyphData>>, IHandle<ISelectionRequest<IGlyphComponent>>
+    public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IRunnableDocument,
+        IDocumentContext<IGlyphData>, IDocumentContext<ISelectionCommandContext<IGlyphData>>, ISelectionCommandContext<IGlyphData>, IRootsContext,
+        IHandle<ISelectionRequest<IGlyphData>>,
+        IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IImportedTypeProvider _importedTypeProvider;
         private readonly SelectionHistoryManager _selectionHistoryManager;
@@ -46,15 +51,9 @@ namespace Calame.DataModelViewer.ViewModels
                 RefreshIcon();
             }
         }
-
-        IDocument IDocumentContext.Document => this;
-        GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
-        ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
-        IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
-        IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
         
-        void IViewerDocument.EnableFreeCamera() {}
         Type IRunnableDocument.RunCommandDefinitionType => Editor?.RunCommandDefinitionType;
+        void IViewerDocument.EnableFreeCamera() { }
 
         public ICommand DragOverCommand { get; }
         public ICommand DropCommand { get; }
@@ -73,6 +72,8 @@ namespace Calame.DataModelViewer.ViewModels
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
 
+            _debuggableViewerContexts = new DebuggableViewerContexts(Viewer, this);
+            
             DragOverCommand = new RelayCommand(x => Editor.OnDragOver((DragEventArgs)x));
             DropCommand = new RelayCommand(x => Editor.OnDrop((DragEventArgs)x));
         }
@@ -113,6 +114,8 @@ namespace Calame.DataModelViewer.ViewModels
 
             Editor.RegisterDependencies(_engine.Registry);
             Editor.PrepareEditor(Viewer.Runner.Engine, Viewer.UserRoot);
+
+            _debuggableViewerContexts.RefreshContexts();
 
             _engine.Initialize();
             await _engine.LoadContentAsync();
@@ -172,6 +175,80 @@ namespace Calame.DataModelViewer.ViewModels
             
             Viewer.LastSelection = selection;
             await EventAggregator.PublishAsync(selection, cancellationToken);
+        }
+
+        private readonly DebuggableViewerContexts _debuggableViewerContexts;
+
+        bool IViewerDocument.DebugMode
+        {
+            get => _debuggableViewerContexts.DebugMode;
+            set => _debuggableViewerContexts.DebugMode = value;
+        }
+
+        IDocument IDocumentContext.Document => this;
+        GlyphEngine IDocumentContext<GlyphEngine>.Context => _debuggableViewerContexts.Engine;
+        ViewerViewModel IDocumentContext<ViewerViewModel>.Context => _debuggableViewerContexts.Viewer;
+        IRootComponentsContext IDocumentContext<IRootComponentsContext>.Context => _debuggableViewerContexts;
+        IRootScenesContext IDocumentContext<IRootScenesContext>.Context => _debuggableViewerContexts;
+        IRootInteractivesContext IDocumentContext<IRootInteractivesContext>.Context => _debuggableViewerContexts;
+
+        ISelectionCommandContext IDocumentContext<ISelectionCommandContext>.Context => this;
+        ISelectionCommandContext<IGlyphComponent> IDocumentContext<ISelectionCommandContext<IGlyphComponent>>.Context => this;
+        ISelectionCommandContext<IGlyphData> IDocumentContext<ISelectionCommandContext<IGlyphData>>.Context => this;
+
+        IRootsContext IDocumentContext<IRootsContext>.Context => this;
+        public IEnumerable Roots => new []{ Editor.Data };
+        IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
+
+        public ICommand SelectCommand => _debuggableViewerContexts.SelectCommand;
+
+        event EventHandler ISelectionCommandContext.CanSelectChanged
+        {
+            add => _debuggableViewerContexts.CanSelectChanged += value;
+            remove => _debuggableViewerContexts.CanSelectChanged -= value;
+        }
+
+        public bool CanSelect(object instance)
+        {
+            switch (instance)
+            {
+                case IGlyphData data:
+                    return CanSelect(data);
+                case IGlyphComponent component:
+                    return CanSelect(component);
+            }
+
+            return false;
+        }
+
+        public bool CanSelect(IGlyphData data) => CanSelect(data.BindedObject);
+        public bool CanSelect(IGlyphComponent component) => _debuggableViewerContexts.CanSelect(component);
+
+        public Task SelectAsync(object instance)
+        {
+            switch (instance)
+            {
+                case IGlyphData data:
+                    return SelectAsync(data);
+                case IGlyphComponent component:
+                    return SelectAsync(component);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task SelectAsync(IGlyphData data)
+        {
+            if (CanSelect(data))
+                return EventAggregator.PublishAsync(new SelectionRequest<IGlyphData>(this, data));
+            return Task.CompletedTask;
+        }
+
+        public Task SelectAsync(IGlyphComponent component)
+        {
+            if (CanSelect(component))
+                return EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, component));
+            return Task.CompletedTask;
         }
     }
 }

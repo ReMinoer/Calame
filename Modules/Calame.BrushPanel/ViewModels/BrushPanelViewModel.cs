@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -19,7 +19,6 @@ using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
-using Glyph.Engine;
 
 namespace Calame.BrushPanel.ViewModels
 {
@@ -32,23 +31,25 @@ namespace Calame.BrushPanel.ViewModels
         public IIconDescriptorManager IconDescriptorManager { get; }
         public IIconDescriptor IconDescriptor { get; }
 
+        private IBrushViewerModule _viewerModule;
+        private ISelectionCommandContext _selectionCommandContext;
+
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataTreeItemBuilder;
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _componentTreeItemBuilder;
-        
-        private GlyphEngine _engine;
-        private IBrushViewerModule _viewerModule;
-        private IDocumentContext<IComponentFilter> _filteringContext;
+
+        public bool DisableChildrenIfParentDisabled => true;
+        public event EventHandler BaseFilterChanged;
 
         private readonly IEngineBrushViewModel[] _allEngineBrushes;
         private readonly IDataBrushViewModel[] _allDataBrushes;
         private readonly ObservableCollection<IBrushViewModel> _brushes;
         public IReadOnlyObservableCollection<IBrushViewModel> Brushes { get; }
 
-        private IEnumerable _items;
-        public IEnumerable Items
+        private IRootsContext _rootsContext;
+        public IRootsContext RootsContext
         {
-            get => _items;
-            private set => SetValue(ref _items, value);
+            get => _rootsContext;
+            private set => SetValue(ref _rootsContext, value);
         }
 
         private object _selectedCanvas;
@@ -57,44 +58,12 @@ namespace Calame.BrushPanel.ViewModels
             get => _selectedCanvas;
             set
             {
-                object previousCanvas = _selectedCanvas;
-
                 if (!SetValue(ref _selectedCanvas, value))
                     return;
 
                 OnCanvasChanged();
 
-                ISelectionRequest<object> selectionRequest;
-                if (_selectedCanvas != null)
-                {
-                    switch (_selectedCanvas)
-                    {
-                        case IGlyphData data:
-                            selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, data);
-                            break;
-                        case IGlyphComponent component:
-                            selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, component);
-                            break;
-                        default:
-                            throw new NotSupportedException();
-                    }
-                }
-                else
-                {
-                    switch (previousCanvas)
-                    {
-                        case IGlyphData _:
-                            selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, (IGlyphData)null);
-                            break;
-                        case IGlyphComponent _:
-                            selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, (IGlyphComponent)null);
-                            break;
-                        default:
-                            throw new NotSupportedException();
-                    }
-                }
-
-                EventAggregator.PublishAsync(selectionRequest).Wait();
+                _selectionCommandContext?.SelectAsync(_selectedCanvas).Wait();
                 SwitchToBrushModeAsync().Wait();
             }
         }
@@ -155,22 +124,16 @@ namespace Calame.BrushPanel.ViewModels
             _allDataBrushes = allDataBrushes;
             _brushes = new ObservableCollection<IBrushViewModel>();
             Brushes = new ReadOnlyObservableCollection<IBrushViewModel>(_brushes);
-
-            if (shell.ActiveItem is IDocumentContext<ViewerViewModel> documentContext)
-                _viewerModule = documentContext.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
         }
 
         protected override Task OnDocumentActivated(IDocumentContext<ViewerViewModel> activeDocument)
         {
-            _engine = activeDocument.Context.Runner.Engine;
-            _viewerModule = activeDocument.Context.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
-            _filteringContext = activeDocument as IDocumentContext<IComponentFilter>;
+            ViewerViewModel viewer = activeDocument.Context;
 
-            if (activeDocument is IDocumentContext<IGlyphData> dataContext)
-                Items = new[] { dataContext.Context };
-            else
-                Items = _engine.Root.Components;
-            
+            _selectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
+            _viewerModule = viewer.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
+            RootsContext = ((IDocumentContext<IRootsContext>)activeDocument).Context;
+
             //IBrush previousBrush = _viewerModule.Brush;
             //IPaint previousPaint = _viewerModule.Paint;
 
@@ -181,6 +144,9 @@ namespace Calame.BrushPanel.ViewModels
             //SelectedBrush = _brushes.FirstOrDefault(x => x == previousBrush);
             //SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == previousPaint);
 
+            if (_selectionCommandContext != null)
+                _selectionCommandContext.CanSelectChanged += OnCanSelectChanged;
+
             _viewerModule.ApplyEnded += OnBrushApplyEnded;
 
             return Task.CompletedTask;
@@ -188,12 +154,16 @@ namespace Calame.BrushPanel.ViewModels
 
         protected override Task OnDocumentsCleaned()
         {
-            HandleSelection(null);
-            Items = null;
+            _viewerModule.ApplyEnded -= OnBrushApplyEnded;
 
-            _engine = null;
+            if (_selectionCommandContext != null)
+                _selectionCommandContext.CanSelectChanged -= OnCanSelectChanged;
+
+            HandleSelection(null);
+
+            RootsContext = null;
+            _selectionCommandContext = null;
             _viewerModule = null;
-            _filteringContext = null;
 
             return Task.CompletedTask;
         }
@@ -218,21 +188,13 @@ namespace Calame.BrushPanel.ViewModels
 
         bool ITreeContext.IsMatchingBaseFilter(object model)
         {
-            IGlyphComponent componentToFilter;
-            switch (model)
-            {
-                case IGlyphData data:
-                    componentToFilter = data.BindedObject;
-                    break;
-                case IGlyphComponent component:
-                    componentToFilter = component;
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
-
             return GetAllBrushesForType(model).Any(brush => brush.IsValidForCanvas(model))
-                   && _filteringContext.Context.Filter(componentToFilter);
+                && (_selectionCommandContext?.CanSelect(model) ?? true);
+        }
+
+        private void OnCanSelectChanged(object sender, EventArgs e)
+        {
+            BaseFilterChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private IEnumerable<IBrushViewModel> GetAllBrushesForType(object canvas)
@@ -250,12 +212,18 @@ namespace Calame.BrushPanel.ViewModels
 
         Task IHandle<ISelectionSpread<IGlyphComponent>>.HandleAsync(ISelectionSpread<IGlyphComponent> message, CancellationToken cancellationToken)
         {
+            if (message.DocumentContext != CurrentDocument)
+                return Task.CompletedTask;
+
             HandleSelection(message.Item);
             return Task.CompletedTask;
         }
 
         Task IHandle<ISelectionSpread<IGlyphData>>.HandleAsync(ISelectionSpread<IGlyphData> message, CancellationToken cancellationToken)
         {
+            if (message.DocumentContext != CurrentDocument)
+                return Task.CompletedTask;
+
             HandleSelection(message.Item);
             return Task.CompletedTask;
         }

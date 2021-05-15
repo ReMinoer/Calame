@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Calame.DocumentContexts;
 using Calame.Viewer.Modules.Base;
 using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
@@ -19,8 +20,7 @@ namespace Calame.Viewer.Modules
     public class BoxedComponentSelectorModule : ViewerModuleBase, IHandle<IDocumentContext<ViewerViewModel>>
     {
         private readonly IEventAggregator _eventAggregator;
-        private IDocumentContext _currentDocument;
-        private IDocumentContext<IComponentFilter> _filteringContext;
+        private ISelectionCommandContext _selectionCommandContext;
 
         private GlyphObject _root;
         private ShapedObjectSelector _shapedObjectSelector;
@@ -68,7 +68,7 @@ namespace Calame.Viewer.Modules
 
         private bool ComponentFilter(IGlyphComponent glyphComponent)
         {
-            return _filteringContext?.Context.Filter(glyphComponent) ?? true;
+            return _selectionCommandContext?.CanSelect(glyphComponent) ?? true;
         }
 
         private async void OnShapedObjectSelectorSelectionChanged(object sender, IBoxedComponent boxedComponent)
@@ -77,13 +77,14 @@ namespace Calame.Viewer.Modules
                 return;
 
             SelectedComponent = boxedComponent?.AllParents().OfType<IBoxedComponent>().First(x => x.Components.AnyOfType<ISceneNodeComponent>());
-            await _eventAggregator.PublishAsync(new SelectionRequest<IBoxedComponent>(_currentDocument, SelectedComponent));
+
+            if (_selectionCommandContext != null)
+                await _selectionCommandContext.SelectAsync(SelectedComponent);
         }
 
         Task IHandle<IDocumentContext<ViewerViewModel>>.HandleAsync(IDocumentContext<ViewerViewModel> message, CancellationToken cancellationToken)
         {
-            _currentDocument = message;
-            _filteringContext = message as IDocumentContext<IComponentFilter>;
+            _selectionCommandContext = (message as IDocumentContext<ISelectionCommandContext>)?.Context;
 
             return Task.CompletedTask;
         }

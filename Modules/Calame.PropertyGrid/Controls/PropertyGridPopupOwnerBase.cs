@@ -360,15 +360,15 @@ namespace Calame.PropertyGrid.Controls
             popup.SelectItemCommand = selectItemCommand;
             popup.CanSelectItem = selectItemCommand.CanExecute(propertyGrid.SelectedObject);
 
-            popup.Removed += OnRemoved;
-            propertyGrid.PropertyValueChanged += OnPropertyValueChanged;
-
             bool CanSelectItem(object item) => SelectItemCommand?.CanExecute(item) ?? false;
             void OnSelectItem(object item)
             {
                 popup.IsOpen = false;
                 SelectItemCommand?.Execute(item);
             }
+
+            popup.Removed += OnRemoved;
+            propertyGrid.PropertyValueChanged += OnPropertyValueChanged;
 
             void OnRemoved(object sender, EventArgs e) => OnItemRemoved(popup, popupOwner);
             void OnPropertyValueChanged(object sender, PropertyValueChangedEventArgs e) => OnPopupPropertyValueChanged(propertyGrid, popupOwner, e);

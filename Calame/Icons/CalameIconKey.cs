@@ -16,6 +16,7 @@
         Pause,
         Stop,
         NextFrame,
+        ViewerDebugMode,
         ResetSession,
         DefaultCamera,
         FreeCamera,

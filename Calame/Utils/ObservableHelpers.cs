@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Windows.Input;
 
 namespace Calame.Utils
 {
@@ -23,6 +24,13 @@ namespace Calame.Utils
         static public IObservable<EventPattern<PropertyChangedEventArgs>> OnPropertyChanged(INotifyPropertyChanged notifyPropertyChanged, params string[] propertyNames)
         {
             return OnPropertyChanged(notifyPropertyChanged).Where(x => propertyNames.Contains(x.EventArgs.PropertyName));
+        }
+
+        static public IObservable<EventPattern<EventArgs>> OnCanExecuteChanged(ICommand command)
+        {
+            return Observable.FromEventPattern<EventHandler, EventArgs>(
+                x => command.CanExecuteChanged += x,
+                x => command.CanExecuteChanged -= x);
         }
     }
 }

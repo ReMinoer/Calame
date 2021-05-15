@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 using Calame.Icons;
 
 namespace Calame.PropertyGrid.Controls
@@ -114,8 +115,16 @@ namespace Calame.PropertyGrid.Controls
         static private void OnSelectItemCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (InlineObjectControl)d;
+            var oldCommand = (ICommand)e.OldValue;
+            var newCommand = (ICommand)e.NewValue;
 
+            if (oldCommand != null)
+                oldCommand.CanExecuteChanged -= control.OnSelectItemCommandChanged;
+            
             control.RefreshAccessIcon();
+
+            if (newCommand != null)
+                newCommand.CanExecuteChanged += control.OnSelectItemCommandChanged;
         }
 
         protected override Type GetNewItemType() => NewItemBaseType ?? GetItemType();
@@ -143,7 +152,7 @@ namespace Calame.PropertyGrid.Controls
             bool value = !IsReadOnlyValue && Value == null;
             SetCanAddItem(value);
         }
-
+        
         private void RefreshCanRemoveItem()
         {
             bool ComputeValue()
@@ -163,6 +172,7 @@ namespace Calame.PropertyGrid.Controls
             SetCanRemoveItem(ComputeValue());
         }
 
+        private void OnSelectItemCommandChanged(object sender, EventArgs e) => RefreshAccessIcon();
         private void RefreshAccessIcon()
         {
             if (SelectItemCommand != null && SelectItemCommand.CanExecute(Value))

@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.SceneViewer.Commands;
 using Calame.Viewer;
@@ -55,11 +56,6 @@ namespace Calame.SceneViewer.ViewModels
         public ViewerViewModel Viewer { get; }
         public SessionModeModule SessionMode { get; }
 
-        IDocument IDocumentContext.Document => this;
-        GlyphEngine IDocumentContext<GlyphEngine>.Context => Viewer.Runner?.Engine;
-        ViewerViewModel IDocumentContext<ViewerViewModel>.Context => Viewer;
-        IComponentFilter IDocumentContext<IComponentFilter>.Context => Viewer.ComponentsFilter;
-
         public bool FreeCameraEnabled { get; private set; }
         public Type RunCommandDefinitionType { get; } = typeof(ResetSessionCommand);
 
@@ -81,6 +77,8 @@ namespace Calame.SceneViewer.ViewModels
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
+
+            _debuggableViewerContexts = new DebuggableViewerContexts(Viewer, this);
 
             SessionMode = new SessionModeModule();
             Viewer.InsertInteractiveMode(0, SessionMode);
@@ -112,6 +110,8 @@ namespace Calame.SceneViewer.ViewModels
             await Session.PrepareSessionAsync(_sessionContext);
             await Session.ResetSessionAsync(_sessionContext);
 
+            _debuggableViewerContexts.RefreshContexts();
+
             _engine.Initialize();
             await _engine.LoadContentAsync();
 
@@ -130,7 +130,8 @@ namespace Calame.SceneViewer.ViewModels
         public async Task ResetSession()
         {
             await EventAggregator.PublishAsync(SelectionRequest<IGlyphComponent>.Empty(this));
-            Viewer.ComponentsFilter.ExcludedRoots.Clear();
+
+            Viewer.NotSelectableComponents.Clear();
             _selectionHistoryManager.GetHistory(this).Clear();
 
             await Session.ResetSessionAsync(_sessionContext);
@@ -243,11 +244,55 @@ namespace Calame.SceneViewer.ViewModels
 
             public Cursor Cursor => Cursors.None;
             public bool UseFreeCamera => false;
+            bool IViewerInteractiveMode.IsUserMode => true;
 
             protected override void ConnectModel() => Model.AddInteractiveMode(this);
             protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
             protected override void ConnectRunner() {}
             protected override void DisconnectRunner() {}
+        }
+
+        private readonly DebuggableViewerContexts _debuggableViewerContexts;
+
+        bool IViewerDocument.DebugMode
+        {
+            get => _debuggableViewerContexts.DebugMode;
+            set => _debuggableViewerContexts.DebugMode = value;
+        }
+
+        IDocument IDocumentContext.Document => this;
+        GlyphEngine IDocumentContext<GlyphEngine>.Context => _debuggableViewerContexts.Engine;
+        ViewerViewModel IDocumentContext<ViewerViewModel>.Context => _debuggableViewerContexts.Viewer;
+        IRootsContext IDocumentContext<IRootsContext>.Context => _debuggableViewerContexts;
+        IRootComponentsContext IDocumentContext<IRootComponentsContext>.Context => _debuggableViewerContexts;
+        IRootScenesContext IDocumentContext<IRootScenesContext>.Context => _debuggableViewerContexts;
+        IRootInteractivesContext IDocumentContext<IRootInteractivesContext>.Context => _debuggableViewerContexts;
+        ISelectionCommandContext IDocumentContext<ISelectionCommandContext>.Context => this;
+        ISelectionCommandContext<IGlyphComponent> IDocumentContext<ISelectionCommandContext<IGlyphComponent>>.Context => this;
+
+        public ICommand SelectCommand => _debuggableViewerContexts.SelectCommand;
+
+        event EventHandler ISelectionCommandContext.CanSelectChanged
+        {
+            add => _debuggableViewerContexts.CanSelectChanged += value;
+            remove => _debuggableViewerContexts.CanSelectChanged -= value;
+        }
+
+        public bool CanSelect(object instance) => instance is IGlyphComponent component && CanSelect(component);
+        public bool CanSelect(IGlyphComponent component) => _debuggableViewerContexts.CanSelect(component);
+
+        public Task SelectAsync(object instance)
+        {
+            if (instance is IGlyphComponent component)
+                return SelectAsync(component);
+            return Task.CompletedTask;
+        }
+
+        public Task SelectAsync(IGlyphComponent component)
+        {
+            if (CanSelect(component))
+                return EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, component));
+            return Task.CompletedTask;
         }
     }
 }

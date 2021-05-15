@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Windows.Input;
 using Calame.Icons;
 using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
@@ -29,7 +30,27 @@ namespace Calame.Utils
         {
             return ObservableHelpers.OnPropertyChanged(notifier?.Invoke(data) ?? data as INotifyPropertyChanged, propertyName);
         }
-        
+
+        public TreeViewItemModelBuilder<T> IsEnabled(Func<T, ICommand> commandGetter, Func<T, object> commandParameterGetter = null, bool valueByDefault = true)
+            => IsEnabled(x => CanExecuteGetter(x, commandGetter, commandParameterGetter, valueByDefault), x => OnCanExecuteChanged(x, commandGetter));
+        public TreeViewItemModelBuilder<T> IsTriggered(Func<T, ICommand> commandGetter, Func<T, object> commandParameterGetter = null, bool valueByDefault = false)
+            => IsTriggered(x => CanExecuteGetter(x, commandGetter, commandParameterGetter, valueByDefault), x => OnCanExecuteChanged(x, commandGetter));
+
+        static private bool CanExecuteGetter(T data, Func<T, ICommand> commandGetter, Func<T, object> commandParameterGetter, bool valueByDefault)
+        {
+            bool result = commandGetter(data)?.CanExecute(commandParameterGetter?.Invoke(data) ?? data) ?? valueByDefault;
+            return result;
+        }
+
+        static private IObservable<object> OnCanExecuteChanged(T data, Func<T, ICommand> commandGetter)
+        {
+            ICommand command = commandGetter(data);
+            if (command == null)
+                return Observable.Empty<object>();
+
+            return ObservableHelpers.OnCanExecuteChanged(command);
+        }
+
         public TreeViewItemModelBuilder<T> DisplayName(Func<T, string> getter, Func<T, IObservable<object>> observableFunc = null)
         {
             AddBinding(getter, observableFunc, (v, x) => v.DisplayName = x);

@@ -4,18 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Calame.InteractionTree.ViewModels"
-             xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
              xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:InteractionTreeViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
              d:DesignWidth="300">
-    <UserControl.Resources>
-        <converters:ObjectToEnumerableConverter x:Key="ObjectToEnumerableConverter" />
-    </UserControl.Resources>
     <userControls:CalameTreeView MinWidth="200"
                                  TreeContext="{Binding}"
-                                 ItemsSource="{Binding Engine.InteractionManager.Root, Converter={StaticResource ObjectToEnumerableConverter}}"
+                                 ItemsSource="{Binding RootInteractivesContext.RootInteractives}"
                                  IconProvider="{Binding IconProvider}"
                                  IconDescriptor="{Binding IconDescriptor}" />
 </UserControl>

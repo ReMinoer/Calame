@@ -41,7 +41,7 @@ namespace Calame.Viewer.Modules
             if (!(selection is IBoxedComponent boxedSelection))
                 return;
 
-            _root = Model.EditorModeRoot.Add<GlyphObject>(Model.ComponentsFilter.ExcludedRoots.Add);
+            _root = Model.EditorModeRoot.Add<GlyphObject>(beforeAdding: Model.NotSelectableComponents.Add);
             _root.Add<SceneNode>();
 
             var lineMesh = new LineMesh(Color.Purple);

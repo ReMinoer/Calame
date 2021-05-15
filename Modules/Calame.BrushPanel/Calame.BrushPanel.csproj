@@ -4,6 +4,7 @@
     <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Calame.DocumentContexts\Calame.DocumentContexts.csproj" />
     <ProjectReference Include="..\..\Calame.Viewer\Calame.Viewer.csproj" />
     <ProjectReference Include="..\..\Calame\Calame.csproj" />
     <ProjectReference Include="..\..\External\gemini\src\Gemini\Gemini.csproj" />

@@ -7,14 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Calame.Commands;
 using Calame.ContentFileTypes;
+using Calame.DocumentContexts;
 using Calame.Icons;
-using Calame.PropertyGrid.Controls;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
-using Glyph.Composition;
-using Glyph.Composition.Modelization;
 using Glyph.Engine;
 using Glyph.Pipeline;
 
@@ -40,14 +38,21 @@ namespace Calame.PropertyGrid.ViewModels
         public string WorkingDirectory
         {
             get => _workingDirectory;
-            set => SetValue(ref _workingDirectory, value);
+            private set => SetValue(ref _workingDirectory, value);
         }
 
         private IRawContentLibrary _rawContentLibrary;
         public IRawContentLibrary RawContentLibrary
         {
             get => _rawContentLibrary;
-            set => SetValue(ref _rawContentLibrary, value);
+            private set => SetValue(ref _rawContentLibrary, value);
+        }
+
+        private ISelectionCommandContext _selectionCommandContext;
+        public ISelectionCommandContext SelectionCommandContext
+        {
+            get => _selectionCommandContext;
+            private set => SetValue(ref _selectionCommandContext, value);
         }
 
         public IContentFileTypeResolver ContentFileTypeResolver { get; }
@@ -58,7 +63,6 @@ namespace Calame.PropertyGrid.ViewModels
         public RelayCommand OpenFileCommand { get; }
         public RelayCommand OpenFolderCommand { get; }
         public AsyncCommand DirtyDocumentCommand { get; }
-        public RelayCommand SelectItemCommand { get; }
 
         protected override object IconKey => CalameIconKey.PropertyGrid;
 
@@ -83,7 +87,6 @@ namespace Calame.PropertyGrid.ViewModels
             OpenFileCommand = new RelayCommand(OnOpenFile, CanOpenFile);
 
             DirtyDocumentCommand = new AsyncCommand(OnDirtyDocument);
-            SelectItemCommand = new RelayCommand(OnSelectItem, CanSelectItem);
         }
 
         private bool CanOpenFolder(object path) => !string.IsNullOrWhiteSpace((string)path);
@@ -103,39 +106,13 @@ namespace Calame.PropertyGrid.ViewModels
             return EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject));
         }
 
-        private bool CanSelectItem(object item)
-        {
-            switch (item)
-            {
-                case IGlyphData _:
-                case IGlyphComponent _:
-                    return !item.GetType().IsValueType;
-                default:
-                    return false;
-            }
-        }
-
-        private void OnSelectItem(object item)
-        {
-            ISelectionRequest<object> selectionRequest;
-            switch (item)
-            {
-                case IGlyphData data:
-                    selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, data);
-                    break;
-                case IGlyphComponent component:
-                    selectionRequest = new SelectionRequest<IGlyphComponent>(CurrentDocument, component);
-                    break;
-                default: throw new NotSupportedException();
-            }
-            EventAggregator.PublishAsync(selectionRequest).Wait();
-        }
-
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
         {
             SelectedObject = null;
+
             WorkingDirectory = activeDocument.WorkingDirectory;
             RawContentLibrary = (activeDocument as IDocumentContext<GlyphEngine>)?.Context.ContentLibrary as IRawContentLibrary;
+            SelectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
 
             return Task.CompletedTask;
         }
@@ -143,8 +120,10 @@ namespace Calame.PropertyGrid.ViewModels
         protected override Task OnDocumentsCleaned()
         {
             SelectedObject = null;
+
             WorkingDirectory = null;
             RawContentLibrary = null;
+            SelectionCommandContext = null;
 
             return Task.CompletedTask;
         }

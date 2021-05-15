@@ -4,6 +4,7 @@
     <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Calame.DocumentContexts\Calame.DocumentContexts.csproj" />
     <ProjectReference Include="..\Calame\Calame.csproj" />
     <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Diese.Collections %28Stave%29\Diese.Collections %28Stave%29.csproj" />
     <ProjectReference Include="..\External\Glyph\External\Fingear\External\Stave\Stave\Stave.csproj" />

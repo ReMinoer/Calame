@@ -111,6 +111,7 @@ namespace Calame.BrushPanel
         public object IconKey => CalameIconKey.BrushMode;
         Cursor IViewerInteractiveMode.Cursor => Cursors.Pen;
         bool IViewerInteractiveMode.UseFreeCamera => true;
+        bool IViewerInteractiveMode.IsUserMode => false;
 
         protected override void ConnectModel() => Model.AddInteractiveMode(this);
         protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);

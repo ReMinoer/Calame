@@ -118,9 +118,16 @@
                                             <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
                                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsDisabledByParent}" Value="True">
+                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
                                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                                             </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding IsDisabledByParent}" Value="True" />
+                                                    <Condition Binding="{Binding TreeContext.DisableChildrenIfParentDisabled, ElementName=This}" Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                            </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </TextBlock.Style>

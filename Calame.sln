@@ -117,6 +117,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glyph.Pipeline", "External\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemini", "External\gemini\src\Gemini\Gemini.csproj", "{659541B0-C2A8-4F33-984F-EEB3729F8969}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.DocumentContexts", "Calame.DocumentContexts\Calame.DocumentContexts.csproj", "{4494C77C-503F-4519-906F-92D2E3119C4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -335,6 +337,10 @@ Global
 		{659541B0-C2A8-4F33-984F-EEB3729F8969}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{659541B0-C2A8-4F33-984F-EEB3729F8969}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{659541B0-C2A8-4F33-984F-EEB3729F8969}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4494C77C-503F-4519-906F-92D2E3119C4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4494C77C-503F-4519-906F-92D2E3119C4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4494C77C-503F-4519-906F-92D2E3119C4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4494C77C-503F-4519-906F-92D2E3119C4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

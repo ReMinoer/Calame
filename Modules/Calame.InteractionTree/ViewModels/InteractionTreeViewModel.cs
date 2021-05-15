@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -11,26 +12,25 @@ using Diese.Collections.Observables.ReadOnly;
 using Fingear.Controls;
 using Fingear.Interactives;
 using Gemini.Framework.Services;
-using Glyph.Engine;
 
 namespace Calame.InteractionTree.ViewModels
 {
     [Export(typeof(InteractionTreeViewModel))]
-    public sealed class InteractionTreeViewModel : CalameTool<IDocumentContext<GlyphEngine>>, ITreeContext
+    public sealed class InteractionTreeViewModel : CalameTool<IDocumentContext<IRootInteractivesContext>>, ITreeContext
     {
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
         public IIconDescriptor IconDescriptor { get; }
 
-        private GlyphEngine _engine;
         private readonly TreeViewItemModelBuilder<IInteractive> _interactiveTreeItemBuilder;
         private readonly TreeViewItemModelBuilder<IControl> _controlTreeItemBuilder;
 
-        public GlyphEngine Engine
+        private IRootInteractivesContext _rootInteractivesContext;
+        public IRootInteractivesContext RootInteractivesContext
         {
-            get => _engine;
-            private set => SetValue(ref _engine, value);
+            get => _rootInteractivesContext;
+            private set => SetValue(ref _rootInteractivesContext, value);
         }
 
         protected override object IconKey => CalameIconKey.InteractionTree;
@@ -64,15 +64,15 @@ namespace Calame.InteractionTree.ViewModels
                                       .IsTriggered(x => x.IsActive, nameof(IControl.IsActive));
         }
         
-        protected override Task OnDocumentActivated(IDocumentContext<GlyphEngine> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<IRootInteractivesContext> activeDocument)
         {
-            Engine = activeDocument.Context;
+            RootInteractivesContext = activeDocument.Context;
             return Task.CompletedTask;
         }
 
         protected override Task OnDocumentsCleaned()
         {
-            Engine = null;
+            RootInteractivesContext = null;
             return Task.CompletedTask;
         }
 
@@ -89,6 +89,8 @@ namespace Calame.InteractionTree.ViewModels
             }
         }
 
+        public bool DisableChildrenIfParentDisabled => true;
+        event EventHandler ITreeContext.BaseFilterChanged { add { } remove { } }
         bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }
