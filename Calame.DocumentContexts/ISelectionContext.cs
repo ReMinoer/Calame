@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace Calame.DocumentContexts
 {
-    public interface ISelectionCommandContext
+    public interface ISelectionContext
     {
-        ICommand SelectCommand { get; }
         event EventHandler CanSelectChanged;
         bool CanSelect(object instance);
         Task SelectAsync(object instance);
     }
 
-    public interface ISelectionCommandContext<in T> : ISelectionCommandContext
+    public interface ISelectionContext<in T> : ISelectionContext
     {
         bool CanSelect(T instance);
         Task SelectAsync(T instance);

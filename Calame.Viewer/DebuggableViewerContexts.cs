@@ -2,14 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using Calame.DocumentContexts;
 using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
 using Fingear.Interactives;
 using Glyph;
 using Glyph.Composition;
-using Glyph.Engine;
 using Stave;
 
 namespace Calame.Viewer
@@ -55,11 +53,10 @@ namespace Calame.Viewer
             }
         }
 
-        public GlyphEngine Engine => _viewer.Runner.Engine;
         public IEnumerable<ISceneNode> RootScenes => _viewer.Runner.Engine.ProjectionManager.SceneRoots;
+        public IContentLibrary ContentLibrary => _viewer.Runner.Engine.ContentLibrary;
 
         private IGlyphComponent _userParentComponent;
-
         public IGlyphComponent UserParentComponent
         {
             get => _userParentComponent;
@@ -75,10 +72,9 @@ namespace Calame.Viewer
             }
         }
 
-        public DebuggableViewerContexts(ViewerViewModel viewer, ISelectionCommandContext selectionCommandContext)
+        public DebuggableViewerContexts(ViewerViewModel viewer)
         {
             Viewer = viewer;
-            SelectCommand = new SelectionCommand(selectionCommandContext);
         }
 
         public void RefreshContexts()
@@ -97,8 +93,7 @@ namespace Calame.Viewer
             Roots = RootComponents;
             CanSelectChanged?.Invoke(this, EventArgs.Empty);
         }
-
-        public ICommand SelectCommand { get; }
+        
         public event EventHandler CanSelectChanged;
 
         public bool CanSelect(IGlyphComponent component)
@@ -124,25 +119,6 @@ namespace Calame.Viewer
         private bool CanSelectBase(IGlyphComponent component)
         {
             return component != null && !component.GetType().IsValueType;
-        }
-
-        private class SelectionCommand : ICommand
-        {
-            private readonly ISelectionCommandContext _context;
-
-            public SelectionCommand(ISelectionCommandContext context)
-            {
-                _context = context;
-            }
-
-            public event EventHandler CanExecuteChanged
-            {
-                add => _context.CanSelectChanged += value;
-                remove => _context.CanSelectChanged -= value;
-            }
-
-            public bool CanExecute(object parameter) => _context.CanSelect(parameter);
-            public void Execute(object parameter) => _context.SelectAsync(parameter).Wait();
         }
     }
 }

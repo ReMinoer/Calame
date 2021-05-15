@@ -30,7 +30,7 @@ namespace Calame.DataModelViewer.ViewModels
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IRunnableDocument,
-        IDocumentContext<IGlyphData>, IDocumentContext<ISelectionCommandContext<IGlyphData>>, ISelectionCommandContext<IGlyphData>, IRootsContext,
+        IDocumentContext<IGlyphData>, IDocumentContext<ISelectionContext<IGlyphData>>, ISelectionContext<IGlyphData>, IRootsContext,
         IHandle<ISelectionRequest<IGlyphData>>,
         IHandle<ISelectionRequest<IGlyphComponent>>
     {
@@ -58,8 +58,6 @@ namespace Calame.DataModelViewer.ViewModels
         public ICommand DragOverCommand { get; }
         public ICommand DropCommand { get; }
 
-        public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
-
         [ImportingConstructor]
         public DataModelViewerViewModel(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, PathWatcher fileWatcher,
             IImportedTypeProvider importedTypeProvider, SelectionHistoryManager selectionHistoryManager,
@@ -72,7 +70,7 @@ namespace Calame.DataModelViewer.ViewModels
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
 
-            _debuggableViewerContexts = new DebuggableViewerContexts(Viewer, this);
+            _debuggableViewerContexts = new DebuggableViewerContexts(Viewer);
             
             DragOverCommand = new RelayCommand(x => Editor.OnDragOver((DragEventArgs)x));
             DropCommand = new RelayCommand(x => Editor.OnDrop((DragEventArgs)x));
@@ -186,23 +184,21 @@ namespace Calame.DataModelViewer.ViewModels
         }
 
         IDocument IDocumentContext.Document => this;
-        GlyphEngine IDocumentContext<GlyphEngine>.Context => _debuggableViewerContexts.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => _debuggableViewerContexts.Viewer;
+        IContentLibrary IDocumentContext<IContentLibrary>.Context => _debuggableViewerContexts.ContentLibrary;
         IRootComponentsContext IDocumentContext<IRootComponentsContext>.Context => _debuggableViewerContexts;
         IRootScenesContext IDocumentContext<IRootScenesContext>.Context => _debuggableViewerContexts;
         IRootInteractivesContext IDocumentContext<IRootInteractivesContext>.Context => _debuggableViewerContexts;
 
-        ISelectionCommandContext IDocumentContext<ISelectionCommandContext>.Context => this;
-        ISelectionCommandContext<IGlyphComponent> IDocumentContext<ISelectionCommandContext<IGlyphComponent>>.Context => this;
-        ISelectionCommandContext<IGlyphData> IDocumentContext<ISelectionCommandContext<IGlyphData>>.Context => this;
+        ISelectionContext IDocumentContext<ISelectionContext>.Context => this;
+        ISelectionContext<IGlyphComponent> IDocumentContext<ISelectionContext<IGlyphComponent>>.Context => this;
+        ISelectionContext<IGlyphData> IDocumentContext<ISelectionContext<IGlyphData>>.Context => this;
 
         IRootsContext IDocumentContext<IRootsContext>.Context => this;
         public IEnumerable Roots => new []{ Editor.Data };
         IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
 
-        public ICommand SelectCommand => _debuggableViewerContexts.SelectCommand;
-
-        event EventHandler ISelectionCommandContext.CanSelectChanged
+        event EventHandler ISelectionContext.CanSelectChanged
         {
             add => _debuggableViewerContexts.CanSelectChanged += value;
             remove => _debuggableViewerContexts.CanSelectChanged -= value;

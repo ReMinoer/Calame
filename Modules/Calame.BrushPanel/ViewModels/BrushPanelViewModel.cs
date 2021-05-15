@@ -32,7 +32,7 @@ namespace Calame.BrushPanel.ViewModels
         public IIconDescriptor IconDescriptor { get; }
 
         private IBrushViewerModule _viewerModule;
-        private ISelectionCommandContext _selectionCommandContext;
+        private ISelectionContext _selectionContext;
 
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataTreeItemBuilder;
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _componentTreeItemBuilder;
@@ -63,7 +63,7 @@ namespace Calame.BrushPanel.ViewModels
 
                 OnCanvasChanged();
 
-                _selectionCommandContext?.SelectAsync(_selectedCanvas).Wait();
+                _selectionContext?.SelectAsync(_selectedCanvas).Wait();
                 SwitchToBrushModeAsync().Wait();
             }
         }
@@ -130,9 +130,9 @@ namespace Calame.BrushPanel.ViewModels
         {
             ViewerViewModel viewer = activeDocument.Context;
 
-            _selectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
+            _selectionContext = activeDocument.TryGetContext<ISelectionContext>();
             _viewerModule = viewer.Modules.FirstOfTypeOrDefault<IBrushViewerModule>();
-            RootsContext = ((IDocumentContext<IRootsContext>)activeDocument).Context;
+            RootsContext = activeDocument.GetContext<IRootsContext>();
 
             //IBrush previousBrush = _viewerModule.Brush;
             //IPaint previousPaint = _viewerModule.Paint;
@@ -144,8 +144,8 @@ namespace Calame.BrushPanel.ViewModels
             //SelectedBrush = _brushes.FirstOrDefault(x => x == previousBrush);
             //SelectedPaint = SelectedBrush?.Paints.FirstOrDefault(x => x.Paint == previousPaint);
 
-            if (_selectionCommandContext != null)
-                _selectionCommandContext.CanSelectChanged += OnCanSelectChanged;
+            if (_selectionContext != null)
+                _selectionContext.CanSelectChanged += OnCanSelectChanged;
 
             _viewerModule.ApplyEnded += OnBrushApplyEnded;
 
@@ -156,13 +156,13 @@ namespace Calame.BrushPanel.ViewModels
         {
             _viewerModule.ApplyEnded -= OnBrushApplyEnded;
 
-            if (_selectionCommandContext != null)
-                _selectionCommandContext.CanSelectChanged -= OnCanSelectChanged;
+            if (_selectionContext != null)
+                _selectionContext.CanSelectChanged -= OnCanSelectChanged;
 
             HandleSelection(null);
 
             RootsContext = null;
-            _selectionCommandContext = null;
+            _selectionContext = null;
             _viewerModule = null;
 
             return Task.CompletedTask;
@@ -189,7 +189,7 @@ namespace Calame.BrushPanel.ViewModels
         bool ITreeContext.IsMatchingBaseFilter(object model)
         {
             return GetAllBrushesForType(model).Any(brush => brush.IsValidForCanvas(model))
-                && (_selectionCommandContext?.CanSelect(model) ?? true);
+                && (_selectionContext?.CanSelect(model) ?? true);
         }
 
         private void OnCanSelectChanged(object sender, EventArgs e)

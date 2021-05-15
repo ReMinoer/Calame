@@ -59,8 +59,6 @@ namespace Calame.SceneViewer.ViewModels
         public bool FreeCameraEnabled { get; private set; }
         public Type RunCommandDefinitionType { get; } = typeof(ResetSessionCommand);
 
-        public string WorkingDirectory => _engine?.ContentLibrary?.WorkingDirectory;
-
         private IGlyphComponent DefaultSelection => Viewer.UserRoot.Components.FirstOrDefault() ?? Viewer.UserRoot;
 
         [ImportingConstructor]
@@ -78,7 +76,7 @@ namespace Calame.SceneViewer.ViewModels
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
             Viewer.RunnerChanged += ViewerViewModelOnRunnerChanged;
 
-            _debuggableViewerContexts = new DebuggableViewerContexts(Viewer, this);
+            _debuggableViewerContexts = new DebuggableViewerContexts(Viewer);
 
             SessionMode = new SessionModeModule();
             Viewer.InsertInteractiveMode(0, SessionMode);
@@ -261,18 +259,16 @@ namespace Calame.SceneViewer.ViewModels
         }
 
         IDocument IDocumentContext.Document => this;
-        GlyphEngine IDocumentContext<GlyphEngine>.Context => _debuggableViewerContexts.Engine;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => _debuggableViewerContexts.Viewer;
+        IContentLibrary IDocumentContext<IContentLibrary>.Context => _debuggableViewerContexts.ContentLibrary;
         IRootsContext IDocumentContext<IRootsContext>.Context => _debuggableViewerContexts;
         IRootComponentsContext IDocumentContext<IRootComponentsContext>.Context => _debuggableViewerContexts;
         IRootScenesContext IDocumentContext<IRootScenesContext>.Context => _debuggableViewerContexts;
         IRootInteractivesContext IDocumentContext<IRootInteractivesContext>.Context => _debuggableViewerContexts;
-        ISelectionCommandContext IDocumentContext<ISelectionCommandContext>.Context => this;
-        ISelectionCommandContext<IGlyphComponent> IDocumentContext<ISelectionCommandContext<IGlyphComponent>>.Context => this;
+        ISelectionContext IDocumentContext<ISelectionContext>.Context => this;
+        ISelectionContext<IGlyphComponent> IDocumentContext<ISelectionContext<IGlyphComponent>>.Context => this;
 
-        public ICommand SelectCommand => _debuggableViewerContexts.SelectCommand;
-
-        event EventHandler ISelectionCommandContext.CanSelectChanged
+        event EventHandler ISelectionContext.CanSelectChanged
         {
             add => _debuggableViewerContexts.CanSelectChanged += value;
             remove => _debuggableViewerContexts.CanSelectChanged -= value;

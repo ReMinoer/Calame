@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Calame.Commands;
 using Calame.ContentFileTypes;
 using Calame.DocumentContexts;
@@ -13,7 +14,7 @@ using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
-using Glyph.Engine;
+using Glyph;
 using Glyph.Pipeline;
 
 namespace Calame.PropertyGrid.ViewModels
@@ -48,11 +49,11 @@ namespace Calame.PropertyGrid.ViewModels
             private set => SetValue(ref _rawContentLibrary, value);
         }
 
-        private ISelectionCommandContext _selectionCommandContext;
-        public ISelectionCommandContext SelectionCommandContext
+        private ICommand _selectItemCommand;
+        public ICommand SelectItemCommand
         {
-            get => _selectionCommandContext;
-            private set => SetValue(ref _selectionCommandContext, value);
+            get => _selectItemCommand;
+            private set => SetValue(ref _selectItemCommand, value);
         }
 
         public IContentFileTypeResolver ContentFileTypeResolver { get; }
@@ -109,10 +110,10 @@ namespace Calame.PropertyGrid.ViewModels
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
         {
             SelectedObject = null;
-
-            WorkingDirectory = activeDocument.WorkingDirectory;
-            RawContentLibrary = (activeDocument as IDocumentContext<GlyphEngine>)?.Context.ContentLibrary as IRawContentLibrary;
-            SelectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
+            
+            RawContentLibrary = activeDocument.TryGetContext<IContentLibrary>() as IRawContentLibrary;
+            WorkingDirectory = RawContentLibrary?.WorkingDirectory;
+            SelectItemCommand = activeDocument.TryGetContext<ISelectionContext>()?.GetSelectionCommand();
 
             return Task.CompletedTask;
         }
@@ -121,9 +122,9 @@ namespace Calame.PropertyGrid.ViewModels
         {
             SelectedObject = null;
 
+            SelectItemCommand = null;
             WorkingDirectory = null;
             RawContentLibrary = null;
-            SelectionCommandContext = null;
 
             return Task.CompletedTask;
         }

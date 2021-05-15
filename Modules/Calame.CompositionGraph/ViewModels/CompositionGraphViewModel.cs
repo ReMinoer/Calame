@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
@@ -26,7 +27,8 @@ namespace Calame.CompositionGraph.ViewModels
         public IIconDescriptor IconDescriptor { get; }
         
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _treeItemBuilder;
-        private ISelectionCommandContext _selectionCommandContext;
+        private ISelectionContext<IGlyphComponent> _selectionContext;
+        private ICommand _selectionCommand;
 
         private IRootComponentsContext _rootComponentsContext;
         public IRootComponentsContext RootComponentsContext
@@ -44,7 +46,7 @@ namespace Calame.CompositionGraph.ViewModels
                 if (!SetValue(ref _selection, value))
                     return;
 
-                _selectionCommandContext?.SelectAsync(_selection).Wait();
+                _selectionContext.SelectAsync(_selection).Wait();
             }
         }
 
@@ -65,14 +67,16 @@ namespace Calame.CompositionGraph.ViewModels
                                .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
                                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
                                .IconDescription(x => iconDescriptor.GetIcon(x))
-                               .IsEnabled(_ => _selectionCommandContext?.SelectCommand);
+                               .IsEnabled(_ => _selectionCommand);
         }
 
         protected override Task OnDocumentActivated(IDocumentContext<IRootComponentsContext> activeDocument)
         {
             _selection = null;
 
-            _selectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
+            _selectionContext = activeDocument.GetSelectionContext<IGlyphComponent>();
+            _selectionCommand = _selectionContext.GetSelectionCommand();
+
             RootComponentsContext = activeDocument.Context;
 
             return Task.CompletedTask;
@@ -83,7 +87,9 @@ namespace Calame.CompositionGraph.ViewModels
             _selection = null;
 
             RootComponentsContext = null;
-            _selectionCommandContext = null;
+
+            _selectionCommand = null;
+            _selectionContext = null;
 
             return Task.CompletedTask;
         }

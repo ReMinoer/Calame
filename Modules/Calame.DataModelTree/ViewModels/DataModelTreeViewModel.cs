@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
 using Calame.Utils;
@@ -22,6 +23,8 @@ namespace Calame.DataModelTree.ViewModels
         public IIconDescriptor IconDescriptor { get; }
 
         private IGlyphData _root;
+        private ISelectionContext<IGlyphData> _selectionContext;
+
         private IGlyphData _selection;
         private readonly TreeViewItemModelBuilder<IGlyphCreator> _treeItemBuilder;
 
@@ -39,8 +42,7 @@ namespace Calame.DataModelTree.ViewModels
                 if (!SetValue(ref _selection, value))
                     return;
 
-                var selectionRequest = new SelectionRequest<IGlyphData>(CurrentDocument, _selection);
-                EventAggregator.PublishAsync(selectionRequest).Wait();
+                _selectionContext.SelectAsync(_selection).Wait();
             }
         }
 
@@ -66,6 +68,8 @@ namespace Calame.DataModelTree.ViewModels
         protected override Task OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
         {
             _selection = null;
+
+            _selectionContext = activeDocument.GetSelectionContext<IGlyphData>();
             Root = activeDocument.Context;
 
             return Task.CompletedTask;
@@ -74,7 +78,9 @@ namespace Calame.DataModelTree.ViewModels
         protected override Task OnDocumentsCleaned()
         {
             _selection = null;
+
             Root = null;
+            _selectionContext = null;
 
             return Task.CompletedTask;
         }

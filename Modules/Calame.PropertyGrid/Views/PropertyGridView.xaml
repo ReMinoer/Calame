@@ -25,7 +25,7 @@
                                      NextCommand="{Binding NextCommand}"
                                      OpenFileCommand="{Binding OpenFileCommand}"
                                      OpenFolderCommand="{Binding OpenFolderCommand}"
-                                     SelectItemCommand="{Binding SelectionCommandContext.SelectCommand}">
+                                     SelectItemCommand="{Binding SelectItemCommand}">
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="PropertyValueChanged">
                     <b:InvokeCommandAction Command="{Binding DirtyDocumentCommand}" />

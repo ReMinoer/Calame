@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
@@ -34,7 +35,8 @@ namespace Calame.SceneGraph.ViewModels
             set => Set(ref _rootScenesContext, value);
         }
 
-        private ISelectionCommandContext _selectionCommandContext;
+        private ISelectionContext<IGlyphComponent> _selectionContext;
+        private ICommand _selectionCommand;
 
         private IGlyphComponent _selection;
         public IGlyphComponent Selection
@@ -48,7 +50,7 @@ namespace Calame.SceneGraph.ViewModels
                 _selectionNode = _selection?.GetSceneNode();
                 NotifyOfPropertyChange(nameof(SelectionNode));
 
-                _selectionCommandContext?.SelectAsync(_selection).Wait();
+                _selectionContext.SelectAsync(_selection).Wait();
             }
         }
 
@@ -64,7 +66,7 @@ namespace Calame.SceneGraph.ViewModels
                 _selection = _selectionNode?.Parent;
                 NotifyOfPropertyChange(nameof(Selection));
 
-                _selectionCommandContext?.SelectAsync(_selection).Wait();
+                _selectionContext.SelectAsync(_selection).Wait();
             }
         }
 
@@ -87,7 +89,7 @@ namespace Calame.SceneGraph.ViewModels
                                .DisplayName(x => (x as IGlyphComponent)?.Parent?.Name ?? x.ToString(), nameof(IGlyphComponent.Name), x => (x as IGlyphComponent)?.Parent as INotifyPropertyChanged)
                                .ChildrenSource(x => x.Children, nameof(ISceneNode.Children))
                                .IconDescription(x => iconDescriptor.GetIcon((x as IGlyphComponent)?.Parent ?? x as IGlyphComponent))
-                               .IsEnabled(x => _selectionCommandContext?.SelectCommand, x => (x as IGlyphComponent)?.Parent);
+                               .IsEnabled(x => _selectionCommand, x => (x as IGlyphComponent)?.Parent);
         }
 
         protected override Task OnDocumentActivated(IDocumentContext<IRootScenesContext> activeDocument)
@@ -95,25 +97,29 @@ namespace Calame.SceneGraph.ViewModels
             _selection = null;
             _selectionNode = null;
 
-            _selectionCommandContext = (activeDocument as IDocumentContext<ISelectionCommandContext>)?.Context;
+            _selectionContext = activeDocument.GetSelectionContext<IGlyphComponent>();
+            _selectionCommand = _selectionContext.GetSelectionCommand();
+
             RootScenesContext = activeDocument.Context;
 
-            if (_selectionCommandContext != null)
-                _selectionCommandContext.CanSelectChanged += OnCanSelectChanged;
+            if (_selectionContext != null)
+                _selectionContext.CanSelectChanged += OnCanSelectChanged;
 
             return Task.CompletedTask;
         }
 
         protected override Task OnDocumentsCleaned()
         {
-            if (_selectionCommandContext != null)
-                _selectionCommandContext.CanSelectChanged -= OnCanSelectChanged;
+            if (_selectionContext != null)
+                _selectionContext.CanSelectChanged -= OnCanSelectChanged;
 
             _selection = null;
             _selectionNode = null;
 
             RootScenesContext = null;
-            _selectionCommandContext = null;
+
+            _selectionCommand = null;
+            _selectionContext = null;
 
             return Task.CompletedTask;
         }
@@ -140,7 +146,7 @@ namespace Calame.SceneGraph.ViewModels
 
         bool ITreeContext.IsMatchingBaseFilter(object data)
         {
-            return _selectionCommandContext == null || _selectionCommandContext.CanSelect((data as IGlyphComponent)?.Parent);
+            return _selectionContext == null || _selectionContext.CanSelect((data as IGlyphComponent)?.Parent);
         }
 
         private event EventHandler BaseFilterChanged;

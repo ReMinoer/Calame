@@ -17,10 +17,11 @@ using Stave;
 
 namespace Calame.Viewer.Modules
 {
+    // TODO: Fix filtering
     public class BoxedComponentSelectorModule : ViewerModuleBase, IHandle<IDocumentContext<ViewerViewModel>>
     {
         private readonly IEventAggregator _eventAggregator;
-        private ISelectionCommandContext _selectionCommandContext;
+        private ISelectionContext<IGlyphComponent> _selectionContext;
 
         private GlyphObject _root;
         private ShapedObjectSelector _shapedObjectSelector;
@@ -66,9 +67,9 @@ namespace Calame.Viewer.Modules
             _root = null;
         }
 
-        private bool ComponentFilter(IGlyphComponent glyphComponent)
+        private bool ComponentFilter(IGlyphComponent component)
         {
-            return _selectionCommandContext?.CanSelect(glyphComponent) ?? true;
+            return _selectionContext?.CanSelect(component) ?? true;
         }
 
         private async void OnShapedObjectSelectorSelectionChanged(object sender, IBoxedComponent boxedComponent)
@@ -77,15 +78,12 @@ namespace Calame.Viewer.Modules
                 return;
 
             SelectedComponent = boxedComponent?.AllParents().OfType<IBoxedComponent>().First(x => x.Components.AnyOfType<ISceneNodeComponent>());
-
-            if (_selectionCommandContext != null)
-                await _selectionCommandContext.SelectAsync(SelectedComponent);
+            await _selectionContext.SelectAsync(SelectedComponent);
         }
 
         Task IHandle<IDocumentContext<ViewerViewModel>>.HandleAsync(IDocumentContext<ViewerViewModel> message, CancellationToken cancellationToken)
         {
-            _selectionCommandContext = (message as IDocumentContext<ISelectionCommandContext>)?.Context;
-
+            _selectionContext = message.GetSelectionContext<IGlyphComponent>();
             return Task.CompletedTask;
         }
     }

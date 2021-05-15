@@ -4,6 +4,7 @@
     <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Calame\Calame.csproj" />
     <ProjectReference Include="..\External\Glyph\External\Fingear\Fingear\Fingear.csproj" />
     <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
     <ProjectReference Include="..\External\Glyph\Glyph\Glyph.csproj" />
