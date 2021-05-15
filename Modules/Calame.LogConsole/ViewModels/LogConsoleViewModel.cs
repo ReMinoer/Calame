@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Calame.Icons;
-using Calame.LogConsole.Commands;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
@@ -64,10 +63,6 @@ namespace Calame.LogConsole.ViewModels
 
         public List<LogEntry> SelectedLogEntries { get; set; } = new List<LogEntry>();
 
-        public ICommand ClearLogCommand { get; }
-        public ICommand AutoScrollLogCommand { get; }
-        public ICommand ScrollLogToEndCommand { get; }
-
         public ICommand CopySelectedLogCommand { get; }
         public ICommand CopyAllLogCommand { get; }
 
@@ -91,10 +86,6 @@ namespace Calame.LogConsole.ViewModels
                 logTarget.MessageLogged += OnMessageLogged;
 
             HiddenLogLevels.CollectionChanged += OnHiddenLogLevelsChanged;
-
-            ClearLogCommand = commandService.GetTargetableCommand<ClearLogCommand>();
-            AutoScrollLogCommand = commandService.GetTargetableCommand<AutoScrollLogCommand>();
-            ScrollLogToEndCommand = commandService.GetTargetableCommand<ScrollLogToEndCommand>();
 
             CopySelectedLogCommand = new RelayCommand(OnCopySelectedLog, CanCopySelectedLog);
             CopyAllLogCommand = new RelayCommand(OnCopyAllLog, CanCopyAllLog);
