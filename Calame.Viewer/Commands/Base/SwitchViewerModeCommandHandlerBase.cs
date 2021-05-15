@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Viewer.Messages;
+﻿using Calame.Viewer.Messages;
 using Caliburn.Micro;
 using Diese.Collections;
 using Gemini.Framework.Commands;
@@ -17,7 +16,7 @@ namespace Calame.Viewer.Commands.Base
             _eventAggregator = IoC.Get<IEventAggregator>();
         }
 
-        protected override bool CanRun(Command command, IViewerDocument document)
+        protected override bool CanRun(IViewerDocument document)
         {
             return document?.Viewer?.InteractiveModes.AnyOfType<TMode>() ?? false;
         }
@@ -28,10 +27,10 @@ namespace Calame.Viewer.Commands.Base
             command.Checked = document?.Viewer?.SelectedMode is TMode;
         }
 
-        protected override async Task RunAsync(Command command, IViewerDocument document)
+        protected override void Run(IViewerDocument document)
         {
             var interactiveMode = document.Viewer.InteractiveModes.FirstOfType<TMode>();
-            await _eventAggregator.PublishAsync(new SwitchViewerModeRequest(document, interactiveMode));
+            _eventAggregator.PublishAsync(new SwitchViewerModeRequest(document, interactiveMode)).Wait();
         }
     }
 }

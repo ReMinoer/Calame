@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.Composition;
-using System.Threading.Tasks;
 using Calame.Commands.Base;
 using Calame.Icons;
 using Gemini.Framework;
@@ -24,14 +23,14 @@ namespace Calame.Commands
                 _selectionHistoryManager = selectionHistoryManager;
             }
 
-            protected override bool CanRun(Command command, IDocument document)
+            protected override bool CanRun(IDocument document)
             {
                 return _selectionHistoryManager.CurrentDocumentHistory?.HasPrevious ?? false;
             }
 
-            protected override async Task RunAsync(Command command, IDocument document)
+            protected override void Run(IDocument document)
             {
-                await _selectionHistoryManager.CurrentDocumentHistory.SelectPreviousAsync();
+                _selectionHistoryManager.CurrentDocumentHistory.SelectPreviousAsync().Wait();
             }
         }
     }

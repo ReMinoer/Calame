@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Calame.SceneViewer.ViewModels;
 using Gemini.Framework.Commands;
 
@@ -27,11 +26,11 @@ namespace Calame.SceneViewer.Commands.Base
             RefreshContext(command, _session);
         }
 
-        protected override sealed bool CanRun(Command command, SceneViewerViewModel document)
+        protected override sealed bool CanRun(SceneViewerViewModel document)
         {
-            return base.CanRun(command, document)
+            return base.CanRun(document)
                 && _session != null
-                && CanRun(command, _session);
+                && CanRun(_session);
         }
 
         protected override sealed void UpdateStatus(Command command, SceneViewerViewModel document)
@@ -40,14 +39,14 @@ namespace Calame.SceneViewer.Commands.Base
             UpdateStatus(command, _session);
         }
 
-        protected override sealed Task RunAsync(Command command, SceneViewerViewModel document)
+        protected override sealed void Run(SceneViewerViewModel document)
         {
-            return RunAsync(command, _session);
+            Run(_session);
         }
 
         protected virtual void RefreshContext(Command command, TSession session) {}
-        protected virtual bool CanRun(Command command, TSession session) => true;
+        protected virtual bool CanRun(TSession session) => true;
         protected virtual void UpdateStatus(Command command, TSession session) { }
-        protected abstract Task RunAsync(Command command, TSession session);
+        protected abstract void Run(TSession session);
     }
 }

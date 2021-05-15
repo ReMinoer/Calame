@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.LogConsole.ViewModels;
 using Gemini.Framework.Commands;
 using Microsoft.Extensions.Logging;
@@ -97,14 +96,12 @@ namespace Calame.LogConsole.Commands
             command.Checked = !tool.HiddenLogLevels.Contains(LogLevel);
         }
 
-        protected override Task RunAsync(Command command, LogConsoleViewModel tool)
+        protected override void Run(LogConsoleViewModel tool)
         {
             if (tool.HiddenLogLevels.Contains(LogLevel))
                 tool.HiddenLogLevels.Remove(LogLevel);
             else
                 tool.HiddenLogLevels.Add(LogLevel);
-
-            return Task.CompletedTask;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.Icons;
 using Calame.SceneViewer.Commands.Base;
 using Calame.SceneViewer.ViewModels;
@@ -22,10 +21,9 @@ namespace Calame.SceneViewer.Commands
                 command.Checked = document?.FreeCameraEnabled == true;
             }
 
-            protected override Task RunAsync(Command command, SceneViewerViewModel document)
+            protected override void Run(SceneViewerViewModel document)
             {
                 document.EnableFreeCamera();
-                return Task.CompletedTask;
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.Icons;
 using Calame.SceneViewer.Commands.Base;
 using Calame.SceneViewer.ViewModels;
@@ -23,7 +22,7 @@ namespace Calame.SceneViewer.Commands
                 command.Checked = document?.Viewer?.Runner?.Engine?.IsPaused == true;
             }
 
-            protected override Task RunAsync(Command command, SceneViewerViewModel document)
+            protected override void Run(SceneViewerViewModel document)
             {
                 GlyphEngine engine = document.Viewer.Runner.Engine;
 
@@ -31,8 +30,6 @@ namespace Calame.SceneViewer.Commands
                     engine.Pause();
                 else
                     engine.Start();
-
-                return Task.CompletedTask;
             }
         }
     }

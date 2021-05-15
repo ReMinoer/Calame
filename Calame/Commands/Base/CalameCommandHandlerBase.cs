@@ -9,19 +9,23 @@ namespace Calame.Commands.Base
         public override sealed void Update(Command command)
         {
             RefreshContext(command);
-            command.Enabled = CanRun(command);
+            command.Enabled = CanRun();
             UpdateStatus(command);
         }
 
-        public override sealed async Task Run(Command command)
+        public override sealed Task Run(Command command)
         {
-            if (CanRun(command))
-                await RunAsync(command);
+            // CommandHandlerBase is using async void to run a task.
+            // We will run it synchronously to prevent simultaneous accesses and not caught exceptions.
+            if (CanRun())
+                Run();
+
+            return Task.CompletedTask;
         }
 
         protected virtual void RefreshContext(Command command) { }
-        protected virtual bool CanRun(Command command) => true;
+        protected virtual bool CanRun() => true;
         protected virtual void UpdateStatus(Command command) { }
-        protected abstract Task RunAsync(Command command);
+        protected abstract void Run();
     }
 }

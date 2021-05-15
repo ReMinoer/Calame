@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Calame.Commands.Base;
 using Calame.Icons;
 using Caliburn.Micro;
@@ -19,6 +18,7 @@ namespace Calame.Commands
             private Type _runCommandDefinitionType;
             private CommandDefinitionBase _runCommandDefinition;
             private CommandHandlerWrapper _commandHandler;
+            private Command _command;
 
             private ICommandService _commandService;
             private ICommandRouter _commandRouter;
@@ -26,6 +26,8 @@ namespace Calame.Commands
             protected override void RefreshContext(Command command, IRunnableDocument document)
             {
                 base.RefreshContext(command, document);
+
+                _command = command;
 
                 if (_runCommandDefinitionType != Document?.RunCommandDefinitionType)
                 {
@@ -62,16 +64,16 @@ namespace Calame.Commands
                 _commandHandler?.Update(command);
             }
 
-            protected override bool CanRun(Command command, IRunnableDocument document)
+            protected override bool CanRun(IRunnableDocument document)
             {
-                return base.CanRun(command, document)
+                return base.CanRun(document)
                     && _commandHandler != null
-                    && command.Enabled;
+                    && _command.Enabled;
             }
 
-            protected override Task RunAsync(Command command, IRunnableDocument document)
+            protected override void Run(IRunnableDocument document)
             {
-                return _commandHandler.Run(command);
+                _commandHandler.Run(_command).Wait();
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.Icons;
 using Calame.Viewer.Commands.Base;
 using Gemini.Framework.Commands;
@@ -15,11 +14,10 @@ namespace Calame.Viewer.Commands
         [CommandHandler]
         public class CommandHandler : ViewerDocumentCommandHandlerBase<IViewerDocument, ResetCameraCommand>
         {
-            protected override Task RunAsync(Command command, IViewerDocument document)
+            protected override void Run(IViewerDocument document)
             {
                 document.EnableFreeCamera();
                 document.Viewer.EditorCamera.ShowTarget(document.Viewer.UserRoot);
-                return Task.CompletedTask;
             }
         }
     }

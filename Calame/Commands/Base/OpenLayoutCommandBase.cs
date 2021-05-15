@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
@@ -16,13 +15,12 @@ namespace Calame.Commands.Base
             _shell = IoC.Get<IShell>();
         }
 
-        protected override Task RunAsync(Command command)
+        protected override void Run()
         {
             foreach (ITool tool in _shell.Tools)
                 tool.IsVisible = false;
 
             OpenLayout(_shell);
-            return Task.CompletedTask;
         }
 
         protected abstract void OpenLayout(IShell shell);

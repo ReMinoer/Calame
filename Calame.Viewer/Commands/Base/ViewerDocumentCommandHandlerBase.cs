@@ -7,9 +7,9 @@ namespace Calame.Viewer.Commands.Base
         where TViewerDocument : class, IViewerDocument
         where TCommandDefinition : CommandDefinition
     {
-        protected override bool CanRun(Command command, TViewerDocument document)
+        protected override bool CanRun(TViewerDocument document)
         {
-            return base.CanRun(command, document)
+            return base.CanRun(document)
                 && (document.Viewer.Runner?.Engine?.IsStarted ?? false);
         }
     }

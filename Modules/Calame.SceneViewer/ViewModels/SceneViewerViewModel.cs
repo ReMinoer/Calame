@@ -125,7 +125,7 @@ namespace Calame.SceneViewer.ViewModels
             CommandManager.InvalidateRequerySuggested();
         }
 
-        public async Task ResetSession()
+        public async Task ResetSessionAsync()
         {
             await EventAggregator.PublishAsync(SelectionRequest<IGlyphComponent>.Empty(this));
 

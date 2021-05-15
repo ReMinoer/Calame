@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.Icons;
 using Calame.LogConsole.ViewModels;
 using Gemini.Framework.Commands;
@@ -15,17 +14,16 @@ namespace Calame.LogConsole.Commands
         [CommandHandler]
         public class CommandHandler : ToolCommandHandlerBase<LogConsoleViewModel, ClearLogCommand>
         {
-            protected override bool CanRun(Command command, LogConsoleViewModel tool)
+            protected override bool CanRun(LogConsoleViewModel tool)
             {
-                return base.CanRun(command, tool)
+                return base.CanRun(tool)
                     && tool.CurrentDocumentLogEntries != null
                     && tool.CurrentDocumentLogEntries.Count > 0;
             }
 
-            protected override Task RunAsync(Command command, LogConsoleViewModel tool)
+            protected override void Run(LogConsoleViewModel tool)
             {
                 tool.CurrentDocumentLogEntries?.Clear();
-                return Task.CompletedTask;
             }
         }
     }

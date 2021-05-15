@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Calame.DataModelViewer.ViewModels;
 using Gemini.Framework.Commands;
 
@@ -27,11 +26,11 @@ namespace Calame.DataModelViewer.Commands.Base
             RefreshContext(command, _editor);
         }
 
-        protected override sealed bool CanRun(Command command, DataModelViewerViewModel document)
+        protected override sealed bool CanRun(DataModelViewerViewModel document)
         {
-            return base.CanRun(command, document)
+            return base.CanRun(document)
                 && _editor != null
-                && CanRun(command, _editor);
+                && CanRun(_editor);
         }
 
         protected override sealed void UpdateStatus(Command command, DataModelViewerViewModel document)
@@ -40,14 +39,14 @@ namespace Calame.DataModelViewer.Commands.Base
             UpdateStatus(command, _editor);
         }
 
-        protected override sealed Task RunAsync(Command command, DataModelViewerViewModel document)
+        protected override sealed void Run(DataModelViewerViewModel document)
         {
-            return RunAsync(command, _editor);
+            Run(_editor);
         }
 
         protected virtual void RefreshContext(Command command, TEditor editor) {}
-        protected virtual bool CanRun(Command command, TEditor editor) => true;
+        protected virtual bool CanRun(TEditor editor) => true;
         protected virtual void UpdateStatus(Command command, TEditor editor) { }
-        protected abstract Task RunAsync(Command command, TEditor editor);
+        protected abstract void Run(TEditor editor);
     }
 }

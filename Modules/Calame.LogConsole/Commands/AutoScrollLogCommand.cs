@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.Icons;
 using Calame.LogConsole.ViewModels;
 using Gemini.Framework.Commands;
@@ -21,10 +20,9 @@ namespace Calame.LogConsole.Commands
                 command.Checked = tool.AutoScroll;
             }
 
-            protected override Task RunAsync(Command command, LogConsoleViewModel tool)
+            protected override void Run(LogConsoleViewModel tool)
             {
                 tool.AutoScroll = !tool.AutoScroll;
-                return Task.CompletedTask;
             }
         }
     }

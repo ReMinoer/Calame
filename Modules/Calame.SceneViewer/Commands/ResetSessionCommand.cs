@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Calame.Commands.Base;
+﻿using Calame.Commands.Base;
 using Calame.Icons;
 using Calame.SceneViewer.Commands.Base;
 using Calame.SceneViewer.ViewModels;
@@ -16,10 +15,9 @@ namespace Calame.SceneViewer.Commands
         [CommandHandler]
         public class CommandHandler : SceneViewerCommandHandlerBase<ResetSessionCommand>
         {
-            protected override Task RunAsync(Command command, SceneViewerViewModel document)
+            protected override void Run(SceneViewerViewModel document)
             {
-                document.ResetSession();
-                return Task.CompletedTask;
+                document.ResetSessionAsync().Wait();
             }
         }
     }

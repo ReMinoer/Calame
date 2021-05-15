@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
@@ -31,11 +30,11 @@ namespace Calame.Commands.Base
             RefreshContext(command, Document);
         }
 
-        protected override sealed bool CanRun(Command command)
+        protected override sealed bool CanRun()
         {
-            return base.CanRun(command)
+            return base.CanRun()
                 && Document != null
-                && CanRun(command, Document);
+                && CanRun(Document);
         }
 
         protected override sealed void UpdateStatus(Command command)
@@ -44,17 +43,15 @@ namespace Calame.Commands.Base
             UpdateStatus(command, Document);
         }
 
-        protected override sealed Task RunAsync(Command command)
+        protected override sealed void Run()
         {
             if (Document != null)
-                return RunAsync(command, Document);
-
-            return Task.CompletedTask;
+                Run(Document);
         }
 
         protected virtual void RefreshContext(Command command, TDocument document) { }
-        protected virtual bool CanRun(Command command, TDocument document) => true;
+        protected virtual bool CanRun(TDocument document) => true;
         protected virtual void UpdateStatus(Command command, TDocument document) { }
-        protected abstract Task RunAsync(Command command, TDocument document);
+        protected abstract void Run(TDocument document);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Linq;
+﻿using System.Linq;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
@@ -29,10 +28,10 @@ namespace Calame.Commands.Base
             RefreshContext(command, Tool);
         }
 
-        protected override sealed bool CanRun(Command command)
+        protected override sealed bool CanRun()
         {
-            return base.CanRun(command)
-                && CanRun(command, Tool);
+            return base.CanRun()
+                && CanRun(Tool);
         }
 
         protected override sealed void UpdateStatus(Command command)
@@ -41,15 +40,15 @@ namespace Calame.Commands.Base
             UpdateStatus(command, Tool);
         }
 
-        protected override sealed Task RunAsync(Command command)
+        protected override sealed void Run()
         {
             Shell.ShowTool(Tool);
-            return RunAsync(command, Tool);
+            Run(Tool);
         }
 
         protected virtual void RefreshContext(Command command, TTool tool) { }
-        protected virtual bool CanRun(Command command, TTool tool) => true;
+        protected virtual bool CanRun(TTool tool) => true;
         protected virtual void UpdateStatus(Command command, TTool tool) { }
-        protected abstract Task RunAsync(Command command, TTool tool);
+        protected abstract void Run(TTool tool);
     }
 }
