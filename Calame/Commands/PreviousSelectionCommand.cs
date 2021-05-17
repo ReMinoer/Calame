@@ -9,7 +9,7 @@ namespace Calame.Commands
     [CommandDefinition]
     public class PreviousSelectionCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Previous Selection";
+        public override string Text => "_Previous Selection";
         public override object IconKey => CalameIconKey.Previous;
 
         [CommandHandler]

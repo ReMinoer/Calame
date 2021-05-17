@@ -4,10 +4,31 @@ using Calame.Commands;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Menus;
 using Gemini.Framework.ToolBars;
-using Gemini.Modules.MainMenu;
+using Gemini.Modules.Shell.Commands;
+using Gemini.Modules.UndoRedo;
+using MenuDefinitions = Gemini.Modules.MainMenu.MenuDefinitions;
 
 namespace Calame
 {
+    static public class ExcludedMenus
+    {
+        [Export]
+        static public ExcludeMenuDefinition ExcludeViewMenu = new ExcludeMenuDefinition(MenuDefinitions.ViewMenu);
+        [Export]
+        static public ExcludeMenuDefinition ExcludeToolsMenu = new ExcludeMenuDefinition(MenuDefinitions.ToolsMenu);
+        [Export]
+        static public ExcludeMenuDefinition ExcludeWindowMenu = new ExcludeMenuDefinition(MenuDefinitions.WindowMenu);
+
+        [Export]
+        static public ExcludeMenuItemGroupDefinition ExcludeUndoRedo = new ExcludeMenuItemGroupDefinition(MenuDefinitions.EditUndoRedoMenuGroup);
+    }
+
+    static public class ExcludedToolsBars
+    {
+        [Export]
+        static public ExcludeToolBarItemGroupDefinition ExcludeUndoRedo = new ExcludeToolBarItemGroupDefinition(ToolBarDefinitions.StandardUndoRedoToolBarGroup);
+    }
+
     static public class CalameToolBars
     {
         [Export]
@@ -21,46 +42,42 @@ namespace Calame
     static public class CalameMenus
     {
         [Export]
-        static public MenuItemGroupDefinition LayoutGroup = new MenuItemGroupDefinition(MenuDefinitions.WindowMenu, -100);
+        static public MenuItemGroupDefinition SelectionHistoryGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 0);
         [Export]
-        static public MenuItemDefinition SaveLayout = new CommandMenuItemDefinition<SaveLayoutCommand>(LayoutGroup, 0);
+        static public MenuItemDefinition PreviousSelection = new CommandMenuItemDefinition<PreviousSelectionCommand>(SelectionHistoryGroup, 0);
         [Export]
-        static public MenuItemDefinition ReloadLayout = new CommandMenuItemDefinition<ReloadLayoutCommand>(LayoutGroup, 10);
+        static public MenuItemDefinition NextSelection = new CommandMenuItemDefinition<NextSelectionCommand>(SelectionHistoryGroup, 0);
 
         [Export]
-        static public MenuItemGroupDefinition LayoutPresetsGroup = new MenuItemGroupDefinition(MenuDefinitions.ViewMenu, -100);
-        [Export]
-        static public MenuItemDefinition LayoutPresetsSubMenu = new TextMenuItemDefinition(LayoutPresetsGroup, 0, "Presets");
-        [Export]
-        static public MenuItemGroupDefinition LayoutPresetSubMenuAllToolsGroup = new MenuItemGroupDefinition(LayoutPresetsSubMenu, 0);
-        [Export]
-        static public MenuItemDefinition AllToolsCommand = new CommandMenuItemDefinition<AllToolsPresetCommand>(LayoutPresetSubMenuAllToolsGroup, -100);
-        [Export]
-        static public MenuItemGroupDefinition LayoutPresetsSubMenuGroup = new MenuItemGroupDefinition(LayoutPresetsSubMenu, 100);
-
-        [Export]
-        static public MenuDefinition ExecuteMenu = new MenuDefinition(MenuDefinitions.MainMenuBar, 6, "Execute");
+        static public MenuDefinition ExecuteMenu = new MenuDefinition(MenuDefinitions.MainMenuBar, 100, "E_xecute");
         [Export]
         static public MenuItemGroupDefinition RunGroup = new MenuItemGroupDefinition(ExecuteMenu, 0);
         [Export]
         static public MenuItemDefinition RunDocument = new CommandMenuItemDefinition<RunDocumentCommand>(RunGroup, 0);
 
         [Export]
-        static public MenuItemGroupDefinition ToolsSubMenuGroup = new MenuItemGroupDefinition(MenuDefinitions.ToolsMenu, 0);
+        static public MenuDefinition WindowMenu = new MenuDefinition(MenuDefinitions.MainMenuBar, 200, "_Window");
+        [Export]
+        static public MenuItemGroupDefinition WindowLayoutGroup = new MenuItemGroupDefinition(WindowMenu, 0);
+        [Export]
+        static public MenuItemGroupDefinition WindowPresetsGroup = new MenuItemGroupDefinition(WindowMenu, 100);
+        [Export]
+        static public MenuItemGroupDefinition WindowToolsGroup = new MenuItemGroupDefinition(WindowMenu, 200);
+        [Export]
+        static public MenuItemGroupDefinition WindowDocumentsGroup = new MenuItemGroupDefinition(WindowMenu, 300);
 
         [Export]
-        static public MenuItemGroupDefinition SelectionHistoryGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 10);
+        static public MenuItemDefinition ReloadLayout = new CommandMenuItemDefinition<ReloadLayoutCommand>(WindowLayoutGroup, 0);
         [Export]
-        static public MenuItemDefinition PreviousSelection = new CommandMenuItemDefinition<PreviousSelectionCommand>(SelectionHistoryGroup, 0);
+        static public MenuItemDefinition SaveLayout = new CommandMenuItemDefinition<SaveLayoutCommand>(WindowLayoutGroup, 10);
         [Export]
-        static public MenuItemDefinition NextSelection = new CommandMenuItemDefinition<NextSelectionCommand>(SelectionHistoryGroup, 0);
+        static public MenuItemDefinition DefaultPresetCommand = new CommandMenuItemDefinition<DefaultPresetCommand>(WindowPresetsGroup, 0);
+        [Export]
+        public static MenuItemDefinition WindowDocumentList = new CommandMenuItemDefinition<SwitchToDocumentCommandListDefinition>(WindowDocumentsGroup, 0);
     }
 
     static public class CalameShortcuts
     {
-        [Export]
-        static public CommandKeyboardShortcut RunSession = new CommandKeyboardShortcut<RunDocumentCommand>(new KeyGesture(Key.F5));
-
         [Export]
         static public CommandKeyboardShortcut PreviousSelection = new CommandKeyboardShortcut<PreviousSelectionCommand>(new KeyGesture(Key.PageUp, ModifierKeys.Control));
         [Export]
@@ -69,5 +86,8 @@ namespace Calame
         static public CommandKeyboardShortcut NextSelection = new CommandKeyboardShortcut<NextSelectionCommand>(new KeyGesture(Key.PageDown, ModifierKeys.Control));
         [Export]
         static public CommandKeyboardShortcut NextSelectionBrowser = new CommandKeyboardShortcut<NextSelectionCommand>(new KeyGesture(Key.BrowserForward));
+
+        [Export]
+        static public CommandKeyboardShortcut RunSession = new CommandKeyboardShortcut<RunDocumentCommand>(new KeyGesture(Key.F5));
     }
 }

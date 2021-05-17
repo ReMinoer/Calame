@@ -9,7 +9,7 @@ namespace Calame.SceneViewer.Commands
     [CommandDefinition]
     public class SessionModeCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Session Mode";
+        public override string Text => "_Session Mode";
         public override object IconKey => CalameIconKey.SessionMode;
 
         [CommandHandler]

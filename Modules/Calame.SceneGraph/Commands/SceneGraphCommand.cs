@@ -8,7 +8,7 @@ namespace Calame.SceneGraph.Commands
     [CommandDefinition]
     public class SceneGraphCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Scene _Graph";
+        public override string Text => "_Scene Graph";
         public override object IconKey => CalameIconKey.SceneGraph;
 
         [CommandHandler]

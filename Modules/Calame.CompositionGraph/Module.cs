@@ -5,7 +5,6 @@ using Calame.CompositionGraph.Commands;
 using Calame.CompositionGraph.ViewModels;
 using Gemini.Framework;
 using Gemini.Framework.Menus;
-using Gemini.Modules.MainMenu;
 
 namespace Calame.CompositionGraph
 {
@@ -13,7 +12,7 @@ namespace Calame.CompositionGraph
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<CompositionGraphCommand>(MenuDefinitions.ViewToolsMenuGroup, 3);
+        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<CompositionGraphCommand>(CalameMenus.WindowToolsGroup, 3);
 
         public override IEnumerable<Type> DefaultTools
         {

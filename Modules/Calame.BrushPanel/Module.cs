@@ -9,7 +9,6 @@ using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Menus;
 using Gemini.Framework.ToolBars;
-using Gemini.Modules.MainMenu;
 
 namespace Calame.BrushPanel
 {
@@ -17,7 +16,7 @@ namespace Calame.BrushPanel
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<BrushPanelCommand>(MenuDefinitions.ViewToolsMenuGroup, 3);
+        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<BrushPanelCommand>(CalameMenus.WindowToolsGroup, 3);
 
         [Export]
         static public ToolBarItemDefinition ViewerToolBarItem = new CommandToolBarItemDefinition<BrushModeCommand>(ViewerToolBar.ModesGroup, 10);

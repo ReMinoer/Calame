@@ -21,7 +21,9 @@ namespace Calame.SceneViewer
 
         public ISession[] Sessions { get; }
         public IDataSession[] DataSessions { get; }
-        public IEnumerable<EditorFileType> FileTypes => Sessions.Select(x => new EditorFileType(x.DisplayName, null, _iconProvider.GetUri(_iconDescriptor.GetIcon(x), 16)));
+
+        public IEnumerable<EditorFileType> FileTypes =>
+            Sessions.Where(x => x.ShowAsNewFileType).Select(x => new EditorFileType(x.DisplayName, null, _iconProvider.GetUri(_iconDescriptor.GetIcon(x), 16)));
 
         bool IEditorProvider.CanCreateNew => true;
 

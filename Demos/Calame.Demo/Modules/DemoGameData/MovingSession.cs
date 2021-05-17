@@ -22,6 +22,8 @@ namespace Calame.Demo.Modules.DemoGameData
     public class MovingSession : ISession
     {
         public string DisplayName => "Moving Demo";
+        public bool ShowAsNewFileType => true;
+
         public IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService, ILogger logger) => new UnusedContentLibrary();
 
         private const string GameViewRootKey = nameof(GameViewRootKey);

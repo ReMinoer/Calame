@@ -6,7 +6,6 @@ using Calame.DataModelTree.Commands;
 using Calame.DataModelTree.ViewModels;
 using Gemini.Framework;
 using Gemini.Framework.Menus;
-using Gemini.Modules.MainMenu;
 using Microsoft.Extensions.Logging;
 using Simulacra.IO.Binding;
 
@@ -16,7 +15,7 @@ namespace Calame.DataModelTree
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<DataModelTreeCommand>(MenuDefinitions.ViewToolsMenuGroup, 3);
+        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<DataModelTreeCommand>(CalameMenus.WindowToolsGroup, 3);
 
         public override IEnumerable<Type> DefaultTools
         {

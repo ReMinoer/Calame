@@ -3,6 +3,7 @@
     public enum CalameIconKey
     {
         // Tools
+        DefaultPreset,
         BrushPanel,
         CompositionGraph,
         DataModelTree,

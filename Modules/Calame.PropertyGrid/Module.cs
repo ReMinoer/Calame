@@ -5,7 +5,6 @@ using Calame.PropertyGrid.Commands;
 using Calame.PropertyGrid.ViewModels;
 using Gemini.Framework;
 using Gemini.Framework.Menus;
-using Gemini.Modules.MainMenu;
 
 namespace Calame.PropertyGrid
 {
@@ -13,7 +12,7 @@ namespace Calame.PropertyGrid
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<PropertyGridCommand>(MenuDefinitions.ViewToolsMenuGroup, 3);
+        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<PropertyGridCommand>(CalameMenus.WindowToolsGroup, 3);
 
         public override IEnumerable<Type> DefaultTools
         {

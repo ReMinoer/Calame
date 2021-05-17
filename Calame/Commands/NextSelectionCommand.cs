@@ -9,7 +9,7 @@ namespace Calame.Commands
     [CommandDefinition]
     public class NextSelectionCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Next Selection";
+        public override string Text => "_Next Selection";
         public override object IconKey => CalameIconKey.Next;
 
         [CommandHandler]

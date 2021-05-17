@@ -5,7 +5,6 @@ using Calame.LogConsole.Commands;
 using Calame.LogConsole.ViewModels;
 using Gemini.Framework;
 using Gemini.Framework.Menus;
-using Gemini.Modules.MainMenu;
 
 namespace Calame.LogConsole
 {
@@ -13,7 +12,7 @@ namespace Calame.LogConsole
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<LogConsoleCommand>(MenuDefinitions.ViewToolsMenuGroup, 3);
+        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<LogConsoleCommand>(CalameMenus.WindowToolsGroup, 3);
         
         public override IEnumerable<Type> DefaultTools
         {

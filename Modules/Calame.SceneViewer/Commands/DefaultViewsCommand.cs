@@ -9,7 +9,7 @@ namespace Calame.SceneViewer.Commands
     [CommandDefinition]
     public class DefaultCameraCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Default Camera";
+        public override string Text => "_Default Camera";
         public override object IconKey => CalameIconKey.DefaultCamera;
 
         [CommandHandler]

@@ -5,7 +5,6 @@ using Calame.InteractionTree.Commands;
 using Calame.InteractionTree.ViewModels;
 using Gemini.Framework;
 using Gemini.Framework.Menus;
-using Gemini.Modules.MainMenu;
 
 namespace Calame.InteractionTree
 {
@@ -13,7 +12,7 @@ namespace Calame.InteractionTree
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<InteractionTreeCommand>(MenuDefinitions.ViewToolsMenuGroup, 3);
+        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<InteractionTreeCommand>(CalameMenus.WindowToolsGroup, 3);
 
         public override IEnumerable<Type> DefaultTools
         {

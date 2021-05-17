@@ -9,7 +9,7 @@ namespace Calame.SceneViewer.Commands
     [CommandDefinition]
     public class FreeCameraCommand : CalameCommandDefinitionBase
     {
-        public override string Text => "Free Camera";
+        public override string Text => "_Free Camera";
         public override object IconKey => CalameIconKey.FreeCamera;
 
         [CommandHandler]
