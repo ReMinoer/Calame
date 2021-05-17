@@ -17,8 +17,8 @@ namespace Calame
         private readonly IIconProvider _iconProvider;
         private readonly IIconDescriptor _iconDescriptor;
 
-        private BitmapImage _bitmapImage;
-        public override sealed ImageSource IconSource => _bitmapImage;
+        private Uri _iconSource;
+        public override sealed Uri IconSource => _iconSource;
         protected virtual object IconKey { get; }
 
         public CalameDocumentBase(IEventAggregator eventAggregator, ILoggerProvider loggerProvider, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
@@ -36,18 +36,8 @@ namespace Calame
 
         protected void RefreshIcon()
         {
-            BitmapImage bitmapImage = null;
-
             Uri uri = _iconProvider.GetUri(_iconDescriptor.GetIcon(IconKey ?? this), 16);
-            if (uri != null)
-            {
-                bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.UriSource = uri;
-                bitmapImage.EndInit();
-            }
-
-            Set(ref _bitmapImage, bitmapImage, nameof(IconSource));
+            Set(ref _iconSource, uri, nameof(IconSource));
         }
 
         protected abstract Task DisposeDocumentAsync();
