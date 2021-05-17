@@ -23,6 +23,8 @@ namespace Calame.SceneViewer
         public IDataSession[] DataSessions { get; }
         public IEnumerable<EditorFileType> FileTypes => Sessions.Select(x => new EditorFileType(x.DisplayName, null, _iconProvider.GetUri(_iconDescriptor.GetIcon(x), 16)));
 
+        bool IEditorProvider.CanCreateNew => true;
+
         [ImportingConstructor]
         public SessionProvider(CompositionContainer compositionContainer, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
             [ImportMany] ISession[] sessions = null, [ImportMany] IDataSession[] dataSession = null)

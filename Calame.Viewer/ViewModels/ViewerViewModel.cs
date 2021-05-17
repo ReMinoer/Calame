@@ -241,10 +241,12 @@ namespace Calame.Viewer.ViewModels
                 await _eventAggregator.PublishAsync(LastSelection);
         }
 
-        private void OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)
+        private Task OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)
         {
             if (Runner?.Engine != null && Runner.Engine.FocusedClient == Client)
                 Runner.Engine.FocusedClient = null;
+
+            return Task.CompletedTask;
         }
 
         public void Dispose()

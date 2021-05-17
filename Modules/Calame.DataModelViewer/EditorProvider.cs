@@ -20,6 +20,8 @@ namespace Calame.DataModelViewer
 
         public List<IEditorSource> Editors { get; } = new List<IEditorSource>();
         public IEnumerable<EditorFileType> FileTypes => Editors.SelectMany(x => x.FileExtensions.Select(e => new EditorFileType(x.DisplayName, e, _iconProvider.GetUri(_iconDescriptor.GetIcon(x), 16))));
+        
+        bool IEditorProvider.CanCreateNew => true;
 
         [ImportingConstructor]
         public EditorProvider(CompositionContainer compositionContainer, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager,
