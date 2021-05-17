@@ -21,6 +21,24 @@ namespace Calame
     static public class CalameMenus
     {
         [Export]
+        static public MenuItemGroupDefinition LayoutGroup = new MenuItemGroupDefinition(MenuDefinitions.WindowMenu, -100);
+        [Export]
+        static public MenuItemDefinition SaveLayout = new CommandMenuItemDefinition<SaveLayoutCommand>(LayoutGroup, 0);
+        [Export]
+        static public MenuItemDefinition ReloadLayout = new CommandMenuItemDefinition<ReloadLayoutCommand>(LayoutGroup, 10);
+
+        [Export]
+        static public MenuItemGroupDefinition LayoutPresetsGroup = new MenuItemGroupDefinition(MenuDefinitions.ViewMenu, -100);
+        [Export]
+        static public MenuItemDefinition LayoutPresetsSubMenu = new TextMenuItemDefinition(LayoutPresetsGroup, 0, "Presets");
+        [Export]
+        static public MenuItemGroupDefinition LayoutPresetSubMenuAllToolsGroup = new MenuItemGroupDefinition(LayoutPresetsSubMenu, 0);
+        [Export]
+        static public MenuItemDefinition AllToolsCommand = new CommandMenuItemDefinition<AllToolsPresetCommand>(LayoutPresetSubMenuAllToolsGroup, -100);
+        [Export]
+        static public MenuItemGroupDefinition LayoutPresetsSubMenuGroup = new MenuItemGroupDefinition(LayoutPresetsSubMenu, 100);
+
+        [Export]
         static public MenuDefinition ExecuteMenu = new MenuDefinition(MenuDefinitions.MainMenuBar, 6, "Execute");
         [Export]
         static public MenuItemGroupDefinition RunGroup = new MenuItemGroupDefinition(ExecuteMenu, 0);
