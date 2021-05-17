@@ -79,7 +79,7 @@ namespace Calame.Viewer.ViewModels
 
                     _viewerModeToggle.Clear();
 
-                    foreach (IViewerModule module in Modules)
+                    foreach (IViewerModule module in Modules.Reverse())
                         module.Disconnect();
                     
                     NotSelectableComponents.Clear();
