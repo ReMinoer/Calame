@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework;
@@ -26,6 +24,9 @@ namespace Calame
         protected virtual object IconKey { get; }
 
         public THandledDocument CurrentDocument { get; private set; }
+
+        public override double PreferredWidth => PreferredLocation == PaneLocation.Right ? 450 : 350;
+        public override double PreferredHeight => 300;
 
         protected CalameTool(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
         {
