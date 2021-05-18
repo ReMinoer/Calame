@@ -38,8 +38,13 @@ namespace Calame.UserControls
             var treeView = (CalameTreeView)d;
             var itemsSource = (IEnumerable)e.NewValue;
 
+            object currentlySelectedItem = treeView.SelectedItem;
+            treeView.SelectedTreeItem = null;
+
             treeView._synchronizer.Reference = itemsSource != null ? new EnumerableReadOnlyObservableList(itemsSource) : null;
-            treeView.UpdateFilter(forceExpand: true);
+            treeView.UpdateFilter(forceExpandOrCollapse: true);
+
+            treeView.SelectedItem = currentlySelectedItem;
         }
 
         ITreeViewItemModel ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.CreateItem(object referenceItem)
@@ -68,18 +73,22 @@ namespace Calame.UserControls
             var oldValue = (ITreeContext)e.OldValue;
             var newValue = (ITreeContext)e.NewValue;
 
+            object currentlySelectedItem = treeView.SelectedItem;
+
             if (oldValue != null)
             {
                 oldValue.BaseFilterChanged -= treeView.OnBaseFilterChanged;
 
+                treeView.SelectedItem = null;
                 treeView._synchronizer.Unsubscribe(treeView._treeItems);
             }
 
             if (newValue != null)
             {
                 treeView._synchronizer.Subscribe(treeView._treeItems);
-                treeView.UpdateFilter(forceExpand: true);
+                treeView.SelectedItem = currentlySelectedItem;
 
+                treeView.UpdateFilter(forceExpandOrCollapse: true);
                 newValue.BaseFilterChanged += treeView.OnBaseFilterChanged;
             }
         }
@@ -98,6 +107,12 @@ namespace Calame.UserControls
             var control = (CalameTreeView)d;
             object value = e.NewValue;
 
+            if (value == null)
+            {
+                control.SelectedTreeItem = null;
+                return;
+            }
+            
             control.SelectedTreeItem = control.TreeItems.SelectMany(x => Tree.BreadthFirst(x, y => y.Children)).FirstOrDefault(y => y.Data == value);
         }
 
@@ -120,7 +135,7 @@ namespace Calame.UserControls
         }
         
         private readonly ObservableListSynchronizer<object, ITreeViewItemModel> _synchronizer;
-        private ObservableList<ITreeViewItemModel> _treeItems;
+        private readonly ObservableList<ITreeViewItemModel> _treeItems;
         public IReadOnlyObservableList<ITreeViewItemModel> TreeItems { get; }
 
         private ITreeViewItemModel _selectedTreeItem;
@@ -152,7 +167,7 @@ namespace Calame.UserControls
                     SelectedItem = null;
 
                 _filterText = value;
-                UpdateFilter(forceExpand: true);
+                UpdateFilter(forceExpandOrCollapse: true);
                 NotifyPropertyChanged();
             }
         }
@@ -254,8 +269,12 @@ namespace Calame.UserControls
             }
         }
 
-        private void OnBaseFilterChanged(object sender, EventArgs eventArgs) => UpdateFilter(forceExpand: true);
-        private void UpdateFilter(bool forceExpand)
+        private void OnBaseFilterChanged(object sender, EventArgs eventArgs)
+        {
+            UpdateFilter(forceExpandOrCollapse: false);
+        }
+
+        private void UpdateFilter(bool forceExpandOrCollapse)
         {
             // If the selected tree item is filtered, it will be unselect
             // during the full filter refresh and change the content of an enumerable.
@@ -263,13 +282,13 @@ namespace Calame.UserControls
             // TODO: Try to keep selection
             if (SelectedTreeItem != null)
             {
-                UpdateFilter(SelectedTreeItem, forceExpand);
+                UpdateFilter(SelectedTreeItem, forceExpandOrCollapse);
                 if (!SelectedTreeItem.VisibleForFilter)
                     SelectedTreeItem = null;
             }
 
             foreach (ITreeViewItemModel treeItem in TreeItems)
-                UpdateFilter(treeItem, forceExpand);
+                UpdateFilter(treeItem, forceExpandOrCollapse);
         }
 
         private void UpdateFilter(ITreeViewItemModel item, bool forceExpand)
@@ -287,17 +306,17 @@ namespace Calame.UserControls
 
             // Re-apply filter on parents
             foreach (ITreeViewItemModel parent in Sequence.AggregateExclusive(newItem, x => x.Parent))
-                ApplyFilterOnItem(parent, forceExpand: false);
+                ApplyFilterOnItem(parent, forceExpandOrCollapse: false);
         }
 
         private void UpdateFilterOnItemRemoved(ITreeViewItemModel oldItem)
         {
             // Re-apply filter on parents
             foreach (ITreeViewItemModel parent in Sequence.AggregateExclusive(oldItem, x => x.Parent))
-                ApplyFilterOnItem(parent, forceExpand: false);
+                ApplyFilterOnItem(parent, forceExpandOrCollapse: false);
         }
 
-        private void ApplyFilterOnItem(ITreeViewItemModel item, bool forceExpand)
+        private void ApplyFilterOnItem(ITreeViewItemModel item, bool forceExpandOrCollapse)
         {
             item.MatchingBaseFilter = TreeContext.IsMatchingBaseFilter(item.Data);
             item.MatchingUserFilter = item.MatchingBaseFilter && IsMatchingUserFilter(item);
@@ -311,7 +330,7 @@ namespace Calame.UserControls
             item.VisibleForFilter = isMatchingActiveFilter || hasChildVisibleForFilter;
             item.VisibleAsParent = !isMatchingActiveFilter && hasChildVisibleForFilter;
             
-            if (forceExpand)
+            if (forceExpandOrCollapse)
             {
                 item.IsExpanded = IsFilteredByUser && hasChildVisibleForFilter;
             }
