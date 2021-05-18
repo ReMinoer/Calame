@@ -4,8 +4,9 @@ using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Caliburn.Micro;
 using Gemini;
-using Microsoft.Extensions.Logging;
+using Gemini.Framework.Services;
 using Simulacra.IO.Watching;
 
 namespace Calame
@@ -21,16 +22,21 @@ namespace Calame
             _icon.UriSource = new Uri("https://cdn3.iconfinder.com/data/icons/wpzoom-developer-icon-set/500/86-64.png");
             _icon.EndInit();
         }
-        
+
+        protected override void StartRuntime()
+        {
+            base.StartRuntime();
+
+            var mainWindow = IoC.Get<IMainWindow>();
+            mainWindow.Title = "Calame";
+            mainWindow.Icon = null;
+        }
+
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
             base.OnStartup(sender, e);
 
             Window mainWindow = Application.MainWindow;
-            if (mainWindow == null)
-                return;
-            
-            mainWindow.Title = "Calame";
             mainWindow.Top = 0;
             mainWindow.Left = 0;
             mainWindow.WindowState = WindowState.Maximized;
