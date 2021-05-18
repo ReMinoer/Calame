@@ -44,7 +44,8 @@ namespace Calame.UserControls
             treeView._synchronizer.Reference = itemsSource != null ? new EnumerableReadOnlyObservableList(itemsSource) : null;
             treeView.UpdateFilter(forceExpandOrCollapse: true);
 
-            treeView.SelectedItem = currentlySelectedItem;
+            if (currentlySelectedItem != null && treeView.TreeItems.SelectMany(x => Tree.BreadthFirst(x, y => y.Children)).Any(y => y.Data == currentlySelectedItem))
+                treeView.SelectedItem = currentlySelectedItem;
         }
 
         ITreeViewItemModel ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.CreateItem(object referenceItem)
