@@ -248,6 +248,9 @@ namespace Calame.SceneViewer.ViewModels
             protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
             protected override void ConnectRunner() {}
             protected override void DisconnectRunner() {}
+
+            void IViewerInteractiveMode.OnSelected() {}
+            void IViewerInteractiveMode.OnUnselected() {}
         }
 
         private readonly DebuggableViewerContexts _debuggableViewerContexts;

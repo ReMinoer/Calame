@@ -217,8 +217,12 @@ namespace Calame.Viewer.ViewModels
             if (mode == null)
                 return Task.CompletedTask;
 
+            SelectedMode?.OnUnselected();
+
             SelectedMode = mode;
             _viewerModeToggle.SelectedInteractive = SelectedMode.Interactive;
+
+            SelectedMode?.OnSelected();
 
             Cursor = SelectedMode.Cursor;
             EditorCamera.Enabled = SelectedMode.UseFreeCamera;
@@ -299,6 +303,9 @@ namespace Calame.Viewer.ViewModels
                 Model.EditorRoot.RemoveAndDispose(_interfaceRoot);
                 _interfaceRoot = null;
             }
+
+            void IViewerInteractiveMode.OnSelected() {}
+            void IViewerInteractiveMode.OnUnselected() {}
         }
     }
 }

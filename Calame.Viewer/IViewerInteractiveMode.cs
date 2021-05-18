@@ -11,5 +11,7 @@ namespace Calame.Viewer
         Cursor Cursor { get; }
         bool UseFreeCamera { get; }
         bool IsUserMode { get; }
+        void OnSelected();
+        void OnUnselected();
     }
 }

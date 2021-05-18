@@ -143,6 +143,18 @@ namespace Calame.BrushPanel
             _root = null;
         }
 
+        void IViewerInteractiveMode.OnSelected()
+        {
+            _brushController.Enabled = true;
+            _brushController.Visible = true;
+        }
+
+        void IViewerInteractiveMode.OnUnselected()
+        {
+            _brushController.Enabled = false;
+            _brushController.Visible = false;
+        }
+
         private void OnApplyStarted(object sender, EventArgs e) => ApplyStarted?.Invoke(this, e);
         private void OnApplyCancelled(object sender, EventArgs e) => ApplyCancelled?.Invoke(this, e);
         private void OnApplyEnded(object sender, EventArgs e) => ApplyEnded?.Invoke(this, e);
