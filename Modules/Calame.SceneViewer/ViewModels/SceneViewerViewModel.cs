@@ -108,7 +108,7 @@ namespace Calame.SceneViewer.ViewModels
             await Session.PrepareSessionAsync(_sessionContext);
             await Session.ResetSessionAsync(_sessionContext);
 
-            _debuggableViewerContexts.RefreshContexts();
+            _debuggableViewerContexts.RefreshDebuggableContexts();
 
             _engine.Initialize();
             await _engine.LoadContentAsync();
@@ -263,7 +263,8 @@ namespace Calame.SceneViewer.ViewModels
 
         IDocument IDocumentContext.Document => this;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => _debuggableViewerContexts.Viewer;
-        IContentLibrary IDocumentContext<IContentLibrary>.Context => _debuggableViewerContexts.ContentLibrary;
+        IContentLibraryContext IDocumentContext<IContentLibraryContext>.Context => _debuggableViewerContexts;
+        IRawContentLibraryContext IDocumentContext<IRawContentLibraryContext>.Context => _debuggableViewerContexts;
         IRootsContext IDocumentContext<IRootsContext>.Context => _debuggableViewerContexts;
         IRootComponentsContext IDocumentContext<IRootComponentsContext>.Context => _debuggableViewerContexts;
         IRootScenesContext IDocumentContext<IRootScenesContext>.Context => _debuggableViewerContexts;

@@ -239,7 +239,6 @@ namespace Calame.Viewer.ViewModels
                 return;
 
             Runner.Engine.FocusedClient = Client;
-            await _eventAggregator.PublishAsync(_owner);
 
             if (LastSelection != null)
                 await _eventAggregator.PublishAsync(LastSelection);

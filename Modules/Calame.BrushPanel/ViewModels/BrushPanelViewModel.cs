@@ -62,9 +62,10 @@ namespace Calame.BrushPanel.ViewModels
                     return;
 
                 OnCanvasChanged();
-
                 _selectionContext?.SelectAsync(_selectedCanvas).Wait();
-                SwitchToBrushModeAsync().Wait();
+
+                if (_selectedCanvas != null)
+                    SwitchToBrushModeAsync().Wait();
             }
         }
 

@@ -30,7 +30,8 @@ namespace Calame.DataModelViewer.ViewModels
     [Export(typeof(DataModelViewerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IRunnableDocument,
-        IDocumentContext<IGlyphData>, IDocumentContext<ISelectionContext<IGlyphData>>, ISelectionContext<IGlyphData>, IRootsContext,
+        IDocumentContext<IRootDataContext>, IRootDataContext, IRootsContext,
+        IDocumentContext<ISelectionContext<IGlyphData>>, ISelectionContext<IGlyphData>,
         IHandle<ISelectionRequest<IGlyphData>>,
         IHandle<ISelectionRequest<IGlyphComponent>>
     {
@@ -97,6 +98,9 @@ namespace Calame.DataModelViewer.ViewModels
 
         private async Task InitializeEngineAsync()
         {
+            RootData = new[] { Editor.Data };
+            Roots = RootData;
+
             IGraphicsDeviceService graphicsDeviceService = WpfGraphicsDeviceService.Instance;
             IContentLibrary contentLibrary = Editor.CreateContentLibrary(graphicsDeviceService, Logger);
 
@@ -113,7 +117,7 @@ namespace Calame.DataModelViewer.ViewModels
             Editor.RegisterDependencies(_engine.Registry);
             Editor.PrepareEditor(Viewer.Runner.Engine, Viewer.UserRoot);
 
-            _debuggableViewerContexts.RefreshContexts();
+            _debuggableViewerContexts.RefreshDebuggableContexts();
 
             _engine.Initialize();
             await _engine.LoadContentAsync();
@@ -185,7 +189,8 @@ namespace Calame.DataModelViewer.ViewModels
 
         IDocument IDocumentContext.Document => this;
         ViewerViewModel IDocumentContext<ViewerViewModel>.Context => _debuggableViewerContexts.Viewer;
-        IContentLibrary IDocumentContext<IContentLibrary>.Context => _debuggableViewerContexts.ContentLibrary;
+        IContentLibraryContext IDocumentContext<IContentLibraryContext>.Context => _debuggableViewerContexts;
+        IRawContentLibraryContext IDocumentContext<IRawContentLibraryContext>.Context => _debuggableViewerContexts;
         IRootComponentsContext IDocumentContext<IRootComponentsContext>.Context => _debuggableViewerContexts;
         IRootScenesContext IDocumentContext<IRootScenesContext>.Context => _debuggableViewerContexts;
         IRootInteractivesContext IDocumentContext<IRootInteractivesContext>.Context => _debuggableViewerContexts;
@@ -195,8 +200,21 @@ namespace Calame.DataModelViewer.ViewModels
         ISelectionContext<IGlyphData> IDocumentContext<ISelectionContext<IGlyphData>>.Context => this;
 
         IRootsContext IDocumentContext<IRootsContext>.Context => this;
-        public IEnumerable Roots => new []{ Editor.Data };
-        IGlyphData IDocumentContext<IGlyphData>.Context => Editor.Data;
+        IRootDataContext IDocumentContext<IRootDataContext>.Context => this;
+
+        private IEnumerable _root;
+        public IEnumerable Roots
+        {
+            get => _root;
+            set => Set(ref _root, value);
+        }
+
+        private IEnumerable<IGlyphData> _rootData;
+        public IEnumerable<IGlyphData> RootData
+        {
+            get => _rootData;
+            set => Set(ref _rootData, value);
+        }
 
         event EventHandler ISelectionContext.CanSelectChanged
         {

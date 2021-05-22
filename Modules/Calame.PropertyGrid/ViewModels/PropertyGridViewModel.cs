@@ -111,7 +111,7 @@ namespace Calame.PropertyGrid.ViewModels
         {
             SelectedObject = null;
             
-            RawContentLibrary = activeDocument.TryGetContext<IContentLibrary>() as IRawContentLibrary;
+            RawContentLibrary = activeDocument.TryGetContext<IRawContentLibraryContext>() as IRawContentLibrary;
             WorkingDirectory = RawContentLibrary?.WorkingDirectory;
             SelectItemCommand = activeDocument.TryGetContext<ISelectionContext>()?.GetSelectionCommand();
 

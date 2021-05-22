@@ -60,13 +60,6 @@ namespace Calame.DataModelViewer.Base
             renderScheduler.Plan(drawer => drawer.SpriteBatchStack.Current.Draw(pixel, drawer.DisplayedRectangle.BoundingBox.ToIntegers(), Color.CornflowerBlue))
                 .Before(renderScheduler.RenderViewTask);
 
-            //var dataRoot = editorRoot.Add<GlyphObject>();
-            //dataRoot.Name = "Data Root";
-            //dataRoot.Add<SceneNode>();
-
-            //Data.Instantiate();
-            //dataRoot.Add(Data.BindedObject);
-
             editorRoot.Add<SceneNode>();
 
             Data.Instantiate();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Windows.Input;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.Viewer;
 using Calame.Viewer.Modules.Base;
@@ -20,14 +21,14 @@ namespace Calame.BrushPanel
     [Export(typeof(IViewerModuleSource))]
     public class EngineViewerModuleSource : IViewerModuleSource
     {
-        public bool IsValidForDocument(IDocumentContext documentContext) => !(documentContext is IDocumentContext<IGlyphData>);
+        public bool IsValidForDocument(IDocumentContext documentContext) => !(documentContext is IDocumentContext<IRootDataContext>);
         public IViewerModule CreateInstance() => new ViewerModule<IGlyphComponent, EngineCursorBrushController>();
     }
 
     [Export(typeof(IViewerModuleSource))]
     public class DataViewerModuleSource : IViewerModuleSource
     {
-        public bool IsValidForDocument(IDocumentContext documentContext) => documentContext is IDocumentContext<IGlyphData>;
+        public bool IsValidForDocument(IDocumentContext documentContext) => documentContext is IDocumentContext<IRootDataContext>;
         public IViewerModule CreateInstance() => new ViewerModule<IGlyphData, DataCursorBrushController>();
     }
 

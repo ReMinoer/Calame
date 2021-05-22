@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows;
-using Calame.SceneViewer.ViewModels;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Services;
@@ -15,22 +13,7 @@ namespace Calame.SceneViewer
             where TSession : ISession
         {
             var sessionProvider = IoC.Get<SessionProvider>();
-            IDocument document = sessionProvider.Create();
-
-            var viewAware = (IViewAware)document;
-            viewAware.ViewAttached += (sender, e) =>
-            {
-                var view = (FrameworkElement)e.View;
-                view.Loaded += LoadedHandler;
-
-                async void LoadedHandler(object sender2, RoutedEventArgs e2)
-                {
-                    view.Loaded -= LoadedHandler;
-                    await sessionProvider.New<TSession>(document);
-                }
-            };
-
-            return shell.OpenDocumentAsync(document);
+            return shell.ShowDocumentAsync(sessionProvider, document => sessionProvider.New<TSession>(document));
         }
 
         static public Task NewDataSessionAsync<TDataSession, TData>(this IShell shell, TData data)
@@ -38,22 +21,7 @@ namespace Calame.SceneViewer
             where TData : IGlyphData
         {
             var sessionProvider = IoC.Get<SessionProvider>();
-            IDocument document = sessionProvider.Create();
-
-            var viewAware = (IViewAware)document;
-            viewAware.ViewAttached += (sender, e) =>
-            {
-                var view = (FrameworkElement)e.View;
-                view.Loaded += LoadedHandler;
-
-                async void LoadedHandler(object sender2, RoutedEventArgs e2)
-                {
-                    view.Loaded -= LoadedHandler;
-                    await sessionProvider.New<TDataSession, TData>(document, data);
-                }
-            };
-
-            return shell.OpenDocumentAsync(document);
+            return shell.ShowDocumentAsync(sessionProvider, document => sessionProvider.New<TDataSession, TData>(document, data));
         }
     }
 }

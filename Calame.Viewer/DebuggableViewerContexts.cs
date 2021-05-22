@@ -8,19 +8,30 @@ using Caliburn.Micro;
 using Fingear.Interactives;
 using Glyph;
 using Glyph.Composition;
+using Glyph.Pipeline;
+using Glyph.WpfInterop;
 using Stave;
 
 namespace Calame.Viewer
 {
-    public class DebuggableViewerContexts : PropertyChangedBase, IRootsContext, IRootComponentsContext, IRootScenesContext, IRootInteractivesContext
+    public class DebuggableViewerContexts : PropertyChangedBase, IRawContentLibraryContext, IRootsContext, IRootComponentsContext, IRootScenesContext, IRootInteractivesContext
     {
-        private ViewerViewModel _viewer;
-        public ViewerViewModel Viewer
+        public ViewerViewModel Viewer { get; }
+
+        private IContentLibrary _contentLibrary;
+        public IContentLibrary ContentLibrary
         {
-            get => _viewer;
-            private set => Set(ref _viewer, value);
+            get => _contentLibrary;
+            private set => Set(ref _contentLibrary, value);
         }
-        
+
+        private IRawContentLibrary _rawContentLibrary;
+        public IRawContentLibrary RawContentLibrary
+        {
+            get => _rawContentLibrary;
+            private set => Set(ref _rawContentLibrary, value);
+        }
+
         private IEnumerable _roots;
         public IEnumerable Roots
         {
@@ -33,6 +44,13 @@ namespace Calame.Viewer
         {
             get => _rootComponents;
             private set => Set(ref _rootComponents, value);
+        }
+
+        private IEnumerable<ISceneNode> _rootScenes;
+        public IEnumerable<ISceneNode> RootScenes
+        {
+            get => _rootScenes;
+            private set => Set(ref _rootScenes, value);
         }
 
         private IEnumerable<IInteractive> _rootInteractives;
@@ -49,12 +67,9 @@ namespace Calame.Viewer
             set
             {
                 if (Set(ref _debugMode, value))
-                    RefreshContexts();
+                    RefreshDebuggableContexts();
             }
         }
-
-        public IEnumerable<ISceneNode> RootScenes => _viewer.Runner.Engine.ProjectionManager.SceneRoots;
-        public IContentLibrary ContentLibrary => _viewer.Runner.Engine.ContentLibrary;
 
         private IGlyphComponent _userParentComponent;
         public IGlyphComponent UserParentComponent
@@ -62,32 +77,45 @@ namespace Calame.Viewer
             get => _userParentComponent;
             set
             {
-                if (_userParentComponent == value)
-                    return;
-
-                _userParentComponent = value;
-
-                if (!DebugMode)
-                    RefreshContexts();
+                if (Set(ref _userParentComponent, value) && !DebugMode)
+                    RefreshDebuggableContexts();
             }
         }
 
         public DebuggableViewerContexts(ViewerViewModel viewer)
         {
             Viewer = viewer;
+
+            RefreshRunner();
+            Viewer.RunnerChanged += OnRunnerChanged;
         }
 
-        public void RefreshContexts()
+        private void OnRunnerChanged(object sender, GlyphWpfRunner e) => RefreshRunner();
+        private void RefreshRunner()
         {
-            if (DebugMode)
+            ContentLibrary = Viewer.Runner?.Engine.ContentLibrary;
+            RawContentLibrary = ContentLibrary as IRawContentLibrary;
+            RootScenes = Viewer.Runner?.Engine.ProjectionManager.SceneRoots;
+
+            RefreshDebuggableContexts();
+        }
+
+        public void RefreshDebuggableContexts()
+        {
+            if (Viewer.Runner == null)
             {
-                RootComponents = new IGlyphComponent[] { _viewer.Runner.Engine.Root };
-                RootInteractives = new IInteractive[] { _viewer.Runner.Engine.InteractionManager.Root };
+                RootComponents = Enumerable.Empty<IGlyphComponent>();
+                RootInteractives = Enumerable.Empty<IInteractive>();
+            }
+            else if (DebugMode)
+            {
+                RootComponents = new IGlyphComponent[] { Viewer.Runner.Engine.Root };
+                RootInteractives = new IInteractive[] { Viewer.Runner.Engine.InteractionManager.Root };
             }
             else
             {
-                RootComponents = (UserParentComponent ?? _viewer.UserRoot).Components;
-                RootInteractives = _viewer.InteractiveModes.Where(x => x.IsUserMode).Select(x => x.Interactive);
+                RootComponents = (UserParentComponent ?? Viewer.UserRoot).Components;
+                RootInteractives = Viewer.InteractiveModes.Where(x => x.IsUserMode).Select(x => x.Interactive);
             }
 
             Roots = RootComponents;
@@ -107,13 +135,13 @@ namespace Calame.Viewer
         private bool CanSelectInDebugMode(IGlyphComponent component)
         {
             return CanSelectBase(component)
-                && !component.AndAllParents().Any(_viewer.NotSelectableComponents.Contains);
+                && !component.AndAllParents().Any(Viewer.NotSelectableComponents.Contains);
         }
 
         private bool CanSelectInUserMode(IGlyphComponent component)
         {
             return CanSelectBase(component)
-                && component.AllParents().Contains(UserParentComponent ?? _viewer.UserRoot);
+                && component.AllParents().Contains(UserParentComponent ?? Viewer.UserRoot);
         }
 
         private bool CanSelectBase(IGlyphComponent component)

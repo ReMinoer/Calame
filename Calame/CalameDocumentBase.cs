@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework;
@@ -38,6 +36,12 @@ namespace Calame
         {
             Uri uri = _iconProvider.GetUri(_iconDescriptor.GetIcon(IconKey ?? this), 16);
             Set(ref _iconSource, uri, nameof(IconSource));
+        }
+
+        protected override async Task OnActivateAsync(CancellationToken cancellationToken)
+        {
+            await base.OnActivateAsync(cancellationToken);
+            await EventAggregator.PublishAsync(this, cancellationToken);
         }
 
         protected abstract Task DisposeDocumentAsync();
