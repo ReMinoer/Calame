@@ -42,7 +42,7 @@ namespace Calame.Icons.Descriptors
                 case CalameIconKey.Stop:
                 case CalameIconKey.Select:
                     return 2;
-                case CalameIconKey.ResetSession:
+                case CalameIconKey.Reset:
                     return 1;
                 default: return 0;
             }

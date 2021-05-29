@@ -58,6 +58,7 @@ namespace Calame.SceneViewer.ViewModels
 
         public bool FreeCameraEnabled { get; private set; }
         public Type RunCommandDefinitionType { get; } = typeof(ResetSessionCommand);
+        public Type RunAlternativeCommandDefinitionType => null;
 
         private IGlyphComponent DefaultSelection => Viewer.UserRoot.Components.FirstOrDefault() ?? Viewer.UserRoot;
 

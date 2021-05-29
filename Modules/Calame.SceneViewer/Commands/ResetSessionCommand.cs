@@ -10,7 +10,7 @@ namespace Calame.SceneViewer.Commands
     public class ResetSessionCommand : CalameCommandDefinitionBase
     {
         public override string Text => "_Reset Session";
-        public override object IconKey => CalameIconKey.ResetSession;
+        public override object IconKey => CalameIconKey.Reset;
 
         [CommandHandler]
         public class CommandHandler : SceneViewerCommandHandlerBase<ResetSessionCommand>

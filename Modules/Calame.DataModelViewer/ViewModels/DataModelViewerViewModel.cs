@@ -54,6 +54,7 @@ namespace Calame.DataModelViewer.ViewModels
         }
         
         Type IRunnableDocument.RunCommandDefinitionType => Editor?.RunCommandDefinitionType;
+        Type IRunnableDocument.RunAlternativeCommandDefinitionType => Editor?.RunAlternativeCommandDefinitionType;
         void IViewerDocument.EnableFreeCamera() { }
 
         public ICommand DragOverCommand { get; }

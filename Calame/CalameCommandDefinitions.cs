@@ -37,6 +37,8 @@ namespace Calame
         static public ToolBarItemGroupDefinition RunGroup = new ToolBarItemGroupDefinition(ExecuteToolBar, 0);
         [Export]
         static public ToolBarItemDefinition RunDocument = new CommandToolBarItemDefinition<RunDocumentCommand>(RunGroup, 0, ToolBarItemDisplay.IconAndText);
+        [Export]
+        static public ToolBarItemDefinition RunDocumentAlternative = new CommandToolBarItemDefinition<RunDocumentAlternativeCommand>(RunGroup, 10);
     }
 
     static public class CalameMenus
@@ -54,6 +56,8 @@ namespace Calame
         static public MenuItemGroupDefinition RunGroup = new MenuItemGroupDefinition(ExecuteMenu, 0);
         [Export]
         static public MenuItemDefinition RunDocument = new CommandMenuItemDefinition<RunDocumentCommand>(RunGroup, 0);
+        [Export]
+        static public MenuItemDefinition RunDocumentAlternative = new CommandMenuItemDefinition<RunDocumentAlternativeCommand>(RunGroup, 10);
 
         [Export]
         static public MenuDefinition WindowMenu = new MenuDefinition(MenuDefinitions.MainMenuBar, 200, "_Window");
@@ -88,6 +92,8 @@ namespace Calame
         static public CommandKeyboardShortcut NextSelectionBrowser = new CommandKeyboardShortcut<NextSelectionCommand>(new KeyGesture(Key.BrowserForward));
 
         [Export]
-        static public CommandKeyboardShortcut RunSession = new CommandKeyboardShortcut<RunDocumentCommand>(new KeyGesture(Key.F5));
+        static public CommandKeyboardShortcut RunDocument = new CommandKeyboardShortcut<RunDocumentCommand>(new KeyGesture(Key.F5));
+        [Export]
+        static public CommandKeyboardShortcut RunDocumentAlternative = new CommandKeyboardShortcut<RunDocumentAlternativeCommand>(new KeyGesture(Key.F5, ModifierKeys.Alt));
     }
 }

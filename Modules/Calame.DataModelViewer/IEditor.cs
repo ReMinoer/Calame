@@ -16,8 +16,10 @@ namespace Calame.DataModelViewer
     public interface IEditor : IDisposable
     {
         IGlyphData Data { get; }
+
         ToolBarDefinition ToolBarDefinition { get; }
         Type RunCommandDefinitionType { get; }
+        Type RunAlternativeCommandDefinitionType { get; }
 
         Task NewDataAsync();
         Task LoadDataAsync(Stream stream);

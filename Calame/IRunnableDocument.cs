@@ -6,5 +6,6 @@ namespace Calame
     public interface IRunnableDocument : IDocument
     {
         Type RunCommandDefinitionType { get; }
+        Type RunAlternativeCommandDefinitionType { get; }
     }
 }
