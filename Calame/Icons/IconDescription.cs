@@ -6,9 +6,9 @@ namespace Calame.Icons
     {
         static public IconDescription None => new IconDescription();
 
-        public object Key { get; set; }
-        public Brush Brush { get; set; }
-        public double Margin { get; set; }
+        public object Key { get; }
+        public Brush Brush { get; }
+        public double Margin { get; }
 
         public bool Defined => Key != null;
 
@@ -17,6 +17,11 @@ namespace Calame.Icons
             Key = key;
             Brush = brush;
             Margin = margin;
+        }
+
+        public override int GetHashCode()
+        {
+            return (Key?.GetHashCode() ?? 0) ^ (Brush?.ToString().GetHashCode() ?? 0) ^ Margin.GetHashCode();
         }
     }
 }
