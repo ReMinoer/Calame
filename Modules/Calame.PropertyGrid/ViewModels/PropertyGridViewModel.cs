@@ -14,8 +14,6 @@ using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
-using Glyph;
-using Glyph.Pipeline;
 
 namespace Calame.PropertyGrid.ViewModels
 {
@@ -35,18 +33,11 @@ namespace Calame.PropertyGrid.ViewModels
             set => SetValue(ref _selectedObject, value);
         }
 
-        private string _workingDirectory;
-        public string WorkingDirectory
+        private IRawContentLibraryContext _rawContentLibraryContext;
+        public IRawContentLibraryContext RawContentLibraryContext
         {
-            get => _workingDirectory;
-            private set => SetValue(ref _workingDirectory, value);
-        }
-
-        private IRawContentLibrary _rawContentLibrary;
-        public IRawContentLibrary RawContentLibrary
-        {
-            get => _rawContentLibrary;
-            private set => SetValue(ref _rawContentLibrary, value);
+            get => _rawContentLibraryContext;
+            private set => SetValue(ref _rawContentLibraryContext, value);
         }
 
         private ICommand _selectItemCommand;
@@ -99,7 +90,7 @@ namespace Calame.PropertyGrid.ViewModels
         private bool CanOpenFile(object path) => !string.IsNullOrWhiteSpace((string)path);
         private async void OnOpenFile(object path)
         {
-            await Shell.OpenFileAsync((string)path, _editorProviders, WorkingDirectory);
+            await Shell.OpenFileAsync((string)path, _editorProviders, RawContentLibraryContext?.RawContentLibrary?.WorkingDirectory);
         }
 
         private Task OnDirtyDocument()
@@ -110,9 +101,8 @@ namespace Calame.PropertyGrid.ViewModels
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
         {
             SelectedObject = null;
-            
-            RawContentLibrary = activeDocument.TryGetContext<IRawContentLibraryContext>() as IRawContentLibrary;
-            WorkingDirectory = RawContentLibrary?.WorkingDirectory;
+
+            RawContentLibraryContext = activeDocument.TryGetContext<IRawContentLibraryContext>();
             SelectItemCommand = activeDocument.TryGetContext<ISelectionContext>()?.GetSelectionCommand();
 
             return Task.CompletedTask;
@@ -123,8 +113,7 @@ namespace Calame.PropertyGrid.ViewModels
             SelectedObject = null;
 
             SelectItemCommand = null;
-            WorkingDirectory = null;
-            RawContentLibrary = null;
+            RawContentLibraryContext = null;
 
             return Task.CompletedTask;
         }
