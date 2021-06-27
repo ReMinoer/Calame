@@ -17,10 +17,8 @@ using Stave;
 
 namespace Calame.Viewer.Modules
 {
-    // TODO: Fix filtering
-    public class BoxedComponentSelectorModule : ViewerModuleBase, IHandle<IDocumentContext<ViewerViewModel>>
+    public class BoxedComponentSelectorModule : ViewerModuleBase
     {
-        private readonly IEventAggregator _eventAggregator;
         private ISelectionContext<IGlyphComponent> _selectionContext;
 
         private GlyphObject _root;
@@ -33,9 +31,9 @@ namespace Calame.Viewer.Modules
             private set => this.SetValue(ref _selectedComponent, value);
         }
         
-        public BoxedComponentSelectorModule(IEventAggregator eventAggregator)
+        public BoxedComponentSelectorModule(ISelectionContext<IGlyphComponent> selectionContext)
         {
-            _eventAggregator = eventAggregator;
+            _selectionContext = selectionContext;
         }
 
         protected override void ConnectModel() {}
@@ -51,15 +49,13 @@ namespace Calame.Viewer.Modules
             _shapedObjectSelector.Filter = ComponentFilter;
 
             _root.Add(_shapedObjectSelector);
-
-            _eventAggregator.SubscribeOnUI(this);
+            
             _shapedObjectSelector.SelectionChanged += OnShapedObjectSelectorSelectionChanged;
         }
 
         protected override void DisconnectRunner()
         {
             _shapedObjectSelector.SelectionChanged -= OnShapedObjectSelectorSelectionChanged;
-            _eventAggregator.Unsubscribe(this);
 
             Model.EditorModeRoot.RemoveAndDispose(_root);
 
@@ -79,12 +75,6 @@ namespace Calame.Viewer.Modules
 
             SelectedComponent = boxedComponent?.AllParents().OfType<IBoxedComponent>().First(x => x.Components.AnyOfType<ISceneNodeComponent>());
             await _selectionContext.SelectAsync(SelectedComponent);
-        }
-
-        Task IHandle<IDocumentContext<ViewerViewModel>>.HandleAsync(IDocumentContext<ViewerViewModel> message, CancellationToken cancellationToken)
-        {
-            _selectionContext = message.GetSelectionContext<IGlyphComponent>();
-            return Task.CompletedTask;
         }
     }
 }
