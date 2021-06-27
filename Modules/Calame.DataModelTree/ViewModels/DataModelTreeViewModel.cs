@@ -15,25 +15,24 @@ using Glyph.Composition.Modelization;
 namespace Calame.DataModelTree.ViewModels
 {
     [Export(typeof(DataModelTreeViewModel))]
-    public sealed class DataModelTreeViewModel : CalameTool<IDocumentContext<IGlyphData>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
+    public sealed class DataModelTreeViewModel : CalameTool<IDocumentContext<IRootDataContext>>, IHandle<ISelectionSpread<IGlyphData>>, ITreeContext
     {
         public override PaneLocation PreferredLocation => PaneLocation.Left;
 
         public IIconProvider IconProvider { get; }
         public IIconDescriptor IconDescriptor { get; }
 
-        private IGlyphData _root;
         private ISelectionContext<IGlyphData> _selectionContext;
-
-        private IGlyphData _selection;
         private readonly TreeViewItemModelBuilder<IGlyphCreator> _treeItemBuilder;
 
-        public IGlyphData Root
+        private IRootDataContext _rootDataContext;
+        public IRootDataContext RootDataContext
         {
-            get => _root;
-            private set => SetValue(ref _root, value);
+            get => _rootDataContext;
+            private set => SetValue(ref _rootDataContext, value);
         }
 
+        private IGlyphData _selection;
         public IGlyphData Selection
         {
             get => _selection;
@@ -65,12 +64,12 @@ namespace Calame.DataModelTree.ViewModels
                                .IconDescription(x => iconDescriptor.GetIcon(x));
         }
         
-        protected override Task OnDocumentActivated(IDocumentContext<IGlyphData> activeDocument)
+        protected override Task OnDocumentActivated(IDocumentContext<IRootDataContext> activeDocument)
         {
             _selection = null;
 
             _selectionContext = activeDocument.GetSelectionContext<IGlyphData>();
-            Root = activeDocument.Context;
+            RootDataContext = activeDocument.Context;
 
             return Task.CompletedTask;
         }
@@ -79,7 +78,7 @@ namespace Calame.DataModelTree.ViewModels
         {
             _selection = null;
 
-            Root = null;
+            RootDataContext = null;
             _selectionContext = null;
 
             return Task.CompletedTask;
