@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+    <PropertyGroup>
+        <TargetFramework>$(TargetFramework)</TargetFramework>
+        <UseWPF>True</UseWPF>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\Calame.Viewer\Calame.Viewer.csproj" />
+      <ProjectReference Include="..\..\External\gemini\src\Gemini\Gemini.csproj" />
+    </ItemGroup>
+</Project>

@@ -118,7 +118,7 @@ namespace Calame.SceneViewer.ViewModels
             Viewer.EditorCamera.ShowTarget(_sessionContext.UserRoot);
 
             _engine.Start();
-            await Viewer.Activate();
+            await Viewer.ActivateAsync();
             
             await EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, DefaultSelection));
             await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode));
@@ -245,10 +245,12 @@ namespace Calame.SceneViewer.ViewModels
             public bool UseFreeCamera => false;
             bool IViewerInteractiveMode.IsUserMode => true;
 
-            protected override void ConnectModel() => Model.AddInteractiveMode(this);
-            protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
+            protected override void ConnectViewer() => Model.AddInteractiveMode(this);
+            protected override void DisconnectViewer() => Model.RemoveInteractiveMode(this);
             protected override void ConnectRunner() {}
-            protected override void DisconnectRunner() {}
+            protected override void DisconnectRunner() { }
+            public override void Activate() { }
+            public override void Deactivate() { }
 
             void IViewerInteractiveMode.OnSelected() {}
             void IViewerInteractiveMode.OnUnselected() {}

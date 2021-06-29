@@ -6,12 +6,12 @@ using Diese;
 using Glyph;
 using Glyph.Animation;
 using Glyph.Animation.Motors.Base;
+using Glyph.Animation.Parallax;
 using Glyph.Audio;
 using Glyph.Composition;
 using Glyph.Core;
 using Glyph.Core.Colliders;
 using Glyph.Core.Inputs;
-using Glyph.Core.Layers;
 using Glyph.Graphics;
 using Glyph.Graphics.Renderer;
 using Glyph.Graphics.Renderer.Base;
@@ -71,6 +71,10 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.RunFast, AnimationCategoryBrush);
             if (type.Is<MotorBase>())
                 return new IconDescription(PackIconMaterialKind.Engine, AnimationCategoryBrush);
+            if (type.Is<ParallaxRoot>())
+                return new IconDescription(PackIconMaterialKind.WeatherSunset, AnimationCategoryBrush);
+            if (type.Is<ParallaxLayer>())
+                return new IconDescription(PackIconMaterialKind.WeatherCloudyArrowRight, AnimationCategoryBrush);
 
             if (type.Is<ISpriteSheet>())
                 return new IconDescription(PackIconMaterialKind.ImageMultiple, GraphicsCategoryBrush);
@@ -124,10 +128,6 @@ namespace Calame.Icons.Descriptors
 
             if (type.Is<Flipper>())
                 return new IconDescription(PackIconMaterialKind.FlipHorizontal, CoreCategoryBrush);
-            if (type.Is<ILayerRoot>())
-                return new IconDescription(PackIconMaterialKind.Layers, CoreCategoryBrush);
-            if (type.Is<ILayerManager>())
-                return new IconDescription(PackIconMaterialKind.LayersTriple, CoreCategoryBrush);
 
             if (type.Is<FreeCamera>())
                 return new IconDescription(PackIconMaterialKind.VideoSwitch, ToolCategoryBrush);

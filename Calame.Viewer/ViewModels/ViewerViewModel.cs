@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.Viewer.Messages;
 using Calame.Viewer.Modules;
@@ -152,10 +153,10 @@ namespace Calame.Viewer.ViewModels
             InteractiveModes = new ReadOnlyObservableList<IViewerInteractiveMode>(_interactiveModes);
 
             _editorModeModule = new EditorModeModule();
-            var componentSelectorModule = new BoxedComponentSelectorModule(_eventAggregator);
+            var componentSelectorModule = new BoxedComponentSelectorModule((owner as IDocumentContext<ISelectionContext<IGlyphComponent>>)?.Context);
 
             var modules = new List<IViewerModule> { _editorModeModule, componentSelectorModule };
-            modules.AddRange(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance()));
+            modules.AddRange(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance(owner)));
 
             foreach (IViewerModule module in modules)
                 module.Model = this;
@@ -231,14 +232,17 @@ namespace Calame.Viewer.ViewModels
             return _eventAggregator.PublishAsync(messageSpread, cancellationToken);
         }
 
-        private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => Activate();
+        private void OnActivated(object sender, ActivationEventArgs activationEventArgs) => ActivateAsync();
 
-        public async Task Activate()
+        public async Task ActivateAsync()
         {
             if (Runner?.Engine == null)
                 return;
 
             Runner.Engine.FocusedClient = Client;
+
+            foreach (IViewerModule module in Modules)
+                module.Activate();
 
             if (LastSelection != null)
                 await _eventAggregator.PublishAsync(LastSelection);
@@ -246,6 +250,9 @@ namespace Calame.Viewer.ViewModels
 
         private Task OnDeactivated(object sender, DeactivationEventArgs deactivationEventArgs)
         {
+            foreach (IViewerModule module in Modules)
+                module.Deactivate();
+
             if (Runner?.Engine != null && Runner.Engine.FocusedClient == Client)
                 Runner.Engine.FocusedClient = null;
 
@@ -281,8 +288,10 @@ namespace Calame.Viewer.ViewModels
             public InteractiveInterfaceRoot Interactive => _interfaceRoot.Interactive;
             IInteractive IViewerInteractiveMode.Interactive => Interactive;
 
-            protected override void ConnectModel() => Model.AddInteractiveMode(this);
-            protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
+            protected override void ConnectViewer() => Model.AddInteractiveMode(this);
+            protected override void DisconnectViewer() => Model.RemoveInteractiveMode(this);
+            public override void Activate() { }
+            public override void Deactivate() { }
 
             protected override void ConnectRunner()
             {

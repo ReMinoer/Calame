@@ -24,7 +24,7 @@ namespace Calame.Viewer.Modules
         }
 
         public bool IsValidForDocument(IDocumentContext documentContext) => true;
-        public IViewerModule CreateInstance() => new SelectionRendererModule(_eventAggregator);
+        public IViewerModule CreateInstance(IDocumentContext documentContext) => new SelectionRendererModule(_eventAggregator);
     }
     
     public class SelectionRendererModule : SelectionHandlerModuleBase

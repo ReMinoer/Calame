@@ -3,6 +3,6 @@
     public interface IViewerModuleSource
     {
         bool IsValidForDocument(IDocumentContext documentContext);
-        IViewerModule CreateInstance();
+        IViewerModule CreateInstance(IDocumentContext documentContext);
     }
 }

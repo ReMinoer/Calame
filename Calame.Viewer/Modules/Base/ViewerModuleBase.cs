@@ -16,12 +16,12 @@ namespace Calame.Viewer.Modules.Base
                     return;
 
                 if (_model != null)
-                    DisconnectModel();
+                    DisconnectViewer();
 
                 _model = value;
 
                 if (_model != null)
-                    ConnectModel();
+                    ConnectViewer();
             }
         }
 
@@ -43,10 +43,12 @@ namespace Calame.Viewer.Modules.Base
             Runner = null;
         }
 
-        protected abstract void ConnectModel();
-        protected abstract void DisconnectModel();
+        protected abstract void ConnectViewer();
+        protected abstract void DisconnectViewer();
         protected abstract void ConnectRunner();
         protected abstract void DisconnectRunner();
+        public abstract void Activate();
+        public abstract void Deactivate();
 
         public virtual void Dispose()
         {

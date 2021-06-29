@@ -20,7 +20,7 @@ namespace Calame.Viewer.Modules
         }
 
         public bool IsValidForDocument(IDocumentContext documentContext) => true;
-        public IViewerModule CreateInstance() => new TransformationEditorModule(_eventAggregator);
+        public IViewerModule CreateInstance(IDocumentContext documentContext) => new TransformationEditorModule(_eventAggregator);
     }
     
     public class TransformationEditorModule : SelectionHandlerModuleBase

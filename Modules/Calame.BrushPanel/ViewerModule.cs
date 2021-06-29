@@ -22,14 +22,14 @@ namespace Calame.BrushPanel
     public class EngineViewerModuleSource : IViewerModuleSource
     {
         public bool IsValidForDocument(IDocumentContext documentContext) => !(documentContext is IDocumentContext<IRootDataContext>);
-        public IViewerModule CreateInstance() => new ViewerModule<IGlyphComponent, EngineCursorBrushController>();
+        public IViewerModule CreateInstance(IDocumentContext documentContext) => new ViewerModule<IGlyphComponent, EngineCursorBrushController>();
     }
 
     [Export(typeof(IViewerModuleSource))]
     public class DataViewerModuleSource : IViewerModuleSource
     {
         public bool IsValidForDocument(IDocumentContext documentContext) => documentContext is IDocumentContext<IRootDataContext>;
-        public IViewerModule CreateInstance() => new ViewerModule<IGlyphData, DataCursorBrushController>();
+        public IViewerModule CreateInstance(IDocumentContext documentContext) => new ViewerModule<IGlyphData, DataCursorBrushController>();
     }
 
     public interface IBrushViewerModule : IViewerModule, IViewerInteractiveMode, IBrushController<object>
@@ -114,8 +114,10 @@ namespace Calame.BrushPanel
         bool IViewerInteractiveMode.UseFreeCamera => true;
         bool IViewerInteractiveMode.IsUserMode => false;
 
-        protected override void ConnectModel() => Model.AddInteractiveMode(this);
-        protected override void DisconnectModel() => Model.RemoveInteractiveMode(this);
+        protected override void ConnectViewer() => Model.AddInteractiveMode(this);
+        protected override void DisconnectViewer() => Model.RemoveInteractiveMode(this);
+        public override void Activate() { }
+        public override void Deactivate() { }
 
         protected override void ConnectRunner()
         {

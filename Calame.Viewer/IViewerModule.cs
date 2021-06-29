@@ -8,5 +8,7 @@ namespace Calame.Viewer
         ViewerViewModel Model { set; }
         void Connect();
         void Disconnect();
+        void Activate();
+        void Deactivate();
     }
 }

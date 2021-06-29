@@ -127,7 +127,7 @@ namespace Calame.DataModelViewer.ViewModels
                 Viewer.EditorCamera.ShowTarget(boxedComponent);
 
             _engine.Start();
-            await Viewer.Activate();
+            await Viewer.ActivateAsync();
 
             await EventAggregator.PublishAsync(new SelectionRequest<IGlyphData>(this, Editor.Data));
 

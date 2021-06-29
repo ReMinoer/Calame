@@ -1,10 +1,6 @@
 ﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Calame.DocumentContexts;
 using Calame.Viewer.Modules.Base;
-using Calame.Viewer.ViewModels;
-using Caliburn.Micro;
 using Diese.Collections;
 using Glyph.Composition;
 using Glyph.Core;
@@ -19,7 +15,7 @@ namespace Calame.Viewer.Modules
 {
     public class BoxedComponentSelectorModule : ViewerModuleBase
     {
-        private ISelectionContext<IGlyphComponent> _selectionContext;
+        private readonly ISelectionContext<IGlyphComponent> _selectionContext;
 
         private GlyphObject _root;
         private ShapedObjectSelector _shapedObjectSelector;
@@ -36,8 +32,10 @@ namespace Calame.Viewer.Modules
             _selectionContext = selectionContext;
         }
 
-        protected override void ConnectModel() {}
-        protected override void DisconnectModel() {}
+        protected override void ConnectViewer() {}
+        protected override void DisconnectViewer() { }
+        public override void Activate() { }
+        public override void Deactivate() { }
 
         protected override void ConnectRunner()
         {

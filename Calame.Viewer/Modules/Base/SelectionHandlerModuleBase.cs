@@ -18,8 +18,10 @@ namespace Calame.Viewer.Modules.Base
             _eventAggregator = eventAggregator;
         }
 
-        protected override void ConnectModel() {}
-        protected override void DisconnectModel() {}
+        protected override void ConnectViewer() {}
+        protected override void DisconnectViewer() { }
+        public override void Activate() { }
+        public override void Deactivate() { }
 
         protected override void ConnectRunner()
         {
