@@ -49,22 +49,24 @@ namespace Calame.DataModelViewer.Base
         protected virtual Task SaveAsync(T data, Stream stream) => Task.Run(() => SaveLoadFormat.Save(Data, stream));
 
         public abstract IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService, ILogger logger);
-        public abstract void RegisterDependencies(IDependencyRegistry registry);
+        protected abstract void RegisterDependencies(IDependencyRegistry registry);
 
-        public virtual void PrepareEditor(GlyphEngine engine, GlyphObject editorRoot)
+        public virtual void PrepareEditor(IEditorContext editorContext)
         {
-            var pixel = new Texture2D(engine.Resolver.Resolve<Func<GraphicsDevice>>()(), 1, 1);
+            RegisterDependencies(editorContext.Engine.Registry);
+
+            var pixel = new Texture2D(editorContext.Engine.Resolver.Resolve<Func<GraphicsDevice>>()(), 1, 1);
             pixel.SetData(new[] { Color.White });
 
-            RenderScheduler renderScheduler = engine.RootView.RenderScheduler;
+            RenderScheduler renderScheduler = editorContext.Engine.RootView.RenderScheduler;
 
             renderScheduler.Plan(drawer => drawer.SpriteBatchStack.Current.Draw(pixel, drawer.DisplayedRectangle.BoundingBox.ToIntegers(), Color.CornflowerBlue))
                 .Before(renderScheduler.RenderViewTask);
 
-            editorRoot.Add<SceneNode>();
+            editorContext.EditorRoot.Add<SceneNode>();
 
             Data.Instantiate();
-            editorRoot.Add(Data.BindedObject);
+            editorContext.EditorRoot.Add(Data.BindedObject);
         }
 
         public virtual void OnDragOver(DragEventArgs dragEventArgs)

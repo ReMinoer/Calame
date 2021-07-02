@@ -15,7 +15,8 @@ namespace Calame.Viewer
         IDocumentContext<IRootInteractivesContext>,
         IDocumentContext<ISelectionContext>,
         IDocumentContext<ISelectionContext<IGlyphComponent>>,
-        ISelectionContext<IGlyphComponent>
+        ISelectionContext<IGlyphComponent>,
+        IDefaultCameraTarget
     {
         ViewerViewModel Viewer { get; }
         bool DebugMode { get; set; }

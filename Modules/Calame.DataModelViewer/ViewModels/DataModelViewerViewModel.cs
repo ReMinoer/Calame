@@ -42,6 +42,8 @@ namespace Calame.DataModelViewer.ViewModels
         public ViewerViewModel Viewer { get; }
 
         private IEditor _editor;
+        private EditorContext _editorContext;
+
         public IEditor Editor
         {
             get => _editor;
@@ -55,6 +57,8 @@ namespace Calame.DataModelViewer.ViewModels
         
         Type IRunnableDocument.RunCommandDefinitionType => Editor?.RunCommandDefinitionType;
         Type IRunnableDocument.RunAlternativeCommandDefinitionType => Editor?.RunAlternativeCommandDefinitionType;
+
+        IBoxedComponent IDefaultCameraTarget.DefaultCameraTarget => _editorContext.DefaultCameraTarget;
         void IViewerDocument.EnableFreeCamera() { }
 
         public ICommand DragOverCommand { get; }
@@ -115,16 +119,15 @@ namespace Calame.DataModelViewer.ViewModels
             Editor.Data.DependencyResolver = _engine.Resolver;
             Editor.Data.SerializationKnownTypes = _importedTypeProvider.Types;
 
-            Editor.RegisterDependencies(_engine.Registry);
-            Editor.PrepareEditor(Viewer.Runner.Engine, Viewer.UserRoot);
+            _editorContext = new EditorContext(Viewer.Runner.Engine, Viewer.UserRoot);
+            Editor.PrepareEditor(_editorContext);
 
             _debuggableViewerContexts.RefreshDebuggableContexts();
 
             _engine.Initialize();
             await _engine.LoadContentAsync();
-
-            if (Editor.Data.BindedObject is IBoxedComponent boxedComponent)
-                Viewer.EditorCamera.ShowTarget(boxedComponent);
+            
+            Viewer.EditorCamera.ShowTarget(_editorContext.DefaultCameraTarget);
 
             _engine.Start();
             await Viewer.ActivateAsync();

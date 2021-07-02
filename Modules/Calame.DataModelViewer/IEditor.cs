@@ -5,11 +5,8 @@ using System.Windows;
 using Gemini.Framework.ToolBars;
 using Glyph;
 using Glyph.Composition.Modelization;
-using Glyph.Core;
-using Glyph.Engine;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
-using Niddle;
 
 namespace Calame.DataModelViewer
 {
@@ -26,8 +23,7 @@ namespace Calame.DataModelViewer
         Task SaveDataAsync(Stream stream);
 
         IContentLibrary CreateContentLibrary(IGraphicsDeviceService graphicsDeviceService, ILogger logger);
-        void RegisterDependencies(IDependencyRegistry registry);
-        void PrepareEditor(GlyphEngine engine, GlyphObject editorRoot);
+        void PrepareEditor(IEditorContext editorContext);
 
         void OnDragOver(DragEventArgs dragEventArgs);
         void OnDrop(DragEventArgs dragEventArgs);

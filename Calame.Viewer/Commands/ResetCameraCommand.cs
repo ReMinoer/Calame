@@ -17,7 +17,9 @@ namespace Calame.Viewer.Commands
             protected override void Run(IViewerDocument document)
             {
                 document.EnableFreeCamera();
-                document.Viewer.EditorCamera.ShowTarget(document.Viewer.UserRoot);
+
+                if (document.DefaultCameraTarget != null)
+                    document.Viewer.EditorCamera.ShowTarget(document.DefaultCameraTarget);
             }
         }
     }

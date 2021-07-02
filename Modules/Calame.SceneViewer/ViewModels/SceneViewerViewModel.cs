@@ -57,6 +57,8 @@ namespace Calame.SceneViewer.ViewModels
         public SessionModeModule SessionMode { get; }
 
         public bool FreeCameraEnabled { get; private set; }
+        IBoxedComponent IDefaultCameraTarget.DefaultCameraTarget => _sessionContext.DefaultCameraTarget;
+
         public Type RunCommandDefinitionType { get; } = typeof(ResetSessionCommand);
         public Type RunAlternativeCommandDefinitionType => null;
 
@@ -114,12 +116,14 @@ namespace Calame.SceneViewer.ViewModels
             _engine.Initialize();
             await _engine.LoadContentAsync();
 
-            EnableFreeCamera();
-            Viewer.EditorCamera.ShowTarget(_sessionContext.UserRoot);
+            EnableDefaultCamera();
+
+            if (_sessionContext.DefaultCameraTarget != null)
+                Viewer.EditorCamera.ShowTarget(_sessionContext.DefaultCameraTarget);
 
             _engine.Start();
             await Viewer.ActivateAsync();
-            
+
             await EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, DefaultSelection));
             await EventAggregator.PublishAsync(new SwitchViewerModeRequest(this, SessionMode));
 

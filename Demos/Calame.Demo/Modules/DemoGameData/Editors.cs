@@ -82,7 +82,7 @@ namespace Calame.Demo.Modules.DemoGameData
             return ContentManager;
         }
 
-        public override void RegisterDependencies(IDependencyRegistry registry)
+        protected override void RegisterDependencies(IDependencyRegistry registry)
         {
             registry.Add(Dependency.OnType<Scene>());
             registry.Add(Dependency.OnType<InstanceObject>());
