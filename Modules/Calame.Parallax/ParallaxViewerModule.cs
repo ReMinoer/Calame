@@ -39,8 +39,7 @@ namespace Calame.Parallax
             _root = Model.EditorModeRoot.Add<GlyphObject>(beforeAdding: Model.NotSelectableComponents.Add);
             _root.Name = "Parallax Controller";
 
-            var parallaxController = _root.Add<ParallaxManipulator>();
-            parallaxController.Settings = parallaxControllerSettings;
+            _root.Add<ParallaxManipulator>(x => x.Settings = parallaxControllerSettings);
         }
 
         public override void Deactivate()
