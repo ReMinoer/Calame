@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SubSolutionConfiguration>
+    <Root>
+        <Projects Path="*/" />
+        <Folder Name="Demos">
+            <Projects Path="Demos/*/" />
+        </Folder>
+        <Folder Name="Modules">
+            <Projects Path="Modules/*/" />
+        </Folder>
+        <Folder Name="External">
+            <Dependencies />
+        </Folder>
+        <Folder Name="Tests">
+            <Dependents KeepOnlyDirect="true" KeepOnlySatisfied="true">
+                <Where>
+                    <ProjectPath Match="**/*.Test*" />
+                </Where>
+            </Dependents>
+        </Folder>
+    </Root>
+</SubSolutionConfiguration>
