@@ -9,10 +9,11 @@ namespace Calame.DataModelViewer
         public GlyphObject EditorRoot { get; }
         public IBoxedComponent DefaultCameraTarget { get; set; }
 
-        public EditorContext(GlyphEngine engine, GlyphObject editorRoot)
+        public EditorContext(GlyphEngine engine, GlyphObject editorRoot, IBoxedComponent defaultCameraTarget)
         {
             Engine = engine;
             EditorRoot = editorRoot;
+            DefaultCameraTarget = defaultCameraTarget;
         }
     }
 }

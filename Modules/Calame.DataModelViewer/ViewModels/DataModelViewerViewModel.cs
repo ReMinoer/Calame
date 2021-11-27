@@ -119,7 +119,7 @@ namespace Calame.DataModelViewer.ViewModels
             Editor.Data.DependencyResolver = _engine.Resolver;
             Editor.Data.SerializationKnownTypes = _importedTypeProvider.Types;
 
-            _editorContext = new EditorContext(Viewer.Runner.Engine, Viewer.UserRoot);
+            _editorContext = new EditorContext(Viewer.Runner.Engine, Viewer.UserRoot, Viewer.UserRoot);
             Editor.PrepareEditor(_editorContext);
 
             _debuggableViewerContexts.RefreshDebuggableContexts();
