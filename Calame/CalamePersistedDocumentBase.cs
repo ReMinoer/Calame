@@ -94,7 +94,7 @@ namespace Calame
             IsDirty = false;
 
             await LoadDocumentAsync(filePath);
-            StartWatchingFilePath(filePath);
+            StartWatchingFilePath();
         }
 
         public async Task Save(string filePath)
@@ -110,13 +110,14 @@ namespace Calame
                 }
             }
 
-            StopWatchingFilePath(filePath);
-            await SaveDocumentAsync(filePath);
-            StartWatchingFilePath(filePath);
+            StopWatchingFilePath();
 
+            await SaveDocumentAsync(filePath);
             FilePath = filePath;
             IsNew = false;
             IsDirty = false;
+
+            StartWatchingFilePath();
         }
 
         public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken)
@@ -137,20 +138,20 @@ namespace Calame
                 }
             }
 
-            StopWatchingFilePath(FilePath);
+            StopWatchingFilePath();
             await DisposeDocumentAsync();
             return true;
         }
 
-        private void StartWatchingFilePath(string filePath)
+        private void StartWatchingFilePath()
         {
-            FileWatcher.WatchFile(filePath, OnFileChanged);
+            FileWatcher.WatchFile(FilePath, OnFileChanged);
         }
 
-        private void StopWatchingFilePath(string filePath)
+        private void StopWatchingFilePath()
         {
             if (!IsNew)
-                FileWatcher.Unwatch(filePath, OnFileChanged);
+                FileWatcher.Unwatch(FilePath, OnFileChanged);
 
             ExternalFileChange = null;
         }
