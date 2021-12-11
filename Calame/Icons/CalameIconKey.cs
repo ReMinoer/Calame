@@ -11,6 +11,7 @@
         LogConsole,
         PropertyGrid,
         SceneGraph,
+        ViewGraph,
 
         // Viewer
         Play,

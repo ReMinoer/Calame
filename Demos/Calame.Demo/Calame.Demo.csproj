@@ -37,6 +37,7 @@
     <ProjectReference Include="..\..\Modules\Calame.PropertyGrid\Calame.PropertyGrid.csproj" />
     <ProjectReference Include="..\..\Modules\Calame.SceneGraph\Calame.SceneGraph.csproj" />
     <ProjectReference Include="..\..\Modules\Calame.SceneViewer\Calame.SceneViewer.csproj" />
+    <ProjectReference Include="..\..\Modules\Calame.ViewGraph\Calame.ViewGraph.csproj" />
     <ProjectReference Include="..\Calame.Demo.Data\Calame.Demo.Data.csproj" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="Calame.ViewGraph.Views.ViewGraphView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:Calame.ViewGraph.ViewModels"
+             xmlns:graph="clr-namespace:Calame.ViewGraph.Graph"
+             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+             xmlns:panAndZoom="clr-namespace:Wpf.Controls.PanAndZoom;assembly=Wpf.Controls.PanAndZoom"
+             xmlns:layout="clr-namespace:GraphShape.Algorithms.Layout;assembly=GraphShape"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:ViewGraphViewModel, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             x:Name="This">
+    <Grid>
+        <panAndZoom:ZoomBorder PanButton="Right">
+            <graph:ViewGraphLayout Graph="{Binding Graph}"
+                                   IsAnimationEnabled="False"
+                                   LayoutAlgorithmType="Tree"
+                                   CreationTransition="{Binding Transition}"
+                                   DestructionTransition="{Binding Transition}">
+                <graph:ViewGraphLayout.LayoutParameters>
+                    <layout:SimpleTreeLayoutParameters LayerGap="20" VertexGap="20" Direction="LeftToRight" />
+                </graph:ViewGraphLayout.LayoutParameters>
+                <graph:ViewGraphLayout.Resources>
+                    <DataTemplate DataType="{x:Type graph:ViewGraphVertex}">
+                        <Button Command="{Binding DataContext.SelectionCommand, ElementName=This}" CommandParameter="{Binding Data}">
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <Border Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" BorderThickness="2" BorderBrush="{Binding Color}" CornerRadius="5">
+                                        <Border Background="Transparent" BorderThickness="2" CornerRadius="2" Padding="10">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="BorderBrush" Value="Transparent"></Setter>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <userControls:CalameIcon Target="{Binding Data}"
+                                                                         IconDescriptor="{Binding DataContext.IconDescriptor, ElementName=This}"
+                                                                         IconProvider="{Binding DataContext.IconProvider, ElementName=This}"
+                                                                         IconSize="16"
+                                                                         Margin="0 0 2 0" />
+                                                <Label Grid.Column="1"
+                                                       Content="{Binding Data}" />
+                                            </Grid>
+                                        </Border>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </DataTemplate>
+                </graph:ViewGraphLayout.Resources>
+            </graph:ViewGraphLayout>
+        </panAndZoom:ZoomBorder>
+    </Grid>
+</UserControl>

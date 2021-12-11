@@ -197,6 +197,7 @@ namespace Calame.DataModelViewer.ViewModels
         IRawContentLibraryContext IDocumentContext<IRawContentLibraryContext>.Context => _debuggableViewerContexts;
         IRootComponentsContext IDocumentContext<IRootComponentsContext>.Context => _debuggableViewerContexts;
         IRootScenesContext IDocumentContext<IRootScenesContext>.Context => _debuggableViewerContexts;
+        IViewsContext IDocumentContext<IViewsContext>.Context => _debuggableViewerContexts;
         IRootInteractivesContext IDocumentContext<IRootInteractivesContext>.Context => _debuggableViewerContexts;
 
         ISelectionContext IDocumentContext<ISelectionContext>.Context => this;

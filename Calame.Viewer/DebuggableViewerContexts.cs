@@ -8,13 +8,14 @@ using Caliburn.Micro;
 using Fingear.Interactives;
 using Glyph;
 using Glyph.Composition;
+using Glyph.Core;
 using Glyph.Pipeline;
 using Glyph.WpfInterop;
 using Stave;
 
 namespace Calame.Viewer
 {
-    public class DebuggableViewerContexts : PropertyChangedBase, IRawContentLibraryContext, IRootsContext, IRootComponentsContext, IRootScenesContext, IRootInteractivesContext
+    public class DebuggableViewerContexts : PropertyChangedBase, IRawContentLibraryContext, IRootsContext, IRootComponentsContext, IRootScenesContext, IViewsContext, IRootInteractivesContext
     {
         public ViewerViewModel Viewer { get; }
 
@@ -51,6 +52,13 @@ namespace Calame.Viewer
         {
             get => _rootScenes;
             private set => Set(ref _rootScenes, value);
+        }
+
+        private IEnumerable<IView> _views;
+        public IEnumerable<IView> Views
+        {
+            get => _views;
+            private set => Set(ref _views, value);
         }
 
         private IEnumerable<IInteractive> _rootInteractives;
@@ -106,16 +114,19 @@ namespace Calame.Viewer
             {
                 RootComponents = Enumerable.Empty<IGlyphComponent>();
                 RootInteractives = Enumerable.Empty<IInteractive>();
+                Views = Enumerable.Empty<IView>();
             }
             else if (DebugMode)
             {
                 RootComponents = new IGlyphComponent[] { Viewer.Runner.Engine.Root };
                 RootInteractives = new IInteractive[] { Viewer.Runner.Engine.InteractionManager.Root };
+                Views = Viewer.Runner.Engine.ProjectionManager.Views;
             }
             else
             {
                 RootComponents = (UserParentComponent ?? Viewer.UserRoot).Components;
                 RootInteractives = Viewer.InteractiveModes.Where(x => x.IsUserMode).Select(x => x.Interactive);
+                Views = Viewer.Runner.Engine.ProjectionManager.Views.Where(x => x != Viewer.EditorView);
             }
 
             Roots = RootComponents;
@@ -146,7 +157,7 @@ namespace Calame.Viewer
 
         private bool CanSelectBase(IGlyphComponent component)
         {
-            return component != null && !component.GetType().IsValueType;
+            return component != null && (Viewer.Runner is null || component.RootParent() == Viewer.Runner.Engine.Root) && !component.GetType().IsValueType;
         }
     }
 }

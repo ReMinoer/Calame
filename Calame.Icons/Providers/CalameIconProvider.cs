@@ -19,6 +19,7 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.LogConsole: return PackIconMaterialKind.Console;
                 case CalameIconKey.PropertyGrid: return PackIconMaterialKind.FormatListBulletedType;
                 case CalameIconKey.SceneGraph: return PackIconMaterialKind.AxisArrow;
+                case CalameIconKey.ViewGraph: return PackIconMaterialKind.Monitor;
 
                 case CalameIconKey.Play: return PackIconMaterialKind.Play;
                 case CalameIconKey.Pause: return PackIconMaterialKind.Pause;

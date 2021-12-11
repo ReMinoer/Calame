@@ -12,6 +12,7 @@ namespace Calame.Viewer
         IDocumentContext<IRootsContext>,
         IDocumentContext<IRootComponentsContext>,
         IDocumentContext<IRootScenesContext>,
+        IDocumentContext<IViewsContext>,
         IDocumentContext<IRootInteractivesContext>,
         IDocumentContext<ISelectionContext>,
         IDocumentContext<ISelectionContext<IGlyphComponent>>,
