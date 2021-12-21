@@ -4,7 +4,9 @@ using Caliburn.Micro;
 using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
+using Glyph.Tools;
 using Glyph.Tools.Transforming;
+using Glyph.Tools.Transforming.Base;
 
 namespace Calame.Viewer.Modules
 {
@@ -50,12 +52,23 @@ namespace Calame.Viewer.Modules
             var controller = new TransformableDataController(selection);
             if (controller.Anchor == null)
                 return;
+            
+            if (controller.SizeController != null)
+            {
+                var rectangleEditor = Model.EditorModeRoot.Add<RectangleEditor>(beforeAdding: Model.NotSelectableComponents.Add);
+                rectangleEditor.EditedObject = controller;
+                rectangleEditor.RaycastClient = Model.Client;
 
-            var transformationEditor = Model.EditorModeRoot.Add<TransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
-            transformationEditor.EditedObject = controller;
-            transformationEditor.RaycastClient = Model.Client;
+                _root = rectangleEditor;
+            }
+            else
+            {
+                var transformationEditor = Model.EditorModeRoot.Add<TransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
+                transformationEditor.EditedObject = controller;
+                transformationEditor.RaycastClient = Model.Client;
 
-            _root = transformationEditor;
+                _root = transformationEditor;
+            }
         }
 
         protected override void ReleaseComponent(IGlyphComponent selection)
