@@ -49,20 +49,24 @@ namespace Calame.Viewer.Modules
 
         protected override void HandleData(IGlyphData selection)
         {
-            var controller = new TransformableDataController(selection);
-            if (controller.Anchor == null)
-                return;
-            
-            if (controller.SizeController != null)
+            if (selection is IRectangleController rectangleController)
             {
+                var anchoredController = rectangleController as IAnchoredController;
+                var anchor = anchoredController?.Anchor ?? selection.BindedObject.GetSceneNode();
+                var anchoredRectangleController = new AnchoredRectangleController(rectangleController, anchor);
+
                 var rectangleEditor = Model.EditorModeRoot.Add<RectangleEditor>(beforeAdding: Model.NotSelectableComponents.Add);
-                rectangleEditor.EditedObject = controller;
+                rectangleEditor.EditedObject = anchoredRectangleController;
                 rectangleEditor.RaycastClient = Model.Client;
 
                 _root = rectangleEditor;
             }
             else
             {
+                var controller = new TransformableDataController(selection);
+                if (controller.Anchor == null)
+                    return;
+
                 var transformationEditor = Model.EditorModeRoot.Add<TransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
                 transformationEditor.EditedObject = controller;
                 transformationEditor.RaycastClient = Model.Client;
