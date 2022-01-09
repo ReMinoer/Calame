@@ -85,10 +85,10 @@ namespace Calame.Viewer.ViewModels
                     
                     NotSelectableComponents.Clear();
 
-                    engine.InteractionManager.Root.Remove(_viewerModeToggle);
-                    engine.InteractionManager.Root.Remove(_editorInteractive);
+                    engine?.InteractionManager.Root.Remove(_viewerModeToggle);
+                    engine?.InteractionManager.Root.Remove(_editorInteractive);
 
-                    _runner.Engine.Root.RemoveAndDispose(Root);
+                    engine?.Root.RemoveAndDispose(Root);
                     
                     EditorView = null;
                     EditorCamera = null;
@@ -271,6 +271,7 @@ namespace Calame.Viewer.ViewModels
                 module.Disconnect();
 
             Runner?.Dispose();
+            Runner = null;
         }
 
         public class EditorModeModule : ViewerModuleBase, IViewerInteractiveMode
