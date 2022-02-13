@@ -121,6 +121,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.DocumentContexts", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Parallax", "Modules\Calame.Parallax\Calame.Parallax.csproj", "{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.ViewGraph", "Modules\Calame.ViewGraph\Calame.ViewGraph.csproj", "{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -347,6 +349,10 @@ Global
 		{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -402,6 +408,7 @@ Global
 		{BD63C0F2-F582-4BE6-8E8E-BE565FBF3E01} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 		{659541B0-C2A8-4F33-984F-EEB3729F8969} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 		{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8} = {95AFED7A-6211-441D-9643-10354F05477E}
+		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418} = {95AFED7A-6211-441D-9643-10354F05477E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51117004-2C3A-426A-86DF-7881F4FEF766}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SubSolutionConfiguration>
+<Subsln xmlns="http://subsln.github.io">
     <Root>
         <Projects Path="*/" />
         <Folder Name="Demos">
@@ -19,4 +19,4 @@
             </Dependents>
         </Folder>
     </Root>
-</SubSolutionConfiguration>
+</Subsln>
