@@ -41,7 +41,8 @@ namespace Calame.DataModelTree.ViewModels
                 if (!SetValue(ref _selection, value))
                     return;
 
-                _selectionContext.SelectAsync(_selection).Wait();
+                if (_selection != null)
+                    _selectionContext.SelectAsync(_selection).Wait();
             }
         }
 
