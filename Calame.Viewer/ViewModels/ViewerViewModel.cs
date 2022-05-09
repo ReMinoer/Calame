@@ -153,7 +153,7 @@ namespace Calame.Viewer.ViewModels
             InteractiveModes = new ReadOnlyObservableList<IViewerInteractiveMode>(_interactiveModes);
 
             _editorModeModule = new EditorModeModule();
-            var componentSelectorModule = new BoxedComponentSelectorModule((owner as IDocumentContext<ISelectionContext<IGlyphComponent>>)?.Context);
+            var componentSelectorModule = new BoxedComponentSelectorModule(_eventAggregator, (owner as IDocumentContext<ISelectionContext<IGlyphComponent>>)?.Context);
 
             var modules = new List<IViewerModule> { _editorModeModule, componentSelectorModule };
             modules.AddRange(moduleSources.Where(x => x.IsValidForDocument(owner)).Select(x => x.CreateInstance(owner)));

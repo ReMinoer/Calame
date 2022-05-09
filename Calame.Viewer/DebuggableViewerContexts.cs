@@ -145,19 +145,21 @@ namespace Calame.Viewer
 
         private bool CanSelectInDebugMode(IGlyphComponent component)
         {
-            return CanSelectBase(component)
-                && !component.AndAllParents().Any(Viewer.NotSelectableComponents.Contains);
+            return component is null
+                || (CanSelectBase(component)
+                    && !component.AndAllParents().Any(Viewer.NotSelectableComponents.Contains));
         }
 
         private bool CanSelectInUserMode(IGlyphComponent component)
         {
-            return CanSelectBase(component)
-                && component.AllParents().Contains(UserParentComponent ?? Viewer.UserRoot);
+            return component is null
+                || (CanSelectBase(component)
+                    && component.AllParents().Contains(UserParentComponent ?? Viewer.UserRoot));
         }
 
         private bool CanSelectBase(IGlyphComponent component)
         {
-            return component != null && (Viewer.Runner is null || component.RootParent() == Viewer.Runner.Engine.Root) && !component.GetType().IsValueType;
+            return (Viewer.Runner is null || component.RootParent() == Viewer.Runner.Engine.Root) && !component.GetType().IsValueType;
         }
     }
 }

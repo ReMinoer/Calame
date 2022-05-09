@@ -1,19 +1,18 @@
 ﻿using System.Linq;
 using Calame.DocumentContexts;
 using Calame.Viewer.Modules.Base;
+using Caliburn.Micro;
 using Diese.Collections;
 using Glyph.Composition;
 using Glyph.Core;
-using Glyph.Core.Resolvers;
 using Glyph.Engine;
-using Glyph.Messaging;
 using Glyph.Tools;
 using Niddle;
 using Stave;
 
 namespace Calame.Viewer.Modules
 {
-    public class BoxedComponentSelectorModule : ViewerModuleBase
+    public class BoxedComponentSelectorModule : SelectionHandlerModuleBase
     {
         private readonly ISelectionContext<IGlyphComponent> _selectionContext;
 
@@ -27,23 +26,21 @@ namespace Calame.Viewer.Modules
             private set => this.SetValue(ref _selectedComponent, value);
         }
         
-        public BoxedComponentSelectorModule(ISelectionContext<IGlyphComponent> selectionContext)
+        public BoxedComponentSelectorModule(IEventAggregator eventAggregator, ISelectionContext<IGlyphComponent> selectionContext)
+             : base(eventAggregator)
         {
             _selectionContext = selectionContext;
         }
 
-        protected override void ConnectViewer() {}
-        protected override void DisconnectViewer() { }
-        public override void Activate() { }
-        public override void Deactivate() { }
-
         protected override void ConnectRunner()
         {
+            base.ConnectRunner();
+
             GlyphEngine engine = Model.Runner.Engine;
 
             _root = Model.EditorModeRoot.Add<GlyphObject>();
 
-            _shapedObjectSelector = engine.Resolver.WithLink<ISubscribableRouter, ISubscribableRouter>(ResolverScope.Global).Resolve<ShapedObjectSelector>();
+            _shapedObjectSelector = engine.Resolver.WithInstance<IGlyphComponent>(Model.UserRoot).Resolve<ShapedObjectSelector>();
             _shapedObjectSelector.Filter = ComponentFilter;
 
             _root.Add(_shapedObjectSelector);
@@ -59,6 +56,18 @@ namespace Calame.Viewer.Modules
 
             _shapedObjectSelector = null;
             _root = null;
+
+            base.DisconnectRunner();
+        }
+
+        protected override void HandleComponent(IGlyphComponent selection)
+        {
+            _shapedObjectSelector.Selection = selection as IBoxedComponent;
+        }
+
+        protected override void ReleaseComponent(IGlyphComponent selection)
+        {
+            _shapedObjectSelector.Selection = null;
         }
 
         private bool ComponentFilter(IGlyphComponent component)
