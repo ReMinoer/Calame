@@ -141,11 +141,15 @@ namespace Calame.Viewer.Modules
         private void OnGrabbed(object sender, EventArgs e)
         {
             _markOwner.Visible = true;
+            _horizontalMark.Visible = false;
+            _verticalMark.Visible = false;
         }
 
         private void OnReleased(object sender, EventArgs e)
         {
             _markOwner.Visible = false;
+            _horizontalMark.Visible = false;
+            _verticalMark.Visible = false;
         }
 
         private Vector2 Snap(IGlyphComponent component, Vector2 oldPosition, Vector2 newPosition)
