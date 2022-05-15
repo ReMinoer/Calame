@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using System.Windows.Media;
 using Calame.Icons;
 using Diese;
 using Diese.Collections;
@@ -14,12 +16,15 @@ namespace Calame.Utils
     public interface ITreeViewItemModel : IParentable<ITreeViewItemModel>, IEquatable<ITreeViewItemModel>, IDisposable
     {
         object Data { get; }
+
         string DisplayName { get; }
+        FontWeight FontWeight { get; }
         IconDescription IconDescription { get; }
 
         new ITreeViewItemModel Parent { get; set; }
         IObservableList<ITreeViewItemModel> Children { get; }
 
+        bool IsHeader { get; set; }
         bool IsEnabled { get; set; }
         bool IsDisabledByParent { get; set; }
         
@@ -53,11 +58,25 @@ namespace Calame.Utils
             set => Set(ref _displayName, value);
         }
 
+        private FontWeight _fontWeight;
+        public FontWeight FontWeight
+        {
+            get => _fontWeight;
+            set => Set(ref _fontWeight, value);
+        }
+
         private IconDescription _iconDescription;
         public IconDescription IconDescription
         {
             get => _iconDescription;
             set => Set(ref _iconDescription, value);
+        }
+
+        private bool _isHeader;
+        public bool IsHeader
+        {
+            get => _isHeader;
+            set => Set(ref _isHeader, value);
         }
 
         private bool _isEnabled = true;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel.Composition;
 using System.Windows.Media;
 using MahApps.Metro.IconPacks;
@@ -19,6 +20,8 @@ namespace Calame.Icons.Descriptors
         {
             if (model == null)
                 return new IconDescription(PackIconMaterialKind.Null, DefaultBrush);
+            if (model is IEnumerable)
+                return new IconDescription(PackIconMaterialKind.Menu, DefaultBrush);
 
             return new IconDescription(PackIconMaterialKind.RhombusOutline, DefaultBrush);
         }

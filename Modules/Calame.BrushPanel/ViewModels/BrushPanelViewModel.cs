@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Calame.DocumentContexts;
 using Calame.Icons;
@@ -35,6 +37,7 @@ namespace Calame.BrushPanel.ViewModels
         private ISelectionContext _selectionContext;
 
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataTreeItemBuilder;
+        private readonly TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>> _childrenSourceItemBuilder;
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _componentTreeItemBuilder;
 
         public bool DisableChildrenIfParentDisabled => true;
@@ -106,17 +109,30 @@ namespace Calame.BrushPanel.ViewModels
             IconDescriptorManager = iconDescriptorManager;
             IconDescriptor = iconDescriptorManager.GetDescriptor();
 
-            IIconDescriptor<IGlyphComponent> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
+            IIconDescriptor defaultIconDescriptor = iconDescriptorManager.GetDescriptor();
+            IIconDescriptor<IGlyphData> dataIconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphData>();
+            IIconDescriptor<IGlyphComponent> componentIconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _dataTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
                                    .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
-                                   .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphData.Children))
-                                   .IconDescription(x => iconDescriptor.GetIcon(x.BindedObject));
+                                   .ChildrenSource(x => new CompositeReadOnlyObservableList<object>
+                                   (
+                                       new EnumerableReadOnlyObservableList<object>(x.Children),
+                                       new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
+                                   ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
+                                   .IconDescription(dataIconDescriptor.GetIcon);
+
+            _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>>()
+                .DisplayName(x => x.ToString())
+                .FontWeight(_ => FontWeights.Bold)
+                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x))
+                .IconDescription(defaultIconDescriptor.GetIcon)
+                .IsHeader(_ => true);
 
             _componentTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()
                                         .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
                                         .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
-                                        .IconDescription(x => iconDescriptor.GetIcon(x));
+                                        .IconDescription(componentIconDescriptor.GetIcon);
 
             SelectBrushCommand = new RelayCommand(OnSelectBrush);
             SelectPaintCommand = new RelayCommand(OnSelectPaint);
@@ -180,6 +196,8 @@ namespace Calame.BrushPanel.ViewModels
             {
                 case IGlyphData data:
                     return _dataTreeItemBuilder.Build(data, synchronizerConfiguration);
+                case IReadOnlyObservableCollection<IGlyphData> childrenSource:
+                    return _childrenSourceItemBuilder.Build(childrenSource, synchronizerConfiguration);
                 case IGlyphComponent component:
                     return _componentTreeItemBuilder.Build(component, synchronizerConfiguration);
                 default:

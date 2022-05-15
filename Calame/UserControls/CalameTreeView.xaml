@@ -60,10 +60,17 @@
             </TreeView.ItemsPanel>
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="Focusable" Value="{Binding IsEnabled}" />
+                    <Setter Property="Focusable" Value="True" />
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                     <Setter Property="Visibility" Value="Visible" />
                     <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                            <Setter Property="Focusable" Value="False" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsHeader}" Value="True">
+                            <Setter Property="Focusable" Value="False" />
+                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" />
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding VisibleForFilter}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
@@ -105,7 +112,7 @@
                                                      IconSize="14"
                                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
                                                      VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding DisplayName}" Background="Transparent">
+                            <TextBlock Text="{Binding DisplayName}" FontWeight="{Binding FontWeight}" Background="Transparent">
                                 <b:Interaction.Behaviors>
                                     <behaviors:TextBlockHighlightFilteredBehavior ItemText="{Binding DisplayName}"
                                                                                   FilterText="{Binding FilterText, ElementName=This}"

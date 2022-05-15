@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using Calame.Icons;
 using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
@@ -17,12 +19,16 @@ namespace Calame.Utils
         
         public TreeViewItemModelBuilder<T> DisplayName(Func<T, string> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => DisplayName(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> FontWeight(Func<T, FontWeight> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => FontWeight(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> IconDescription(Func<T, IconDescription> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => IconDescription(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> ChildrenSource(Func<T, IReadOnlyObservableList<object>> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => ChildrenSource(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> IsEnabled(Func<T, bool> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => IsEnabled(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> IsHeader(Func<T, bool> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => IsHeader(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> IsTriggered(Func<T, bool> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => IsTriggered(getter, x => OnPropertyChanged(x, propertyName, notifier));
 
@@ -57,6 +63,12 @@ namespace Calame.Utils
             return this;
         }
 
+        public TreeViewItemModelBuilder<T> FontWeight(Func<T, FontWeight> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.FontWeight = x);
+            return this;
+        }
+
         public TreeViewItemModelBuilder<T> IconDescription(Func<T, IconDescription> getter, Func<T, IObservable<object>> observableFunc = null)
         {
             AddBinding(getter, observableFunc, (v, x) => v.IconDescription = x);
@@ -72,6 +84,12 @@ namespace Calame.Utils
         public TreeViewItemModelBuilder<T> IsEnabled(Func<T, bool> getter, Func<T, IObservable<object>> observableFunc = null)
         {
             AddBinding(getter, observableFunc, (v, x) => v.IsEnabled = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> IsHeader(Func<T, bool> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.IsHeader = x);
             return this;
         }
 

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using Calame.DocumentContexts;
 using Calame.Icons;
 using Calame.UserControls;
@@ -23,7 +26,8 @@ namespace Calame.DataModelTree.ViewModels
         public IIconDescriptor IconDescriptor { get; }
 
         private ISelectionContext<IGlyphData> _selectionContext;
-        private readonly TreeViewItemModelBuilder<IGlyphCreator> _treeItemBuilder;
+        private readonly TreeViewItemModelBuilder<IGlyphData> _dataItemBuilder;
+        private readonly TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>> _childrenSourceItemBuilder;
 
         private IRootDataContext _rootDataContext;
         public IRootDataContext RootDataContext
@@ -32,8 +36,8 @@ namespace Calame.DataModelTree.ViewModels
             private set => SetValue(ref _rootDataContext, value);
         }
 
-        private IGlyphData _selection;
-        public IGlyphData Selection
+        private object _selection;
+        public object Selection
         {
             get => _selection;
             set
@@ -41,8 +45,8 @@ namespace Calame.DataModelTree.ViewModels
                 if (!SetValue(ref _selection, value))
                     return;
 
-                if (_selection != null)
-                    _selectionContext.SelectAsync(_selection).Wait();
+                if (_selection is IGlyphData data)
+                    _selectionContext.SelectAsync(data).Wait();
             }
         }
 
@@ -57,12 +61,24 @@ namespace Calame.DataModelTree.ViewModels
             IconProvider = iconProvider;
             IconDescriptor = iconDescriptorManager.GetDescriptor();
 
-            IIconDescriptor<IGlyphData> iconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphData>();
+            IIconDescriptor defaultIconDescriptor = iconDescriptorManager.GetDescriptor();
+            IIconDescriptor<IGlyphData> dataIconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphData>();
 
-            _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphCreator>()
-                               .DisplayName(x => x.DisplayName, nameof(IGlyphCreator.DisplayName))
-                               .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphCreator.Children))
-                               .IconDescription(x => iconDescriptor.GetIcon(x));
+            _dataItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
+                .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
+                .ChildrenSource(x => new CompositeReadOnlyObservableList<object>
+                (
+                    new EnumerableReadOnlyObservableList<object>(x.Children),
+                    new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
+                ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
+                .IconDescription(x => dataIconDescriptor.GetIcon(x));
+
+            _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>>()
+                .DisplayName(x => x.ToString())
+                .FontWeight(_ => FontWeights.Bold)
+                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x))
+                .IconDescription(x => defaultIconDescriptor.GetIcon(x))
+                .IsHeader(_ => true);
         }
         
         protected override Task OnDocumentActivated(IDocumentContext<IRootDataContext> activeDocument)
@@ -93,7 +109,15 @@ namespace Calame.DataModelTree.ViewModels
 
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
-            return _treeItemBuilder.Build((IGlyphCreator)data, synchronizerConfiguration);
+            switch (data)
+            {
+                case IGlyphData glyphData:
+                    return _dataItemBuilder.Build(glyphData, synchronizerConfiguration);
+                case IReadOnlyObservableCollection<IGlyphData> childrenSource:
+                    return _childrenSourceItemBuilder.Build(childrenSource, synchronizerConfiguration);
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         public bool DisableChildrenIfParentDisabled => false;
