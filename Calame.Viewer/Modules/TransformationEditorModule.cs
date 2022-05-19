@@ -34,6 +34,7 @@ namespace Calame.Viewer.Modules
     {
         private GlyphObject _root;
         private BoxedComponentsSnapping _boxedComponentsSnapping;
+        private GridComponentsSnapping _gridComponentsSnapping;
         private InputModifiers _inputModifiers;
         private GlyphObject _markOwner;
         private GlyphObject _horizontalMark;
@@ -53,7 +54,8 @@ namespace Calame.Viewer.Modules
 
             _root = Model.EditorModeRoot.Add<GlyphObject>();
             _boxedComponentsSnapping = new BoxedComponentsSnapping(Model.UserRoot);
-            
+            _gridComponentsSnapping = new GridComponentsSnapping(Model.UserRoot);
+
             _inputModifiers = _root.Add<InputModifiers>();
 
             _markOwner = _root.Add<GlyphObject>();
@@ -73,6 +75,7 @@ namespace Calame.Viewer.Modules
         protected override void DisconnectRunner()
         {
             _boxedComponentsSnapping.Dispose();
+            _gridComponentsSnapping.Dispose();
             Model.EditorModeRoot.RemoveAndDispose(_root);
 
             _handle = null;
@@ -81,6 +84,7 @@ namespace Calame.Viewer.Modules
             _verticalMark = null;
             _horizontalMark = null;
             _inputModifiers = null;
+            _gridComponentsSnapping = null;
             _boxedComponentsSnapping = null;
             _root = null;
 
@@ -93,7 +97,7 @@ namespace Calame.Viewer.Modules
             if (sceneNode == null)
                 return;
 
-            var transformationEditor = Model.EditorModeRoot.Add<MultiModeTransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
+            var transformationEditor = _root.Add<MultiModeTransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
             transformationEditor.EditedObject = new MultiModeTransformationController(sceneNode);
             transformationEditor.RaycastClient = Model.Client;
             transformationEditor.Revaluation = x => Snap(selection, sceneNode.Position, x);
@@ -112,7 +116,7 @@ namespace Calame.Viewer.Modules
                 var anchor = anchoredController?.Anchor ?? selection.BindedObject.GetSceneNode();
                 var anchoredRectangleController = new AnchoredRectangleController(rectangleController, anchor);
 
-                var rectangleEditor = Model.EditorModeRoot.Add<RectangleEditor>(beforeAdding: Model.NotSelectableComponents.Add);
+                var rectangleEditor = _root.Add<RectangleEditor>(beforeAdding: Model.NotSelectableComponents.Add);
                 rectangleEditor.EditedObject = anchoredRectangleController;
                 rectangleEditor.RaycastClient = Model.Client;
                 //rectangleEditor.Revaluation = x => Snap(selection.BindedObject, anchoredRectangleController.Rectangle.Position, x);
@@ -125,7 +129,7 @@ namespace Calame.Viewer.Modules
                 if (controller.Anchor == null)
                     return;
 
-                var transformationEditor = Model.EditorModeRoot.Add<TransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
+                var transformationEditor = _root.Add<TransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
                 transformationEditor.EditedObject = controller;
                 transformationEditor.RaycastClient = Model.Client;
                 transformationEditor.Revaluation = x => Snap(selection.BindedObject, controller.PositionController.Position, x);
@@ -154,10 +158,22 @@ namespace Calame.Viewer.Modules
 
         private Vector2 Snap(IGlyphComponent component, Vector2 oldPosition, Vector2 newPosition)
         {
-            if (_inputModifiers.CtrlPressed)
-                return newPosition;
+            Vector2 snappedPosition;
+            float? horizontalSnap;
+            float? verticalSnap;
 
-            Vector2 snappedPosition = _boxedComponentsSnapping.Snap(component, oldPosition, newPosition, out float? horizontalSnap, out float? verticalSnap);
+            if (_inputModifiers.CtrlPressed)
+            {
+                snappedPosition = _boxedComponentsSnapping.Snap(component, oldPosition, newPosition, out horizontalSnap, out verticalSnap);
+            }
+            else if (_inputModifiers.AltPressed)
+            {
+                snappedPosition = _gridComponentsSnapping.Snap(component, oldPosition, newPosition, out horizontalSnap, out verticalSnap);
+            }
+            else
+            {
+                return newPosition;
+            }
 
             _horizontalMark.Visible = horizontalSnap.HasValue;
             if (horizontalSnap.HasValue)
