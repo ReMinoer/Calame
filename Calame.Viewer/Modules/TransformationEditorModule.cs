@@ -172,7 +172,9 @@ namespace Calame.Viewer.Modules
             }
             else
             {
-                return newPosition;
+                snappedPosition = newPosition;
+                horizontalSnap = null;
+                verticalSnap = null;
             }
 
             _horizontalMark.Visible = horizontalSnap.HasValue;
