@@ -288,10 +288,7 @@ namespace Calame.PropertyGrid.Controls
                 return;
             }
 
-            var contextMenu = new ContextMenu
-            {
-                PlacementTarget = (UIElement)sender
-            };
+            var contextMenu = new ContextMenu();
 
             string[] typeNames = _newItemTypes.Select(x => x.Name).ToArray();
             ReduceTypeNamePatterns(typeNames);

@@ -240,7 +240,7 @@ namespace Calame.DataModelViewer.ViewModels
             return false;
         }
 
-        public bool CanSelect(IGlyphData data) => CanSelect(data.BindedObject);
+        public bool CanSelect(IGlyphData data) => data is null || CanSelect(data.BindedObject);
         public bool CanSelect(IGlyphComponent component) => _debuggableViewerContexts.CanSelect(component);
 
         public Task SelectAsync(object instance)

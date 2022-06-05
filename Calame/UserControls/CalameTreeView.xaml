@@ -10,8 +10,12 @@
              xmlns:attachedProperties="clr-namespace:Calame.AttachedProperties"
              xmlns:behaviors="clr-namespace:Calame.Behaviors"
              xmlns:icons="clr-namespace:Calame.Icons"
+             xmlns:converters="clr-namespace:Calame.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="200">
+    <UserControl.Resources>
+        <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+    </UserControl.Resources>
     <DockPanel DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}">
         <DockPanel DockPanel.Dock="Top">
             <StackPanel DockPanel.Dock="Left"
@@ -44,6 +48,7 @@
         </DockPanel>
         <TreeView ItemsSource="{Binding TreeItems}"
                   Background="White"
+                  HorizontalContentAlignment="Stretch"
                   attachedProperties:Focus.IsFocused="{Binding IsTreeViewFocused}">
             <b:Interaction.Behaviors>
                 <behaviors:TreeViewBindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}" />
@@ -104,15 +109,36 @@
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type utils:ITreeViewItemModel}">
-                    <Border Padding="2">
+                    <Border>
+                        <Border.ContextMenu>
+                            <ContextMenu ItemsSource="{Binding ContextMenuItems}" />
+                        </Border.ContextMenu>
                         <DockPanel>
                             <userControls:CalameIcon DockPanel.Dock="Left"
-                                                     Margin="0 0 3 0"
+                                                     Margin="2 2 3 2"
                                                      IconDescription="{Binding IconDescription}"
                                                      IconSize="14"
                                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
                                                      VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding DisplayName}" FontWeight="{Binding FontWeight}" Background="Transparent">
+                            <Button DockPanel.Dock="Right" 
+                                    Margin="2 0 0 0"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    Command="{Binding QuickCommand}"
+                                    CommandParameter="{Binding}"
+                                    ToolTip="{Binding QuickCommandToolTip}"
+                                    Visibility="{Binding QuickCommand, Converter={StaticResource ObjectToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal" Margin="1 0">
+                                    <userControls:CalameIcon IconSize="12"
+                                                             IconDescription="{Binding QuickCommandIconDescription}"
+                                                             IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
+                                                             VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding QuickCommandLabel}"
+                                               Visibility="{Binding QuickCommandLabel, Converter={StaticResource ObjectToVisibilityConverter}}"
+                                               FontSize="10"
+                                               Margin="3 0 0 0" VerticalAlignment="Center"></TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <TextBlock Margin="0 2" Text="{Binding DisplayName}" FontWeight="{Binding FontWeight}" Background="Transparent">
                                 <b:Interaction.Behaviors>
                                     <behaviors:TextBlockHighlightFilteredBehavior ItemText="{Binding DisplayName}"
                                                                                   FilterText="{Binding FilterText, ElementName=This}"

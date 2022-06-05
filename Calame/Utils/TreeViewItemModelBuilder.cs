@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Calame.Icons;
@@ -31,10 +34,24 @@ namespace Calame.Utils
             => IsHeader(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> IsTriggered(Func<T, bool> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => IsTriggered(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> ContextMenuItems(Func<T, IEnumerable> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => ContextMenuItems(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> QuickCommand(Func<T, ICommand> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => QuickCommand(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> QuickCommandIconDescription(Func<T, IconDescription> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => QuickCommandIconDescription(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> QuickCommandLabel(Func<T, string> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => QuickCommandLabel(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> QuickCommandToolTip(Func<T, string> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => QuickCommandToolTip(getter, x => OnPropertyChanged(x, propertyName, notifier));
 
         static private IObservable<object> OnPropertyChanged(T data, string propertyName, Func<T, INotifyPropertyChanged> notifier)
         {
-            return ObservableHelpers.OnPropertyChanged(notifier?.Invoke(data) ?? data as INotifyPropertyChanged, propertyName);
+            INotifyPropertyChanged notifyPropertyChanged = notifier?.Invoke(data) ?? data as INotifyPropertyChanged;
+            if (notifyPropertyChanged is null)
+                return Observable.Empty<object>();
+
+            return ObservableHelpers.OnPropertyChanged(notifyPropertyChanged, propertyName);
         }
 
         public TreeViewItemModelBuilder<T> IsEnabled(Func<T, ICommand> commandGetter, Func<T, object> commandParameterGetter = null, bool valueByDefault = true)
@@ -96,6 +113,36 @@ namespace Calame.Utils
         public TreeViewItemModelBuilder<T> IsTriggered(Func<T, bool> getter, Func<T, IObservable<object>> observableFunc = null)
         {
             AddBinding(getter, observableFunc, (v, x) => v.IsTriggered = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> ContextMenuItems(Func<T, IEnumerable> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.ContextMenuItems = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> QuickCommand(Func<T, ICommand> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.QuickCommand = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> QuickCommandIconDescription(Func<T, IconDescription> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.QuickCommandIconDescription = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> QuickCommandLabel(Func<T, string> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.QuickCommandLabel = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> QuickCommandToolTip(Func<T, string> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.QuickCommandToolTip = x);
             return this;
         }
 

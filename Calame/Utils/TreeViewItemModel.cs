@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Calame.Icons;
 using Diese;
 using Diese.Collections;
@@ -35,6 +37,12 @@ namespace Calame.Utils
         bool MatchingUserFilter { get; set; }
         bool VisibleForFilter { get; set; }
         bool VisibleAsParent { get; set; }
+
+        IEnumerable ContextMenuItems { get; set; }
+        ICommand QuickCommand { get; set; }
+        IconDescription QuickCommandIconDescription { get; }
+        string QuickCommandLabel { get; }
+        string QuickCommandToolTip { get; }
     }
 
     public class TreeViewItemModel<T> : NotifyPropertyChangedBase, ITreeViewItemModel
@@ -155,6 +163,41 @@ namespace Calame.Utils
                 _parent = value;
                 _parent?.Children.Add(this);
             }
+        }
+
+        private IEnumerable _contextMenuItems;
+        public IEnumerable ContextMenuItems
+        {
+            get => _contextMenuItems;
+            set => Set(ref _contextMenuItems, value);
+        }
+
+        private ICommand _quickCommand;
+        public ICommand QuickCommand
+        {
+            get => _quickCommand;
+            set => Set(ref _quickCommand, value);
+        }
+
+        private IconDescription _quickCommandIconDescription;
+        public IconDescription QuickCommandIconDescription
+        {
+            get => _quickCommandIconDescription;
+            set => Set(ref _quickCommandIconDescription, value);
+        }
+
+        private string _quickCommandToolTip;
+        public string QuickCommandToolTip
+        {
+            get => _quickCommandToolTip;
+            set => Set(ref _quickCommandToolTip, value);
+        }
+
+        private string _quickCommandLabel;
+        public string QuickCommandLabel
+        {
+            get => _quickCommandLabel;
+            set => Set(ref _quickCommandLabel, value);
         }
 
         public TreeViewItemModel(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)

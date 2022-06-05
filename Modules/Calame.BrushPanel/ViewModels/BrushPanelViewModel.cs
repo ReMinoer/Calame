@@ -37,7 +37,7 @@ namespace Calame.BrushPanel.ViewModels
         private ISelectionContext _selectionContext;
 
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataTreeItemBuilder;
-        private readonly TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>> _childrenSourceItemBuilder;
+        private readonly TreeViewItemModelBuilder<IGlyphDataChildrenSource> _childrenSourceItemBuilder;
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _componentTreeItemBuilder;
 
         public bool DisableChildrenIfParentDisabled => true;
@@ -122,11 +122,11 @@ namespace Calame.BrushPanel.ViewModels
                                    ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
                                    .IconDescription(dataIconDescriptor.GetIcon);
 
-            _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>>()
-                .DisplayName(x => x.ToString())
+            _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IGlyphDataChildrenSource>()
+                .DisplayName(x => x.PropertyName)
                 .FontWeight(_ => FontWeights.Bold)
-                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x))
-                .IconDescription(defaultIconDescriptor.GetIcon)
+                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphDataChildrenSource.Children))
+                .IconDescription(x => IconDescriptor.GetIcon(x.Children), nameof(IGlyphDataChildrenSource.Children))
                 .IsHeader(_ => true);
 
             _componentTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()
@@ -196,7 +196,7 @@ namespace Calame.BrushPanel.ViewModels
             {
                 case IGlyphData data:
                     return _dataTreeItemBuilder.Build(data, synchronizerConfiguration);
-                case IReadOnlyObservableCollection<IGlyphData> childrenSource:
+                case IGlyphDataChildrenSource childrenSource:
                     return _childrenSourceItemBuilder.Build(childrenSource, synchronizerConfiguration);
                 case IGlyphComponent component:
                     return _componentTreeItemBuilder.Build(component, synchronizerConfiguration);

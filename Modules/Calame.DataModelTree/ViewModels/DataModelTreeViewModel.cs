@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Calame.DocumentContexts;
 using Calame.Icons;
@@ -12,6 +16,7 @@ using Calame.Utils;
 using Caliburn.Micro;
 using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
+using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph.Composition.Modelization;
 
@@ -25,9 +30,12 @@ namespace Calame.DataModelTree.ViewModels
         public IIconProvider IconProvider { get; }
         public IIconDescriptor IconDescriptor { get; }
 
+        private readonly Type[] _newTypeRegistry;
         private ISelectionContext<IGlyphData> _selectionContext;
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataItemBuilder;
-        private readonly TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>> _childrenSourceItemBuilder;
+        private readonly TreeViewItemModelBuilder<IGlyphDataChildrenSource> _childrenSourceItemBuilder;
+        
+        private readonly ICommand _removeCommand;
 
         private IRootDataContext _rootDataContext;
         public IRootDataContext RootDataContext
@@ -45,24 +53,25 @@ namespace Calame.DataModelTree.ViewModels
                 if (!SetValue(ref _selection, value))
                     return;
 
-                if (_selection is IGlyphData data)
-                    _selectionContext.SelectAsync(data).Wait();
+                _selectionContext.SelectAsync(_selection as IGlyphData).Wait();
             }
         }
 
         protected override object IconKey => CalameIconKey.DataModelTree;
 
         [ImportingConstructor]
-        public DataModelTreeViewModel(IShell shell, IEventAggregator eventAggregator, IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
+        public DataModelTreeViewModel(IShell shell, IEventAggregator eventAggregator, IImportedTypeProvider importedTypeProvider,
+            IIconProvider iconProvider, IIconDescriptorManager iconDescriptorManager)
             : base(shell, eventAggregator, iconProvider, iconDescriptorManager)
         {
             DisplayName = "Data Model Tree";
 
             IconProvider = iconProvider;
             IconDescriptor = iconDescriptorManager.GetDescriptor();
-
-            IIconDescriptor defaultIconDescriptor = iconDescriptorManager.GetDescriptor();
             IIconDescriptor<IGlyphData> dataIconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphData>();
+
+            _newTypeRegistry = importedTypeProvider.Types.Where(t => t.GetConstructor(Type.EmptyTypes) != null).ToArray();
+            _removeCommand = new RelayCommand(OnRemove, CanRemove);
 
             _dataItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
                 .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
@@ -71,16 +80,63 @@ namespace Calame.DataModelTree.ViewModels
                     new EnumerableReadOnlyObservableList<object>(x.Children),
                     new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
                 ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
-                .IconDescription(x => dataIconDescriptor.GetIcon(x));
+                .IconDescription(x => dataIconDescriptor.GetIcon(x))
+                .ContextMenuItems(GetContextMenuItems);
 
-            _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IReadOnlyObservableCollection<IGlyphData>>()
-                .DisplayName(x => x.ToString())
+            _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IGlyphDataChildrenSource>()
+                .DisplayName(x => x.PropertyName)
                 .FontWeight(_ => FontWeights.Bold)
-                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x))
-                .IconDescription(x => defaultIconDescriptor.GetIcon(x))
-                .IsHeader(_ => true);
+                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphDataChildrenSource.Children))
+                .IconDescription(x => IconDescriptor.GetIcon(x.Children), nameof(IGlyphDataChildrenSource.Children))
+                .IsHeader(_ => true)
+                .QuickCommand(CreateAddCommand, nameof(IGlyphDataChildrenSource.Children))
+                .QuickCommandIconDescription(_ => new IconDescription(CalameIconKey.Add, Brushes.DarkGreen, margin: 0.5))
+                .QuickCommandLabel(_ => "Add")
+                .QuickCommandToolTip(_ => "Add");
         }
-        
+
+        private ICommand CreateAddCommand(IGlyphDataChildrenSource x)
+        {
+            if (!(x.Children is IList list))
+                return null;
+
+            var addCommand = new AddCollectionItemCommand(list, _newTypeRegistry, IconProvider, IconDescriptor);
+            addCommand.ItemAdded += (sender, args) =>
+            {
+                Selection = addCommand.AddedItem;
+            };
+
+            return addCommand;
+        }
+
+        private IEnumerable GetContextMenuItems(IGlyphData data)
+        {
+            if (data.ParentSource != null)
+            {
+                yield return new MenuItem
+                {
+                    Header = "Remove",
+                    Command = _removeCommand,
+                    CommandParameter = data,
+                    Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.Delete), 16)
+                };
+            }
+        }
+
+        private bool CanRemove(object obj) => obj is IGlyphData item && item.ParentSource != null;
+        private void OnRemove(object obj)
+        {
+            if (!CanRemove(obj))
+                return;
+
+            var item = (IGlyphData)obj;
+
+            if (Selection == item)
+                Selection = null;
+
+            item.ParentSource.Remove(item);
+        }
+
         protected override Task OnDocumentActivated(IDocumentContext<IRootDataContext> activeDocument)
         {
             _selection = null;
@@ -113,7 +169,7 @@ namespace Calame.DataModelTree.ViewModels
             {
                 case IGlyphData glyphData:
                     return _dataItemBuilder.Build(glyphData, synchronizerConfiguration);
-                case IReadOnlyObservableCollection<IGlyphData> childrenSource:
+                case IGlyphDataChildrenSource childrenSource:
                     return _childrenSourceItemBuilder.Build(childrenSource, synchronizerConfiguration);
                 default:
                     throw new NotSupportedException();
