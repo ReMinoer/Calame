@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -32,17 +35,6 @@ namespace Calame
             mainWindow.Icon = null;
         }
 
-        protected override void OnStartup(object sender, StartupEventArgs e)
-        {
-            base.OnStartup(sender, e);
-
-            Window mainWindow = Application.MainWindow;
-            mainWindow.Top = 0;
-            mainWindow.Left = 0;
-            mainWindow.WindowState = WindowState.Maximized;
-            mainWindow.Icon = _icon;
-        }
-
         protected override void BindServices(CompositionBatch batch)
         {
             base.BindServices(batch);
@@ -64,5 +56,26 @@ namespace Calame
             }
         }
 #endif
+
+        protected override void OnStartup(object sender, StartupEventArgs e)
+        {
+            base.OnStartup(sender, e);
+
+            Window mainWindow = Application.MainWindow;
+            mainWindow.Top = 0;
+            mainWindow.Left = 0;
+            mainWindow.WindowState = WindowState.Maximized;
+            mainWindow.Icon = _icon;
+
+            foreach (string commandLineArgument in Environment.GetCommandLineArgs())
+            {
+                if (File.Exists(commandLineArgument))
+                {
+                    var shell = (IShell)GetInstance(typeof(IShell), null);
+                    IEnumerable<IEditorProvider> editorProviders = GetAllInstances(typeof(IEditorProvider)).Cast<IEditorProvider>();
+                    shell.OpenFileAsync(commandLineArgument, editorProviders);
+                }
+            }
+        }
     }
 }
