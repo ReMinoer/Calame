@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework;
@@ -36,7 +37,12 @@ namespace Calame
             _iconProvider = iconProvider;
             _iconDescriptor = iconDescriptorManager.GetDescriptor();
 
-            if (shell.ActiveItem is THandledDocument document)
+            RefreshIcon();
+        }
+
+        protected override Task OnInitializeAsync(CancellationToken cancellationToken)
+        {
+            if (Shell.ActiveItem is THandledDocument document)
             {
                 CurrentDocument = document;
                 OnDocumentActivated(CurrentDocument);
@@ -45,7 +51,7 @@ namespace Calame
             Shell.ActiveDocumentChanged += ShellOnActiveDocumentChanged;
             EventAggregator.SubscribeOnUI(this);
 
-            RefreshIcon();
+            return base.OnInitializeAsync(cancellationToken);
         }
 
         private void RefreshIcon()
