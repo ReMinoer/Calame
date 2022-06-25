@@ -11,6 +11,7 @@ using Calame.PropertyGrid.Utils;
 using Diese;
 using Glyph.Composition;
 using Glyph.Pipeline;
+using Glyph.Tools.UndoRedo;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
@@ -35,6 +36,9 @@ namespace Calame.PropertyGrid.Controls
             DependencyProperty.Register(nameof(ShowHeader), typeof(bool), typeof(CalamePropertyGrid), new PropertyMetadata(true));
         static public readonly DependencyProperty PopupsWidthProperty =
             DependencyProperty.Register(nameof(PopupsWidth), typeof(double), typeof(CalamePropertyGrid), new PropertyMetadata(double.NaN));
+
+        static public readonly DependencyProperty UndoRedoStackProperty =
+            DependencyProperty.Register(nameof(UndoRedoStack), typeof(IUndoRedoStack), typeof(CalamePropertyGrid), new PropertyMetadata(null));
 
         static public readonly DependencyProperty IconProviderProperty =
             DependencyProperty.Register(nameof(IconProvider), typeof(IIconProvider), typeof(CalamePropertyGrid), new PropertyMetadata(null));
@@ -151,6 +155,12 @@ namespace Calame.PropertyGrid.Controls
         {
             get => (double)GetValue(PopupsWidthProperty);
             set => SetValue(PopupsWidthProperty, value);
+        }
+
+        public IUndoRedoStack UndoRedoStack
+        {
+            get => (IUndoRedoStack)GetValue(UndoRedoStackProperty);
+            set => SetValue(UndoRedoStackProperty, value);
         }
 
         public IIconProvider IconProvider

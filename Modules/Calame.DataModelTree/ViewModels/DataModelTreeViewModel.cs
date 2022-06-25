@@ -19,6 +19,7 @@ using Diese.Collections.Observables.ReadOnly;
 using Gemini.Framework;
 using Gemini.Framework.Services;
 using Glyph.Composition.Modelization;
+using Glyph.Tools.UndoRedo;
 
 namespace Calame.DataModelTree.ViewModels
 {
@@ -32,6 +33,8 @@ namespace Calame.DataModelTree.ViewModels
 
         private readonly Type[] _newTypeRegistry;
         private ISelectionContext<IGlyphData> _selectionContext;
+        private IUndoRedoContext _undoRedoContext;
+
         private readonly TreeViewItemModelBuilder<IGlyphData> _dataItemBuilder;
         private readonly TreeViewItemModelBuilder<IGlyphDataChildrenSource> _childrenSourceItemBuilder;
         
@@ -95,18 +98,20 @@ namespace Calame.DataModelTree.ViewModels
                 .QuickCommandToolTip(_ => "Add");
         }
 
-        private ICommand CreateAddCommand(IGlyphDataChildrenSource x)
+        private ICommand CreateAddCommand(IGlyphDataChildrenSource childrenSource)
         {
-            if (!(x.Children is IList list))
+            if (!(childrenSource.Children is IList list))
                 return null;
 
-            var addCommand = new AddCollectionItemCommand(list, _newTypeRegistry, IconProvider, IconDescriptor);
-            addCommand.ItemAdded += (sender, args) =>
-            {
-                Selection = addCommand.AddedItem;
-            };
+            return new AddCollectionItemCommand(list, (i, x) => AddDataChild(childrenSource, i, (IGlyphData)x), _newTypeRegistry, IconProvider, IconDescriptor);
+        }
 
-            return addCommand;
+        private void AddDataChild(IGlyphDataChildrenSource childrenSource, int index, IGlyphData data)
+        {
+            _undoRedoContext?.UndoRedoStack.Execute($"Add data {data} to parent {childrenSource}.",
+                () => childrenSource.Set(index, data),
+                () => childrenSource.Unset(index)
+            );
         }
 
         private IEnumerable GetContextMenuItems(IGlyphData data)
@@ -134,7 +139,12 @@ namespace Calame.DataModelTree.ViewModels
             if (Selection == item)
                 Selection = null;
 
-            item.ParentSource.Remove(item);
+            IGlyphDataSource parent = item.ParentSource;
+            int index = parent.IndexOf(item);
+
+            _undoRedoContext?.UndoRedoStack.Execute($"Remove item {item} from parent {parent}.",
+                () => parent.Unset(index),
+                () => parent.Set(index, item));
         }
 
         protected override Task OnDocumentActivated(IDocumentContext<IRootDataContext> activeDocument)
@@ -142,6 +152,7 @@ namespace Calame.DataModelTree.ViewModels
             _selection = null;
 
             _selectionContext = activeDocument.GetSelectionContext<IGlyphData>();
+            _undoRedoContext = activeDocument.TryGetContext<IUndoRedoContext>();
             RootDataContext = activeDocument.Context;
 
             return Task.CompletedTask;
@@ -152,6 +163,7 @@ namespace Calame.DataModelTree.ViewModels
             _selection = null;
 
             RootDataContext = null;
+            _undoRedoContext = null;
             _selectionContext = null;
 
             return Task.CompletedTask;

@@ -14,6 +14,7 @@ using Calame.Utils;
 using Diese.Collections;
 using Gemini.Framework;
 using Glyph.Pipeline;
+using Glyph.Tools.UndoRedo;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
@@ -35,6 +36,8 @@ namespace Calame.PropertyGrid.Controls
 
         static public readonly DependencyProperty EditorDefinitionsProperty =
             DependencyProperty.Register(nameof(EditorDefinitions), typeof(EditorDefinitionCollection), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
+        static public readonly DependencyProperty UndoRedoStackProperty =
+            DependencyProperty.Register(nameof(UndoRedoStack), typeof(IUndoRedoStack), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null));
         static public readonly DependencyProperty NewItemTypeRegistryProperty =
             DependencyProperty.Register(nameof(NewItemTypeRegistry), typeof(IList<Type>), typeof(PropertyGridPopupOwnerBase), new PropertyMetadata(null, OnNewItemTypeRegistryChanged));
 
@@ -85,6 +88,12 @@ namespace Calame.PropertyGrid.Controls
         {
             get => (EditorDefinitionCollection)GetValue(EditorDefinitionsProperty);
             set => SetValue(EditorDefinitionsProperty, value);
+        }
+
+        public IUndoRedoStack UndoRedoStack
+        {
+            get => (IUndoRedoStack)GetValue(UndoRedoStackProperty);
+            set => SetValue(UndoRedoStackProperty, value);
         }
 
         public IList<Type> NewItemTypeRegistry
@@ -336,6 +345,7 @@ namespace Calame.PropertyGrid.Controls
             popup.SetBinding(PropertyGridPopup.SystemIconDescriptorProperty, new Binding(nameof(SystemIconDescriptor)) { Source = this });
 
             CalamePropertyGrid propertyGrid = popup.PropertyGrid;
+            propertyGrid.SetBinding(CalamePropertyGrid.UndoRedoStackProperty, new Binding(nameof(UndoRedoStack)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.NewItemTypeRegistryProperty, new Binding(nameof(NewItemTypeRegistry)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.ShowHeaderProperty, new Binding(nameof(ShowHeader)) { Source = this });
             propertyGrid.SetBinding(CalamePropertyGrid.PopupsWidthProperty, new Binding(nameof(PopupWidth)) { Source = this });

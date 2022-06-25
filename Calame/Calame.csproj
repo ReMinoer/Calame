@@ -11,6 +11,7 @@
     <ProjectReference Include="..\External\Glyph\External\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop\MonoGame.Framework.WpfInterop.csproj" />
     <ProjectReference Include="..\External\Glyph\External\Simulacra\Simulacra\Simulacra.csproj" />
     <ProjectReference Include="..\External\Glyph\Glyph.Composition\Glyph.Composition.csproj" />
+    <ProjectReference Include="..\External\Glyph\Glyph.Tools\Glyph.Tools.csproj" />
     <ProjectReference Include="..\External\Glyph\Glyph\Glyph.csproj" />
   </ItemGroup>
   <ItemGroup>

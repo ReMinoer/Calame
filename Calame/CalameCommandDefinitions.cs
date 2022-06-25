@@ -6,6 +6,7 @@ using Gemini.Framework.Menus;
 using Gemini.Framework.ToolBars;
 using Gemini.Modules.Shell.Commands;
 using Gemini.Modules.UndoRedo;
+using Gemini.Modules.UndoRedo.Commands;
 using MenuDefinitions = Gemini.Modules.MainMenu.MenuDefinitions;
 
 namespace Calame
@@ -18,15 +19,6 @@ namespace Calame
         static public ExcludeMenuDefinition ExcludeToolsMenu = new ExcludeMenuDefinition(MenuDefinitions.ToolsMenu);
         [Export]
         static public ExcludeMenuDefinition ExcludeWindowMenu = new ExcludeMenuDefinition(MenuDefinitions.WindowMenu);
-
-        [Export]
-        static public ExcludeMenuItemGroupDefinition ExcludeUndoRedo = new ExcludeMenuItemGroupDefinition(MenuDefinitions.EditUndoRedoMenuGroup);
-    }
-
-    static public class ExcludedToolsBars
-    {
-        [Export]
-        static public ExcludeToolBarItemGroupDefinition ExcludeUndoRedo = new ExcludeToolBarItemGroupDefinition(ToolBarDefinitions.StandardUndoRedoToolBarGroup);
     }
 
     static public class CalameToolBars
@@ -76,6 +68,8 @@ namespace Calame
         static public MenuItemDefinition SaveLayout = new CommandMenuItemDefinition<SaveLayoutCommand>(WindowLayoutGroup, 10);
         [Export]
         static public MenuItemDefinition DefaultPresetCommand = new CommandMenuItemDefinition<DefaultPresetCommand>(WindowPresetsGroup, 0);
+        [Export]
+        static public MenuItemDefinition ViewHistoryCommand = new CommandMenuItemDefinition<ViewHistoryCommandDefinition>(WindowToolsGroup, 0);
         [Export]
         public static MenuItemDefinition WindowDocumentList = new CommandMenuItemDefinition<SwitchToDocumentCommandListDefinition>(WindowDocumentsGroup, 0);
     }

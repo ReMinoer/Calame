@@ -15,6 +15,7 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:utils="clr-namespace:Simulacra.Utils;assembly=Simulacra"
              xmlns:utils1="clr-namespace:Calame.Utils;assembly=Calame"
+             xmlns:utils2="clr-namespace:Calame.PropertyGrid.Utils"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance controls:CalamePropertyGrid, IsDesignTimeCreatable=True}"
              d:DesignHeight="300"
@@ -45,19 +46,26 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorComboBox SelectedValue="{Binding Value, Mode=TwoWay}"
-                                                         ItemsSource="{Binding PropertyType, Converter={StaticResource EnumTypeToValuesConverter}}">
-                            <xctk:PropertyGridEditorComboBox.IsReadOnly>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </xctk:PropertyGridEditorComboBox.IsReadOnly>
-                        </xctk:PropertyGridEditorComboBox>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <xctk:PropertyGridEditorComboBox SelectedValue="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
+                                                             ItemsSource="{Binding PropertyType, Converter={StaticResource EnumTypeToValuesConverter}}">
+                                <xctk:PropertyGridEditorComboBox.IsReadOnly>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </xctk:PropertyGridEditorComboBox.IsReadOnly>
+                            </xctk:PropertyGridEditorComboBox>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -81,18 +89,25 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorCheckBox IsChecked="{Binding Value, Mode=TwoWay}">
-                            <xctk:PropertyGridEditorCheckBox.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </xctk:PropertyGridEditorCheckBox.IsEnabled>
-                        </xctk:PropertyGridEditorCheckBox>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <xctk:PropertyGridEditorCheckBox IsChecked="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}">
+                                <xctk:PropertyGridEditorCheckBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </xctk:PropertyGridEditorCheckBox.IsEnabled>
+                            </xctk:PropertyGridEditorCheckBox>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -104,22 +119,29 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorIntegerUpDown Value="{Binding Value, Mode=TwoWay}"
-                                                              UpdateValueOnEnterKey="True"
-                                                              Minimum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMinimumConverter}}"
-                                                              Maximum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMaximumConverter}}"
-                                                              TextAlignment="Left">
-                            <xctk:PropertyGridEditorIntegerUpDown.IsReadOnly>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </xctk:PropertyGridEditorIntegerUpDown.IsReadOnly>
-                        </xctk:PropertyGridEditorIntegerUpDown>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <xctk:PropertyGridEditorIntegerUpDown Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
+                                                                  UpdateValueOnEnterKey="True"
+                                                                  Minimum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMinimumConverter}}"
+                                                                  Maximum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMaximumConverter}}"
+                                                                  TextAlignment="Left">
+                                <xctk:PropertyGridEditorIntegerUpDown.IsReadOnly>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </xctk:PropertyGridEditorIntegerUpDown.IsReadOnly>
+                            </xctk:PropertyGridEditorIntegerUpDown>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -131,22 +153,29 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorSingleUpDown Value="{Binding Value, Mode=TwoWay}"
-                                                             UpdateValueOnEnterKey="True"
-                                                             Minimum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMinimumConverter}}"
-                                                             Maximum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMaximumConverter}}"
-                                                             TextAlignment="Left">
-                            <xctk:PropertyGridEditorSingleUpDown.IsReadOnly>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </xctk:PropertyGridEditorSingleUpDown.IsReadOnly>
-                        </xctk:PropertyGridEditorSingleUpDown>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <xctk:PropertyGridEditorSingleUpDown Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
+                                                                 UpdateValueOnEnterKey="True"
+                                                                 Minimum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMinimumConverter}}"
+                                                                 Maximum="{Binding PropertyDescriptor.Attributes, Converter={StaticResource AttributesToMaximumConverter}}"
+                                                                 TextAlignment="Left">
+                                <xctk:PropertyGridEditorSingleUpDown.IsReadOnly>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </xctk:PropertyGridEditorSingleUpDown.IsReadOnly>
+                            </xctk:PropertyGridEditorSingleUpDown>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -158,20 +187,27 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorMaskedTextBox Mask="AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
-                                                              ValueDataType="system:Guid"
-                                                              Value="{Binding Value, Mode=TwoWay}">
-                            <xctk:PropertyGridEditorMaskedTextBox.IsReadOnly>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </xctk:PropertyGridEditorMaskedTextBox.IsReadOnly>
-                        </xctk:PropertyGridEditorMaskedTextBox>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <xctk:PropertyGridEditorMaskedTextBox Mask="AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
+                                                                  ValueDataType="system:Guid"
+                                                                  Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}">
+                                <xctk:PropertyGridEditorMaskedTextBox.IsReadOnly>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </xctk:PropertyGridEditorMaskedTextBox.IsReadOnly>
+                            </xctk:PropertyGridEditorMaskedTextBox>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -183,43 +219,50 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <userControls:PathControl Height="24"
-                                                  UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}"
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <userControls:PathControl Height="24"
+                                                  UserPath="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay, Converter={StaticResource FilePathToStringConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}">
-                            <userControls:PathControl.RootFolder>
-                                <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
-                                    <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
-                                    <Binding Path="WorkingDirectory">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:PathControl.RootFolder>
-                            <userControls:PathControl.FileTypes>
-                                <MultiBinding Converter="{StaticResource AttributesToFileTypesConverter}">
-                                    <Binding Path="PropertyDescriptor.Attributes" />
-                                    <Binding Path="PropertyGridContentFileTypeResolver">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:PathControl.FileTypes>
-                            <userControls:PathControl.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:PathControl.IsEnabled>
-                        </userControls:PathControl>
+                                <userControls:PathControl.RootFolder>
+                                    <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
+                                        <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
+                                        <Binding Path="WorkingDirectory">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:PathControl.RootFolder>
+                                <userControls:PathControl.FileTypes>
+                                    <MultiBinding Converter="{StaticResource AttributesToFileTypesConverter}">
+                                        <Binding Path="PropertyDescriptor.Attributes" />
+                                        <Binding Path="PropertyGridContentFileTypeResolver">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:PathControl.FileTypes>
+                                <userControls:PathControl.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:PathControl.IsEnabled>
+                            </userControls:PathControl>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -231,43 +274,50 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <userControls:AssetPathControl Height="24"
-                                                       UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource AssetPathToStringConverter}}"
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <userControls:AssetPathControl Height="24"
+                                                       UserPath="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay, Converter={StaticResource AssetPathToStringConverter}}"
                                                        ShowOpenPathButton="True"
                                                        OpenPathCommand="{Binding OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                        IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                        IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}">
-                            <userControls:AssetPathControl.RootFolder>
-                                <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
-                                    <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
-                                    <Binding Path="WorkingDirectory">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:AssetPathControl.RootFolder>
-                            <userControls:PathControl.FileTypes>
-                                <MultiBinding Converter="{StaticResource AttributesToFileTypesConverter}" ConverterParameter="xnb">
-                                    <Binding Path="PropertyDescriptor.Attributes" />
-                                    <Binding Path="PropertyGridContentFileTypeResolver">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:PathControl.FileTypes>
-                            <userControls:AssetPathControl.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:AssetPathControl.IsEnabled>
-                        </userControls:AssetPathControl>
+                                <userControls:AssetPathControl.RootFolder>
+                                    <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
+                                        <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
+                                        <Binding Path="WorkingDirectory">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:AssetPathControl.RootFolder>
+                                <userControls:PathControl.FileTypes>
+                                    <MultiBinding Converter="{StaticResource AttributesToFileTypesConverter}" ConverterParameter="xnb">
+                                        <Binding Path="PropertyDescriptor.Attributes" />
+                                        <Binding Path="PropertyGridContentFileTypeResolver">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:PathControl.FileTypes>
+                                <userControls:AssetPathControl.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:AssetPathControl.IsEnabled>
+                            </userControls:AssetPathControl>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -279,34 +329,41 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <userControls:PathControl Height="24"
-                                                  UserPath="{Binding Value, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <userControls:PathControl Height="24"
+                                                  UserPath="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay, Converter={StaticResource FolderPathToStringConverter}}"
                                                   ShowOpenPathButton="True"
                                                   OpenPathCommand="{Binding OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                   FolderMode="True">
-                            <userControls:PathControl.RootFolder>
-                                <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
-                                    <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
-                                    <Binding Path="WorkingDirectory">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:PathControl.RootFolder>
-                            <userControls:PathControl.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:PathControl.IsEnabled>
-                        </userControls:PathControl>
+                                <userControls:PathControl.RootFolder>
+                                    <MultiBinding Converter="{StaticResource NullCoalescingConverter}">
+                                        <Binding Path="PropertyDescriptor.Attributes" Converter="{StaticResource AttributesToRootFolderConverter}" />
+                                        <Binding Path="WorkingDirectory">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:PathControl.RootFolder>
+                                <userControls:PathControl.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:PathControl.IsEnabled>
+                            </userControls:PathControl>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -318,19 +375,26 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <userControls:Vector2Control Value="{Binding Value, Mode=TwoWay}"
-                                                     UpdateValueOnEnterKey="True">
-                            <userControls:Vector2Control.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:Vector2Control.IsEnabled>
-                        </userControls:Vector2Control>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <userControls:Vector2Control Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
+                                                         UpdateValueOnEnterKey="True">
+                                <userControls:Vector2Control.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:Vector2Control.IsEnabled>
+                            </userControls:Vector2Control>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -342,19 +406,26 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <userControls:Vector3Control Value="{Binding Value, Mode=TwoWay}"
-                                                     UpdateValueOnEnterKey="True">
-                            <userControls:Vector3Control.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:Vector3Control.IsEnabled>
-                        </userControls:Vector3Control>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <userControls:Vector3Control Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
+                                                         UpdateValueOnEnterKey="True">
+                                <userControls:Vector3Control.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:Vector3Control.IsEnabled>
+                            </userControls:Vector3Control>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -366,19 +437,26 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <userControls:Vector4Control Value="{Binding Value, Mode=TwoWay}"
-                                                     UpdateValueOnEnterKey="True">
-                            <userControls:Vector4Control.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:Vector4Control.IsEnabled>
-                        </userControls:Vector4Control>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <userControls:Vector4Control Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
+                                                         UpdateValueOnEnterKey="True">
+                                <userControls:Vector4Control.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:Vector4Control.IsEnabled>
+                            </userControls:Vector4Control>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -390,19 +468,26 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <userControls:PointControl Value="{Binding Value, Mode=TwoWay}"
-                                                   UpdateValueOnEnterKey="True">
-                            <userControls:PointControl.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </userControls:PointControl.IsEnabled>
-                        </userControls:PointControl>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <userControls:PointControl Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
+                                                       UpdateValueOnEnterKey="True">
+                                <userControls:PointControl.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </userControls:PointControl.IsEnabled>
+                            </userControls:PointControl>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -414,19 +499,26 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:ColorPicker SelectedColor="{Binding Value, Converter={StaticResource MonoGameToWpfColorConverter}}"
-                                          ColorMode="ColorCanvas">
-                            <xctk:ColorPicker.IsEnabled>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </xctk:ColorPicker.IsEnabled>
-                        </xctk:ColorPicker>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <xctk:ColorPicker SelectedColor="{Binding Value, Source={StaticResource UndoRedoBinding}, Converter={StaticResource MonoGameToWpfColorConverter}}"
+                                              ColorMode="ColorCanvas">
+                                <xctk:ColorPicker.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}" ConverterParameter="Revert">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </xctk:ColorPicker.IsEnabled>
+                            </xctk:ColorPicker>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -441,6 +533,7 @@
                         <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
                                                           IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           PopupWidth="{Binding PopupsWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
@@ -488,18 +581,25 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <xctk:PropertyGridEditorTextBox Text="{Binding Value, Mode=TwoWay}">
-                            <xctk:PropertyGridEditorTextBox.IsReadOnly>
-                                <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
-                                    <Binding Path="IsReadOnly" />
-                                    <Binding Path="IsReadOnly">
-                                        <Binding.RelativeSource>
-                                            <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
-                                        </Binding.RelativeSource>
-                                    </Binding>
-                                </MultiBinding>
-                            </xctk:PropertyGridEditorTextBox.IsReadOnly>
-                        </xctk:PropertyGridEditorTextBox>
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <xctk:PropertyGridEditorTextBox Text="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}">
+                                <xctk:PropertyGridEditorTextBox.IsReadOnly>
+                                    <MultiBinding Converter="{StaticResource BooleanOrBooleanConverter}">
+                                        <Binding Path="IsReadOnly" />
+                                        <Binding Path="IsReadOnly">
+                                            <Binding.RelativeSource>
+                                                <RelativeSource Mode="FindAncestor" AncestorType="{x:Type controls:CalamePropertyGrid}" />
+                                            </Binding.RelativeSource>
+                                        </Binding>
+                                    </MultiBinding>
+                                </xctk:PropertyGridEditorTextBox.IsReadOnly>
+                            </xctk:PropertyGridEditorTextBox>
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>
@@ -517,6 +617,7 @@
                         <controls:InlineCollectionControl ItemsSource="{Binding Value, Mode=TwoWay}"
                                                           IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           PopupWidth="{Binding PopupsWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                          UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                           IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
@@ -539,12 +640,19 @@
                 </xctk:EditorTemplateDefinition.TargetProperties>
                 <xctk:EditorTemplateDefinition.EditingTemplate>
                     <DataTemplate DataType="xctk:PropertyItem">
-                        <controls:InlineObjectControl Value="{Binding Value, Mode=TwoWay}"
+                        <Grid>
+                            <Grid.Resources>
+                                <utils2:UndoRedoPropertyItemBinding x:Key="UndoRedoBinding"
+                                                                    PropertyItem="{Binding}"
+                                                                    UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}" />
+                            </Grid.Resources>
+                            <controls:InlineObjectControl Value="{Binding Value, Source={StaticResource UndoRedoBinding}, Mode=TwoWay}"
                                                       BaseType="{Binding PropertyType}"
                                                       NewItemBaseType="{Binding PropertyType}"
                                                       IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       IsReadOnlyValue="{Binding IsReadOnly}"
                                                       PopupWidth="{Binding PopupsWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
+                                                      UndoRedoStack="{Binding UndoRedoStack, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       IconDescriptorManager="{Binding IconDescriptorManager, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       IconDescriptor="{Binding IconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
@@ -557,6 +665,7 @@
                                                       SelectItemCommand="{Binding SelectItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:CalamePropertyGrid}}}"
                                                       ShowHeader="False"
                                                       PropertyValueChanged="OnPropertyValueChanged" />
+                        </Grid>
                     </DataTemplate>
                 </xctk:EditorTemplateDefinition.EditingTemplate>
             </xctk:EditorTemplateDefinition>

@@ -14,6 +14,7 @@ using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
+using Glyph.Tools.UndoRedo;
 
 namespace Calame.PropertyGrid.ViewModels
 {
@@ -47,6 +48,13 @@ namespace Calame.PropertyGrid.ViewModels
             private set => SetValue(ref _selectItemCommand, value);
         }
 
+        private IUndoRedoStack _undoRedoStack;
+        public IUndoRedoStack UndoRedoStack
+        {
+            get => _undoRedoStack;
+            private set => SetValue(ref _undoRedoStack, value);
+        }
+        
         public IContentFileTypeResolver ContentFileTypeResolver { get; }
         public IList<Type> NewItemTypeRegistry { get; }
 
@@ -54,7 +62,6 @@ namespace Calame.PropertyGrid.ViewModels
         public TargetableCommand NextCommand { get; }
         public RelayCommand OpenFileCommand { get; }
         public RelayCommand OpenFolderCommand { get; }
-        public AsyncCommand DirtyDocumentCommand { get; }
 
         protected override object IconKey => CalameIconKey.PropertyGrid;
 
@@ -77,8 +84,6 @@ namespace Calame.PropertyGrid.ViewModels
             _editorProviders = editorProviders;
             OpenFolderCommand = new RelayCommand(OnOpenFolder, CanOpenFolder);
             OpenFileCommand = new RelayCommand(OnOpenFile, CanOpenFile);
-
-            DirtyDocumentCommand = new AsyncCommand(OnDirtyDocument);
         }
 
         private bool CanOpenFolder(object path) => !string.IsNullOrWhiteSpace((string)path);
@@ -93,17 +98,13 @@ namespace Calame.PropertyGrid.ViewModels
             await Shell.OpenFileAsync((string)path, _editorProviders, RawContentLibraryContext?.RawContentLibrary?.WorkingDirectory);
         }
 
-        private Task OnDirtyDocument()
-        {
-            return EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedObject));
-        }
-
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
         {
             SelectedObject = null;
 
             RawContentLibraryContext = activeDocument.TryGetContext<IRawContentLibraryContext>();
             SelectItemCommand = activeDocument.TryGetContext<ISelectionContext>()?.GetSelectionCommand();
+            UndoRedoStack = activeDocument.TryGetContext<IUndoRedoContext>()?.UndoRedoStack;
 
             return Task.CompletedTask;
         }

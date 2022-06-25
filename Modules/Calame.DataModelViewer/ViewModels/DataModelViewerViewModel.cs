@@ -20,9 +20,12 @@ using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
+using Glyph.Resolver;
+using Glyph.Tools.UndoRedo;
 using Glyph.WpfInterop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
+using Niddle;
 using Simulacra.IO.Watching;
 
 namespace Calame.DataModelViewer.ViewModels
@@ -32,11 +35,16 @@ namespace Calame.DataModelViewer.ViewModels
     public class DataModelViewerViewModel : CalamePersistedDocumentBase, IViewerDocument, IRunnableDocument,
         IDocumentContext<IRootDataContext>, IRootDataContext, IRootsContext,
         IDocumentContext<ISelectionContext<IGlyphData>>, ISelectionContext<IGlyphData>,
+        IDocumentContext<IUndoRedoContext>, IUndoRedoContext,
         IHandle<ISelectionRequest<IGlyphData>>,
         IHandle<ISelectionRequest<IGlyphComponent>>
     {
         private readonly IImportedTypeProvider _importedTypeProvider;
         private readonly SelectionHistoryManager _selectionHistoryManager;
+
+        private readonly DataModelUndoRedoManager _undoRedoManager;
+        public IUndoRedoStack UndoRedoStack => _undoRedoManager;
+        protected override sealed Gemini.Modules.UndoRedo.IUndoRedoManager CreateUndoRedoManager() => _undoRedoManager;
 
         private GlyphEngine _engine;
         public ViewerViewModel Viewer { get; }
@@ -73,6 +81,7 @@ namespace Calame.DataModelViewer.ViewModels
         {
             _importedTypeProvider = importedTypeProvider;
             _selectionHistoryManager = selectionHistoryManager;
+            _undoRedoManager = new DataModelUndoRedoManager(this);
 
             Viewer = new ViewerViewModel(this, eventAggregator, viewerModuleSources);
 
@@ -203,9 +212,9 @@ namespace Calame.DataModelViewer.ViewModels
         ISelectionContext IDocumentContext<ISelectionContext>.Context => this;
         ISelectionContext<IGlyphComponent> IDocumentContext<ISelectionContext<IGlyphComponent>>.Context => this;
         ISelectionContext<IGlyphData> IDocumentContext<ISelectionContext<IGlyphData>>.Context => this;
-
         IRootsContext IDocumentContext<IRootsContext>.Context => this;
         IRootDataContext IDocumentContext<IRootDataContext>.Context => this;
+        IUndoRedoContext IDocumentContext<IUndoRedoContext>.Context => this;
 
         private IEnumerable _root;
         public IEnumerable Roots

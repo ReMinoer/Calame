@@ -7,6 +7,7 @@ using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Tools.Brushing;
 using Glyph.Tools.Brushing.Space;
+using Glyph.Tools.UndoRedo;
 using Niddle;
 
 namespace Calame.BrushPanel.ViewModels
@@ -52,8 +53,8 @@ namespace Calame.BrushPanel.ViewModels
             => Brush.UpdateApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanEndApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
             => Brush.CanEndApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
-        public void EndApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
-            => Brush.EndApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
+        public void EndApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint, IUndoRedoStack undoRedoStack)
+            => Brush.EndApply((TCanvas)canvas, (TArgs)args, (TPaint)paint, undoRedoStack);
         public void OnInvalidStart(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
             => Brush.OnInvalidStart((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void OnCancellation(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
@@ -75,8 +76,8 @@ namespace Calame.BrushPanel.ViewModels
             => Brush.UpdateApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanEndApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
             => Brush.CanEndApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
-        public void EndApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
-            => Brush.EndApply((TCanvas)canvas, (TArgs)args, (TPaint)paint);
+        public void EndApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint, IUndoRedoStack undoRedoStack)
+            => Brush.EndApply((TCanvas)canvas, (TArgs)args, (TPaint)paint, undoRedoStack);
         public void OnInvalidStart(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
             => Brush.OnInvalidStart((TCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void OnCancellation(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
@@ -122,8 +123,8 @@ namespace Calame.BrushPanel.ViewModels
             => ComponentBrush.UpdateApply((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanEndApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
             => ComponentBrush.CanEndApply((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
-        public void EndApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
-            => ComponentBrush.EndApply((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
+        public void EndApply(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint, IUndoRedoStack undoRedoStack)
+            => ComponentBrush.EndApply((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint, undoRedoStack);
         public void OnInvalidStart(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
             => ComponentBrush.OnInvalidStart((TComponentCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void OnCancellation(IGlyphComponent canvas, ISpaceBrushArgs args, IPaint paint)
@@ -141,8 +142,8 @@ namespace Calame.BrushPanel.ViewModels
             => DataBrush.UpdateApply((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
         public bool CanEndApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
             => DataBrush.CanEndApply((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
-        public void EndApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
-            => DataBrush.EndApply((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
+        public void EndApply(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint, IUndoRedoStack undoRedoStack)
+            => DataBrush.EndApply((TDataCanvas)canvas, (TArgs)args, (TPaint)paint, undoRedoStack);
         public void OnInvalidStart(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)
             => DataBrush.OnInvalidStart((TDataCanvas)canvas, (TArgs)args, (TPaint)paint);
         public void OnCancellation(IGlyphData canvas, ISpaceBrushArgs args, IPaint paint)

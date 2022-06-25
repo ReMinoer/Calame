@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Diese.Collections;
+using Glyph.Tools.UndoRedo;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Calame.PropertyGrid.Controls
@@ -65,7 +66,16 @@ namespace Calame.PropertyGrid.Controls
 
         protected override void AddItem(object item)
         {
-            _list.Add(item);
+            IList list = _list;
+            int itemIndex = _list.Count;
+
+            UndoRedoStack.Execute($"Add item {item}",
+                () => list.Add(item),
+                () =>
+                {
+                    (item as IDisposable)?.Dispose();
+                    list.RemoveAt(itemIndex);
+                });
 
             OnPropertyCollectionChanged();
             OnExpandObject(ItemsControl.ItemContainerGenerator.ContainerFromItem(item));
@@ -77,9 +87,18 @@ namespace Calame.PropertyGrid.Controls
             if (itemIndex == -1)
                 throw new InvalidOperationException();
 
-            (_list[itemIndex] as IDisposable)?.Dispose();
+            IList list = _list;
+            object item = _list[itemIndex];
 
-            _list.RemoveAt(itemIndex);
+            UndoRedoStack.Execute($"Remove item {item}",
+                () =>
+                {
+                    (item as IDisposable)?.Dispose();
+                    list.RemoveAt(itemIndex);
+                },
+                () => list.Insert(itemIndex, item)
+            );
+            
             OnPropertyCollectionChanged();
         }
 
@@ -94,7 +113,13 @@ namespace Calame.PropertyGrid.Controls
             if (currentIndex == -1)
                 throw new InvalidOperationException();
 
-            _list[currentIndex] = value;
+            IList list = _list;
+            object oldValue = _list[currentIndex];
+
+            UndoRedoStack.Execute($"Edit item to {value}",
+                () => list[currentIndex] = value,
+                () => list[currentIndex] = oldValue
+            );
         }
 
         private FrameworkElement _dragSender;
@@ -154,45 +179,104 @@ namespace Calame.PropertyGrid.Controls
             if (draggedItem == null)
                 return;
 
+            object movedItem = draggedItem.Data;
+            int oldIndex = draggedItem.Index;
+
             int newIndex = GetIndex((DependencyObject)sender);
             if (newIndex == -1)
                 throw new InvalidOperationException();
 
-            if (newIndex == draggedItem.Index)
+            if (newIndex == oldIndex)
                 return;
+
+            IList list = _list;
+            Array array = _array;
+            string actionDescription = $"Move item {movedItem} to index {newIndex}";
 
             if (CanAddItem)
             {
-                _list.RemoveAt(draggedItem.Index);
-                _list.Insert(newIndex, draggedItem.Data);
+                UndoRedoStack.Execute(actionDescription,
+                    () =>
+                    {
+                        list.RemoveAt(oldIndex);
+                        list.Insert(newIndex, movedItem);
+                    },
+                    () =>
+                    {
+                        list.RemoveAt(newIndex);
+                        list.Insert(oldIndex, movedItem);
+                    });
             }
             else
             {
-                if (_array != null)
+                if (array != null)
                 {
-                    if (newIndex < draggedItem.Index)
+                    if (newIndex < oldIndex)
                     {
-                        Array.Copy(_array, newIndex, _array, newIndex + 1, draggedItem.Index - newIndex);
+                        UndoRedoStack.Execute(actionDescription,
+                            () =>
+                            {
+                                Array.Copy(array, newIndex, array, newIndex + 1, oldIndex - newIndex);
+                                list[newIndex] = movedItem;
+                            },
+                            () =>
+                            {
+                                Array.Copy(array, newIndex + 1, array, newIndex, oldIndex - newIndex);
+                                list[oldIndex] = movedItem;
+                            });
+
                     }
-                    else // if (draggedItem.Index < newIndex)
+                    else // if (newIndex > oldIndex)
                     {
-                        Array.Copy(_array, draggedItem.Index + 1, _array, draggedItem.Index, newIndex - draggedItem.Index);
+                        UndoRedoStack.Execute(actionDescription,
+                            () =>
+                            {
+                                Array.Copy(array, oldIndex + 1, array, oldIndex, newIndex - oldIndex);
+                                list[newIndex] = movedItem;
+                            },
+                            () =>
+                            {
+                                Array.Copy(array, oldIndex, array, oldIndex + 1, newIndex - oldIndex);
+                                list[oldIndex] = movedItem;
+                            });
                     }
                 }
                 else
                 {
-                    if (newIndex < draggedItem.Index)
+                    if (newIndex < oldIndex)
                     {
-                        for (int i = draggedItem.Index; i > newIndex; i--)
-                            _list[i] = _list[i - 1];
+                        UndoRedoStack.Execute(actionDescription,
+                            () =>
+                            {
+                                for (int i = oldIndex; i > newIndex; i--)
+                                    list[i] = list[i - 1];
+                                list[newIndex] = movedItem;
+                            },
+                            () =>
+                            {
+                                for (int i = newIndex; i < oldIndex; i++)
+                                    list[i] = list[i + 1];
+                                list[oldIndex] = movedItem;
+                            });
                     }
-                    else // if (draggedItem.Index < newIndex)
+                    else // if (newIndex > oldIndex)
                     {
-                        for (int i = draggedItem.Index; i < newIndex; i++)
-                            _list[i] = _list[i + 1];
+                        UndoRedoStack.Execute(actionDescription,
+                            () =>
+                            {
+                                for (int i = oldIndex; i < newIndex; i++)
+                                    list[i] = list[i + 1];
+                                list[newIndex] = movedItem;
+                            },
+                            () =>
+                            {
+                                for (int i = newIndex; i > oldIndex; i--)
+                                    list[i] = list[i - 1];
+                                list[oldIndex] = movedItem;
+                            });
                     }
+
                 }
-                _list[newIndex] = draggedItem.Data;
             }
 
             OnPropertyCollectionChanged();

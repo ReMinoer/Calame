@@ -114,13 +114,13 @@ namespace Calame.BrushPanel.ViewModels
             IIconDescriptor<IGlyphComponent> componentIconDescriptor = iconDescriptorManager.GetDescriptor<IGlyphComponent>();
 
             _dataTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
-                                   .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
-                                   .ChildrenSource(x => new CompositeReadOnlyObservableList<object>
-                                   (
-                                       new EnumerableReadOnlyObservableList<object>(x.Children),
-                                       new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
-                                   ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
-                                   .IconDescription(dataIconDescriptor.GetIcon);
+                .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
+                .ChildrenSource(x => new CompositeReadOnlyObservableList<object>
+                (
+                    new EnumerableReadOnlyObservableList<object>(x.Children),
+                    new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
+                ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
+                .IconDescription(dataIconDescriptor.GetIcon);
 
             _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IGlyphDataChildrenSource>()
                 .DisplayName(x => x.PropertyName)
@@ -130,9 +130,9 @@ namespace Calame.BrushPanel.ViewModels
                 .IsHeader(_ => true);
 
             _componentTreeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()
-                                        .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
-                                        .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
-                                        .IconDescription(componentIconDescriptor.GetIcon);
+                .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
+                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
+                .IconDescription(componentIconDescriptor.GetIcon);
 
             SelectBrushCommand = new RelayCommand(OnSelectBrush);
             SelectPaintCommand = new RelayCommand(OnSelectPaint);
@@ -164,15 +164,11 @@ namespace Calame.BrushPanel.ViewModels
             if (_selectionContext != null)
                 _selectionContext.CanSelectChanged += OnCanSelectChanged;
 
-            _viewerModule.ApplyEnded += OnBrushApplyEnded;
-
             return Task.CompletedTask;
         }
 
         protected override Task OnDocumentsCleaned()
         {
-            _viewerModule.ApplyEnded -= OnBrushApplyEnded;
-
             if (_selectionContext != null)
                 _selectionContext.CanSelectChanged -= OnCanSelectChanged;
 
@@ -183,11 +179,6 @@ namespace Calame.BrushPanel.ViewModels
             _viewerModule = null;
 
             return Task.CompletedTask;
-        }
-
-        private void OnBrushApplyEnded(object sender, EventArgs e)
-        {
-            EventAggregator.PublishAsync(new DirtyMessage(CurrentDocument, SelectedCanvas)).Wait();
         }
 
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object model, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)

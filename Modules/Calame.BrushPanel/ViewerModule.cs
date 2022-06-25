@@ -22,14 +22,18 @@ namespace Calame.BrushPanel
     public class EngineViewerModuleSource : IViewerModuleSource
     {
         public bool IsValidForDocument(IDocumentContext documentContext) => !(documentContext is IDocumentContext<IRootDataContext>);
-        public IViewerModule CreateInstance(IDocumentContext documentContext) => new ViewerModule<IGlyphComponent, EngineCursorBrushController>();
+
+        public IViewerModule CreateInstance(IDocumentContext documentContext)
+            => new ViewerModule<IGlyphComponent, EngineCursorBrushController>(documentContext.TryGetContext<IUndoRedoContext>());
     }
 
     [Export(typeof(IViewerModuleSource))]
     public class DataViewerModuleSource : IViewerModuleSource
     {
         public bool IsValidForDocument(IDocumentContext documentContext) => documentContext is IDocumentContext<IRootDataContext>;
-        public IViewerModule CreateInstance(IDocumentContext documentContext) => new ViewerModule<IGlyphData, DataCursorBrushController>();
+
+        public IViewerModule CreateInstance(IDocumentContext documentContext)
+            => new ViewerModule<IGlyphData, DataCursorBrushController>(documentContext.TryGetContext<IUndoRedoContext>());
     }
 
     public interface IBrushViewerModule : IViewerModule, IViewerInteractiveMode, IBrushController<object>
@@ -42,6 +46,7 @@ namespace Calame.BrushPanel
         where TCanvas : class
         where TBrushController : SimpleCursorBrushControllerBase<TCanvas, IBrush<TCanvas, ISpaceBrushArgs, IPaint>, IPaint>
     {
+        private readonly IUndoRedoContext _undoRedoContext;
         private GlyphObject _root;
         private TBrushController _brushController;
 
@@ -114,6 +119,11 @@ namespace Calame.BrushPanel
         bool IViewerInteractiveMode.UseFreeCamera => true;
         bool IViewerInteractiveMode.IsUserMode => false;
 
+        public ViewerModule(IUndoRedoContext undoRedoContext)
+        {
+            _undoRedoContext = undoRedoContext;
+        }
+
         protected override void ConnectViewer() => Model.AddInteractiveMode(this);
         protected override void DisconnectViewer() => Model.RemoveInteractiveMode(this);
         public override void Activate() { }
@@ -122,10 +132,10 @@ namespace Calame.BrushPanel
         protected override void ConnectRunner()
         {
             _root = Model.EditorRoot.Add<GlyphObject>();
-
             Interactive = _root.Add<InteractiveRoot>().Interactive;
 
             _brushController = _root.Add<TBrushController>();
+            _brushController.UndoRedoStack = _undoRedoContext?.UndoRedoStack;
             _brushController.Input = InputSystem.Instance.Mouse[MouseButton.Left];
             _brushController.RaycastClient = Model.Client;
 

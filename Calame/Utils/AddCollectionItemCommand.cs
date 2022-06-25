@@ -13,6 +13,7 @@ namespace Calame.Utils
     public class AddCollectionItemCommand : ICommand
     {
         private readonly IList _list;
+        private readonly Action<int, object> _insertItemAction;
         private readonly IList<Type> _newTypeRegistry;
         private readonly IIconProvider _iconProvider;
         private readonly IIconDescriptor _iconDescriptor;
@@ -21,18 +22,17 @@ namespace Calame.Utils
         private readonly ICommand _addItemCommand;
 
         private bool CanAddItem => _list != null && !_list.IsFixedSize;
-        public object AddedItem { get; private set; }
 
         public event EventHandler CanExecuteChanged;
-        public event EventHandler ItemAdded;
 
-        public AddCollectionItemCommand(IList list, IList<Type> newTypeRegistry, IIconProvider iconProvider, IIconDescriptor iconDescriptor)
+        public AddCollectionItemCommand(IList list, Action<int, object> insertItemAction, IList<Type> newTypeRegistry, IIconProvider iconProvider, IIconDescriptor iconDescriptor)
         {
             _list = list;
+            _insertItemAction = insertItemAction;
             _newTypeRegistry = newTypeRegistry;
             _iconProvider = iconProvider;
             _iconDescriptor = iconDescriptor;
-            _addItemCommand = new RelayCommand(x => AddItemOfType((Type)x));
+            _addItemCommand = new RelayCommand(x => InsertItemOfType(_list.Count, (Type)x));
 
             RefreshNewItemTypes();
         }
@@ -42,7 +42,7 @@ namespace Calame.Utils
         {
             if (_newItemTypes.Count == 1)
             {
-                AddItemOfType(_newItemTypes[0]);
+                InsertItemOfType(_list.Count, _newItemTypes[0]);
                 return;
             }
 
@@ -67,14 +67,8 @@ namespace Calame.Utils
             contextMenu.IsOpen = true;
         }
 
-        private void AddItemOfType(Type itemType) => AddItem(CreateItem(itemType));
-        private void AddItem(object item)
-        {
-            _list.Add(item);
-
-            AddedItem = item;
-            ItemAdded?.Invoke(this, EventArgs.Empty);
-        }
+        private void InsertItemOfType(int index, Type itemType) => InsertItem(index, CreateItem(itemType));
+        private void InsertItem(int index, object item) => _insertItemAction?.Invoke(index, item);
 
         private object CreateItem(Type type)
         {

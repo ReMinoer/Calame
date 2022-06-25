@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using Calame.DocumentContexts;
 using Calame.Viewer.Modules.Base;
 using Caliburn.Micro;
 using Glyph;
@@ -11,7 +12,9 @@ using Glyph.Graphics.Renderer;
 using Glyph.Tools.Base;
 using Glyph.Tools.Snapping;
 using Glyph.Tools.Transforming;
+using Glyph.Tools.UndoRedo;
 using Microsoft.Xna.Framework;
+using Niddle;
 
 namespace Calame.Viewer.Modules
 {
@@ -27,11 +30,13 @@ namespace Calame.Viewer.Modules
         }
 
         public bool IsValidForDocument(IDocumentContext documentContext) => true;
-        public IViewerModule CreateInstance(IDocumentContext documentContext) => new TransformationEditorModule(_eventAggregator);
+        public IViewerModule CreateInstance(IDocumentContext documentContext) => new TransformationEditorModule(_eventAggregator, documentContext.TryGetContext<IUndoRedoContext>());
     }
     
     public class TransformationEditorModule : SelectionHandlerModuleBase
     {
+        private readonly IUndoRedoContext _undoRedoContext;
+
         private GlyphObject _root;
         private BoxedComponentsSnapping _boxedComponentsSnapping;
         private GridComponentsSnapping _gridComponentsSnapping;
@@ -43,9 +48,10 @@ namespace Calame.Viewer.Modules
         private SceneNode _verticalMarkSceneNode;
         private IHandle _handle;
 
-        public TransformationEditorModule(IEventAggregator eventAggregator)
+        public TransformationEditorModule(IEventAggregator eventAggregator, IUndoRedoContext undoRedoContext)
             : base(eventAggregator)
         {
+            _undoRedoContext = undoRedoContext;
         }
 
         protected override void ConnectRunner()
@@ -53,6 +59,10 @@ namespace Calame.Viewer.Modules
             base.ConnectRunner();
 
             _root = Model.EditorModeRoot.Add<GlyphObject>();
+
+            if (_undoRedoContext?.UndoRedoStack != null)
+                _root.Resolver.Local.Registry.Add(Dependency.OnType<IUndoRedoStack>().Using(_undoRedoContext.UndoRedoStack));
+
             _boxedComponentsSnapping = new BoxedComponentsSnapping(Model.UserRoot);
             _gridComponentsSnapping = new GridComponentsSnapping(Model.UserRoot);
 

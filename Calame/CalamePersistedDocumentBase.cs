@@ -12,7 +12,7 @@ using Simulacra.IO.Watching;
 
 namespace Calame
 {
-    public abstract class CalamePersistedDocumentBase : CalameDocumentBase, IPersistedDocument, IHandle<IDirtyMessage>
+    public abstract class CalamePersistedDocumentBase : CalameDocumentBase, IPersistedDocument
     {
         protected readonly PathWatcher FileWatcher;
 
@@ -49,7 +49,7 @@ namespace Calame
         public bool IsDirty
         {
             get => _isDirty;
-            protected set
+            private set
             {
                 if (Set(ref _isDirty, value))
                     UpdateDisplayName();
@@ -120,6 +120,11 @@ namespace Calame
             StartWatchingFilePath();
         }
 
+        public void SetDirty()
+        {
+            IsDirty = true;
+        }
+
         public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken)
         {
             if (IsDirty)
@@ -158,7 +163,7 @@ namespace Calame
 
         private void OnFileChanged(object sender, FileChangedEventArgs e)
         {
-            IsDirty = true;
+            SetDirty();
             ExternalFileChange = e.ChangeType;
         }
 
@@ -216,14 +221,6 @@ namespace Calame
                 case MessageBoxResult.Cancel: return null;
                 default: throw new NotSupportedException();
             }
-        }
-
-        Task IHandle<IDirtyMessage>.HandleAsync(IDirtyMessage message, CancellationToken cancellationToken)
-        {
-            if (message.DocumentContext == this)
-                IsDirty = true;
-
-            return Task.CompletedTask;
         }
     }
 }

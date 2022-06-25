@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:Calame.PropertyGrid.ViewModels"
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:glyph="clr-namespace:Glyph;assembly=Glyph"
              xmlns:documentContexts="clr-namespace:Calame.DocumentContexts;assembly=Calame.DocumentContexts"
              mc:Ignorable="d"
@@ -17,6 +16,7 @@
                                      CompactMode="True"
                                      ShowNavigationButtons="True"
                                      PopupsWidth="{Binding ActualWidth, RelativeSource={RelativeSource Self}}"
+                                     UndoRedoStack="{Binding UndoRedoStack}"
                                      NewItemTypeRegistry="{Binding NewItemTypeRegistry}"
                                      IconProvider="{Binding IconProvider}"
                                      IconDescriptorManager="{Binding IconDescriptorManager}"
@@ -27,12 +27,6 @@
                                      NextCommand="{Binding NextCommand}"
                                      OpenFileCommand="{Binding OpenFileCommand}"
                                      OpenFolderCommand="{Binding OpenFolderCommand}"
-                                     SelectItemCommand="{Binding SelectItemCommand}">
-            <b:Interaction.Triggers>
-                <b:EventTrigger EventName="PropertyValueChanged">
-                    <b:InvokeCommandAction Command="{Binding DirtyDocumentCommand}" />
-                </b:EventTrigger>
-            </b:Interaction.Triggers>
-        </controls:CalamePropertyGrid>
+                                     SelectItemCommand="{Binding SelectItemCommand}" />
     </Grid>
 </UserControl>
