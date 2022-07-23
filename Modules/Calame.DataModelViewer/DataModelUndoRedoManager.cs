@@ -9,7 +9,7 @@ using Glyph.Tools.UndoRedo;
 
 namespace Calame.DataModelViewer
 {
-    public class DataModelUndoRedoManager : IUndoRedoManager, IUndoRedoStack
+    public class DataModelUndoRedoManager : IUndoRedoManager, IUndoRedoStack, IDisposable
     {
         private readonly UndoRedoManager _base;
         private readonly DataModelViewerViewModel _document;
@@ -17,12 +17,24 @@ namespace Calame.DataModelViewer
         public DataModelUndoRedoManager(DataModelViewerViewModel document)
         {
             _base = new UndoRedoManager();
-            _base.PropertyChanged += (s, e) => PropertyChanged?.Invoke(this, e);
-            _base.BatchBegin += (s, e) => BatchBegin?.Invoke(this, e);
-            _base.BatchEnd += (s, e) => BatchEnd?.Invoke(this, e);
+            _base.PropertyChanged += OnBasePropertyChanged;
+            _base.BatchBegin += OnBaseBatchBegin;
+            _base.BatchEnd += OnBaseBatchEnd;
 
             _document = document;
         }
+
+        public void Dispose()
+        {
+            _base.BatchEnd -= OnBaseBatchEnd;
+            _base.BatchBegin -= OnBaseBatchBegin;
+            _base.PropertyChanged -= OnBasePropertyChanged;
+            _base.Dispose();
+        }
+
+        private void OnBasePropertyChanged(object s, PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+        private void OnBaseBatchBegin(object s, EventArgs e) => BatchBegin?.Invoke(this, e);
+        private void OnBaseBatchEnd(object s, EventArgs e) => BatchEnd?.Invoke(this, e);
 
         public IObservableCollection<IUndoableAction> ActionStack => _base.ActionStack;
         public IUndoableAction CurrentAction => _base.CurrentAction;
@@ -128,11 +140,12 @@ namespace Calame.DataModelViewer
         void IUndoRedoStack.Execute(IUndoRedo undoRedo) => ExecuteAction(new UndoRedoUndoableAction(undoRedo));
         void IUndoRedoStack.Push(IUndoRedo undoRedo) => PushAction(new UndoRedoUndoableAction(undoRedo));
 
-        private class DocumentUndoableAction : IUndoableAction
+        private class DocumentUndoableAction : IUndoableAction, IDisposable
         {
             private readonly DataModelViewerViewModel _document;
             private readonly object[] _selectedItems;
             private readonly IUndoableAction _undoableAction;
+            private readonly IDisposable _disposableAction;
 
             public string Name => _undoableAction.Name;
 
@@ -141,6 +154,7 @@ namespace Calame.DataModelViewer
                 _document = document;
                 _selectedItems = _document.Viewer.LastSelection.Items.ToArray();
                 _undoableAction = undoableAction;
+                _disposableAction = undoableAction as IDisposable;
             }
 
             public void Execute()
@@ -155,6 +169,11 @@ namespace Calame.DataModelViewer
                 _document.SelectAsync(_selectedItems).Wait();
                 _undoableAction.Undo();
                 _document.SetDirty();
+            }
+
+            public void Dispose()
+            {
+                _disposableAction.Dispose();
             }
         }
     }

@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Diese.Collections;
+using Glyph;
 using Glyph.Tools.UndoRedo;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
@@ -70,12 +71,18 @@ namespace Calame.PropertyGrid.Controls
             int itemIndex = _list.Count;
 
             UndoRedoStack.Execute($"Add item {item}",
-                () => list.Add(item),
                 () =>
                 {
-                    (item as IDisposable)?.Dispose();
+                    (item as IRestorable)?.Restore();
+                    list.Add(item);
+                },
+                () =>
+                {
                     list.RemoveAt(itemIndex);
-                });
+                    (item as IRestorable)?.Store();
+                },
+                null,
+                () => (item as IDisposable)?.Dispose());
 
             OnPropertyCollectionChanged();
             OnExpandObject(ItemsControl.ItemContainerGenerator.ContainerFromItem(item));
@@ -93,12 +100,17 @@ namespace Calame.PropertyGrid.Controls
             UndoRedoStack.Execute($"Remove item {item}",
                 () =>
                 {
-                    (item as IDisposable)?.Dispose();
                     list.RemoveAt(itemIndex);
+                    (item as IRestorable)?.Store();
                 },
-                () => list.Insert(itemIndex, item)
-            );
-            
+                () =>
+                {
+                    (item as IRestorable)?.Restore();
+                    list.Insert(itemIndex, item);
+                },
+                () => (item as IDisposable)?.Dispose(),
+                null);
+
             OnPropertyCollectionChanged();
         }
 

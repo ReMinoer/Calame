@@ -18,6 +18,7 @@ using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
 using Gemini.Framework;
 using Gemini.Framework.Services;
+using Glyph;
 using Glyph.Composition.Modelization;
 using Glyph.Tools.UndoRedo;
 
@@ -106,12 +107,23 @@ namespace Calame.DataModelTree.ViewModels
             return new AddCollectionItemCommand(list, (i, x) => AddDataChild(childrenSource, i, (IGlyphData)x), _newTypeRegistry, IconProvider, IconDescriptor);
         }
 
-        private void AddDataChild(IGlyphDataChildrenSource childrenSource, int index, IGlyphData data)
+        private void AddDataChild(IGlyphDataChildrenSource childrenSource, int index, IGlyphData child)
         {
-            _undoRedoContext?.UndoRedoStack.Execute($"Add data {data} to parent {childrenSource}.",
-                () => childrenSource.Set(index, data),
-                () => childrenSource.Unset(index)
-            );
+            _undoRedoContext?.UndoRedoStack.Execute($"Add data {child} to source {childrenSource}.",
+                () =>
+                {
+                    (child as IRestorable)?.Restore();
+                    childrenSource.Set(index, child);
+                    Selection = child;
+                },
+                () =>
+                {
+                    Selection = child.ParentSource.Owner;
+                    childrenSource.Unset(index);
+                    (child as IRestorable)?.Store();
+                },
+                null,
+                () => (child as IDisposable)?.Dispose());
         }
 
         private IEnumerable GetContextMenuItems(IGlyphData data)
@@ -134,17 +146,29 @@ namespace Calame.DataModelTree.ViewModels
             if (!CanRemove(obj))
                 return;
 
-            var item = (IGlyphData)obj;
+            var child = (IGlyphData)obj;
 
-            if (Selection == item)
+            if (Selection == child)
                 Selection = null;
 
-            IGlyphDataSource parent = item.ParentSource;
-            int index = parent.IndexOf(item);
+            IGlyphDataSource childrenSource = child.ParentSource;
+            int index = childrenSource.IndexOf(child);
 
-            _undoRedoContext?.UndoRedoStack.Execute($"Remove item {item} from parent {parent}.",
-                () => parent.Unset(index),
-                () => parent.Set(index, item));
+            _undoRedoContext?.UndoRedoStack.Execute($"Remove data {child} from source {childrenSource}.",
+                () =>
+                {
+                    Selection = child.ParentSource.Owner;
+                    childrenSource.Unset(index);
+                    (child as IRestorable)?.Store();
+                },
+                () =>
+                {
+                    (child as IRestorable)?.Restore();
+                    childrenSource.Set(index, child);
+                    Selection = child;
+                },
+                () => (child as IDisposable)?.Dispose(),
+                null);
         }
 
         protected override Task OnDocumentActivated(IDocumentContext<IRootDataContext> activeDocument)

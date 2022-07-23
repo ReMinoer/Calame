@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using Glyph;
 using Glyph.Tools.UndoRedo;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
@@ -34,19 +35,26 @@ namespace Calame.PropertyGrid.Utils
             set
             {
                 object oldValue = Value;
-                if (oldValue == value)
+                object newValue = value;
+                if (oldValue.Equals(newValue))
                     return;
 
                 PropertyDescriptor propertyDescriptor = PropertyItem.PropertyDescriptor;
                 object instance = PropertyItem.Instance;
-                object newValue = value;
-
-                if (newValue == oldValue)
-                    return;
 
                 UndoRedoStack.Execute($"Set property {propertyDescriptor.Name} of instance {instance} to {newValue}.",
-                    () => propertyDescriptor.SetValue(instance, newValue),
-                    () => propertyDescriptor.SetValue(instance, oldValue));
+                    () =>
+                    {
+                        (newValue as IRestorable)?.Restore();
+                        propertyDescriptor.SetValue(instance, newValue);
+                    },
+                    () =>
+                    {
+                        propertyDescriptor.SetValue(instance, oldValue);
+                        (newValue as IRestorable)?.Store();
+                    },
+                    null,
+                    () => (newValue as IDisposable)?.Dispose());
                 
                 NotifyPropertyChanged();
             }
