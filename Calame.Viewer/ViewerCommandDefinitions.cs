@@ -47,6 +47,11 @@ namespace Calame.Viewer
         static public MenuItemDefinition ViewerDebugMode = new CommandMenuItemDefinition<ViewerDebugModeCommand>(DebugGroup, 0);
 
         [Export]
+        static public MenuItemGroupDefinition EditSelectionGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 200);
+        [Export]
+        static public MenuItemDefinition DeleteSelection = new CommandMenuItemDefinition<DeleteSelectionCommand>(EditSelectionGroup, 0);
+
+        [Export]
         static public MenuItemGroupDefinition CameraActionGroup = new MenuItemGroupDefinition(Definition, 200);
         [Export]
         static public MenuItemDefinition ResetCamera = new CommandMenuItemDefinition<ResetCameraCommand>(CameraActionGroup, 0);
@@ -61,6 +66,9 @@ namespace Calame.Viewer
 
         [Export]
         static public CommandKeyboardShortcut ViewerDebugMode = new CommandKeyboardShortcut<ViewerDebugModeCommand>(new KeyGesture(Key.D, ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Shift));
+
+        [Export]
+        static public CommandKeyboardShortcut DeleteSelection = new CommandKeyboardShortcut<DeleteSelectionCommand>(new KeyGesture(Key.Delete));
 
         [Export]
         static public CommandKeyboardShortcut ResetCamera = new CommandKeyboardShortcut<ResetCameraCommand>(new KeyGesture(Key.F, ModifierKeys.Control | ModifierKeys.Alt));

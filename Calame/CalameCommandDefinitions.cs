@@ -36,7 +36,7 @@ namespace Calame
     static public class CalameMenus
     {
         [Export]
-        static public MenuItemGroupDefinition SelectionHistoryGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 0);
+        static public MenuItemGroupDefinition SelectionHistoryGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 100);
         [Export]
         static public MenuItemDefinition PreviousSelection = new CommandMenuItemDefinition<PreviousSelectionCommand>(SelectionHistoryGroup, 0);
         [Export]
