@@ -36,6 +36,8 @@
         Folder,
         Add,
         AddFromList,
+        InsertAbove,
+        InsertBelow,
         Delete,
         Select,
         OpenWith,

@@ -44,6 +44,8 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.Folder: return PackIconMaterialKind.FolderOpen;
                 case CalameIconKey.Add: return PackIconMaterialKind.PlusCircle;
                 case CalameIconKey.AddFromList: return PackIconMaterialKind.PlaylistPlus;
+                case CalameIconKey.InsertAbove: return PackIconMaterialKind.ArrowUpRightBold;
+                case CalameIconKey.InsertBelow: return PackIconMaterialKind.ArrowDownRightBold;
                 case CalameIconKey.Delete: return PackIconMaterialKind.CloseCircle;
                 case CalameIconKey.Select: return PackIconMaterialKind.ArrowTopRightThick;
                 case CalameIconKey.OpenWith: return PackIconMaterialKind.ApplicationImport;

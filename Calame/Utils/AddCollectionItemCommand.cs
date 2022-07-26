@@ -17,6 +17,8 @@ namespace Calame.Utils
         private readonly IList<Type> _newTypeRegistry;
         private readonly IIconProvider _iconProvider;
         private readonly IIconDescriptor _iconDescriptor;
+        private readonly object _targetItem;
+        private readonly bool _afterTarget;
 
         private IList<Type> _newItemTypes;
         private readonly ICommand _addItemCommand;
@@ -25,29 +27,54 @@ namespace Calame.Utils
 
         public event EventHandler CanExecuteChanged;
 
-        public AddCollectionItemCommand(IList list, Action<int, object> insertItemAction, IList<Type> newTypeRegistry, IIconProvider iconProvider, IIconDescriptor iconDescriptor)
+        public AddCollectionItemCommand(IList list,
+            Action<int, object> insertItemAction,
+            IList<Type> newTypeRegistry,
+            IIconProvider iconProvider,
+            IIconDescriptor iconDescriptor,
+            object targetItem = null,
+            bool afterTarget = false)
         {
             _list = list;
             _insertItemAction = insertItemAction;
             _newTypeRegistry = newTypeRegistry;
             _iconProvider = iconProvider;
             _iconDescriptor = iconDescriptor;
-            _addItemCommand = new RelayCommand(x => InsertItemOfType(_list.Count, (Type)x));
+            _targetItem = targetItem;
+            _afterTarget = afterTarget;
+            _addItemCommand = new RelayCommand(x => InsertItemOfType((Type)x));
 
             RefreshNewItemTypes();
         }
 
-        public bool CanExecute(object _) => _newItemTypes != null && _newItemTypes.Count > 0;
-        public void Execute(object _)
+        public bool CanExecute(object obj) => _newItemTypes != null && _newItemTypes.Count > 0;
+        public void Execute(object obj)
         {
             if (_newItemTypes.Count == 1)
             {
-                InsertItemOfType(_list.Count, _newItemTypes[0]);
+                InsertItemOfType(_newItemTypes[0]);
                 return;
             }
 
             var contextMenu = new ContextMenu();
+            BuildMenuItems(contextMenu.Items);
+            contextMenu.IsOpen = true;
+        }
 
+        public void SetupMenuItem(MenuItem menuItem)
+        {
+            if (_newItemTypes.Count == 1)
+            {
+                menuItem.Command = _addItemCommand;
+                menuItem.CommandParameter = _newItemTypes[0];
+                return;
+            }
+            
+            BuildMenuItems(menuItem.Items);
+        }
+
+        public void BuildMenuItems(IList menuItems)
+        {
             string[] typeNames = _newItemTypes.Select(x => x.Name).ToArray();
             ReduceTypeNamePatterns(typeNames);
 
@@ -61,14 +88,24 @@ namespace Calame.Utils
                     Icon = _iconProvider.GetControl(_iconDescriptor.GetTypeIcon(_newItemTypes[i]), 16)
                 };
 
-                contextMenu.Items.Add(menuItem);
+                menuItems.Add(menuItem);
             }
-
-            contextMenu.IsOpen = true;
         }
 
-        private void InsertItemOfType(int index, Type itemType) => InsertItem(index, CreateItem(itemType));
-        private void InsertItem(int index, object item) => _insertItemAction?.Invoke(index, item);
+        private void InsertItemOfType(Type itemType) => InsertItem(CreateItem(itemType));
+        private void InsertItem(object item) => _insertItemAction?.Invoke(GetTargetIndex(), item);
+
+        private int GetTargetIndex()
+        {
+            if (_targetItem is null)
+                return _list.Count;
+
+            int index = _list.IndexOf(_targetItem);
+            if (_afterTarget)
+                index++;
+
+            return index;
+        }
 
         private object CreateItem(Type type)
         {

@@ -93,18 +93,19 @@ namespace Calame.DataModelTree.ViewModels
                 .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Children), nameof(IGlyphDataChildrenSource.Children))
                 .IconDescription(x => IconDescriptor.GetIcon(x.Children), nameof(IGlyphDataChildrenSource.Children))
                 .IsHeader(_ => true)
-                .QuickCommand(CreateAddCommand, nameof(IGlyphDataChildrenSource.Children))
+                .QuickCommand(x => CreateAddCommand(x), nameof(IGlyphDataChildrenSource.Children))
                 .QuickCommandIconDescription(_ => new IconDescription(CalameIconKey.Add, Brushes.DarkGreen, margin: 0.5))
                 .QuickCommandLabel(_ => "Add")
                 .QuickCommandToolTip(_ => "Add");
         }
 
-        private ICommand CreateAddCommand(IGlyphDataChildrenSource childrenSource)
+        private AddCollectionItemCommand CreateAddCommand(IGlyphDataChildrenSource childrenSource, IGlyphData insertTarget = null, bool afterTarget = false)
         {
             if (!(childrenSource.Children is IList list))
                 return null;
 
-            return new AddCollectionItemCommand(list, (i, x) => AddDataChild(childrenSource, i, (IGlyphData)x), _newTypeRegistry, IconProvider, IconDescriptor);
+            return new AddCollectionItemCommand(list,
+                (i, x) => AddDataChild(childrenSource, i, (IGlyphData)x), _newTypeRegistry, IconProvider, IconDescriptor, insertTarget, afterTarget);
         }
 
         private void AddDataChild(IGlyphDataChildrenSource childrenSource, int index, IGlyphData child)
@@ -130,9 +131,31 @@ namespace Calame.DataModelTree.ViewModels
         {
             if (data.ParentSource != null)
             {
+                if (data.ParentSource is IGlyphDataChildrenSource childrenSource)
+                {
+                    var insertAboveItem = new MenuItem
+                    {
+                        Header = "Insert _Above",
+                        Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.InsertAbove), 16)
+                    };
+
+                    var insertBelowItem = new MenuItem
+                    {
+                        Header = "_Insert Below",
+                        Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.InsertBelow), 16)
+                    };
+
+                    CreateAddCommand(childrenSource, insertTarget: data).SetupMenuItem(insertAboveItem);
+                    CreateAddCommand(childrenSource, insertTarget: data, afterTarget: true).SetupMenuItem(insertBelowItem);
+
+                    yield return insertAboveItem;
+                    yield return insertBelowItem;
+                    yield return new Separator();
+                }
+
                 yield return new MenuItem
                 {
-                    Header = "Remove",
+                    Header = "_Remove",
                     Command = _removeCommand,
                     CommandParameter = data,
                     Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.Delete), 16)
@@ -147,9 +170,6 @@ namespace Calame.DataModelTree.ViewModels
                 return;
 
             var child = (IGlyphData)obj;
-
-            if (Selection == child)
-                Selection = null;
 
             IGlyphDataSource childrenSource = child.ParentSource;
             int index = childrenSource.IndexOf(child);
