@@ -91,7 +91,7 @@ namespace Calame.Icons.Descriptors
             if (type.Is<RendererBase>())
                 return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);
             if (type.Is<EffectLoader>())
-                return new IconDescription(PackIconMaterialKind.Gradient, GraphicsCategoryBrush);
+                return new IconDescription(PackIconMaterialKind.GradientVertical, GraphicsCategoryBrush);
 
             if (type.Is<SongPlayer>())
                 return new IconDescription(PackIconMaterialKind.Radio, AudioCategoryBrush);

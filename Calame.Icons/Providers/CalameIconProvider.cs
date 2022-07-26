@@ -28,7 +28,7 @@ namespace Calame.Icons.Providers
                 case CalameIconKey.Reset: return PackIconMaterialKind.RotateLeft;
                 case CalameIconKey.ViewerDebugMode: return PackIconMaterialKind.ApplicationCog;
 
-                case CalameIconKey.DefaultCamera: return PackIconMaterialKind.AppleAirplay;
+                case CalameIconKey.DefaultCamera: return PackIconMaterialKind.CastVariant;
                 case CalameIconKey.FreeCamera: return PackIconMaterialKind.Video;
                 case CalameIconKey.ResetCamera: return PackIconMaterialKind.CameraMeteringMatrix;
                 case CalameIconKey.FocusCamera: return PackIconMaterialKind.CameraMeteringCenter;
