@@ -25,18 +25,21 @@ namespace Calame.Demo.Data.Data.Base
             Bindings.From(x => x.LocalScale).To(x => x.SceneNode.LocalScale);
         }
 
+        bool IPositionController.IsLocalPosition => true;
         Vector2 IPositionController.Position
         {
             get => LocalPosition;
             set => LocalPosition = value;
         }
 
+        bool IRotationController.IsLocalRotation => true;
         float IRotationController.Rotation
         {
             get => LocalRotation;
             set => LocalRotation = value;
         }
 
+        bool IScaleController.IsLocalScale => true;
         float IScaleController.Scale
         {
             get => LocalScale;
