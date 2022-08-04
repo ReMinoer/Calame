@@ -286,7 +286,7 @@ namespace Calame.Viewer.ViewModels
 
             public GlyphObject Root { get; private set; }
 
-            public InteractiveInterfaceRoot Interactive => _interfaceRoot.Interactive;
+            public InteractiveInterfaceRoot<IGlyphInteractiveInterface> Interactive => _interfaceRoot.Interactive;
             IInteractive IViewerInteractiveMode.Interactive => Interactive;
 
             protected override void ConnectViewer() => Model.AddInteractiveMode(this);

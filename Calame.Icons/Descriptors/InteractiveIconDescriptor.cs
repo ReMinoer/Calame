@@ -5,6 +5,7 @@ using Calame.Icons.Base;
 using Diese;
 using Fingear.Interactives;
 using Fingear.Interactives.Interfaces;
+using Glyph.UI;
 using MahApps.Metro.IconPacks;
 
 namespace Calame.Icons.Descriptors
@@ -34,7 +35,7 @@ namespace Calame.Icons.Descriptors
 
         public override IconDescription GetTypeIcon(Type type)
         {
-            if (type.Is<InteractiveInterfaceRoot>())
+            if (type.Is<InterfaceRoot.RootInteractive>())
                 return new IconDescription(PackIconMaterialKind.ViewDashboardVariant, UiCategoryBrush);
 
             return IconDescription.None;
