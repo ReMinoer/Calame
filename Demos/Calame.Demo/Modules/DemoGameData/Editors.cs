@@ -13,6 +13,7 @@ using Glyph.Content;
 using Glyph.IO;
 using Glyph.Pipeline;
 using Microsoft.Extensions.Logging;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
 using Niddle;
 
@@ -187,7 +188,7 @@ namespace Calame.Demo.Modules.DemoGameData
                 Directory.CreateDirectory(folderPath);
             }
 
-            Instance = new RawContentLibrary(graphicsDeviceService, logger, RawRootPath, cacheRootPath);
+            Instance = new RawContentLibrary(graphicsDeviceService, logger, TargetPlatform.Windows, RawRootPath, cacheRootPath);
             return Instance;
         }
     }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}"
 EndProject
@@ -119,11 +119,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gemini", "External\gemini\s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.DocumentContexts", "Calame.DocumentContexts\Calame.DocumentContexts.csproj", "{4494C77C-503F-4519-906F-92D2E3119C4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calame.Parallax", "Modules\Calame.Parallax\Calame.Parallax.csproj", "{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.Parallax", "Modules\Calame.Parallax\Calame.Parallax.csproj", "{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.ViewGraph", "Modules\Calame.ViewGraph\Calame.ViewGraph.csproj", "{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.UndoRedo", "Modules\Calame.UndoRedo\Calame.UndoRedo.csproj", "{799B4146-1DA6-47DE-854B-AE86E0D0589A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -355,10 +353,6 @@ Global
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Release|Any CPU.Build.0 = Release|Any CPU
-		{799B4146-1DA6-47DE-854B-AE86E0D0589A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{799B4146-1DA6-47DE-854B-AE86E0D0589A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{799B4146-1DA6-47DE-854B-AE86E0D0589A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{799B4146-1DA6-47DE-854B-AE86E0D0589A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -415,7 +409,6 @@ Global
 		{659541B0-C2A8-4F33-984F-EEB3729F8969} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 		{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8} = {95AFED7A-6211-441D-9643-10354F05477E}
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418} = {95AFED7A-6211-441D-9643-10354F05477E}
-		{799B4146-1DA6-47DE-854B-AE86E0D0589A} = {95AFED7A-6211-441D-9643-10354F05477E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51117004-2C3A-426A-86DF-7881F4FEF766}

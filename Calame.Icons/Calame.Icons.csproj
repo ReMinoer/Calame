@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>$(TargetFramework)</TargetFramework>
     <UseWPF>True</UseWPF>
@@ -24,6 +24,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
-    <PackageReference Include="MonoGame.Framework.Portable" Version="3.7.1.189" PrivateAssets="All" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" PrivateAssets="All" />
   </ItemGroup>
 </Project>
