@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>$(TargetFramework)</TargetFramework>
     <UseWPF>True</UseWPF>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
