@@ -89,7 +89,7 @@ namespace Calame.PropertyGrid.ViewModels
         private bool CanOpenFolder(object path) => !string.IsNullOrWhiteSpace((string)path);
         private void OnOpenFolder(object path)
         {
-            Process.Start((string)path);
+            Process.Start(new ProcessStartInfo((string)path) { UseShellExecute = true });
         }
 
         private bool CanOpenFile(object path) => !string.IsNullOrWhiteSpace((string)path);

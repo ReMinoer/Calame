@@ -57,7 +57,7 @@ namespace Calame
                         return;
                 }
                 
-                Process.Start(filePath);
+                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
                 return;
             }
 
