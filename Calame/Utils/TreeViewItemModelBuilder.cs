@@ -41,6 +41,16 @@ namespace Calame.Utils
             => QuickCommandLabel(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> QuickCommandToolTip(Func<T, string> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => QuickCommandToolTip(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> DraggedDataProvider(Func<T, Func<DraggedData>> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => DraggedDataProvider(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> DragEnterAction(Func<T, Action<DragEventArgs>> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => DragEnterAction(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> DragOverAction(Func<T, Action<DragEventArgs>> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => DragOverAction(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> DragLeaveAction(Func<T, Action<DragEventArgs>> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => DragLeaveAction(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> DropAction(Func<T, Action<DragEventArgs>> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => DropAction(getter, x => OnPropertyChanged(x, propertyName, notifier));
 
         static private IObservable<object> OnPropertyChanged(T data, string propertyName, Func<T, INotifyPropertyChanged> notifier)
         {
@@ -140,6 +150,36 @@ namespace Calame.Utils
         public TreeViewItemModelBuilder<T> QuickCommandToolTip(Func<T, string> getter, Func<T, IObservable<object>> observableFunc = null)
         {
             AddBinding(getter, observableFunc, (v, x) => v.QuickCommandToolTip = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> DraggedDataProvider(Func<T, Func<DraggedData>> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.DraggedDataProvider = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> DragEnterAction(Func<T, Action<DragEventArgs>> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.DragEnterAction = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> DragOverAction(Func<T, Action<DragEventArgs>> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.DragOverAction = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> DragLeaveAction(Func<T, Action<DragEventArgs>> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.DragLeaveAction = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> DropAction(Func<T, Action<DragEventArgs>> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.DropAction = x);
             return this;
         }
 

@@ -72,13 +72,13 @@ namespace Calame.Viewer.Commands
                                 IGlyphData newSelection = Sequence.AggregateExclusive(data, x => x.ParentSource.Owner).FirstOrDefault(document.CanSelect);
                                 document.SelectAsync(newSelection).Wait();
 
-                                parentSource.Unset(index);
+                                parentSource.RemoveAt(index);
                                 (data as IRestorable)?.Store();
                             },
                             () =>
                             {
                                 (data as IRestorable)?.Restore();
-                                parentSource.Set(index, data);
+                                parentSource.Insert(index, data);
 
                                 IGlyphData newSelection = Sequence.Aggregate(data, x => x.ParentSource.Owner).FirstOrDefault(document.CanSelect);
                                 document.SelectAsync(newSelection).Wait();

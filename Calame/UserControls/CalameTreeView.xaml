@@ -109,19 +109,23 @@
             </TreeView.ItemContainerStyle>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" DataType="{x:Type utils:ITreeViewItemModel}">
-                    <Border>
+                    <Border Background="Transparent">
+                        <b:Interaction.Behaviors>
+                            <behaviors:DragSourceBehavior DragSource="{Binding}" />
+                            <behaviors:DropTargetBehavior DropTarget="{Binding}" />
+                        </b:Interaction.Behaviors>
                         <Border.ContextMenu>
                             <ContextMenu ItemsSource="{Binding ContextMenuItems}" />
                         </Border.ContextMenu>
                         <DockPanel>
                             <userControls:CalameIcon DockPanel.Dock="Left"
-                                                     Margin="2 2 3 2"
+                                                     Margin="2 3 3 3"
                                                      IconDescription="{Binding IconDescription}"
                                                      IconSize="14"
                                                      IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type userControls:CalameTreeView}}}"
                                                      VerticalAlignment="Center" />
                             <Button DockPanel.Dock="Right" 
-                                    Margin="2 0 0 0"
+                                    Margin="2 1 0 1"
                                     Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                     Command="{Binding QuickCommand}"
                                     CommandParameter="{Binding}"

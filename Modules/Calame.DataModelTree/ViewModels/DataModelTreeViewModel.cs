@@ -85,7 +85,11 @@ namespace Calame.DataModelTree.ViewModels
                     new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
                 ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
                 .IconDescription(x => dataIconDescriptor.GetIcon(x))
-                .ContextMenuItems(GetContextMenuItems);
+                .ContextMenuItems(GetContextMenuItems)
+                .DraggedDataProvider(x => () => new DraggedData(DragDropEffects.Move, new DataObject(typeof(IGlyphData), x)))
+                .DragEnterAction(x => e => OnDragOverData(e, x))
+                .DragOverAction(x => e => OnDragOverData(e, x))
+                .DropAction(x => e => OnDropOnData(e, x));
 
             _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IGlyphDataChildrenSource>()
                 .DisplayName(x => x.PropertyName)
@@ -96,7 +100,119 @@ namespace Calame.DataModelTree.ViewModels
                 .QuickCommand(x => CreateAddCommand(x), nameof(IGlyphDataChildrenSource.Children))
                 .QuickCommandIconDescription(_ => new IconDescription(CalameIconKey.Add, Brushes.DarkGreen, margin: 0.5))
                 .QuickCommandLabel(_ => "Add")
-                .QuickCommandToolTip(_ => "Add");
+                .QuickCommandToolTip(_ => "Add")
+                .DragEnterAction(x => e => OnDragOverChildrenSource(e, x))
+                .DragOverAction(x => e => OnDragOverChildrenSource(e, x))
+                .DropAction(x => e => OnDropOnChildrenSource(e, x));
+        }
+
+        private void OnDragOverData(DragEventArgs dragEventArgs, IGlyphData dropTarget)
+        {
+            dragEventArgs.Effects = IsValidDrop(dragEventArgs, dropTarget, out _, out _, out _)
+                ? DragDropEffects.Move
+                : DragDropEffects.None;
+
+            dragEventArgs.Handled = true;
+        }
+
+        private void OnDragOverChildrenSource(DragEventArgs dragEventArgs, IGlyphDataChildrenSource dropTarget)
+        {
+            dragEventArgs.Effects = IsValidDrop(dragEventArgs, dropTarget, out _, out _, out _)
+                ? DragDropEffects.Move
+                : DragDropEffects.None;
+
+            dragEventArgs.Handled = true;
+        }
+
+        private void OnDropOnData(DragEventArgs dragEventArgs, IGlyphData dropTarget)
+        {
+            if (dropTarget.ParentSource is IGlyphDataChildrenSource childrenSource
+                && IsValidDrop(dragEventArgs, dropTarget, out IGlyphData draggedData, out int oldIndex, out int newIndex))
+                Drop(draggedData, childrenSource, oldIndex, newIndex);
+        }
+
+        private void OnDropOnChildrenSource(DragEventArgs dragEventArgs, IGlyphDataChildrenSource dropTarget)
+        {
+            if (IsValidDrop(dragEventArgs, dropTarget, out IGlyphData draggedData, out int oldIndex, out int newIndex) && draggedData.ParentSource != dropTarget)
+                Drop(draggedData, dropTarget, oldIndex, newIndex);
+        }
+
+        private void Drop(IGlyphData draggedData, IGlyphDataChildrenSource targetSource, int oldIndex, int newIndex)
+        {
+            if (draggedData.ParentSource == targetSource)
+            {
+                if (newIndex == targetSource.Count)
+                    newIndex--;
+                if (oldIndex == newIndex)
+                    return;
+            }
+
+            IGlyphDataSource oldDataSource = draggedData.ParentSource;
+            IGlyphDataSource newDataSource = targetSource;
+
+            _undoRedoContext?.UndoRedoStack.Execute($"Move data {draggedData} to index {newIndex} in {newDataSource}.",
+                () =>
+                {
+                    oldDataSource.RemoveAt(oldIndex);
+                    newDataSource.Insert(newIndex, draggedData);
+                },
+                () =>
+                {
+                    newDataSource.RemoveAt(newIndex);
+                    oldDataSource.Insert(oldIndex, draggedData);
+                }
+            );
+        }
+
+        private bool IsValidDrop(DragEventArgs dragEventArgs, IGlyphData dropTarget, out IGlyphData draggedData, out int oldIndex, out int newIndex)
+        {
+            draggedData = null;
+            oldIndex = -1;
+            newIndex = -1;
+
+            if (dropTarget.ParentSource is null)
+                return false;
+
+            if (!dragEventArgs.Data.GetDataPresent(typeof(IGlyphData)))
+                return false;
+
+            draggedData = (IGlyphData)dragEventArgs.Data.GetData(typeof(IGlyphData));
+            if (draggedData?.ParentSource is null)
+                return false;
+
+            oldIndex = draggedData.ParentSource.IndexOf(draggedData);
+            newIndex = dropTarget.ParentSource.IndexOf(dropTarget);
+
+            if (!draggedData.ParentSource.CanRemoveAt(oldIndex))
+                return false;
+            if (!dropTarget.ParentSource.CanInsert(newIndex, draggedData))
+                return false;
+
+            return true;
+        }
+
+        private bool IsValidDrop(DragEventArgs dragEventArgs, IGlyphDataChildrenSource dropTarget, out IGlyphData draggedData, out int oldIndex, out int newIndex)
+        {
+            draggedData = null;
+            oldIndex = -1;
+            newIndex = -1;
+
+            if (!dragEventArgs.Data.GetDataPresent(typeof(IGlyphData)))
+                return false;
+
+            draggedData = (IGlyphData)dragEventArgs.Data.GetData(typeof(IGlyphData));
+            if (draggedData?.ParentSource is null)
+                return false;
+
+            oldIndex = draggedData.ParentSource.IndexOf(draggedData);
+            newIndex = dropTarget.Count;
+
+            if (!draggedData.ParentSource.CanRemoveAt(oldIndex))
+                return false;
+            if (!dropTarget.CanInsert(newIndex, draggedData))
+                return false;
+
+            return true;
         }
 
         private AddCollectionItemCommand CreateAddCommand(IGlyphDataChildrenSource childrenSource, IGlyphData insertTarget = null, bool afterTarget = false)
@@ -114,13 +230,13 @@ namespace Calame.DataModelTree.ViewModels
                 () =>
                 {
                     (child as IRestorable)?.Restore();
-                    childrenSource.Set(index, child);
+                    childrenSource.Insert(index, child);
                     Selection = child;
                 },
                 () =>
                 {
                     Selection = child.ParentSource.Owner;
-                    childrenSource.Unset(index);
+                    childrenSource.RemoveAt(index);
                     (child as IRestorable)?.Store();
                 },
                 null,
@@ -131,35 +247,49 @@ namespace Calame.DataModelTree.ViewModels
         {
             if (data.ParentSource != null)
             {
-                if (data.ParentSource is IGlyphDataChildrenSource childrenSource)
+                int dataIndex = data.ParentSource.IndexOf(data);
+                bool canInsertAbove = data.ParentSource.CanInsert(dataIndex);
+                bool canInsertBelow = data.ParentSource.CanInsert(dataIndex + 1);
+
+                if (data.ParentSource is IGlyphDataChildrenSource childrenSource && (canInsertAbove || canInsertBelow))
                 {
-                    var insertAboveItem = new MenuItem
+                    if (canInsertAbove)
                     {
-                        Header = "Insert _Above",
-                        Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.InsertAbove), 16)
-                    };
+                        var insertAboveItem = new MenuItem
+                        {
+                            Header = "Insert _Above",
+                            Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.InsertAbove), 16)
+                        };
 
-                    var insertBelowItem = new MenuItem
+                        CreateAddCommand(childrenSource, insertTarget: data).SetupMenuItem(insertAboveItem);
+                        yield return insertAboveItem;
+                    }
+
+                    if (canInsertBelow)
                     {
-                        Header = "_Insert Below",
-                        Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.InsertBelow), 16)
-                    };
+                        var insertBelowItem = new MenuItem
+                        {
+                            Header = "_Insert Below",
+                            Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.InsertBelow), 16)
+                        };
 
-                    CreateAddCommand(childrenSource, insertTarget: data).SetupMenuItem(insertAboveItem);
-                    CreateAddCommand(childrenSource, insertTarget: data, afterTarget: true).SetupMenuItem(insertBelowItem);
+                        CreateAddCommand(childrenSource, insertTarget: data, afterTarget: true).SetupMenuItem(insertBelowItem);
+                        yield return insertBelowItem;
+                    }
 
-                    yield return insertAboveItem;
-                    yield return insertBelowItem;
                     yield return new Separator();
                 }
 
-                yield return new MenuItem
+                if (data.ParentSource.CanRemoveAt(dataIndex))
                 {
-                    Header = "_Remove",
-                    Command = _removeCommand,
-                    CommandParameter = data,
-                    Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.Delete), 16)
-                };
+                    yield return new MenuItem
+                    {
+                        Header = "_Remove",
+                        Command = _removeCommand,
+                        CommandParameter = data,
+                        Icon = IconProvider.GetControl(IconDescriptor.GetIcon(CalameIconKey.Delete), 16)
+                    };
+                }
             }
         }
 
@@ -178,13 +308,13 @@ namespace Calame.DataModelTree.ViewModels
                 () =>
                 {
                     Selection = child.ParentSource.Owner;
-                    childrenSource.Unset(index);
+                    childrenSource.RemoveAt(index);
                     (child as IRestorable)?.Store();
                 },
                 () =>
                 {
                     (child as IRestorable)?.Restore();
-                    childrenSource.Set(index, child);
+                    childrenSource.Insert(index, child);
                     Selection = child;
                 },
                 () => (child as IDisposable)?.Dispose(),

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Calame.Behaviors;
 using Calame.Icons;
 using Diese;
 using Diese.Collections;
@@ -15,7 +16,7 @@ using Diese.Collections.Observables.ReadOnly;
 
 namespace Calame.Utils
 {
-    public interface ITreeViewItemModel : IParentable<ITreeViewItemModel>, IEquatable<ITreeViewItemModel>, IDisposable
+    public interface ITreeViewItemModel : IParentable<ITreeViewItemModel>, IEquatable<ITreeViewItemModel>, IDragSource, IDropTarget, IDisposable
     {
         object Data { get; }
 
@@ -200,6 +201,41 @@ namespace Calame.Utils
             set => Set(ref _quickCommandLabel, value);
         }
 
+        private Func<DraggedData> _draggedDataProvider;
+        public Func<DraggedData> DraggedDataProvider
+        {
+            get => _draggedDataProvider;
+            set => Set(ref _draggedDataProvider, value);
+        }
+
+        private Action<DragEventArgs> _dragEnterAction;
+        public Action<DragEventArgs> DragEnterAction
+        {
+            get => _dragEnterAction;
+            set => Set(ref _dragEnterAction, value);
+        }
+
+        private Action<DragEventArgs> _dragOverAction;
+        public Action<DragEventArgs> DragOverAction
+        {
+            get => _dragOverAction;
+            set => Set(ref _dragOverAction, value);
+        }
+
+        private Action<DragEventArgs> _dragLeaveAction;
+        public Action<DragEventArgs> DragLeaveAction
+        {
+            get => _dragLeaveAction;
+            set => Set(ref _dragLeaveAction, value);
+        }
+
+        private Action<DragEventArgs> _dropAction;
+        public Action<DragEventArgs> DropAction
+        {
+            get => _dropAction;
+            set => Set(ref _dropAction, value);
+        }
+
         public TreeViewItemModel(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
             Data = data;
@@ -208,6 +244,12 @@ namespace Calame.Utils
             ChildrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(synchronizerConfiguration);
             ChildrenSynchronizer.Subscribe(Children);
         }
+
+        public DraggedData GetDraggedData() => DraggedDataProvider?.Invoke();
+        public void OnDragEnter(DragEventArgs eventArgs) => DragEnterAction?.Invoke(eventArgs);
+        public void OnDragOver(DragEventArgs eventArgs) => DragOverAction?.Invoke(eventArgs);
+        public void OnDragLeave(DragEventArgs eventArgs) => DragLeaveAction?.Invoke(eventArgs);
+        public void OnDrop(DragEventArgs eventArgs) => DropAction?.Invoke(eventArgs);
 
         public virtual void Dispose()
         {
