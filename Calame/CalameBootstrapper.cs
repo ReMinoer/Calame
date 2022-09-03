@@ -67,7 +67,7 @@ namespace Calame
             mainWindow.WindowState = WindowState.Maximized;
             mainWindow.Icon = _icon;
 
-            foreach (string commandLineArgument in Environment.GetCommandLineArgs())
+            foreach (string commandLineArgument in Environment.GetCommandLineArgs().Skip(1))
             {
                 if (File.Exists(commandLineArgument))
                 {
