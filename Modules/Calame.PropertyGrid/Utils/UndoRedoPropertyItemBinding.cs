@@ -36,7 +36,7 @@ namespace Calame.PropertyGrid.Utils
             {
                 object oldValue = Value;
                 object newValue = value;
-                if (oldValue.Equals(newValue))
+                if (Equals(oldValue, newValue))
                     return;
 
                 PropertyDescriptor propertyDescriptor = PropertyItem.PropertyDescriptor;
