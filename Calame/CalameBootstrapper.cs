@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.ReflectionModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -42,20 +43,22 @@ namespace Calame
             batch.AddExportedValue(new PathWatcher());
         }
 
-#if DEBUG
-        protected override void Configure()
+        protected override void PopulateAssemblySource()
         {
-            try
-            {
-                base.Configure();
-            }
-            catch (ReflectionTypeLoadException e)
-            {
-                Console.WriteLine(e.Message);
-                throw;
-            }
+            string executableDirectoryPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+            var geminiCatalog = new DirectoryCatalog(executableDirectoryPath, "Gemini*.dll");
+            AssemblySource.Instance.AddRange(
+                geminiCatalog.Parts
+                    .Select(part => ReflectionModelServices.GetPartType(part).Value.Assembly)
+                    .Where(assembly => !AssemblySource.Instance.Contains(assembly)));
+
+            var calameCatalog = new DirectoryCatalog(executableDirectoryPath, "Calame*.dll");
+            AssemblySource.Instance.AddRange(
+                calameCatalog.Parts
+                    .Select(part => ReflectionModelServices.GetPartType(part).Value.Assembly)
+                    .Where(assembly => !AssemblySource.Instance.Contains(assembly)));
         }
-#endif
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
