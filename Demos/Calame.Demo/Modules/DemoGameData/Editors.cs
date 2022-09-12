@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Windows;
 using Calame.DataModelViewer;
@@ -9,7 +10,6 @@ using Calame.Dialogs;
 using Calame.Icons;
 using Glyph;
 using Glyph.Composition.Modelization;
-using Glyph.Content;
 using Glyph.IO;
 using Glyph.Pipeline;
 using Microsoft.Extensions.Logging;
@@ -107,7 +107,7 @@ namespace Calame.Demo.Modules.DemoGameData
             base.OnDragOver(dragEventArgs);
         }
 
-        public override async void OnDrop(DragEventArgs dragEventArgs)
+        public override void OnDrop(DragEventArgs dragEventArgs)
         {
             var filePaths = dragEventArgs.Data.GetData(DataFormats.FileDrop) as string[];
             if (filePaths != null && filePaths.Length != 0)
@@ -121,39 +121,12 @@ namespace Calame.Demo.Modules.DemoGameData
                     if (assetPath == null)
                         continue;
 
-                    IAsset<object> asset = EditorContentLibrary.Instance.GetAsset<object>(assetPath);
-                    asset.Handle();
+                    Type contentType = EditorContentLibrary.Instance.GetContentType(filePath);
 
-                    object content;
-                    try
-                    {
-                        content = await asset.GetContentAsync();
-                    }
-                    catch (NoImporterException)
-                    {
-                        content = null;
-                    }
-                    finally
-                    {
-                        await asset.ReleaseAsync();
-                    }
-
-                    switch (content)
-                    {
-                        case Texture2D _:
-                            Data.Instances.Add(new SpriteInstanceData
-                            {
-                                AssetPath = assetPath
-                            });
-                            break;
-                        case null:
-                            Data.Instances.Add(new FileInstanceData
-                            {
-                                FilePath = filePath
-                            });
-                            break;
-                    }
-
+                    if (contentType == typeof(Texture2D))
+                        Data.Instances.Add(new SpriteInstanceData { AssetPath = assetPath });
+                    else if (contentType is null)
+                        Data.Instances.Add(new FileInstanceData { FilePath = filePath });
                 }
                 return;
             }
