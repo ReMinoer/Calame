@@ -52,7 +52,7 @@ namespace Calame.Viewer.ViewModels
         public ReadOnlyList<IViewerModule> Modules { get; }
         public ReadOnlyObservableList<IViewerInteractiveMode> InteractiveModes { get; }
         
-        public ObservableCollection<IGlyphComponent> NotSelectableComponents { get; }
+        public ObservableList<IGlyphComponent> NotSelectableComponents { get; }
         public ISelectionSpread<object> LastSelection { get; set; }
 
         private IViewerInteractiveMode _selectedMode;
@@ -163,7 +163,7 @@ namespace Calame.Viewer.ViewModels
 
             Modules = new ReadOnlyList<IViewerModule>(modules);
             
-            NotSelectableComponents = new ObservableCollection<IGlyphComponent>();
+            NotSelectableComponents = new ObservableList<IGlyphComponent>();
 
             _owner.Activated += OnActivated;
             _owner.Deactivated += OnDeactivated;

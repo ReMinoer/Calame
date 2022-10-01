@@ -45,7 +45,7 @@ namespace Calame.BrushPanel.ViewModels
 
         private readonly IEngineBrushViewModel[] _allEngineBrushes;
         private readonly IDataBrushViewModel[] _allDataBrushes;
-        private readonly ObservableCollection<IBrushViewModel> _brushes;
+        private readonly ObservableList<IBrushViewModel> _brushes;
         public IReadOnlyObservableCollection<IBrushViewModel> Brushes { get; }
 
         private IRootsContext _rootsContext;
@@ -139,7 +139,7 @@ namespace Calame.BrushPanel.ViewModels
 
             _allEngineBrushes = allEngineBrushes;
             _allDataBrushes = allDataBrushes;
-            _brushes = new ObservableCollection<IBrushViewModel>();
+            _brushes = new ObservableList<IBrushViewModel>();
             Brushes = new ReadOnlyObservableCollection<IBrushViewModel>(_brushes);
         }
 

@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Diese.Collections;
+using Diese.Collections.Observables;
 using Glyph;
 using Glyph.Tools.UndoRedo;
 using Xceed.Wpf.Toolkit.PropertyGrid;
@@ -24,9 +25,11 @@ namespace Calame.PropertyGrid.Controls
         }
 
         private IList _list;
+        private IObservableList _observableList;
         private Array _array;
         public override bool CanAddItem => _list != null && !_list.IsFixedSize;
         public override bool CanRemoveItem => CanAddItem;
+        public bool CanMoveItem => (_list != null && !_list.IsReadOnly) || _observableList != null;
         public bool CanEditItem => _list != null && !_list.IsReadOnly;
 
         public InlineCollectionControl()
@@ -45,11 +48,13 @@ namespace Calame.PropertyGrid.Controls
         static private void RefreshItemsSource(InlineCollectionControl control, IEnumerable itemsSource)
         {
             control._list = itemsSource as IList;
+            control._observableList = itemsSource as IObservableList;
             if (!control.CanAddItem)
                 control._array = itemsSource as Array;
 
             control.OnPropertyChanged(nameof(CanAddItem));
             control.OnPropertyChanged(nameof(CanRemoveItem));
+            control.OnPropertyChanged(nameof(CanMoveItem));
             control.OnPropertyChanged(nameof(CanEditItem));
         }
 
@@ -151,7 +156,7 @@ namespace Calame.PropertyGrid.Controls
         {
             if (e.LeftButton != MouseButtonState.Pressed)
                 return;
-            if (!CanEditItem)
+            if (!CanMoveItem)
                 return;
             if (_dragStartPosition == null)
                 return;
@@ -202,10 +207,17 @@ namespace Calame.PropertyGrid.Controls
                 return;
 
             IList list = _list;
+            IObservableList observableList = _observableList;
             Array array = _array;
             string actionDescription = $"Move item {movedItem} to index {newIndex}";
 
-            if (CanAddItem)
+            if (CanMoveItem)
+            {
+                UndoRedoStack.Execute(actionDescription,
+                    () => observableList.Move(oldIndex, newIndex),
+                    () => observableList.Move(newIndex, oldIndex));
+            }
+            else if (CanAddItem)
             {
                 UndoRedoStack.Execute(actionDescription,
                     () =>

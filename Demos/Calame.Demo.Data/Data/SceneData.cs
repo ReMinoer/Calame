@@ -8,7 +8,7 @@ namespace Calame.Demo.Data.Data
 {
     public class SceneData : BindedData<SceneData, Scene>
     {
-        public ObservableCollection<IInstanceData<IGlyphComponent>> Instances { get; } = new ObservableCollection<IInstanceData<IGlyphComponent>>();
+        public ObservableList<IInstanceData<IGlyphComponent>> Instances { get; } = new ObservableList<IInstanceData<IGlyphComponent>>();
 
         static SceneData()
         {

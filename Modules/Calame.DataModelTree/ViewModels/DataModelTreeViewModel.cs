@@ -150,18 +150,28 @@ namespace Calame.DataModelTree.ViewModels
             IGlyphDataSource oldDataSource = draggedData.ParentSource;
             IGlyphDataSource newDataSource = targetSource;
 
-            _undoRedoContext?.UndoRedoStack.Execute($"Move data {draggedData} to index {newIndex} in {newDataSource}.",
-                () =>
-                {
-                    oldDataSource.RemoveAt(oldIndex);
-                    newDataSource.Insert(newIndex, draggedData);
-                },
-                () =>
-                {
-                    newDataSource.RemoveAt(newIndex);
-                    oldDataSource.Insert(oldIndex, draggedData);
-                }
-            );
+            if (oldDataSource == newDataSource)
+            {
+                _undoRedoContext?.UndoRedoStack.Execute($"Move data {draggedData} to index {newIndex} in {newDataSource}.",
+                    () => newDataSource.Move(oldIndex, newIndex),
+                    () => newDataSource.Move(newIndex, oldIndex)
+                );
+            }
+            else
+            {
+                _undoRedoContext?.UndoRedoStack.Execute($"Move data {draggedData} to index {newIndex} in {newDataSource}.",
+                    () =>
+                    {
+                        oldDataSource.RemoveAt(oldIndex);
+                        newDataSource.Insert(newIndex, draggedData);
+                    },
+                    () =>
+                    {
+                        newDataSource.RemoveAt(newIndex);
+                        oldDataSource.Insert(oldIndex, draggedData);
+                    }
+                );
+            }
         }
 
         private bool IsValidDrop(DragEventArgs dragEventArgs, IGlyphData dropTarget, out IGlyphData draggedData, out int oldIndex, out int newIndex)
