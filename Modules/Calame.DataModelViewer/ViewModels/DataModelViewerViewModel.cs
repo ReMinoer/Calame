@@ -20,12 +20,10 @@ using Glyph.Composition;
 using Glyph.Composition.Modelization;
 using Glyph.Core;
 using Glyph.Engine;
-using Glyph.Resolver;
 using Glyph.Tools.UndoRedo;
 using Glyph.WpfInterop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
-using Niddle;
 using Simulacra.IO.Watching;
 
 namespace Calame.DataModelViewer.ViewModels
@@ -277,6 +275,46 @@ namespace Calame.DataModelViewer.ViewModels
             if (CanSelect(component))
                 return EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, component));
             return Task.CompletedTask;
+        }
+
+        public async Task SelectAsync(IEnumerable instances)
+        {
+            var dataList = new List<IGlyphData>();
+            var componentList = new List<IGlyphComponent>();
+
+            foreach (object instance in instances)
+            {
+                switch (instance)
+                {
+                    case IGlyphData data:
+                        dataList.Add(data);
+                        break;
+                    case IGlyphComponent component:
+                        componentList.Add(component);
+                        break;
+                }
+            }
+
+            await SelectAsync(dataList);
+            await SelectAsync(componentList);
+        }
+
+        public Task SelectAsync(IEnumerable<IGlyphData> dataEnumerable)
+        {
+            IGlyphData[] selectableData = dataEnumerable.Where(CanSelect).ToArray();
+            if (selectableData.Length == 0)
+                return Task.CompletedTask;
+
+            return EventAggregator.PublishAsync(new SelectionRequest<IGlyphData>(this, selectableData));
+        }
+
+        public Task SelectAsync(IEnumerable<IGlyphComponent> components)
+        {
+            IGlyphComponent[] selectableComponents = components.Where(CanSelect).ToArray();
+            if (selectableComponents.Length == 0)
+                return Task.CompletedTask;
+
+            return EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, selectableComponents));
         }
     }
 }

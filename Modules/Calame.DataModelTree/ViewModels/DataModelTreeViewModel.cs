@@ -79,17 +79,17 @@ namespace Calame.DataModelTree.ViewModels
 
             _dataItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
                 .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
-                .ChildrenSource(x => new CompositeReadOnlyObservableList<object>
-                (
+                .ChildrenSource(x => new CompositeReadOnlyObservableList<object>(
                     new EnumerableReadOnlyObservableList<object>(x.Children),
-                    new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
-                ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
+                    new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)),
+                    x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
                 .IconDescription(x => dataIconDescriptor.GetIcon(x))
                 .ContextMenuItems(GetContextMenuItems)
                 .DraggedDataProvider(x => () => new DraggedData(DragDropEffects.Move, new DataObject(typeof(IGlyphData), x)))
                 .DragEnterAction(x => e => OnDragOverData(e, x))
                 .DragOverAction(x => e => OnDragOverData(e, x))
-                .DropAction(x => e => OnDropOnData(e, x));
+                .DropAction(x => e => OnDropOnData(e, x))
+                .CanInlineChild(x => x.Data is IGlyphDataChildrenSource);
 
             _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IGlyphDataChildrenSource>()
                 .DisplayName(x => x.PropertyName)
@@ -108,6 +108,9 @@ namespace Calame.DataModelTree.ViewModels
 
         private void OnDragOverData(DragEventArgs dragEventArgs, IGlyphData dropTarget)
         {
+            if (dragEventArgs.Handled)
+                return;
+
             dragEventArgs.Effects = IsValidDrop(dragEventArgs, dropTarget, out _, out _, out _)
                 ? DragDropEffects.Move
                 : DragDropEffects.None;
@@ -117,6 +120,9 @@ namespace Calame.DataModelTree.ViewModels
 
         private void OnDragOverChildrenSource(DragEventArgs dragEventArgs, IGlyphDataChildrenSource dropTarget)
         {
+            if (dragEventArgs.Handled)
+                return;
+
             dragEventArgs.Effects = IsValidDrop(dragEventArgs, dropTarget, out _, out _, out _)
                 ? DragDropEffects.Move
                 : DragDropEffects.None;
@@ -126,15 +132,27 @@ namespace Calame.DataModelTree.ViewModels
 
         private void OnDropOnData(DragEventArgs dragEventArgs, IGlyphData dropTarget)
         {
+            if (dragEventArgs.Handled)
+                return;
+
             if (dropTarget.ParentSource is IGlyphDataChildrenSource childrenSource
                 && IsValidDrop(dragEventArgs, dropTarget, out IGlyphData draggedData, out int oldIndex, out int newIndex))
+            {
                 Drop(draggedData, childrenSource, oldIndex, newIndex);
+                dragEventArgs.Handled = true;
+            }
         }
 
         private void OnDropOnChildrenSource(DragEventArgs dragEventArgs, IGlyphDataChildrenSource dropTarget)
         {
+            if (dragEventArgs.Handled)
+                return;
+
             if (IsValidDrop(dragEventArgs, dropTarget, out IGlyphData draggedData, out int oldIndex, out int newIndex) && draggedData.ParentSource != dropTarget)
+            {
                 Drop(draggedData, dropTarget, oldIndex, newIndex);
+                dragEventArgs.Handled = true;
+            }
         }
 
         private void Drop(IGlyphData draggedData, IGlyphDataChildrenSource targetSource, int oldIndex, int newIndex)
@@ -374,6 +392,7 @@ namespace Calame.DataModelTree.ViewModels
 
         public bool DisableChildrenIfParentDisabled => false;
         event EventHandler ITreeContext.BaseFilterChanged { add { } remove { } }
+
         bool ITreeContext.IsMatchingBaseFilter(object data) => true;
     }
 }

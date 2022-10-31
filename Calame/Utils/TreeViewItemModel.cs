@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using Calame.Behaviors;
 using Calame.Icons;
 using Diese;
 using Diese.Collections;
@@ -16,7 +15,7 @@ using Diese.Collections.Observables.ReadOnly;
 
 namespace Calame.Utils
 {
-    public interface ITreeViewItemModel : IParentable<ITreeViewItemModel>, IEquatable<ITreeViewItemModel>, IDragSource, IDropTarget, IDisposable
+    public interface ITreeViewItemModel : IParentable<ITreeViewItemModel>, IEquatable<ITreeViewItemModel>, IDragSource, IDropTarget, INotifyPropertyChanged, IDisposable
     {
         object Data { get; }
 
@@ -25,9 +24,12 @@ namespace Calame.Utils
         IconDescription IconDescription { get; }
 
         new ITreeViewItemModel Parent { get; set; }
-        IObservableList<ITreeViewItemModel> Children { get; }
+        IReadOnlyObservableList<ITreeViewItemModel> Children { get; }
+        IReadOnlyObservableList<ITreeViewItemModel> LogicChildren { get; }
+        void AddChild(ITreeViewItemModel child);
+        void RemoveChild(ITreeViewItemModel child);
 
-        bool IsHeader { get; set; }
+        bool IsHeader { get; }
         bool IsEnabled { get; set; }
         bool IsDisabledByParent { get; set; }
         
@@ -39,8 +41,8 @@ namespace Calame.Utils
         bool VisibleForFilter { get; set; }
         bool VisibleAsParent { get; set; }
 
-        IEnumerable ContextMenuItems { get; set; }
-        ICommand QuickCommand { get; set; }
+        IEnumerable ContextMenuItems { get; }
+        ICommand QuickCommand { get; }
         IconDescription QuickCommandIconDescription { get; }
         string QuickCommandLabel { get; }
         string QuickCommandToolTip { get; }
@@ -50,8 +52,10 @@ namespace Calame.Utils
     {
         protected readonly T Data;
         object ITreeViewItemModel.Data => Data;
-
-        public IObservableList<ITreeViewItemModel> Children { get; }
+        
+        private readonly ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel> _children;
+        public IReadOnlyObservableList<ITreeViewItemModel> Children { get; }
+        public IReadOnlyObservableList<ITreeViewItemModel> LogicChildren => Children;
         protected readonly ObservableListSynchronizer<object, ITreeViewItemModel> ChildrenSynchronizer;
         
         public IReadOnlyObservableList<object> ChildrenSource
@@ -97,7 +101,7 @@ namespace Calame.Utils
                 if (!Set(ref _isEnabled, value))
                     return;
 
-                foreach (ITreeViewItemModel item in Tree.DepthFirst<ITreeViewItemModel>(this, x => x.Children))
+                foreach (ITreeViewItemModel item in Tree.DepthFirst<ITreeViewItemModel>(this, x => x.LogicChildren))
                     item.IsDisabledByParent = Sequence.Aggregate(item, x => x.Parent).Any(x => !x.IsEnabled);
             }
         }
@@ -160,9 +164,9 @@ namespace Calame.Utils
                 if (_parent.NullableEquals(value))
                     return;
                 
-                _parent?.Children.Remove(this);
+                _parent?.RemoveChild(this);
                 _parent = value;
-                _parent?.Children.Add(this);
+                _parent?.AddChild(this);
             }
         }
 
@@ -240,10 +244,15 @@ namespace Calame.Utils
         {
             Data = data;
 
-            Children = new ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel>(this);
+            _children = new ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel>(this);
+            Children = new ReadOnlyObservableList<ITreeViewItemModel>(_children);
+
             ChildrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(synchronizerConfiguration);
-            ChildrenSynchronizer.Subscribe(Children);
+            ChildrenSynchronizer.Subscribe(_children);
         }
+
+        public void AddChild(ITreeViewItemModel child) => _children.Add(child);
+        public void RemoveChild(ITreeViewItemModel child) => _children.Remove(child);
 
         public DraggedData GetDraggedData() => DraggedDataProvider?.Invoke();
         public void OnDragEnter(DragEventArgs eventArgs) => DragEnterAction?.Invoke(eventArgs);

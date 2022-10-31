@@ -28,6 +28,7 @@ using Glyph.Graphics;
 using Glyph.WpfInterop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections;
 
 namespace Calame.SceneViewer.ViewModels
 {
@@ -301,6 +302,20 @@ namespace Calame.SceneViewer.ViewModels
             if (CanSelect(component))
                 return EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, component));
             return Task.CompletedTask;
+        }
+
+        public Task SelectAsync(IEnumerable instances)
+        {
+            return SelectAsync(instances.OfType<IGlyphComponent>());
+        }
+
+        public Task SelectAsync(IEnumerable<IGlyphComponent> components)
+        {
+            IGlyphComponent[] selectableComponents = components.Where(CanSelect).ToArray();
+            if (selectableComponents.Length == 0)
+                return Task.CompletedTask;
+
+            return EventAggregator.PublishAsync(new SelectionRequest<IGlyphComponent>(this, selectableComponents));
         }
     }
 }

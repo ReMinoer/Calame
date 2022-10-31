@@ -152,7 +152,7 @@ namespace Calame.DataModelViewer
             public DocumentUndoableAction(DataModelViewerViewModel document, IUndoableAction undoableAction)
             {
                 _document = document;
-                _selectedItems = _document.Viewer.LastSelection.Items.ToArray();
+                _selectedItems = _document.Viewer.LastSelection?.Items.ToArray() ?? Array.Empty<object>();
                 _undoableAction = undoableAction;
                 _disposableAction = undoableAction as IDisposable;
             }

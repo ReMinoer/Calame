@@ -127,6 +127,7 @@
                             <Button DockPanel.Dock="Right" 
                                     Margin="2 1 0 1"
                                     Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    Background="Transparent"
                                     Command="{Binding QuickCommand}"
                                     CommandParameter="{Binding}"
                                     ToolTip="{Binding QuickCommandToolTip}"

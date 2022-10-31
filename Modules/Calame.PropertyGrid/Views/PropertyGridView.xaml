@@ -7,26 +7,75 @@
              xmlns:controls="clr-namespace:Calame.PropertyGrid.Controls"
              xmlns:glyph="clr-namespace:Glyph;assembly=Glyph"
              xmlns:documentContexts="clr-namespace:Calame.DocumentContexts;assembly=Calame.DocumentContexts"
+             xmlns:converters="clr-namespace:Calame.Converters;assembly=Calame"
+             xmlns:userControls="clr-namespace:Calame.UserControls;assembly=Calame"
+             xmlns:icons="clr-namespace:Calame.Icons;assembly=Calame"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance viewModels:PropertyGridViewModel, IsDesignTimeCreatable=True}"
+             d:DataContext="{d:DesignInstance viewModels:PropertyGridViewModel}"
              d:DesignHeight="500"
              d:DesignWidth="300">
-    <Grid>
-        <controls:CalamePropertyGrid SelectedObject="{Binding SelectedObject}"
-                                     CompactMode="True"
-                                     ShowNavigationButtons="True"
-                                     PopupsWidth="{Binding ActualWidth, RelativeSource={RelativeSource Self}}"
-                                     UndoRedoStack="{Binding UndoRedoStack}"
-                                     NewItemTypeRegistry="{Binding NewItemTypeRegistry}"
-                                     IconProvider="{Binding IconProvider}"
-                                     IconDescriptorManager="{Binding IconDescriptorManager}"
-                                     WorkingDirectory="{Binding Path=RawContentLibraryContext.(documentContexts:IContentLibraryContext.ContentLibrary).(glyph:IContentLibrary.WorkingDirectory)}"
-                                     ContentFileTypeResolver="{Binding ContentFileTypeResolver}"
-                                     RawContentLibrary="{Binding Path=RawContentLibraryContext.(documentContexts:IRawContentLibraryContext.RawContentLibrary)}"
-                                     PreviousCommand="{Binding PreviousCommand}"
-                                     NextCommand="{Binding NextCommand}"
-                                     OpenFileCommand="{Binding OpenFileCommand}"
-                                     OpenFolderCommand="{Binding OpenFolderCommand}"
-                                     SelectItemCommand="{Binding SelectItemCommand}" />
-    </Grid>
+    <UserControl.Resources>
+        <converters:AreSameConverter x:Key="AreSameConverter" />
+        <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+        <DataTemplate x:Key="PropertyGridTemplate">
+            <controls:CalamePropertyGrid SelectedObject="{Binding}"
+                                         CompactMode="True"
+                                         PopupsWidth="{Binding ActualWidth, RelativeSource={RelativeSource Self}}"
+                                         UndoRedoStack="{Binding DataContext.UndoRedoStack, ElementName=Panel}"
+                                         NewItemTypeRegistry="{Binding DataContext.NewItemTypeRegistry, ElementName=Panel}"
+                                         IconProvider="{Binding DataContext.IconProvider, ElementName=Panel}"
+                                         IconDescriptorManager="{Binding DataContext.IconDescriptorManager, ElementName=Panel}"
+                                         WorkingDirectory="{Binding Path=DataContext.RawContentLibraryContext.(documentContexts:IContentLibraryContext.ContentLibrary).(glyph:IContentLibrary.WorkingDirectory), ElementName=Panel}"
+                                         ContentFileTypeResolver="{Binding DataContext.ContentFileTypeResolver, ElementName=Panel}"
+                                         RawContentLibrary="{Binding Path=DataContext.RawContentLibraryContext.(documentContexts:IRawContentLibraryContext.RawContentLibrary), ElementName=Panel}"
+                                         PreviousCommand="{Binding DataContext.PreviousCommand, ElementName=Panel}"
+                                         NextCommand="{Binding DataContext.NextCommand, ElementName=Panel}"
+                                         OpenFileCommand="{Binding DataContext.OpenFileCommand, ElementName=Panel}"
+                                         OpenFolderCommand="{Binding DataContext.OpenFolderCommand, ElementName=Panel}"
+                                         SelectItemCommand="{Binding DataContext.SelectItemCommand, ElementName=Panel}">
+                <controls:CalamePropertyGrid.ShowNavigationButtons>
+                    <MultiBinding Converter="{StaticResource AreSameConverter}">
+                        <MultiBinding.Bindings>
+                            <Binding />
+                            <Binding Path="DataContext.SelectedObject" ElementName="Panel" />
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </controls:CalamePropertyGrid.ShowNavigationButtons>
+            </controls:CalamePropertyGrid>
+        </DataTemplate>
+        <DataTemplate x:Key="SubPropertyGridTemplate">
+            <Border Margin="0 0 0 0" BorderThickness="0" BorderBrush="DimGray">
+                <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PropertyGridTemplate}" />
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ScrollViewer x:Name="Panel" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <ContentPresenter Content="{Binding SelectedObject}"
+                              ContentTemplate="{StaticResource PropertyGridTemplate}" />
+            <Grid Margin="0 0 0 0"
+                  Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"
+                  Visibility="{Binding SelectedComposable, Converter={StaticResource ObjectToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label FontWeight="SemiBold">Composition</Label>
+                <Button Grid.Column="2" Padding="10 5" HorizontalAlignment="Right"
+                        Command="{Binding AddComponentCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <userControls:CalameIcon Margin="0 0 5 0"
+                                                 IconSize="16"
+                                                 Target="{x:Static icons:CalameIconKey.Add}"
+                                                 IconDescriptor="{Binding IconDescriptor}"
+                                                 IconProvider="{Binding IconProvider}" />
+                        <TextBlock Text="Add"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+            <ItemsControl ItemsSource="{Binding SelectedComposable.Composition}"
+                          ItemTemplate="{StaticResource SubPropertyGridTemplate}" />
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

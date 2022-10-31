@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
@@ -10,10 +11,12 @@ using Calame.Commands;
 using Calame.ContentFileTypes;
 using Calame.DocumentContexts;
 using Calame.Icons;
+using Calame.Utils;
 using Caliburn.Micro;
 using Gemini.Framework;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Services;
+using Glyph;
 using Glyph.Tools.UndoRedo;
 
 namespace Calame.PropertyGrid.ViewModels
@@ -25,13 +28,21 @@ namespace Calame.PropertyGrid.ViewModels
 
         private readonly IEditorProvider[] _editorProviders;
         public IIconProvider IconProvider { get; }
+        public IIconDescriptor IconDescriptor { get; }
         public IIconDescriptorManager IconDescriptorManager { get; }
 
         private object _selectedObject;
         public object SelectedObject
         {
             get => _selectedObject;
-            set => SetValue(ref _selectedObject, value);
+            private set => SetValue(ref _selectedObject, value);
+        }
+
+        private IComposable _selectedComposable;
+        public IComposable SelectedComposable
+        {
+            get => _selectedComposable;
+            private set => SetValue(ref _selectedComposable, value);
         }
 
         private IRawContentLibraryContext _rawContentLibraryContext;
@@ -49,6 +60,8 @@ namespace Calame.PropertyGrid.ViewModels
         }
 
         private IUndoRedoStack _undoRedoStack;
+        private ICommand _addComponentCommand;
+
         public IUndoRedoStack UndoRedoStack
         {
             get => _undoRedoStack;
@@ -62,6 +75,12 @@ namespace Calame.PropertyGrid.ViewModels
         public TargetableCommand NextCommand { get; }
         public RelayCommand OpenFileCommand { get; }
         public RelayCommand OpenFolderCommand { get; }
+
+        public ICommand AddComponentCommand
+        {
+            get => _addComponentCommand;
+            set => Set(ref _addComponentCommand, value);
+        }
 
         protected override object IconKey => CalameIconKey.PropertyGrid;
 
@@ -77,6 +96,7 @@ namespace Calame.PropertyGrid.ViewModels
 
             IconProvider = iconProvider;
             IconDescriptorManager = iconDescriptorManager;
+            IconDescriptor = IconDescriptorManager.GetDescriptor();
 
             PreviousCommand = commandService.GetTargetableCommand<PreviousSelectionCommand>();
             NextCommand = commandService.GetTargetableCommand<NextSelectionCommand>();
@@ -101,6 +121,7 @@ namespace Calame.PropertyGrid.ViewModels
         protected override Task OnDocumentActivated(IDocumentContext activeDocument)
         {
             SelectedObject = null;
+            SelectedComposable = null;
 
             RawContentLibraryContext = activeDocument.TryGetContext<IRawContentLibraryContext>();
             SelectItemCommand = activeDocument.TryGetContext<ISelectionContext>()?.GetSelectionCommand();
@@ -112,6 +133,7 @@ namespace Calame.PropertyGrid.ViewModels
         protected override Task OnDocumentsCleaned()
         {
             SelectedObject = null;
+            SelectedComposable = null;
 
             SelectItemCommand = null;
             RawContentLibraryContext = null;
@@ -122,7 +144,33 @@ namespace Calame.PropertyGrid.ViewModels
         public Task HandleAsync(ISelectionSpread<object> message, CancellationToken cancellationToken)
         {
             SelectedObject = message.Item;
+            SelectedComposable = SelectedObject as IComposable;
+            
+            if (SelectedComposable != null)
+                AddComponentCommand = new AddCollectionItemCommand(SelectedComposable.Composition, InsertItem, NewItemTypeRegistry, IconProvider, IconDescriptor);
+            else
+                AddComponentCommand = null;
+
             return Task.CompletedTask;
+        }
+
+        private void InsertItem(int index, object item)
+        {
+            IList list = SelectedComposable.Composition;
+
+            UndoRedoStack.Execute($"Add {item} to {SelectedComposable}.",
+                () =>
+                {
+                    (item as IRestorable)?.Restore();
+                    list.Insert(index, item);
+                },
+                () =>
+                {
+                    list.RemoveAt(index);
+                    (item as IRestorable)?.Store();
+                },
+                null,
+                () => (item as IDisposable)?.Dispose());
         }
     }
 }

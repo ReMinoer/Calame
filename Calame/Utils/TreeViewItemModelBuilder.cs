@@ -16,7 +16,7 @@ namespace Calame.Utils
     public class TreeViewItemModelBuilder<T>
     {
         private readonly List<Func<T, IBindingModule<TreeViewItemModel>>> _bindingModulesFunc = new List<Func<T, IBindingModule<TreeViewItemModel>>>();
-        
+
         public TreeViewItemModelBuilder<T> DisplayName(Func<T, string> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => DisplayName(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> FontWeight(Func<T, FontWeight> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
@@ -193,9 +193,22 @@ namespace Calame.Utils
             return observableFunc?.Invoke(data).Select(x => getter(data)).StartWith(getter(data)) ?? Observable.Return(getter(data));
         }
 
+        private Func<ITreeViewItemModel, bool> _canInlineChild;
+
+        public TreeViewItemModelBuilder<T> CanInlineChild(Func<ITreeViewItemModel, bool> canInlineChild)
+        {
+            _canInlineChild = canInlineChild;
+            return this;
+        }
+
         public ITreeViewItemModel Build(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
-            return new TreeViewItemModel(data, _bindingModulesFunc.Select(x => x(data)), synchronizerConfiguration);
+            var treeViewItemModel = new TreeViewItemModel(data, _bindingModulesFunc.Select(x => x(data)), synchronizerConfiguration);
+
+            if (_canInlineChild != null)
+                return new InlinableTreeViewItemModel<T>(treeViewItemModel, _canInlineChild);
+            
+            return treeViewItemModel;
         }
 
         private class TreeViewItemModel : TreeViewItemModel<T>

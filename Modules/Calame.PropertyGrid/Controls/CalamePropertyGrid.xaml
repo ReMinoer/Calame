@@ -711,6 +711,7 @@
         </Border>
         <xctk:PropertyGrid Grid.Row="1"
                            Name="PropertyGrid"
+                           BorderThickness="0"
                            EditorDefinitions="{StaticResource EditorDefinitions}"
                            SelectedObject="{Binding DisplayedObject, ElementName=This}"
                            IsReadOnly="{Binding IsReadOnly, ElementName=This}"

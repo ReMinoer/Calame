@@ -53,9 +53,9 @@ namespace Calame.UserControls
         object ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.GetReference(ITreeViewItemModel collectedItem)
             => collectedItem.Data;
         void ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.SubscribeItem(ITreeViewItemModel collectedItem)
-            => collectedItem.Children.CollectionChanged += OnItemChanged;
+            => collectedItem.LogicChildren.CollectionChanged += OnItemChanged;
         void ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.UnsubscribeItem(ITreeViewItemModel collectedItem)
-            => collectedItem.Children.CollectionChanged -= OnItemChanged;
+            => collectedItem.LogicChildren.CollectionChanged -= OnItemChanged;
         void ICollectionSynchronizerConfiguration<object, ITreeViewItemModel>.DisposeItem(ITreeViewItemModel collectedItem)
             => collectedItem.Dispose();
 
@@ -237,7 +237,7 @@ namespace Calame.UserControls
         {
             treeItem.IsExpanded = value;
 
-            foreach (ITreeViewItemModel child in treeItem.Children)
+            foreach (ITreeViewItemModel child in treeItem.LogicChildren)
                 UpdateAllExpand(child, value);
         }
 
@@ -294,7 +294,7 @@ namespace Calame.UserControls
 
         private void UpdateFilter(ITreeViewItemModel item, bool forceExpand)
         {
-            foreach (ITreeViewItemModel child in item.Children)
+            foreach (ITreeViewItemModel child in item.LogicChildren)
                 UpdateFilter(child, forceExpand);
 
             ApplyFilterOnItem(item, forceExpand);
@@ -326,7 +326,7 @@ namespace Calame.UserControls
                 ? item.MatchingUserFilter
                 : item.MatchingBaseFilter;
 
-            bool hasChildVisibleForFilter = item.Children.Any(x => x.VisibleForFilter);
+            bool hasChildVisibleForFilter = item.LogicChildren.Any(x => x.VisibleForFilter);
 
             item.VisibleForFilter = isMatchingActiveFilter || hasChildVisibleForFilter;
             item.VisibleAsParent = !isMatchingActiveFilter && hasChildVisibleForFilter;

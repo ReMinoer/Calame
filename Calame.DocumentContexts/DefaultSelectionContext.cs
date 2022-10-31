@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -37,6 +40,20 @@ namespace Calame.DocumentContexts
             if (CanSelect(instance))
                 return _eventAggregator.PublishAsync(new SelectionRequest<T>(_currentDocument, instance));
             return Task.CompletedTask;
+        }
+
+        public Task SelectAsync(IEnumerable instances)
+        {
+            return SelectAsync(instances.OfType<T>());
+        }
+
+        public Task SelectAsync(IEnumerable<T> instances)
+        {
+            T[] selectableInstances = instances.Where(CanSelect).ToArray();
+            if (selectableInstances.Length == 0)
+                return Task.CompletedTask;
+
+            return _eventAggregator.PublishAsync(new SelectionRequest<T>(_currentDocument, selectableInstances));
         }
     }
 }
