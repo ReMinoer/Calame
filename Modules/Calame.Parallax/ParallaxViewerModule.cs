@@ -44,6 +44,9 @@ namespace Calame.Parallax
 
         public override void Deactivate()
         {
+            if (_root is null)
+                return;
+
             Model.EditorModeRoot.RemoveAndDispose(_root);
             _root = null;
         }
