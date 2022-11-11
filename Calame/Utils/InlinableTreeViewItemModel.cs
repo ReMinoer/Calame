@@ -60,7 +60,8 @@ namespace Calame.Utils
             }
             else
             {
-                InlinedItem.PropertyChanged -= OnInlinedItemPropertyChanged;
+                if (InlinedItem != null)
+                    InlinedItem.PropertyChanged -= OnInlinedItemPropertyChanged;
             }
 
             foreach (string redirectedPropertyName in RedirectedPropertiesNames)

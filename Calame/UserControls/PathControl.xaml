@@ -14,22 +14,18 @@
         <converters:PathToWatermarkConverter x:Key="PathToWatermarkConverter" />
     </UserControl.Resources>
     <DockPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-        <local:CalameIcon DockPanel.Dock="Left" Width="24" IconSize="12"
-                          Target="{Binding DefaultIconKey, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
-                          IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
-                          IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}" />
-        <Button DockPanel.Dock="Right" Width="30"
-                Content="..."
-                Click="OnBrowseButtonClicked" />
-        <Button DockPanel.Dock="Right" Width="20"
-                Visibility="{Binding ShowOpenPathButton, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
+        <Button DockPanel.Dock="Left" Width="24"
+                IsEnabled="{Binding ShowOpenPathButton, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
                 Command="{Binding OpenPathCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
                 CommandParameter="{Binding FullPath, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}">
             <local:CalameIcon IconSize="12"
-                              Target="{x:Static icons:CalameIconKey.OpenWith}"
+                              Target="{Binding DefaultIconKey, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
                               IconProvider="{Binding IconProvider, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
                               IconDescriptor="{Binding SystemIconDescriptor, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}" />
         </Button>
+        <Button DockPanel.Dock="Right" Width="30"
+                Content="..."
+                Click="OnBrowseButtonClicked" />
         <xctk:PropertyGridEditorTextBox Text="{Binding DisplayedPath, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"
                                         Watermark="{Binding DisplayedPath, Converter={StaticResource PathToWatermarkConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:PathControl}}}"/>
     </DockPanel>

@@ -15,7 +15,7 @@ using Stave;
 
 namespace Calame.Viewer
 {
-    public class DebuggableViewerContexts : PropertyChangedBase, IRawContentLibraryContext, IRootsContext, IRootComponentsContext, IRootScenesContext, IViewsContext, IRootInteractivesContext
+    public class DebuggableViewerContexts : PropertyChangedBase, IRawContentLibraryContext, IRootsContext, IRootComponentsContext, IRootScenesContext, IViewsContext, IRootInteractivesContext, IDisposable
     {
         public ViewerViewModel Viewer { get; }
 
@@ -96,6 +96,11 @@ namespace Calame.Viewer
 
             RefreshRunner();
             Viewer.RunnerChanged += OnRunnerChanged;
+        }
+
+        public void Dispose()
+        {
+            Viewer.RunnerChanged -= OnRunnerChanged;
         }
 
         private void OnRunnerChanged(object sender, GlyphWpfRunner e) => RefreshRunner();

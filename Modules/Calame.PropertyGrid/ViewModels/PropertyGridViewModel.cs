@@ -112,7 +112,11 @@ namespace Calame.PropertyGrid.ViewModels
             Process.Start(new ProcessStartInfo((string)path) { UseShellExecute = true });
         }
 
-        private bool CanOpenFile(object path) => !string.IsNullOrWhiteSpace((string)path);
+        private bool CanOpenFile(object path)
+        {
+            return Shell.CanOpenFile((string)path, _editorProviders, RawContentLibraryContext?.RawContentLibrary?.WorkingDirectory);
+        }
+
         private async void OnOpenFile(object path)
         {
             await Shell.OpenFileAsync((string)path, _editorProviders, RawContentLibraryContext?.RawContentLibrary?.WorkingDirectory);

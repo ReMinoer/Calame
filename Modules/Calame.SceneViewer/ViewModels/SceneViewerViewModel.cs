@@ -170,6 +170,8 @@ namespace Calame.SceneViewer.ViewModels
 
             _engine.Stop();
 
+            _debuggableViewerContexts.Dispose();
+
             _viewTracker?.Dispose();
             _viewTracker = null;
 

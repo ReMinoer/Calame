@@ -160,6 +160,7 @@ namespace Calame.DataModelViewer.ViewModels
 
             _engine.Stop();
 
+            _debuggableViewerContexts.Dispose();
             Editor.Dispose();
             Viewer.Dispose();
 

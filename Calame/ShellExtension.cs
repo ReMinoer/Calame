@@ -38,27 +38,37 @@ namespace Calame
             => shell.ShowDocumentAsync(editorProvider, document => editorProvider.New(document, name));
         static public Task OpenFileAsync(this IShell shell, IEditorProvider editorProvider, string filePath)
             => shell.ShowDocumentAsync(editorProvider, document => editorProvider.Open(document, filePath));
+        
+        static public bool CanOpenFile(this IShell _, string filePath, IReadOnlyCollection<IEditorProvider> editorProviders, string workingDirectory = null)
+        {
+            if (editorProviders.Any(p => p.Handles(filePath)))
+                return true;
 
-        static public async Task OpenFileAsync(this IShell shell, string filePath, IEnumerable<IEditorProvider> editorProviders, string workingDirectory = null)
+            filePath = GetAssetRealPath(filePath, workingDirectory);
+            return editorProviders.Any(p => p.Handles(filePath)) || File.Exists(filePath);
+        }
+
+        static public async Task OpenFileAsync(this IShell shell, string filePath, IReadOnlyCollection<IEditorProvider> editorProviders, string workingDirectory = null)
         {
             IEditorProvider editorProvider = editorProviders.FirstOrDefault(p => p.Handles(filePath));
-            if (editorProvider == null)
+            if (editorProvider is null)
             {
-                if (!Path.HasExtension(filePath) && !File.Exists(filePath))
+                filePath = GetAssetRealPath(filePath, workingDirectory);
+
+                editorProvider = editorProviders.FirstOrDefault(p => p.Handles(filePath));
+                if (editorProvider is null)
                 {
-                    string assetName = Path.GetFileName(filePath);
-                    string folderPath = Path.GetDirectoryName(filePath) ?? throw new ArgumentException();
+                    if (File.Exists(filePath))
+                    {
+                        Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Failed to open file \"{filePath}\".", "Failed to open file");
+                    }
 
-                    if (!Path.IsPathRooted(folderPath))
-                        folderPath = Path.Combine(workingDirectory ?? Environment.CurrentDirectory, folderPath);
-
-                    filePath = Directory.EnumerateFiles(folderPath, $"{assetName}.*").FirstOrDefault();
-                    if (filePath == null)
-                        return;
+                    return;
                 }
-                
-                Process.Start(new ProcessStartInfo(filePath) { UseShellExecute = true });
-                return;
             }
 
             IDocument alreadyOpenedDocument = shell.Documents.OfType<IPersistedDocument>().FirstOrDefault(x => new PathComparer().Equals(x.FilePath, filePath));
@@ -69,6 +79,27 @@ namespace Calame
             }
 
             await shell.OpenFileAsync(editorProvider, filePath);
+        }
+
+        static private string GetAssetRealPath(string filePath, string workingDirectory)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                return filePath;
+
+            if (!Path.HasExtension(filePath) && !File.Exists(filePath))
+            {
+                string assetName = Path.GetFileName(filePath);
+                string folderPath = Path.GetDirectoryName(filePath) ?? throw new ArgumentException();
+
+                if (!Path.IsPathRooted(folderPath))
+                    folderPath = Path.Combine(workingDirectory ?? Environment.CurrentDirectory, folderPath);
+
+                string assetFullPath = Directory.EnumerateFiles(folderPath, $"{assetName}.*").FirstOrDefault();
+                if (assetFullPath != null)
+                    filePath = assetFullPath;
+            }
+
+            return filePath;
         }
     }
 }
