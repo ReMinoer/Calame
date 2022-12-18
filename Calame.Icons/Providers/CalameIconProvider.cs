@@ -12,6 +12,8 @@ namespace Calame.Icons.Providers
         {
             switch (key)
             {
+                case CalameIconKey.Reopen: return PackIconMaterialKind.FileRefresh;
+
                 case CalameIconKey.BrushPanel: return PackIconMaterialKind.Palette;
                 case CalameIconKey.CompositionGraph: return PackIconMaterialKind.HexagonMultiple;
                 case CalameIconKey.DataModelTree: return PackIconMaterialKind.HexagonMultipleOutline;

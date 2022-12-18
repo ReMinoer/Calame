@@ -4,6 +4,7 @@ using Calame.Commands;
 using Gemini.Framework.Commands;
 using Gemini.Framework.Menus;
 using Gemini.Framework.ToolBars;
+using Gemini.Modules.Shell;
 using Gemini.Modules.Shell.Commands;
 using Gemini.Modules.UndoRedo;
 using Gemini.Modules.UndoRedo.Commands;
@@ -24,6 +25,9 @@ namespace Calame
     static public class CalameToolBars
     {
         [Export]
+        static public ToolBarItemDefinition Reopen = new CommandToolBarItemDefinition<ReopenCommand>(Gemini.Modules.Shell.ToolBarDefinitions.StandardOpenSaveToolBarGroup, 100);
+
+        [Export]
         static public ToolBarDefinition ExecuteToolBar = new ToolBarDefinition(1000, "Execute");
         [Export]
         static public ToolBarItemGroupDefinition RunGroup = new ToolBarItemGroupDefinition(ExecuteToolBar, 0);
@@ -35,6 +39,9 @@ namespace Calame
 
     static public class CalameMenus
     {
+        [Export]
+        static public MenuItemDefinition Reopen = new CommandMenuItemDefinition<ReopenCommand>(MenuDefinitions.FileCloseMenuGroup, -100);
+
         [Export]
         static public MenuItemGroupDefinition SelectionHistoryGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 100);
         [Export]

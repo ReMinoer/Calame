@@ -2,6 +2,9 @@
 {
     public enum CalameIconKey
     {
+        // Shell
+        Reopen,
+
         // Tools
         DefaultPreset,
         BrushPanel,
