@@ -120,7 +120,8 @@ namespace Calame.BrushPanel.ViewModels
                     new EnumerableReadOnlyObservableList<object>(x.Children),
                     new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)
                 ), x => ObservableHelpers.OnPropertyChanged(x as INotifyPropertyChanged, nameof(IGlyphData.Children), nameof(IGlyphData.ChildrenSources)))
-                .IconDescription(dataIconDescriptor.GetIcon);
+                .IconDescription(dataIconDescriptor.GetIcon)
+                .CanInlineChild(x => x.Data is IGlyphDataChildrenSource);
 
             _childrenSourceItemBuilder = new TreeViewItemModelBuilder<IGlyphDataChildrenSource>()
                 .DisplayName(x => x.PropertyName)
