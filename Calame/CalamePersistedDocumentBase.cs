@@ -125,23 +125,30 @@ namespace Calame
             IsDirty = true;
         }
 
+        public async Task<bool?> TrySaveBeforeCloseAsync()
+        {
+            if (!IsDirty)
+                return true;
+            
+            bool? result = UserWantToSaveUnsavedChanged();
+            switch (result)
+            {
+                case true:
+                    _externalFileChange = null;
+                    await Save(FilePath);
+                    break;
+                case false:
+                    IsDirty = false;
+                    break;
+            }
+
+            return result;
+        }
+
         public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken)
         {
-            if (IsDirty)
-            {
-                switch (UserWantToSaveUnsavedChanged())
-                {
-                    case true:
-                        _externalFileChange = null;
-                        await Save(FilePath);
-                        break;
-                    case false:
-                        IsDirty = false;
-                        break;
-                    case null:
-                        return false;
-                }
-            }
+            if (await TrySaveBeforeCloseAsync() is null)
+                return false;
 
             StopWatchingFilePath();
             await DisposeDocumentAsync();

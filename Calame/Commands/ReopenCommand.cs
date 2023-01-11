@@ -27,12 +27,15 @@ namespace Calame.Commands
 
             protected override void Run(IPersistedDocument document)
             {
-                TaskHandler.Handle(async () =>
+                TaskHandler.HandleOnUIThread(async () =>
                 {
-                    // If close is cancelled, OpenFileAsync will just focus the document (already focused).
+                    if (document is CalamePersistedDocumentBase persistedDocument
+                        && await persistedDocument.TrySaveBeforeCloseAsync() is null)
+                        return;
+
                     await Shell.CloseDocumentAsync(document);
                     await Shell.OpenFileAsync(document.FilePath, _editorProviders);
-                }).Wait();
+                });
             }
         }
     }

@@ -12,6 +12,13 @@ namespace Calame.Icons.Descriptors
         static private readonly Brush BlueBrush = new SolidColorBrush(Color.FromRgb(0, 74, 140));
         static private readonly Brush RedBrush = new SolidColorBrush(Color.FromRgb(145, 33, 11));
 
+        static CalameIconDescriptor()
+        {
+            GreenBrush.Freeze();
+            BlueBrush.Freeze();
+            RedBrush.Freeze();
+        }
+
         public override IconDescription GetDefaultIcon(CalameIconKey key)
         {
             return new IconDescription(key, GetBrush(key), GetPadding(key));
@@ -42,6 +49,8 @@ namespace Calame.Icons.Descriptors
                 case CalameIconKey.Stop:
                 case CalameIconKey.Select:
                     return 2;
+                case CalameIconKey.Reopen:
+                    return 1.5;
                 case CalameIconKey.Reset:
                     return 1;
                 default: return 0;
