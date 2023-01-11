@@ -48,6 +48,8 @@ namespace Calame.DataModelViewer
             get => _base.UndoCountLimit;
             set => _base.UndoCountLimit = value;
         }
+        
+        public bool IsCurrentlyUndoRedo { get; private set; }
 
         public event EventHandler BatchBegin;
         public event EventHandler BatchEnd;
@@ -117,17 +119,9 @@ namespace Calame.DataModelViewer
                 IsCurrentlyUndoRedo = false;
             }
         }
-
-        public void ExecuteAction(IUndoableAction action)
-        {
-            if (IsCurrentlyUndoRedo)
-                throw new InvalidOperationException("Actions should not be pushed on stack during an undo or redo operation.");
-
-            _base.ExecuteAction(new DocumentUndoableAction(_document, action));
-            _document.SetDirty();
-        }
-
-        public void PushAction(IUndoableAction action)
+        
+        public void Push(IUndoRedo undoRedo) => PushAction(new UndoRedoUndoableAction(undoRedo));
+        private void PushAction(IUndoableAction action)
         {
             if (IsCurrentlyUndoRedo)
                 throw new InvalidOperationException("Actions should not be pushed on stack during an undo or redo operation.");
@@ -136,9 +130,12 @@ namespace Calame.DataModelViewer
             _document.SetDirty();
         }
 
-        public bool IsCurrentlyUndoRedo { get; private set; }
-        void IUndoRedoStack.Execute(IUndoRedo undoRedo) => ExecuteAction(new UndoRedoUndoableAction(undoRedo));
-        void IUndoRedoStack.Push(IUndoRedo undoRedo) => PushAction(new UndoRedoUndoableAction(undoRedo));
+        void IUndoRedoManager.PushAction(IUndoableAction action) => PushAction(action);
+        void IUndoRedoManager.ExecuteAction(IUndoableAction action)
+        {
+            action.Execute();
+            PushAction(action);
+        }
 
         private class DocumentUndoableAction : IUndoableAction, IDisposable
         {

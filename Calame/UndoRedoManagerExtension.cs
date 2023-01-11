@@ -6,17 +6,15 @@ namespace Calame
 {
     static public class UndoRedoManagerExtension
     {
-        static public void Execute(this IUndoRedoManager undoRedoManager, string description, Action doAction, Action undoAction, Action doDispose = null, Action undoDispose = null)
-        {
-            if (undoRedoManager is null)
-                doAction();
-            else
-                undoRedoManager.ExecuteAction(new UndoRedoUndoableAction(new UndoRedoAction(description, doAction, undoAction, doDispose, undoDispose, alreadyDone: false)));
-        }
-
         static public void Push(this IUndoRedoManager undoRedoManager, string description, Action redoAction, Action undoAction, Action doDispose = null, Action undoDispose = null)
         {
-            undoRedoManager?.PushAction(new UndoRedoUndoableAction(new UndoRedoAction(description, redoAction, undoAction, doDispose, undoDispose, alreadyDone: true)));
+            undoRedoManager?.PushAction(new UndoRedoUndoableAction(new UndoRedoAction(description, redoAction, undoAction, doDispose, undoDispose)));
+        }
+
+        static public void Execute(this IUndoRedoManager undoRedoManager, string description, Action doAction, Action undoAction, Action doDispose = null, Action undoDispose = null)
+        {
+            doAction();
+            undoRedoManager.Push(description, doAction, undoAction, doDispose, undoDispose);
         }
     }
 }
