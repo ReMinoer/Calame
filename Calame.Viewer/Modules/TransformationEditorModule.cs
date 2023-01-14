@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using Calame.DocumentContexts;
 using Calame.Viewer.Modules.Base;
+using Calame.Viewer.ViewModels;
 using Caliburn.Micro;
 using Glyph;
 using Glyph.Composition;
@@ -30,12 +31,19 @@ namespace Calame.Viewer.Modules
         }
 
         public bool IsValidForDocument(IDocumentContext documentContext) => true;
-        public IViewerModule CreateInstance(IDocumentContext documentContext) => new TransformationEditorModule(_eventAggregator, documentContext.TryGetContext<IUndoRedoContext>());
+        public IViewerModule CreateInstance(IDocumentContext documentContext)
+        {
+            return new TransformationEditorModule(
+                _eventAggregator,
+                documentContext.TryGetContext<IUndoRedoContext>(),
+                documentContext as IViewerDocument);
+        }
     }
     
     public class TransformationEditorModule : SelectionHandlerModuleBase
     {
         private readonly IUndoRedoContext _undoRedoContext;
+        private readonly IViewerDocument _viewerDocument;
 
         private GlyphObject _root;
         private BoxedComponentsSnapping _boxedComponentsSnapping;
@@ -48,10 +56,11 @@ namespace Calame.Viewer.Modules
         private SceneNode _verticalMarkSceneNode;
         private IHandle _handle;
 
-        public TransformationEditorModule(IEventAggregator eventAggregator, IUndoRedoContext undoRedoContext)
+        public TransformationEditorModule(IEventAggregator eventAggregator, IUndoRedoContext undoRedoContext, IViewerDocument viewerDocument)
             : base(eventAggregator)
         {
             _undoRedoContext = undoRedoContext;
+            _viewerDocument = viewerDocument;
         }
 
         protected override void ConnectRunner()
@@ -141,6 +150,7 @@ namespace Calame.Viewer.Modules
 
                 var transformationEditor = _root.Add<TransformationEditor>(beforeAdding: Model.NotSelectableComponents.Add);
                 transformationEditor.EditedObject = controller;
+                transformationEditor.ScaleAnchorNode = _viewerDocument?.Viewer.Runner.Engine.Root.GetSceneNode();
                 transformationEditor.RaycastClient = Model.Client;
                 transformationEditor.Revaluation = x => Snap(selection.BindedObject, controller.PositionController.Position, x);
 
