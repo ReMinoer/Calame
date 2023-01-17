@@ -137,6 +137,7 @@ namespace Calame.Viewer.Modules
 
                 var rectangleEditor = _root.Add<RectangleEditor>(beforeAdding: Model.NotSelectableComponents.Add);
                 rectangleEditor.EditedObject = anchoredRectangleController;
+                rectangleEditor.ScaleAnchorNode = _viewerDocument?.Viewer.Runner.Engine.Root.GetSceneNode();
                 rectangleEditor.RaycastClient = Model.Client;
                 //rectangleEditor.Revaluation = x => Snap(selection.BindedObject, anchoredRectangleController.Rectangle.Position, x);
 
