@@ -12,6 +12,8 @@ namespace Calame.Icons.Providers
         {
             switch (key)
             {
+                case CalameIconKey.CheckUpdates: return PackIconMaterialKind.PackageDown;
+
                 case CalameIconKey.Reopen: return PackIconMaterialKind.Refresh;
 
                 case CalameIconKey.BrushPanel: return PackIconMaterialKind.Palette;

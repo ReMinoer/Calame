@@ -2,6 +2,9 @@
 {
     public enum CalameIconKey
     {
+        // Calame
+        CheckUpdates,
+
         // Shell
         Reopen,
 

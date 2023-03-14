@@ -123,6 +123,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.Parallax", "Modules\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.ViewGraph", "Modules\Calame.ViewGraph\Calame.ViewGraph.csproj", "{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.AutoUpdate", "Calame.AutoUpdate\Calame.AutoUpdate.csproj", "{4B9ECD82-83A2-42F4-9282-52C805B00CC0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calame.UpdateChecker", "Modules\Calame.UpdateChecker\Calame.UpdateChecker.csproj", "{F3C82048-BCC5-4FF6-A019-AA64F9596573}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -353,6 +357,14 @@ Global
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B9ECD82-83A2-42F4-9282-52C805B00CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B9ECD82-83A2-42F4-9282-52C805B00CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B9ECD82-83A2-42F4-9282-52C805B00CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B9ECD82-83A2-42F4-9282-52C805B00CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3C82048-BCC5-4FF6-A019-AA64F9596573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3C82048-BCC5-4FF6-A019-AA64F9596573}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3C82048-BCC5-4FF6-A019-AA64F9596573}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3C82048-BCC5-4FF6-A019-AA64F9596573}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -409,6 +421,7 @@ Global
 		{659541B0-C2A8-4F33-984F-EEB3729F8969} = {BE0BEC3B-45B1-4C4E-BCE0-5CBCD28D8475}
 		{7FB37B72-92E6-4DE4-B086-CA613A2A9AC8} = {95AFED7A-6211-441D-9643-10354F05477E}
 		{34FA9CF2-982E-4525-A36E-CF8D2A3CD418} = {95AFED7A-6211-441D-9643-10354F05477E}
+		{F3C82048-BCC5-4FF6-A019-AA64F9596573} = {95AFED7A-6211-441D-9643-10354F05477E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51117004-2C3A-426A-86DF-7881F4FEF766}

@@ -52,6 +52,7 @@ namespace Calame.Icons.Descriptors
                 case CalameIconKey.Reopen:
                     return 1.5;
                 case CalameIconKey.Reset:
+                case CalameIconKey.CheckUpdates:
                     return 1;
                 default: return 0;
             }

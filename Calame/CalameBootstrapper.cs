@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.ReflectionModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -32,7 +32,7 @@ namespace Calame
             base.StartRuntime();
 
             var mainWindow = IoC.Get<IMainWindow>();
-            mainWindow.Title = "Calame";
+            mainWindow.Title = $"Calame - {CalameUtils.GetVersion() ?? "Development Build"}";
             mainWindow.Icon = null;
         }
 
