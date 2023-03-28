@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.ReflectionModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -19,11 +18,12 @@ namespace Calame
     {
         private readonly BitmapImage _icon;
 
-        public CalameBootstrapper()
+        public CalameBootstrapper() {}
+        public CalameBootstrapper(Uri iconUri)
         {
             _icon = new BitmapImage();
             _icon.BeginInit();
-            _icon.UriSource = new Uri("https://cdn3.iconfinder.com/data/icons/wpzoom-developer-icon-set/500/86-64.png");
+            _icon.UriSource = iconUri;
             _icon.EndInit();
         }
 
