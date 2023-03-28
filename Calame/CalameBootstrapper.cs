@@ -70,6 +70,8 @@ namespace Calame
             mainWindow.WindowState = WindowState.Maximized;
             mainWindow.Icon = _icon;
 
+            OnBeforeOpeningDocuments();
+
             IEditorProvider[] editorProviders = null;
             foreach (string commandLineArgument in Environment.GetCommandLineArgs().Skip(1))
             {
@@ -81,6 +83,10 @@ namespace Calame
                     shell.OpenFileAsync(commandLineArgument, editorProviders);
                 }
             }
+        }
+
+        protected virtual void OnBeforeOpeningDocuments()
+        {
         }
     }
 }
