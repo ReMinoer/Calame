@@ -11,68 +11,68 @@ namespace Calame.Viewer
     public class ViewerToolBar
     {
         [Export]
-        static public ToolBarDefinition Definition = new ToolBarDefinition(100, "Viewer");
+        static public readonly ToolBarDefinition Definition = new ToolBarDefinition(100, "Viewer");
 
         [Export]
-        static public ToolBarItemGroupDefinition ModesGroup = new ToolBarItemGroupDefinition(Definition, 0);
+        static public readonly ToolBarItemGroupDefinition ModesGroup = new ToolBarItemGroupDefinition(Definition, 0);
         [Export]
-        static public ToolBarItemDefinition EditorMode = new CommandToolBarItemDefinition<EditorModeCommand>(ModesGroup, 0);
+        static public readonly ToolBarItemDefinition EditorMode = new CommandToolBarItemDefinition<EditorModeCommand>(ModesGroup, 0);
 
         [Export]
-        static public ToolBarItemGroupDefinition DebugGroup = new ToolBarItemGroupDefinition(Definition, 100);
+        static public readonly ToolBarItemGroupDefinition DebugGroup = new ToolBarItemGroupDefinition(Definition, 100);
         [Export]
-        static public ToolBarItemDefinition ViewerDebugMode = new CommandToolBarItemDefinition<ViewerDebugModeCommand>(DebugGroup, 0);
+        static public readonly ToolBarItemDefinition ViewerDebugMode = new CommandToolBarItemDefinition<ViewerDebugModeCommand>(DebugGroup, 0);
 
         [Export]
-        static public ToolBarItemGroupDefinition CameraActionGroup = new ToolBarItemGroupDefinition(Definition, 200);
+        static public readonly ToolBarItemGroupDefinition CameraActionGroup = new ToolBarItemGroupDefinition(Definition, 200);
         [Export]
-        static public ToolBarItemDefinition ResetCamera = new CommandToolBarItemDefinition<ResetCameraCommand>(CameraActionGroup, 0);
+        static public readonly ToolBarItemDefinition ResetCamera = new CommandToolBarItemDefinition<ResetCameraCommand>(CameraActionGroup, 0);
         [Export]
-        static public ToolBarItemDefinition FocusCamera = new CommandToolBarItemDefinition<FocusCameraCommand>(CameraActionGroup, 10);
+        static public readonly ToolBarItemDefinition FocusCamera = new CommandToolBarItemDefinition<FocusCameraCommand>(CameraActionGroup, 10);
     }
 
     public class ViewerMenu
     {
         [Export]
-        static public MenuDefinition Definition = new MenuDefinition(MenuDefinitions.MainMenuBar, 150, "_Viewer");
+        static public readonly MenuDefinition Definition = new MenuDefinition(MenuDefinitions.MainMenuBar, 150, "_Viewer");
 
         [Export]
-        static public MenuItemGroupDefinition ModesGroup = new MenuItemGroupDefinition(Definition, 0);
+        static public readonly MenuItemGroupDefinition ModesGroup = new MenuItemGroupDefinition(Definition, 0);
         [Export]
-        static public MenuItemDefinition EditorMode = new CommandMenuItemDefinition<EditorModeCommand>(ModesGroup, 0);
+        static public readonly MenuItemDefinition EditorMode = new CommandMenuItemDefinition<EditorModeCommand>(ModesGroup, 0);
 
         [Export]
-        static public MenuItemGroupDefinition DebugGroup = new MenuItemGroupDefinition(Definition, 100);
+        static public readonly MenuItemGroupDefinition DebugGroup = new MenuItemGroupDefinition(Definition, 100);
         [Export]
-        static public MenuItemDefinition ViewerDebugMode = new CommandMenuItemDefinition<ViewerDebugModeCommand>(DebugGroup, 0);
+        static public readonly MenuItemDefinition ViewerDebugMode = new CommandMenuItemDefinition<ViewerDebugModeCommand>(DebugGroup, 0);
 
         [Export]
-        static public MenuItemGroupDefinition EditSelectionGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 200);
+        static public readonly MenuItemGroupDefinition EditSelectionGroup = new MenuItemGroupDefinition(MenuDefinitions.EditMenu, 200);
         [Export]
-        static public MenuItemDefinition DeleteSelection = new CommandMenuItemDefinition<DeleteSelectionCommand>(EditSelectionGroup, 0);
+        static public readonly MenuItemDefinition DeleteSelection = new CommandMenuItemDefinition<DeleteSelectionCommand>(EditSelectionGroup, 0);
 
         [Export]
-        static public MenuItemGroupDefinition CameraActionGroup = new MenuItemGroupDefinition(Definition, 200);
+        static public readonly MenuItemGroupDefinition CameraActionGroup = new MenuItemGroupDefinition(Definition, 200);
         [Export]
-        static public MenuItemDefinition ResetCamera = new CommandMenuItemDefinition<ResetCameraCommand>(CameraActionGroup, 0);
+        static public readonly MenuItemDefinition ResetCamera = new CommandMenuItemDefinition<ResetCameraCommand>(CameraActionGroup, 0);
         [Export]
-        static public MenuItemDefinition FocusCamera = new CommandMenuItemDefinition<FocusCameraCommand>(CameraActionGroup, 10);
+        static public readonly MenuItemDefinition FocusCamera = new CommandMenuItemDefinition<FocusCameraCommand>(CameraActionGroup, 10);
     }
 
     static public class SessionShortcuts
     {
         [Export]
-        static public CommandKeyboardShortcut EditorMode = new CommandKeyboardShortcut<EditorModeCommand>(new KeyGesture(Key.F1));
+        static public readonly CommandKeyboardShortcut EditorMode = new CommandKeyboardShortcut<EditorModeCommand>(new KeyGesture(Key.F1, ModifierKeys.Control));
 
         [Export]
-        static public CommandKeyboardShortcut ViewerDebugMode = new CommandKeyboardShortcut<ViewerDebugModeCommand>(new KeyGesture(Key.D, ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Shift));
+        static public readonly CommandKeyboardShortcut ViewerDebugMode = new CommandKeyboardShortcut<ViewerDebugModeCommand>(new KeyGesture(Key.D, ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Shift));
 
         [Export]
-        static public CommandKeyboardShortcut DeleteSelection = new CommandKeyboardShortcut<DeleteSelectionCommand>(new KeyGesture(Key.Delete));
+        static public readonly CommandKeyboardShortcut DeleteSelection = new CommandKeyboardShortcut<DeleteSelectionCommand>(new KeyGesture(Key.Delete));
 
         [Export]
-        static public CommandKeyboardShortcut ResetCamera = new CommandKeyboardShortcut<ResetCameraCommand>(new KeyGesture(Key.F, ModifierKeys.Control | ModifierKeys.Alt));
+        static public readonly CommandKeyboardShortcut ResetCamera = new CommandKeyboardShortcut<ResetCameraCommand>(new KeyGesture(Key.F, ModifierKeys.Control | ModifierKeys.Alt));
         [Export]
-        static public CommandKeyboardShortcut FocusCamera = new CommandKeyboardShortcut<FocusCameraCommand>(new KeyGesture(Key.F, ModifierKeys.Control));
+        static public readonly CommandKeyboardShortcut FocusCamera = new CommandKeyboardShortcut<FocusCameraCommand>(new KeyGesture(Key.F, ModifierKeys.Control));
     }
 }

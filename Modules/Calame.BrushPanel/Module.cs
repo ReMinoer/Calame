@@ -16,12 +16,12 @@ namespace Calame.BrushPanel
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<BrushPanelCommand>(CalameMenus.WindowToolsGroup, 3);
+        static public readonly MenuItemDefinition MenuItem = new CommandMenuItemDefinition<BrushPanelCommand>(CalameMenus.WindowToolsGroup, 3);
 
         [Export]
-        static public ToolBarItemDefinition ViewerToolBarItem = new CommandToolBarItemDefinition<BrushModeCommand>(ViewerToolBar.ModesGroup, 10);
+        static public readonly ToolBarItemDefinition ViewerToolBarItem = new CommandToolBarItemDefinition<BrushModeCommand>(ViewerToolBar.ModesGroup, 10);
         [Export]
-        static public MenuItemDefinition ViewerMenuItem = new CommandMenuItemDefinition<BrushModeCommand>(ViewerMenu.ModesGroup, 10);
+        static public readonly MenuItemDefinition ViewerMenuItem = new CommandMenuItemDefinition<BrushModeCommand>(ViewerMenu.ModesGroup, 10);
 
         public override IEnumerable<Type> DefaultTools
         {
@@ -35,6 +35,6 @@ namespace Calame.BrushPanel
     static public class SessionShortcuts
     {
         [Export]
-        static public CommandKeyboardShortcut SessionMode = new CommandKeyboardShortcut<BrushModeCommand>(new KeyGesture(Key.F2));
+        static public readonly CommandKeyboardShortcut SessionMode = new CommandKeyboardShortcut<BrushModeCommand>(new KeyGesture(Key.F2, ModifierKeys.Control));
     }
 }

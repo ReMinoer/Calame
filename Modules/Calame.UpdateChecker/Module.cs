@@ -34,10 +34,8 @@ namespace Calame.UpdateChecker
 
             await CheckUpdatesCommand.CheckUpdatesAndApply(AutoUpdateConfiguration, _shell, _loggerProvider.CreateLogger(nameof(UpdateChecker)));
         }
-
+        
         [Export]
-        static public MenuItemGroupDefinition FileUpdateGroup = new MenuItemGroupDefinition(MenuDefinitions.FileMenu, 9);
-        [Export]
-        static public MenuItemDefinition CheckEditorUpdate = new CommandMenuItemDefinition<CheckUpdatesCommand>(FileUpdateGroup, 0);
+        static public readonly MenuItemDefinition CheckEditorUpdate = new CommandMenuItemDefinition<CheckUpdatesCommand>(CalameMenus.FileSystemGroup, 10);
     }
 }

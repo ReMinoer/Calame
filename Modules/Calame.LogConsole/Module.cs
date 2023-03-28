@@ -12,7 +12,7 @@ namespace Calame.LogConsole
     public class Module : ModuleBase
     {
         [Export]
-        static public MenuItemDefinition MenuItem = new CommandMenuItemDefinition<LogConsoleCommand>(CalameMenus.WindowToolsGroup, 3);
+        static public readonly MenuItemDefinition MenuItem = new CommandMenuItemDefinition<LogConsoleCommand>(CalameMenus.WindowToolsGroup, 3);
         
         public override IEnumerable<Type> DefaultTools
         {
