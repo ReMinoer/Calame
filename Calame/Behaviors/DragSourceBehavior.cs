@@ -41,7 +41,7 @@ namespace Calame.Behaviors
             _startMousePosition = e.GetPosition(null);
 
             _rootUiElement = GetRootUiElement(AssociatedObject);
-            _rootUiElement.PreviewMouseLeftButtonUp += OnPreviewMouseLeftButtonUp;
+            _rootUiElement.MouseLeftButtonUp += OnPreviewMouseLeftButtonUp;
             _rootUiElement.PreviewMouseMove += OnPreviewMouseMove;
         }
 
@@ -50,8 +50,8 @@ namespace Calame.Behaviors
             if (_rootUiElement is null)
                 return;
             
-            _rootUiElement.PreviewMouseLeftButtonUp -= OnPreviewMouseLeftButtonUp;
             _rootUiElement.PreviewMouseMove -= OnPreviewMouseMove;
+            _rootUiElement.MouseLeftButtonUp -= OnPreviewMouseLeftButtonUp;
             _rootUiElement = null;
 
             _startMousePosition = null;

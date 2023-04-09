@@ -79,6 +79,8 @@ namespace Calame.DataModelTree.ViewModels
 
             _dataItemBuilder = new TreeViewItemModelBuilder<IGlyphData>()
                 .DisplayName(x => x.DisplayName, nameof(IGlyphData.DisplayName))
+                .CanEditDisplayName(x => x.CanSetDisplayName, nameof(IGlyphData.CanSetDisplayName))
+                .DisplayNameSetter(x => x.SetDisplayName)
                 .ChildrenSource(x => new CompositeReadOnlyObservableList<object>(
                     new EnumerableReadOnlyObservableList<object>(x.Children),
                     new EnumerableReadOnlyObservableList<object>(x.ChildrenSources)),
@@ -352,9 +354,9 @@ namespace Calame.DataModelTree.ViewModels
         protected override Task OnDocumentActivated(IDocumentContext<IRootDataContext> activeDocument)
         {
             _selection = null;
-
-            _selectionContext = activeDocument.GetSelectionContext<IGlyphData>();
+            
             _undoRedoContext = activeDocument.TryGetContext<IUndoRedoContext>();
+            _selectionContext = activeDocument.GetSelectionContext<IGlyphData>();
             RootDataContext = activeDocument.Context;
 
             return Task.CompletedTask;
@@ -365,8 +367,8 @@ namespace Calame.DataModelTree.ViewModels
             _selection = null;
 
             RootDataContext = null;
-            _undoRedoContext = null;
             _selectionContext = null;
+            _undoRedoContext = null;
 
             return Task.CompletedTask;
         }
@@ -382,7 +384,7 @@ namespace Calame.DataModelTree.ViewModels
             switch (data)
             {
                 case IGlyphData glyphData:
-                    return _dataItemBuilder.Build(glyphData, synchronizerConfiguration);
+                    return _dataItemBuilder.Build(glyphData, synchronizerConfiguration, _undoRedoContext?.UndoRedoStack);
                 case IGlyphDataChildrenSource childrenSource:
                     return _childrenSourceItemBuilder.Build(childrenSource, synchronizerConfiguration);
                 default:

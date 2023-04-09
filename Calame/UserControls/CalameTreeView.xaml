@@ -46,10 +46,13 @@
                                         IconProvider="{Binding IconProvider}"
                                         IconDescriptor="{Binding IconDescriptor}" />
         </DockPanel>
-        <TreeView ItemsSource="{Binding TreeItems}"
+        <TreeView x:Name="TreeView"
+                  ItemsSource="{Binding TreeItems}"
                   Background="White"
-                  HorizontalContentAlignment="Stretch"
-                  attachedProperties:Focus.IsFocused="{Binding IsTreeViewFocused}">
+                  HorizontalContentAlignment="Stretch">
+            <TreeView.InputBindings>
+                <KeyBinding Key="F2" Command="{Binding SelectedTreeItem.EditDisplayNameCommand, FallbackValue={x:Null}}" />
+            </TreeView.InputBindings>
             <b:Interaction.Behaviors>
                 <behaviors:TreeViewBindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
@@ -117,7 +120,7 @@
                         <Border.ContextMenu>
                             <ContextMenu ItemsSource="{Binding ContextMenuItems}" />
                         </Border.ContextMenu>
-                        <DockPanel>
+                        <DockPanel LastChildFill="False">
                             <userControls:CalameIcon DockPanel.Dock="Left"
                                                      Margin="2 3 3 3"
                                                      IconDescription="{Binding IconDescription}"
@@ -143,33 +146,48 @@
                                                Margin="3 0 0 0" VerticalAlignment="Center"></TextBlock>
                                 </StackPanel>
                             </Button>
-                            <TextBlock Margin="0 2" Text="{Binding DisplayName}" FontWeight="{Binding FontWeight}" Background="Transparent">
-                                <b:Interaction.Behaviors>
-                                    <behaviors:TextBlockHighlightFilteredBehavior ItemText="{Binding DisplayName}"
-                                                                                  FilterText="{Binding FilterText, ElementName=This}"
-                                                                                  HighlightBackground="Gold"/>
-                                </b:Interaction.Behaviors>
-                                <TextBlock.Style>
-                                    <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
-                                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
-                                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                            </DataTrigger>
-                                            <MultiDataTrigger>
-                                                <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding IsDisabledByParent}" Value="True" />
-                                                    <Condition Binding="{Binding TreeContext.DisableChildrenIfParentDisabled, ElementName=This}" Value="True" />
-                                                </MultiDataTrigger.Conditions>
-                                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-                                            </MultiDataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <userControls:EditableTextControl CanEdit="{Binding CanEditDisplayName}"
+                                                              EditMode="{Binding IsEditingDisplayName, Mode=TwoWay}"
+                                                              DisplayContent="{Binding}"
+                                                              EditableText="{Binding EditableDisplayName}">
+                                <userControls:EditableTextControl.DisplayTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0 2"
+                                                   Text="{Binding EditableDisplayName}"
+                                                   FontWeight="{Binding FontWeight}"
+                                                   Background="Transparent">
+                                            <b:Interaction.Behaviors>
+                                                <behaviors:TextBlockHighlightFilteredBehavior ItemText="{Binding DisplayName}"
+                                                                                              FilterText="{Binding FilterText, ElementName=This}"
+                                                                                              HighlightBackground="Gold"/>
+                                            </b:Interaction.Behaviors>
+                                            <TextBlock.Style>
+                                                <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Background" Value="Transparent" />
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#407F7F7F" />
+                                                        </Trigger>
+                                                        <DataTrigger Binding="{Binding VisibleAsParent}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                                        </DataTrigger>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsDisabledByParent}" Value="True" />
+                                                                <Condition Binding="{Binding TreeContext.DisableChildrenIfParentDisabled, ElementName=This}" Value="True" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </userControls:EditableTextControl.DisplayTemplate>
+                            </userControls:EditableTextControl>
                         </DockPanel>
                     </Border>
                 </HierarchicalDataTemplate>

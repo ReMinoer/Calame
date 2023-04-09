@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Calame.Icons;
 using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
+using Glyph.Tools.UndoRedo;
 using Simulacra.Binding;
 
 namespace Calame.Utils
@@ -19,6 +20,10 @@ namespace Calame.Utils
 
         public TreeViewItemModelBuilder<T> DisplayName(Func<T, string> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => DisplayName(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> CanEditDisplayName(Func<T, bool> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => CanEditDisplayName(getter, x => OnPropertyChanged(x, propertyName, notifier));
+        public TreeViewItemModelBuilder<T> DisplayNameSetter(Func<T, Action<string>> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
+            => DisplayNameSetter(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> FontWeight(Func<T, FontWeight> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
             => FontWeight(getter, x => OnPropertyChanged(x, propertyName, notifier));
         public TreeViewItemModelBuilder<T> IconDescription(Func<T, IconDescription> getter, string propertyName, Func<T, INotifyPropertyChanged> notifier = null)
@@ -84,6 +89,18 @@ namespace Calame.Utils
         public TreeViewItemModelBuilder<T> DisplayName(Func<T, string> getter, Func<T, IObservable<object>> observableFunc = null)
         {
             AddBinding(getter, observableFunc, (v, x) => v.DisplayName = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> CanEditDisplayName(Func<T, bool> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.CanEditDisplayName = x);
+            return this;
+        }
+
+        public TreeViewItemModelBuilder<T> DisplayNameSetter(Func<T, Action<string>> getter, Func<T, IObservable<object>> observableFunc = null)
+        {
+            AddBinding(getter, observableFunc, (v, x) => v.DisplayNameSetter = x);
             return this;
         }
 
@@ -201,9 +218,9 @@ namespace Calame.Utils
             return this;
         }
 
-        public ITreeViewItemModel Build(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
+        public ITreeViewItemModel Build(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration, IUndoRedoStack undoRedoStack = null)
         {
-            var treeViewItemModel = new TreeViewItemModel(data, _bindingModulesFunc.Select(x => x(data)), synchronizerConfiguration);
+            var treeViewItemModel = new TreeViewItemModel(data, _bindingModulesFunc.Select(x => x(data)), synchronizerConfiguration, undoRedoStack);
 
             if (_canInlineChild != null)
                 return new InlinableTreeViewItemModel<T>(treeViewItemModel, _canInlineChild);
@@ -215,11 +232,11 @@ namespace Calame.Utils
         {
             private readonly BindingManager<TreeViewItemModel> _bindingManager;
 
-            public TreeViewItemModel(
-                T data,
+            public TreeViewItemModel(T data,
                 IEnumerable<IBindingModule<TreeViewItemModel>> bindingModules,
-                ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration
-            ) : base(data, synchronizerConfiguration)
+                ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration,
+                IUndoRedoStack undoRedoStack)
+                : base(data, synchronizerConfiguration, undoRedoStack)
             {
                 _bindingManager = new BindingManager<TreeViewItemModel>();
                 _bindingManager.Modules.AddRange(bindingModules);

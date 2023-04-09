@@ -27,6 +27,7 @@ namespace Calame.CompositionGraph.ViewModels
         public IIconDescriptor IconDescriptor { get; }
         
         private readonly TreeViewItemModelBuilder<IGlyphComponent> _treeItemBuilder;
+        private IUndoRedoContext _undoRedoContext;
         private ISelectionContext<IGlyphComponent> _selectionContext;
         private ICommand _selectionCommand;
 
@@ -65,6 +66,8 @@ namespace Calame.CompositionGraph.ViewModels
 
             _treeItemBuilder = new TreeViewItemModelBuilder<IGlyphComponent>()
                                .DisplayName(x => x.Name, nameof(IGlyphComponent.Name))
+                               .CanEditDisplayName(_ => true)
+                               .DisplayNameSetter(x => newName => x.Name = newName)
                                .ChildrenSource(x => new EnumerableReadOnlyObservableList<object>(x.Components), nameof(IGlyphComponent.Components))
                                .IconDescription(x => iconDescriptor.GetIcon(x))
                                .IsEnabled(_ => _selectionCommand);
@@ -74,6 +77,7 @@ namespace Calame.CompositionGraph.ViewModels
         {
             _selection = null;
 
+            _undoRedoContext = activeDocument.TryGetContext<IUndoRedoContext>();
             _selectionContext = activeDocument.GetSelectionContext<IGlyphComponent>();
             _selectionCommand = _selectionContext.GetSelectionCommand();
 
@@ -90,6 +94,7 @@ namespace Calame.CompositionGraph.ViewModels
 
             _selectionCommand = null;
             _selectionContext = null;
+            _undoRedoContext = null;
 
             return Task.CompletedTask;
         }
@@ -110,7 +115,7 @@ namespace Calame.CompositionGraph.ViewModels
         
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
-            return _treeItemBuilder.Build((IGlyphComponent)data, synchronizerConfiguration);
+            return _treeItemBuilder.Build((IGlyphComponent)data, synchronizerConfiguration, _undoRedoContext?.UndoRedoStack);
         }
 
         public bool DisableChildrenIfParentDisabled => true;

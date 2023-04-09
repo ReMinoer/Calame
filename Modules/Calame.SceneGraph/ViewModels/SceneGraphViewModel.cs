@@ -34,7 +34,8 @@ namespace Calame.SceneGraph.ViewModels
             get => _rootScenesContext;
             set => Set(ref _rootScenesContext, value);
         }
-
+        
+        private IUndoRedoContext _undoRedoContext;
         private ISelectionContext<IGlyphComponent> _selectionContext;
         private ICommand _selectionCommand;
 
@@ -87,6 +88,14 @@ namespace Calame.SceneGraph.ViewModels
 
             _treeItemBuilder = new TreeViewItemModelBuilder<ISceneNode>()
                                .DisplayName(x => (x as IGlyphComponent)?.Parent?.Name ?? x.ToString(), nameof(IGlyphComponent.Name), x => (x as IGlyphComponent)?.Parent as INotifyPropertyChanged)
+                               .CanEditDisplayName(_ => true)
+                               .DisplayNameSetter(x =>
+                                   newName =>
+                                   {
+                                       IGlyphContainer glyphContainer = (x as IGlyphComponent)?.Parent;
+                                       if (glyphContainer != null)
+                                           glyphContainer.Name = newName;
+                                   })
                                .ChildrenSource(x => x.Children, nameof(ISceneNode.Children))
                                .IconDescription(x => iconDescriptor.GetIcon((x as IGlyphComponent)?.Parent ?? x as IGlyphComponent))
                                .IsEnabled(x => _selectionCommand, x => (x as IGlyphComponent)?.Parent);
@@ -96,7 +105,8 @@ namespace Calame.SceneGraph.ViewModels
         {
             _selection = null;
             _selectionNode = null;
-
+            
+            _undoRedoContext = activeDocument.TryGetContext<IUndoRedoContext>();
             _selectionContext = activeDocument.GetSelectionContext<IGlyphComponent>();
             _selectionCommand = _selectionContext.GetSelectionCommand();
 
@@ -120,6 +130,7 @@ namespace Calame.SceneGraph.ViewModels
 
             _selectionCommand = null;
             _selectionContext = null;
+            _undoRedoContext = null;
 
             return Task.CompletedTask;
         }
@@ -163,7 +174,7 @@ namespace Calame.SceneGraph.ViewModels
 
         ITreeViewItemModel ITreeContext.CreateTreeItemModel(object data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
         {
-            return _treeItemBuilder.Build((ISceneNode)data, synchronizerConfiguration);
+            return _treeItemBuilder.Build((ISceneNode)data, synchronizerConfiguration, _undoRedoContext?.UndoRedoStack);
         }
     }
 }

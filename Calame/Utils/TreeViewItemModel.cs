@@ -12,6 +12,8 @@ using Diese.Collections.Children;
 using Diese.Collections.Children.Observables;
 using Diese.Collections.Observables;
 using Diese.Collections.Observables.ReadOnly;
+using Gemini.Framework;
+using Glyph.Tools.UndoRedo;
 
 namespace Calame.Utils
 {
@@ -19,7 +21,12 @@ namespace Calame.Utils
     {
         object Data { get; }
 
-        string DisplayName { get; }
+        string DisplayName { get; set; }
+        string EditableDisplayName { get; set; }
+        bool CanEditDisplayName { get; }
+        ICommand EditDisplayNameCommand { get; }
+        bool IsEditingDisplayName { get; set; }
+
         FontWeight FontWeight { get; }
         IconDescription IconDescription { get; }
 
@@ -50,6 +57,8 @@ namespace Calame.Utils
 
     public class TreeViewItemModel<T> : NotifyPropertyChangedBase, ITreeViewItemModel
     {
+        private readonly IUndoRedoStack _undoRedoStack;
+
         protected readonly T Data;
         object ITreeViewItemModel.Data => Data;
         
@@ -68,7 +77,51 @@ namespace Calame.Utils
         public string DisplayName
         {
             get => _displayName;
-            set => Set(ref _displayName, value);
+            set
+            {
+                if (Set(ref _displayName, value))
+                {
+                    DisplayNameSetter?.Invoke(value);
+                    NotifyPropertyChanged(nameof(EditableDisplayName));
+                }
+            }
+        }
+        
+        public string EditableDisplayName
+        {
+            get => DisplayName;
+            set
+            {
+                if (DisplayName == value)
+                    return;
+
+                string oldValue = DisplayName;
+
+                _undoRedoStack.Execute($"Set item name to {value}",
+                    () => DisplayName = value,
+                    () => DisplayName = oldValue);
+            }
+        }
+
+        private bool _canEditDisplayNam;
+        public bool CanEditDisplayName
+        {
+            get => _canEditDisplayNam;
+            set => Set(ref _canEditDisplayNam, value);
+        }
+
+        private bool _isEditingDisplayName;
+        public bool IsEditingDisplayName
+        {
+            get => _isEditingDisplayName;
+            set => Set(ref _isEditingDisplayName, value);
+        }
+
+        private Action<string> _displayNameSetter;
+        public Action<string> DisplayNameSetter
+        {
+            get => _displayNameSetter;
+            set => Set(ref _displayNameSetter, value);
         }
 
         private FontWeight _fontWeight;
@@ -240,15 +293,20 @@ namespace Calame.Utils
             set => Set(ref _dropAction, value);
         }
 
-        public TreeViewItemModel(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration)
+        public ICommand EditDisplayNameCommand { get; }
+
+        public TreeViewItemModel(T data, ICollectionSynchronizerConfiguration<object, ITreeViewItemModel> synchronizerConfiguration, IUndoRedoStack undoRedoStack)
         {
             Data = data;
+            _undoRedoStack = undoRedoStack;
 
             _children = new ObservableChildrenList<ITreeViewItemModel, ITreeViewItemModel>(this);
             Children = new ReadOnlyObservableList<ITreeViewItemModel>(_children);
 
             ChildrenSynchronizer = new ObservableListSynchronizer<object, ITreeViewItemModel>(synchronizerConfiguration);
             ChildrenSynchronizer.Subscribe(_children);
+
+            EditDisplayNameCommand = new RelayCommand(_ => IsEditingDisplayName = true, _ => CanEditDisplayName);
         }
 
         public void AddChild(ITreeViewItemModel child) => _children.Add(child);

@@ -193,6 +193,14 @@ namespace Calame.UserControls
             _treeItems.CollectionChanged += OnItemChanged;
 
             InitializeComponent();
+
+            TreeView.MouseDown += TreeViewOnMouseDown;
+        }
+
+        private void TreeViewOnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            SelectedItem = null;
+            TreeView.Focus();
         }
 
         private void OnCollapseAll(object _)
@@ -218,19 +226,7 @@ namespace Calame.UserControls
             OnCollapseAll(_);
 
             SelectedItem = selectedItem;
-            FocusTreeView();
-        }
-
-        public bool IsTreeViewFocused { get; private set; }
-
-        public void FocusTreeView()
-        {
-            IsTreeViewFocused = false;
-            NotifyPropertyChanged(nameof(IsTreeViewFocused));
-            IsTreeViewFocused = true;
-            NotifyPropertyChanged(nameof(IsTreeViewFocused));
-            IsTreeViewFocused = false;
-            NotifyPropertyChanged(nameof(IsTreeViewFocused));
+            TreeView.Focus();
         }
 
         private void UpdateAllExpand(ITreeViewItemModel treeItem, bool value)

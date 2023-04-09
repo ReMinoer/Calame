@@ -108,12 +108,25 @@ namespace Calame.Utils
         }
 
         public object Data => _baseItem.Data;
-        public string DisplayName => _baseItem.DisplayName;
+        public bool CanEditDisplayName => _baseItem.CanEditDisplayName;
+        public ICommand EditDisplayNameCommand => _baseItem.EditDisplayNameCommand;
         public FontWeight FontWeight => _baseItem.FontWeight;
         public IconDescription IconDescription => _baseItem.IconDescription;
         public bool IsHeader => _baseItem.IsHeader;
         public bool IsTriggered => _baseItem.IsTriggered;
         public IEnumerable ContextMenuItems => _baseItem.ContextMenuItems;
+
+        public string DisplayName
+        {
+            get => _baseItem.DisplayName;
+            set => _baseItem.DisplayName = value;
+        }
+        
+        public string EditableDisplayName
+        {
+            get => _baseItem.EditableDisplayName;
+            set => _baseItem.EditableDisplayName = value;
+        }
 
         public ITreeViewItemModel Parent
         {
@@ -137,6 +150,12 @@ namespace Calame.Utils
         {
             get => _baseItem.IsExpanded;
             set => _baseItem.IsExpanded = value;
+        }
+
+        public bool IsEditingDisplayName
+        {
+            get => _baseItem.IsEditingDisplayName;
+            set => _baseItem.IsEditingDisplayName = value;
         }
 
         public bool MatchingBaseFilter

@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="Calame.UserControls.EditableTextControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:Calame.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="50" d:DesignWidth="200"
+             x:Name="This">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:RevertedBooleanToVisibilityConverter x:Key="RevertedBooleanToVisibilityConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <ContentPresenter
+            Content="{Binding DisplayContent, ElementName=This}"
+            ContentTemplate="{Binding DisplayTemplate, ElementName=This}"
+            ContentTemplateSelector="{Binding ContentTemplateSelector, ElementName=This}"
+            Visibility="{Binding EditMode, ElementName=This, Converter={StaticResource RevertedBooleanToVisibilityConverter}}"
+            MouseLeftButtonDown="OnMouseLeftButtonDown">
+        </ContentPresenter>
+        <TextBox
+            x:Name="TextBox"
+            Text="{Binding EditableText, ElementName=This}"
+            Visibility="{Binding EditMode, ElementName=This, Converter={StaticResource BooleanToVisibilityConverter}}"
+            LostFocus="OnLostFocus"
+            KeyDown="OnKeyDown"/>
+    </Grid>
+</UserControl>
