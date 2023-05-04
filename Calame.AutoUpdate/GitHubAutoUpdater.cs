@@ -57,7 +57,7 @@ namespace Calame.AutoUpdate
                 return null;
             }
 
-            var webBrowserDialog = new WebBrowserDialog(loginUri)
+            var webBrowserDialog = new WebBrowserDialog(loginUri, configuration.WebViewUserDataFolder)
             {
                 Owner = System.Windows.Application.Current.MainWindow,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,

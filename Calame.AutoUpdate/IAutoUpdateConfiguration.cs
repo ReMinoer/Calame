@@ -8,5 +8,6 @@
         string RepositoryOwner { get; }
         string RepositoryName { get; }
         string InstallerAssetName { get; }
+        string WebViewUserDataFolder { get; }
     }
 }
