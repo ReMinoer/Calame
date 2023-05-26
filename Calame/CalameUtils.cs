@@ -11,8 +11,10 @@ namespace Calame
         static public string GetVersion() => GetVersion(GetCurrentExecutablePath());
         static public string GetVersion(string executablePath)
         {
-            string executableVersion = FileVersionInfo.GetVersionInfo(executablePath).FileVersion;
-            return executableVersion != "1.0.0.0" ? executableVersion : null;
+            string fileVersion = FileVersionInfo.GetVersionInfo(executablePath).FileVersion;
+            string executableVersion = fileVersion.Substring(0, fileVersion.LastIndexOf('.'));
+
+            return executableVersion != "1.0.0" ? executableVersion : null;
         }
 
         static public string GetCurrentExecutablePath() => Assembly.GetEntryAssembly().Location;

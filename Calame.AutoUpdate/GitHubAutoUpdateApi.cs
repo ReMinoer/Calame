@@ -81,9 +81,7 @@ namespace Calame.AutoUpdate
                 return null;
 
             IApiResponse<object> response = await client.Connection.Get<object>(new Uri(assetUrl), new Dictionary<string, string>(), "application/octet-stream");
-            byte[] bytes = Encoding.ASCII.GetBytes(response.HttpResponse.Body.ToString());
-
-            return bytes;
+            return response.HttpResponse.Body as byte[];
         }
     }
 }

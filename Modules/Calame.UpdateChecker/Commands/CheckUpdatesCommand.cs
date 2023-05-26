@@ -36,13 +36,13 @@ namespace Calame.UpdateChecker.Commands
             public override Task Run(Command command) => CheckUpdatesAndApply(AutoUpdateConfiguration, _shell, _logger);
         }
 
-        static public async Task CheckUpdatesAndApply(IAutoUpdateConfiguration autoUpdateConfiguration, IShell shell, ILogger logger)
+        static public async Task CheckUpdatesAndApply(IAutoUpdateConfiguration autoUpdateConfiguration, IShell shell, ILogger logger, bool silentIfUpToDate = false)
         {
-            string installerFilePath = await GitHubAutoUpdater.CheckUpdatesAndAskUserToDownload(autoUpdateConfiguration, logger);
+            string installerFilePath = await GitHubAutoUpdater.CheckUpdatesAndAskUserToDownload(autoUpdateConfiguration, logger, silentIfUpToDate);
             if (installerFilePath is null)
                 return;
 
-            Process.Start(installerFilePath, Path.GetDirectoryName(CalameUtils.GetCurrentExecutablePath()));
+            Process.Start("msiexec", $"/i {installerFilePath}");
             shell.Close();
         }
     }

@@ -1,12 +1,12 @@
 ﻿using System.IO;
 
-namespace Calame.Icons.Providers.Base
+namespace Calame
 {
-    static public class RuntimeIconsFolder
+    static public class TempFolder
     {
-        static public readonly string Path = System.IO.Path.Combine(TempFolder.Path, "CalameMahAppsRuntimeIcons");
+        static public readonly string Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "CalameTemp");
 
-        static RuntimeIconsFolder()
+        static TempFolder()
         {
             Clean();
         }

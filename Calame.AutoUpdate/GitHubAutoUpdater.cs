@@ -13,13 +13,13 @@ namespace Calame.AutoUpdate
     {
         private const string MessageCaption = "Auto-Update";
 
-        static public async Task<string> CheckUpdatesAndAskUserToDownload(IAutoUpdateConfiguration configuration, ILogger logger)
+        static public async Task<string> CheckUpdatesAndAskUserToDownload(IAutoUpdateConfiguration configuration, ILogger logger, bool silentIfUpToDate = false)
         {
             GitHubClient gitHubClient = await GetGitHubClientAsync(configuration, logger);
             if (gitHubClient is null)
                 return null;
 
-            Release latestRelease = await CheckUpdatesAsync(gitHubClient, configuration, logger);
+            Release latestRelease = await CheckUpdatesAsync(gitHubClient, configuration, logger, silentIfUpToDate);
             if (latestRelease is null)
                 return null;
             
@@ -105,7 +105,7 @@ namespace Calame.AutoUpdate
             return gitHubClient;
         }
 
-        static private async Task<Release> CheckUpdatesAsync(GitHubClient gitHubClient, IAutoUpdateConfiguration configuration, ILogger logger)
+        static private async Task<Release> CheckUpdatesAsync(GitHubClient gitHubClient, IAutoUpdateConfiguration configuration, ILogger logger, bool silentIfUpToDate = false)
         {
             string repositoryOwner = configuration.RepositoryOwner;
             string repositoryName = configuration.RepositoryName;
@@ -127,7 +127,7 @@ namespace Calame.AutoUpdate
 
             if (CalameUtils.IsDevelopmentBuild())
             {
-                message = $"Latest version is: {latestRelease.TagName}.\n\n(This development build will not be updated.)";
+                message = $"Latest version is: {latestRelease.TagName}\n\n(This development build will not be updated.)";
 
                 MessageBox.Show(message, MessageCaption, MessageBoxButton.OK, MessageBoxImage.Information);
                 return null;
@@ -135,6 +135,9 @@ namespace Calame.AutoUpdate
 
             if (latestRelease.TagName == CalameUtils.GetVersion())
             {
+                if (silentIfUpToDate)
+                    return null;
+
                 message = $"You are using the latest version. ({latestRelease.TagName})";
 
                 MessageBox.Show(message, MessageCaption, MessageBoxButton.OK, MessageBoxImage.Information);
@@ -157,29 +160,18 @@ namespace Calame.AutoUpdate
 
         static private async Task<string> DownloadInstallerAsset(GitHubClient gitHubClient, IAutoUpdateConfiguration configuration, Release release)
         {
-            string downloadFolderPath = GetRandomFolderPath(Path.GetTempPath());
             string installerAssetName = configuration.InstallerAssetName;
             byte[] assetBytes = await GitHubAutoUpdateApi.DownloadAsset(gitHubClient, release, installerAssetName);
 
-            string assetFilePath = Path.Combine(downloadFolderPath, installerAssetName);
+            TempFolder.CreateIfMissing();
+
+            string assetFilePath = Path.Combine(TempFolder.Path, installerAssetName);
             using (FileStream assetFileStream = File.Create(assetFilePath))
             {
                 await assetFileStream.WriteAsync(assetBytes);
             }
 
             return assetFilePath;
-        }
-
-        static private string GetRandomFolderPath(string parentFolderPath)
-        {
-            string folderPath;
-            do
-            {
-                folderPath = Path.Combine(parentFolderPath, Path.GetFileNameWithoutExtension(Path.GetRandomFileName()));
-            }
-            while (Directory.Exists(folderPath));
-
-            return folderPath;
         }
     }
 }

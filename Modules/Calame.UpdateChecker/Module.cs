@@ -32,7 +32,7 @@ namespace Calame.UpdateChecker
             if (CalameUtils.IsDevelopmentBuild())
                 return;
 
-            await CheckUpdatesCommand.CheckUpdatesAndApply(AutoUpdateConfiguration, _shell, _loggerProvider.CreateLogger(nameof(UpdateChecker)));
+            await CheckUpdatesCommand.CheckUpdatesAndApply(AutoUpdateConfiguration, _shell, _loggerProvider.CreateLogger(nameof(UpdateChecker)), silentIfUpToDate: true);
         }
         
         [Export]

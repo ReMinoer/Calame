@@ -12,11 +12,6 @@ namespace Calame.Icons.Providers.Base
     public abstract class MahAppsIconProviderModuleBase<TKind, TControl> : IIconProviderModule<TKind>
         where TControl : PackIconControlBase, new()
     {
-        static MahAppsIconProviderModuleBase()
-        {
-            RuntimeIconsFolder.Clean();
-        }
-
         public bool Handle(IconDescription iconDescription)
         {
             return iconDescription.Key is TKind;
@@ -47,7 +42,7 @@ namespace Calame.Icons.Providers.Base
 
         public Uri GetUri(IconDescription iconDescription, int size)
         {
-            RuntimeIconsFolder.Create();
+            RuntimeIconsFolder.CreateIfMissing();
 
             string hash = iconDescription.GetHashCode().ToString("X");
             string filePath = Path.Combine(RuntimeIconsFolder.Path, Path.ChangeExtension(hash, "png"));
