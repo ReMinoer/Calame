@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +8,9 @@ using System.Windows;
 using Calame.Icons;
 using Caliburn.Micro;
 using Gemini.Framework;
+using Gemini.Framework.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Simulacra.IO.Watching;
 
 namespace Calame
@@ -120,6 +123,33 @@ namespace Calame
             StartWatchingFilePath();
         }
 
+        // Copied from Gemini.Framework.Document
+        public async Task<bool> SaveAs()
+        {
+            var dialog = new SaveFileDialog
+            {
+                FileName = FileName
+            };
+
+            string fileExtension = Path.GetExtension(FileName);
+            EditorFileType fileType = IoC.GetAll<IEditorProvider>()
+                .SelectMany(x => x.FileTypes)
+                .SingleOrDefault(x => x.FileExtension == fileExtension);
+
+            string filter = string.Empty;
+            if (fileType != null)
+                filter = fileType.Name + "|*" + fileType.FileExtension + "|";
+
+            filter += "All Files|*.*";
+            dialog.Filter = filter;
+
+            if (dialog.ShowDialog() != true)
+                return false;
+
+            await Save(dialog.FileName);
+            return true;
+        }
+
         public void SetDirty()
         {
             IsDirty = true;
@@ -134,12 +164,21 @@ namespace Calame
             switch (result)
             {
                 case true:
+                {
                     _externalFileChange = null;
-                    await Save(FilePath);
+
+                    if (IsNew)
+                        result = await SaveAs() ? (bool?)true : null;
+                    else
+                        await Save(FilePath);
+
                     break;
+                }
                 case false:
+                {
                     IsDirty = false;
                     break;
+                }
             }
 
             return result;
@@ -217,7 +256,7 @@ namespace Calame
                 messageBuilder.AppendLine();
             }
 
-            messageBuilder.AppendLine("You will lose your changes if you don't save them !");
+            messageBuilder.AppendLine($"You will lose your changes on {FileName} if you don't save them !");
             messageBuilder.Append("Do you want to save before closing ?");
 
             MessageBoxResult result = MessageBox.Show(messageBuilder.ToString(), "Unsaved changes", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
