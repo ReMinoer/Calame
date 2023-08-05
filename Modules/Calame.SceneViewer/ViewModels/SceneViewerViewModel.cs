@@ -100,10 +100,12 @@ namespace Calame.SceneViewer.ViewModels
 
             _engine.Root.Add<SceneNode>();
             _engine.RootView.Camera = _engine.Root.Add<Camera>();
-            
+
             var sessionView = _engine.Root.Add<FillView>();
+            sessionView.Name = "Session View";
             sessionView.ParentView = _engine.RootView;
 
+            // Start tracker after session view creation
             _viewTracker = _engine.Resolver.Resolve<MessagingTracker<IView>>();
 
             Viewer.Runner = new GlyphWpfRunner { Engine = _engine };

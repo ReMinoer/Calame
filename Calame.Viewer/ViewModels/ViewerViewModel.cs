@@ -120,7 +120,6 @@ namespace Calame.Viewer.ViewModels
                     EditorView = engine.Root.Add<FillView>();
                     EditorView.Name = "Editor View";
                     EditorView.ParentView = engine.RootView;
-                    EditorView.DrawClientFilter = new ExcludingFilter<IDrawClient>();
 
                     EditorCamera = EditorRoot.Add<FreeCamera>();
                     ConnectRunner();
