@@ -76,6 +76,11 @@ namespace Calame.Icons.Descriptors
             if (type.Is<ParallaxLayer>())
                 return new IconDescription(PackIconMaterialKind.WeatherCloudyArrowRight, AnimationCategoryBrush);
 
+            if (type.Is<IEffectRenderer>())
+                return new IconDescription(PackIconMaterialKind.GradientVertical, GraphicsCategoryBrush);
+            if (type.Is<IEffectSource>())
+                return new IconDescription(PackIconMaterialKind.GradientVertical, GraphicsCategoryBrush);
+
             if (type.Is<ISpriteSheet>())
                 return new IconDescription(PackIconMaterialKind.ImageMultiple, GraphicsCategoryBrush);
             if (type.Is<ISpriteSource>())
@@ -90,8 +95,6 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.Shape, GraphicsCategoryBrush);
             if (type.Is<RendererBase>())
                 return new IconDescription(PackIconMaterialKind.ProjectorScreen, GraphicsCategoryBrush);
-            if (type.Is<EffectLoader>())
-                return new IconDescription(PackIconMaterialKind.GradientVertical, GraphicsCategoryBrush);
 
             if (type.Is<SongPlayer>())
                 return new IconDescription(PackIconMaterialKind.Radio, AudioCategoryBrush);

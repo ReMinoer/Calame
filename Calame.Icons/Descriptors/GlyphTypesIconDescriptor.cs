@@ -85,6 +85,8 @@ namespace Calame.Icons.Descriptors
                 return new IconDescription(PackIconMaterialKind.FileMusic, DefaultBrush);
             if (type.Is<Song>())
                 return new IconDescription(PackIconMaterialKind.BookMusic, DefaultBrush);
+            if (type.Is<Effect>())
+                return new IconDescription(PackIconMaterialKind.FileStar, DefaultBrush);
 
             return IconDescription.None;
         }
